@@ -1,11 +1,13 @@
 import os
+import gx
 import flag
 import lib.gg
-import gx
-import game.window
 
+import game.window
 import game.math.resolution
 import game.animation
+
+import framework.audio
 
 import tests
 
@@ -70,7 +72,7 @@ fn main() {
 	// get beatmap path
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application('Kurarin')
-	fp.version('Not good enough for a version.')
+	fp.version('v0.0.1')
 	fp.description('Plays an osu! beatmap! (User mode soontm maybe)')
 
 	beatmap_path := fp.string('beatmap_file', `b`, '', 'Path to the .osu file.')
@@ -103,6 +105,10 @@ fn main() {
 		init_fn: frame_init,
 		frame_fn: frame_update
 	)
+
+	// Init audio
+	audio.init_audio()
+
 
 	main_window.game_speed = game_speed
 	main_window.game = window.make_game_window(ctx: mut main_window.ctx, beatmap: beatmap_path)

@@ -73,7 +73,7 @@ pub fn get_audio_controller() &AudioController {
 	return audio
 }
 
-fn init() {
+pub fn init_audio() {
 	mut audio_ptr := global
 	audio_ptr.master = miniaudio.device()
 	println('> Global AudioController Initialized!')
