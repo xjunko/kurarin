@@ -19,6 +19,7 @@ Anyway heres some screenshots I guess.
 
 ## Bugs
 
+* Due to some bug in v-miniaudio I had to disable hitsounds for now, it gets updated recently so ill update it sooner or later.
 * The entire thing is a bug and error-prone
 * Slider is not accurate at all since I barely put any time into it
 * Storyboard is not accurate at all since I am stupid
