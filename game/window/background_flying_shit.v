@@ -8,7 +8,7 @@ import framework.math.time
 import game.math.resolution
 
 pub fn generate_bullshit(mut window &GameWindow) {
-	if false { // This is more of a testing function to stress test so yea...
+	if true { // This is more of a testing function to stress test so yea...
 		return
 	}
 	// Generate the flying shit every 10 seconds 
