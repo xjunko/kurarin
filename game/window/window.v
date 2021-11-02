@@ -25,7 +25,7 @@ pub struct GameWindow {
 		beatmap_path string
 
 		// time shit
-		game_speed  f64 = f64(0.5)
+		game_speed  f64 = f64(1.0)
 		start_at    f64 = f64(2000)
 		global_time &ktime.TimeCounter = &ktime.TimeCounter{}
 		game_time   &ktime.TimeCounter = &ktime.TimeCounter{}
