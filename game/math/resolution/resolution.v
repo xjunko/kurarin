@@ -43,7 +43,7 @@ pub fn (mut r Resolution) calculate() {
 	r.down_offset = (r.height - r.playfield_height) / 1.9
 
 	//
-	println('> Resolution: ${r}')
+	// println('> Resolution: ${r}')
 }
 
 pub fn init() {
