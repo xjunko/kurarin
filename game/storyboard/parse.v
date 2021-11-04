@@ -70,6 +70,7 @@ pub fn parse_storyboard(mut ctx &gg.Context, path string) &Storyboard {
 }
 
 pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
+	mut parsed := false
 	mut current_section := ''
 	mut current_sprite := ''
 	mut commands := []string{}
@@ -114,6 +115,7 @@ pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 				
 				if line.starts_with("Sprite") || line.starts_with("Animation") {
 					if current_sprite.len != 0 {
+						parsed = true
 						time_took_to_load_object.reset()
 						storyboard.load_sprite(current_sprite, commands)
 						println('> Storyboard: Took ${time_took_to_load_object.tick()/1000:.2f}seconds to load ${current_sprite}!')
@@ -134,7 +136,9 @@ pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 		storyboard.load_sprite(current_sprite, commands)
 	}
 
-	println('> Storyboard: Took ${time_took_to_parse.tick() / 1000:.2f}seconds to parse storyboard!')
+	if parsed {
+		println('> Storyboard: Took ${time_took_to_parse.tick() / 1000:.2f}seconds to parse storyboard!')
+	}
 }
 
 //
