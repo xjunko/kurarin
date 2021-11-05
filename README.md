@@ -49,6 +49,16 @@ Options:
 * Compiling with `-gc boehm` makes audio glitchy for a millisecond randomly
 * And so on...
 
+## TODOs
+
+i got school soontm so this might not be finished at all :trollface:
+
+* Actual slider renderer lmao
+* Slider curves
+* Actual osu! gameplay hitsystem and not whatever the fuck placeholder shit Im using rn
+* Unfucked the codebase and make it stable overall
+* Replay support (kinda already there but not really, you just had to somehow give the replay event into auto listener and it should show up)
+
 ## Credits
 
 * [danser-go](https://github.com/Wieku/danser-go) - most of the code is based from here and osr2mp4.
@@ -56,11 +66,6 @@ Options:
 * [osu!](https://osu.ppy.sh/home) - the game itself.
 * [V's library](https://github.com/vlang/v/vlib) - I yoinked gg, stbi to my own lib. (thanks V contributors!)
 * [v-miniaudio](https://github.com/Larpon/v-miniaudio) - yoinked to lib. (thanks larpon!)
-
-## Note
-ill rewrite this from scratch again sometimes later, i got school now lmao ;-;.
-
-
 ## License
 
 MIT
