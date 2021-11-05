@@ -24,7 +24,7 @@ pub fn (mut window GameWindow) add_auto_player(args AddPlayerArg) {
 	for event in args.events {
 		player_sprite.add_transform(
 			typ: .move,
-			easing: easing.linear,
+			easing: easing.quad_out,
 			time: time2.Time{last_event.time.end, event.time.start},
 			before: [last_event.position.x, last_event.position.y],
 			after: [event.position.x, event.position.y]
