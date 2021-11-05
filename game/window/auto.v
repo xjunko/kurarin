@@ -50,10 +50,10 @@ pub fn (mut window GameWindow) add_auto_player(args AddPlayerArg) {
 					)
 				}
 				
-				event_index++	
+				event_index++
 			}
 
-			timelib.sleep(16 * timelib.millisecond)
+			timelib.sleep(1 * timelib.millisecond)
 		}
 	}(mut window, player_sprite, args.events)
 }

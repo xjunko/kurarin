@@ -58,8 +58,9 @@ pub fn make_auto(bmap beatmap.Beatmap) []ReplayEvent {
 
 			
 		} else if object is game_object.Spinner {
+			/*
 			distance := f64(100)
-			steps := 20
+			steps := 1
 			for i := 0; i < 1000; i += steps {
 				progress := (object.time.end - object.time.start) * (f64(i) / f64(1000))
 
@@ -72,8 +73,25 @@ pub fn make_auto(bmap beatmap.Beatmap) []ReplayEvent {
 					position: position,
 					time: time.Time{object.time.start + progress, object.time.start + progress + steps}
 				}
-				// println(events)
 			}
+			*/
+			speed := f64(0.85)
+			radius := f64(50)
+			timeframe := f64(16)
+			mut rot := f64(0)
+
+			for i := object.time.start; i < object.time.end; i += timeframe {
+				pos_x := math.cos(rot) * radius + 512 / 2
+				pos_y := math.sin(rot) * radius + 384 / 2
+
+				events << ReplayEvent{
+					position: vector.Vector2{pos_x, pos_y},
+					time: time.Time{i, i}
+				}
+
+				rot += speed
+			}
+			
 		} else {
 			events << ReplayEvent{
 				position: object.position,
