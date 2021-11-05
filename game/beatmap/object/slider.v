@@ -54,31 +54,42 @@ pub fn (mut slider Slider) check_if_mouse_clicked_on_hitobject(x f64, y f64, tim
 pub fn (mut slider Slider) process_points() {
 	// mut last_position := slider.
 	mut size_ratio := (54.4 - 4.48 * slider.diff.cs) * 1.05 * 2 / 128
+
 	mut slider_points := slider.data[5].split('|')
+	// slider_type := slider_points[0]
 	slider_points = slider_points[1..]
-	last_point := slider_points[slider_points.len - 1].split(':')
+	
 
-	slider.points << slider.position
-	slider.points << vector.Vector2{
-		last_point[0].f64(),
-		last_point[1].f64()
+	// NEW slider shit
+	mut vector_points := []vector.Vector2{}
+	vector_points << slider.position
+	for points in slider_points {
+		items := points.split(":")
+		vector_points << vector.Vector2{items[0].f64(), items[1].f64()}
 	}
-	slider.end_position = slider.points[slider.points.len - 1] // get the last points
 
+	slider.points = curves.create_curve("L", vector_points, slider.pixel_length)
+	
+	slider.end_position = slider.points[slider.points.len - 1] // get the last points
 	slider.curve = curves.Linear{
 		slider.points[0],
-		slider.points[1]
+		slider.points[slider.points.len - 1]
 	}
+	
 
+	
 	// peppysliders lets goooo
-	quality := 100
+	// quality := 100
 
-	for t := 0; t < 1000; t += quality {
+	// last_position :=
+	slider_body_temp := gg.get_texture_from_skin('hitcircleoverlay')
+	for position in slider.points {
+		// t := (i / slider.points.len) * 1000
 		mut sprite := &sprite.Sprite{
-			textures: [gg.get_texture_from_skin('hitcircleoverlay')],
+			textures: [slider_body_temp],
 		}
 
-		position := slider.curve.point_at(f64(t) / f64(1000))
+		// position := slider.curve.point_at(f64(t) / f64(1000))
 		sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [f64(1)])
 		sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
 		sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
@@ -95,13 +106,10 @@ pub fn (mut slider Slider) process_points() {
 			}
 		)
 
-		// color
-		// if not the last and the first one
-		if (t + quality) < 1000 && (t != 0) {
-			sprite.color = gx.Color{127, 127, 127, 255} // gray
-		}
+		sprite.color = gx.Color{127, 127, 127, 255}
 
 		// if the last one
+		/*
 		if (t + quality) >= 1000 {
 			sprite.remove_all_transform_with_type(.fade)
 			sprite.remove_all_transform_with_type(.scale_factor)
@@ -118,10 +126,14 @@ pub fn (mut slider Slider) process_points() {
 			slider.sliderend = sprite
 			slider.sprites << sprite
 		} else {
-			// put the slider body first so itll be at the back of everything
-			mut first := [sprite]
-			first << slider.sprites
-			slider.sprites = first
-		}
+		}*/
+		// put the slider body first so itll be at the back of everything
+		mut first := [sprite]
+		first << slider.sprites
+		slider.sprites = first
+		
+	}
+	unsafe {
+		slider.points.free()
 	}
 }

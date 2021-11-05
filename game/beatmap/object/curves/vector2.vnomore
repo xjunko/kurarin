@@ -1,0 +1,43 @@
+module curves
+import math
+
+pub struct Vector2 {
+	pub mut:
+		x f64
+		y f64
+}
+
+pub fn (vector Vector2) add(t Vector2) Vector2 {
+	return Vector2{vector.x + t.x, vector.y + t.y}
+}
+
+pub fn (vector Vector2) sub(t Vector2) Vector2 {
+	return Vector2{vector.x - t.x, vector.y - t.y}
+}
+
+pub fn (vector Vector2) multiply(t f64) Vector2 {
+	return Vector2{vector.x * t, vector.y * t}
+}
+
+pub fn (vector Vector2) divide(t f64) Vector2 {
+	return Vector2{vector.x / t, vector.y / t}
+}
+
+pub fn (vector Vector2) length() f64 {
+	return vector.length_squared()
+}
+
+pub fn (vector Vector2) length_squared() f64 {
+	return math.pow(vector.x, 2) + math.pow(vector.y, 2)
+}
+
+pub fn (vector Vector2) distance(t Vector2) f64 {
+	return math.sqrt(
+		math.pow(vector.x - t.x, 2) +
+		math.pow(vector.y - t.y, 2)
+	)
+}
+
+pub fn (vector Vector2) equals(t Vector2) bool {
+	return vector.x == t.x && vector.y == t.y
+}

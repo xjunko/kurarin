@@ -1,14 +1,9 @@
 /*
-Demonstrates how to load a sound file and play it back using the low-level API.
+Shows one way to handle looping of a sound.
 
-The low-level API uses a callback to deliver audio between the application and miniaudio for playback or recording. When
-in playback mode, as in this example, the application sends raw audio data to miniaudio which is then played back through
-the default playback device as defined by the operating system.
-
-This example uses the `ma_decoder` API to load a sound and play it back. The decoder is entirely decoupled from the
-device and can be used independently of it. This example only plays back a single sound file, but it's possible to play
-back multiple files by simple loading multiple decoders and mixing them (do not create multiple devices to do this). See
-the simple_mixing example for how best to do this.
+This example uses a decoder as the data source. Decoders can be used with the `ma_data_source` API which, conveniently,
+supports looping via the `ma_data_source_read_pcm_frames()` API. To use it, all you need to do is pass a pointer to the
+decoder straight into `ma_data_source_read_pcm_frames()` and it will just work.
 */
 #define MINIAUDIO_IMPLEMENTATION
 #include "../miniaudio.h"
@@ -17,12 +12,18 @@ the simple_mixing example for how best to do this.
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
+    ma_bool32 isLooping = MA_TRUE;
+
     ma_decoder* pDecoder = (ma_decoder*)pDevice->pUserData;
     if (pDecoder == NULL) {
         return;
     }
 
-    ma_decoder_read_pcm_frames(pDecoder, pOutput, frameCount);
+    /*
+    A decoder is a data source which means you can seemlessly plug it into the ma_data_source API. We can therefore take advantage
+    of the "loop" parameter of ma_data_source_read_pcm_frames() to handle looping for us.
+    */
+    ma_data_source_read_pcm_frames(pDecoder, pOutput, frameCount, NULL, isLooping);
 
     (void)pInput;
 }
@@ -41,7 +42,6 @@ int main(int argc, char** argv)
 
     result = ma_decoder_init_file(argv[1], NULL, &decoder);
     if (result != MA_SUCCESS) {
-        printf("Could not load file: %s\n", argv[1]);
         return -2;
     }
 

@@ -2,24 +2,20 @@ module curves
 
 import framework.math.vector { Vector2 }
 
-pub struct Linear {
-	pub mut:
-		p1 Vector2
-		p2 Vector2
-}
+pub fn create_linear(control_points []Vector2) []Vector2 {
+	mut output := []Vector2{}
 
-pub fn (ln Linear) point_at(t f64) Vector2 {
-	return ln.p1.lerp(ln.p2, t)
-}
+	for i := 1; i < control_points.len; i++ {
+		l1 := control_points[i - 1]
+		l2 := control_points[i]
+		
+		mut segments := 1
 
-pub fn (ln Linear) get_start_angle() f64 {
-	return ln.p1.angle_rv(ln.p2)
-}
+		for j := 0; j <= segments; j++ {
+			v1 := l1.add_(l2.sub_(l1).multiply_(j / segments))
+			output << v1
+		}
+	}
 
-pub fn (ln Linear) get_end_angle() f64 {
-	return ln.p2.angle_rv(ln.p1)
-}
-
-pub fn (ln Linear) get_length() f64 {
-	return ln.p1.distance(ln.p2)
+	return output
 }

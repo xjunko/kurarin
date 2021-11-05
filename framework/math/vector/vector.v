@@ -102,3 +102,43 @@ pub fn (v &Vector2) distance(v1 Vector2) f64 {
 pub fn (v &Vector2) angle_rv(v1 Vector2) f64 {
 	return math.atan(v.y-v1.y + v.x-v1.x)
 }
+
+// from slider stuff
+pub fn (vector Vector2) add_(t Vector2) Vector2 {
+	return Vector2{vector.x + t.x, vector.y + t.y}
+}
+
+pub fn (vector Vector2) sub_(t Vector2) Vector2 {
+	return Vector2{vector.x - t.x, vector.y - t.y}
+}
+
+pub fn (vector Vector2) multiply_(t f64) Vector2 {
+	return Vector2{vector.x * t, vector.y * t}
+}
+
+pub fn (vector Vector2) divide_(t f64) Vector2 {
+	return Vector2{vector.x / t, vector.y / t}
+}
+
+pub fn (vector Vector2) length() f64 {
+	return vector.length_squared()
+}
+
+pub fn (vector Vector2) length_squared() f64 {
+	return math.pow(vector.x, 2) + math.pow(vector.y, 2)
+}
+
+pub fn (vector Vector2) equals(t Vector2) bool {
+	return vector.x == t.x && vector.y == t.y
+}
+
+pub fn (vector Vector2) multiply_vector(t Vector2) f64 {
+	return vector.x * t.x + vector.y * t.y
+}
+
+pub fn (vector Vector2) scale_(s f64) Vector2 {
+	return Vector2{
+		vector.x * s,
+		vector.y * s
+	}
+}

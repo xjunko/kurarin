@@ -3,7 +3,7 @@ module object
 import math
 import lib.gg
 
-// import framework.audio
+import framework.audio
 import framework.math.time as time2
 import framework.math.easing
 import framework.math.vector
@@ -154,8 +154,8 @@ pub fn (mut hitobject HitObject) check_if_mouse_clicked_on_hitobject(x f64, y f6
 	
 
 	if hitobject.logic.is_cursor_on_hitcircle(x, y, osu_space) && hitobject.logic.is_hittable(time) && !hitobject.logic.clicked {
-		// mut audio_ptr := audio.global
-		// audio_ptr.add_audio_and_play_blocking(path: 'assets/skins/default/${hitobject.hitsound}.wav') // dont play audio for now
+		mut audio_ptr := audio.global
+		audio_ptr.add_audio_and_play_blocking(path: 'assets/skins/default/${hitobject.hitsound}.wav') // dont play audio for now
 		hitobject.logic.clicked = true
 		// resets
 		hitobject.hitcircle.reset_transforms()
