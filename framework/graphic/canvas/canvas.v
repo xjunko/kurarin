@@ -7,6 +7,7 @@ import framework.math.vector
 import framework.graphic.sprite
 
 import game.beatmap.object
+import game.math.difficulty
 
 pub struct Canvas {
 	pub mut:
@@ -31,12 +32,22 @@ pub fn (mut c Canvas) update(time f64) {
 	// c.sprites = c.sprites.filter(it.time.end > time)
 	// c.hitobjects = c.hitobjects.filter(it.time.end > time)
 
-	for mut object in c.hitobjects {
+	// Optimization
+	mut hitobjects_to_be_removed := 0
+	for i := c.hitobjects.len - 1; i >= 0; i-- {
+		mut object := &c.hitobjects[i]
+
+		if time > object.time.end + difficulty.hit_fade_out {
+			hitobjects_to_be_removed++
+			continue
+		}
+
 		for mut sprite in object.sprites {
 			sprite.update(time)
 		}
 	}
-	
+	c.hitobjects = c.hitobjects[0 .. c.hitobjects.len - hitobjects_to_be_removed]
+
 	for mut sprite in c.sprites {
 		sprite.update(time)
 	}
