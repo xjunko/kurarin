@@ -27,7 +27,7 @@ pub fn make_auto(bmap beatmap.Beatmap) []ReplayEvent {
 			}
 			
 			// Follow the curves 
-			steps := 250
+			steps := 100
 			offset := 10
 			for i in 0 .. 1000 {
 				if (i % steps) == 0 {
