@@ -11,6 +11,7 @@ pub struct MakeArguments {
 	mut:
 		id     int
 		items  []string
+		color  []f64
 		diff   difficulty.Difficulty
 		timing timing.TimingPoint
 		
@@ -47,7 +48,8 @@ pub fn make_circle(arg MakeArguments) &HitObject {
 		is_slider: arg.is_slider,
 		diff: arg.diff,
 		timing: arg.timing,
-		data: arg.items
+		data: arg.items,
+		color: arg.color
 	}
 	hitobject.pre_init()
 
