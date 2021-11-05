@@ -37,7 +37,7 @@ pub fn (mut c Canvas) update(time f64) {
 	for i := c.hitobjects.len - 1; i >= 0; i-- {
 		mut object := &c.hitobjects[i]
 
-		if time > object.time.end + difficulty.hit_fade_out {
+		if time > object.time.end + difficulty.hit_fade_out * 2 {
 			hitobjects_to_be_removed++
 			continue
 		}
