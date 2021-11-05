@@ -133,7 +133,10 @@ pub fn (mut slider Slider) process_points() {
 		slider.sprites = first
 		
 	}
+
+	/*
 	unsafe {
 		slider.points.free()
 	}
+	*/
 }
