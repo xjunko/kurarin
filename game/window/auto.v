@@ -24,11 +24,11 @@ pub fn (mut window GameWindow) add_auto_player(args AddPlayerArg) {
 	for event in args.events {
 		player_sprite.add_transform(
 			typ: .move,
-			easing: easing.quad_out,
+			easing: easing.linear,
 			time: time2.Time{last_event.time.end, event.time.start},
 			before: [last_event.position.x, last_event.position.y],
 			after: [event.position.x, event.position.y]
-			)
+		)
 		last_event = event
 	}
 
@@ -41,12 +41,15 @@ pub fn (mut window GameWindow) add_auto_player(args AddPlayerArg) {
 		mut event_index := 0
 		for event_index < events.len {
 			if window.game_time.time >= events[event_index].time.start {
-				window.beatmap.check_if_clicked(
-					events[event_index].position.x,
-					events[event_index].position.y,
-					events[event_index].time.start,
-					true
-				)
+				if events[event_index].key != 0 {
+					window.beatmap.check_if_clicked(
+						events[event_index].position.x,
+						events[event_index].position.y,
+						events[event_index].time.start,
+						true
+					)
+				}
+				
 				event_index++	
 			}
 
