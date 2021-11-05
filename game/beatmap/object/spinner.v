@@ -20,6 +20,7 @@ pub fn (mut spinner Spinner) initialize_object(mut ctx &gg.Context, last_object 
 	start_time := spinner.time.start - preempt
 	end_time := spinner.time.start
 	duration := spinner.HitObject.data[5].split(':')[0].f64() - end_time
+	spinner.time.end += duration
 
 
 	spinner.spinnercircle = &sprite.Sprite{
