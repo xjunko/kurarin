@@ -57,6 +57,9 @@ Options:
 * [V's library](https://github.com/vlang/v/vlib) - I yoinked gg, stbi to my own lib. (thanks V contributors!)
 * [v-miniaudio](https://github.com/Larpon/v-miniaudio) - yoinked to lib. (thanks larpon!)
 
+## Note
+ill rewrite this from scratch again sometimes later, i got school now lmao ;-;.
+
 
 ## License
 
