@@ -1,6 +1,7 @@
 module beatmap
 
 import os
+import math
 import object
 
 import game.math.difficulty
@@ -38,6 +39,7 @@ pub fn parse_beatmap(path string) &Beatmap {
 	
 	//
 	mut combo_index := 1
+	mut color_index := 0
 
 	for line in lines {
 		if line.trim_space().len == 0 || line.starts_with('//') { continue }
@@ -77,19 +79,42 @@ pub fn parse_beatmap(path string) &Beatmap {
 				beatmap.timing.add(vals)
 			}
 
+			'Colours' {
+				items := parse_k_v(line, ":", 2)
+				mut colors := []f64{}
+
+				for value in items[1].split(",") {
+					colors << value.f64()
+				}
+
+				beatmap.colors << colors
+			}
+
 			'HitObjects' {
 				if !beatmap.difficulty.created {
-					// Make difficulty
+					// Make difficulty and timing
 					beatmap.difficulty_math = beatmap.difficulty.make_difficulty()
+					beatmap.timing.process()
+				}
+
+				// Some color index fallback cuz its not completed
+				if beatmap.colors.len == 0 {
+					beatmap.colors << [f64(26), 116, 242]
+					beatmap.colors << [f64(164), 32, 240]
+					beatmap.colors << [f64(37), 185, 239]
+					beatmap.colors << [f64(23), 209, 116]
+					beatmap.colors << [f64(255), 75, 255]
 				}
 
 				combo_index++		
+				
 				items := parse_commas(line)
-				mut object := object.make_hitobject(id: beatmap.objects.len, items: items, diff: beatmap.difficulty_math, timing: beatmap.timing)
+				mut object := object.make_hitobject(id: beatmap.objects.len, items: items, diff: beatmap.difficulty_math, timing: beatmap.timing, color: beatmap.colors[color_index % beatmap.colors.len])
 				object.combo_index = combo_index
 
 				if object.is_new_combo {
 					combo_index = 1
+					color_index++
 				}				
 
 				beatmap.objects << object
