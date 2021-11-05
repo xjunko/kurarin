@@ -56,7 +56,7 @@ pub fn (mut slider Slider) process_points() {
 	mut size_ratio := (54.4 - 4.48 * slider.diff.cs) * 1.05 * 2 / 128
 
 	mut slider_points := slider.data[5].split('|')
-	// slider_type := slider_points[0]
+	mut slider_type := slider_points[0]
 	slider_points = slider_points[1..]
 	
 
@@ -68,7 +68,11 @@ pub fn (mut slider Slider) process_points() {
 		vector_points << vector.Vector2{items[0].f64(), items[1].f64()}
 	}
 
-	slider.points = curves.create_curve("L", vector_points, slider.pixel_length)
+	if slider_type == 'P' {
+		slider_type = 'B' // Perfetc is fucked atm
+	}
+
+	slider.points = curves.create_curve(slider_type, vector_points, slider.pixel_length)
 	
 	slider.end_position = slider.points[slider.points.len - 1] // get the last points
 	slider.curve = curves.Linear{
