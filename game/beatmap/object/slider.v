@@ -6,6 +6,7 @@ import gx
 
 import framework.math.vector
 import framework.math.time
+import framework.math.easing
 import framework.graphic.sprite
 
 import curves
@@ -32,7 +33,10 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	// duration and shit - not accurate
 	slider.repeated = slider.data[6].f64()
 	slider.pixel_length = slider.data[7].f64()
-	slider.duration = (((slider.timing.get_beat_duration(slider.time.start) * 10) * slider.pixel_length) / (100 * slider.diff.slider_multiplier))
+	slider.duration = (
+		slider.timing.get_beat_duration(slider.time.start) * slider.pixel_length / (100 * slider.diff.slider_multiplier)
+	)
+	
 	slider.time.end += slider.duration * slider.repeated
 
 	// why do i need to do this again lol
@@ -67,17 +71,18 @@ pub fn (mut slider Slider) process_points() {
 	}
 
 	// peppysliders lets goooo
-	quality := 200
-	
+	quality := 100
+
 	for t := 0; t < 1000; t += quality {
 		mut sprite := &sprite.Sprite{
 			textures: [gg.get_texture_from_skin('hitcircleoverlay')],
 		}
+
 		position := slider.curve.point_at(f64(t) / f64(1000))
 		sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [f64(1)])
 		sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
 		sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
-		sprite.add_transform(typ: .move, time: time.Time{slider.time.start, slider.time.start}, before: [position.x, position.y])
+		sprite.add_transform(typ: .move, easing: easing.quad_out, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [slider.position.x, slider.position.y], after: [position.x, position.y])
 
 		//
 		sprite.reset_time_based_on_transforms()
@@ -93,7 +98,7 @@ pub fn (mut slider Slider) process_points() {
 		// color
 		// if not the last and the first one
 		if (t + quality) < 1000 && (t != 0) {
-			sprite.color = gx.red
+			sprite.color = gx.Color{127, 127, 127, 255} // gray
 		}
 
 		// if the last one
@@ -104,6 +109,7 @@ pub fn (mut slider Slider) process_points() {
 			sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
 			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
 			sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(1)], after: [f64(1.4)])
+			sprite.add_transform(typ: .color, time: time.Time{slider.time.start, slider.time.start}, before: slider.HitObject.color)
 
 			sprite.reset_time_based_on_transforms()
 			sprite.reset_attributes_based_on_transforms()
