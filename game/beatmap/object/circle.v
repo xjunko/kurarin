@@ -37,6 +37,7 @@ pub struct HitObject {
 		combo_sprite     &sprite.Sprite = &sprite.Sprite{}
 
 		hitsound          string = 'drum-hitnormal'
+		color             []f64
 		is_hidden 		  bool
 		is_spinner        bool
 		is_slider 		  bool
@@ -92,6 +93,10 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 	start_time := hitobject.time.start - diff.preempt
 	end_time := hitobject.time.start	
 
+	// combo colour
+	hitobject.hitcircle.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color)
+	hitobject.hitcircleoverlay.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color)
+
 	hitobject.ratiod_scale = size
 	for mut sprite in clickable {
 		sprite.add_transform(typ: .move, easing: easing.linear, time: time2.Time{start_time, start_time}, before: [hitobject.position.x, hitobject.position.y])
@@ -121,13 +126,15 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 		hitobject.approachcircle.add_transform(typ: .move, easing: easing.linear, time: time2.Time{start_time, start_time}, before: [hitobject.position.x, hitobject.position.y])
 		hitobject.approachcircle.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, math.min(end_time, end_time - diff.preempt + difficulty.hit_fade_in * 2)}, before: [f64(0)], after: [f64(229)])
 		hitobject.approachcircle.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{end_time, end_time}, before: [f64(0)], after: [f64(0)])
-		hitobject.approachcircle.add_transform(typ: .scale_factor, easing: easing.linear, time: time2.Time{start_time, end_time}, before: [f64(4)], after: [f64(0.9)])
+		hitobject.approachcircle.add_transform(typ: .scale_factor, easing: easing.linear, time: time2.Time{start_time, end_time}, before: [f64(4)], after: [f64(0.9)])		
+
+		hitobject.approachcircle.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color)
 		
 		hitobject.approachcircle.after_add_transform_reset()
 		hitobject.approachcircle.change_size(size: size)
 	}
 
-	// hitobject.hitanimation = animation.make_hit_animation(.hmiss, hitobject.position, end_time)
+	hitobject.hitanimation = animation.make_hit_animation(.hmiss, hitobject.position, end_time)
 	hitobject.hitanimation.change_size(size: size, keep_ratio: true)
 
 	hitobject.sprites = [
