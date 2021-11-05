@@ -55,7 +55,9 @@ pub struct Beatmap {
 		ready      		bool
 
 		//
+		colors          [][]f64
 		storyboard      &storyboard.Storyboard = voidptr(0)
+
 
 		// fs
 		root     string
