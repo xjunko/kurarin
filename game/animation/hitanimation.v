@@ -1,6 +1,6 @@
 module animation
 
-import rand
+// import rand
 import lib.gg
 
 import framework.math.vector
@@ -44,12 +44,16 @@ pub struct HitAnimation {
 
 pub fn make_hit_animation(typ HitType, position vector.Vector2, time_ f64) &sprite.Sprite {
 	mut sprite := &sprite.Sprite{
-		textures: [gg.get_texture_from_skin(typ.get_filename())],
-		angle: rand.f64_in_range(-10, 10)
+		textures: [gg.get_texture_from_skin(typ.get_filename())]
+		// angle: rand.f64_in_range(-10, 10)
 
 	}
-
-	sprite.add_transform(typ: .move, easing: easing.linear, time: time.Time{time_, time_}, before: [position.x, position.y])
+	if typ == .hmiss {
+		sprite.add_transform(typ: .move, easing: easing.quad_out, time: time.Time{time_, time_ + 200}, before: [position.x, position.y], after: [position.x, position.y + 16])
+	} else {
+		sprite.add_transform(typ: .move, easing: easing.linear, time: time.Time{time_, time_}, before: [position.x, position.y])
+	}
+	
 	sprite.add_transform(typ: .fade, easing: easing.quad_out, time: time.Time{time_, time_ + 200}, before: [f64(0)], after: [f64(255)])
 	sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{time_, time_ + 100}, before: [f64(1.4)], after: [f64(0.7)])
 	sprite.add_transform(typ: .fade, easing: easing.quad_out, time: time.Time{time_ + 200, time_ + 400}, before: [f64(255)], after: [f64(0)])
