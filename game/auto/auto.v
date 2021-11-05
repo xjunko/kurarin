@@ -31,7 +31,9 @@ pub fn make_auto(bmap beatmap.Beatmap) []ReplayEvent {
 			offset := 10
 			for i in 0 .. 1000 {
 				if (i % steps) == 0 {
-					position := object.curve.point_at(f64(i) / f64(1000))
+					// Get slider points
+					// position := object.curve.point_at(f64(i) / f64(1000))
+					position := object.points[int(math.min(int(object.points.len * (f64(i) / f64(1000))), object.points.len))]
 					time_offset := (object.time.end - object.time.start - offset) * (f64(i) / f64(1000))
 
 					events << ReplayEvent{
@@ -39,6 +41,11 @@ pub fn make_auto(bmap beatmap.Beatmap) []ReplayEvent {
 						time: time.Time{object.time.start + offset + time_offset, object.time.start + offset + time_offset},
 					}
 				}
+			}
+
+			// Free points
+			unsafe {
+				object.points.free()
 			}
 			
 
