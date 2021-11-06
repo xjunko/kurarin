@@ -75,12 +75,16 @@ pub fn (mut tp TimingPoint) process() {
 }
 
 
-pub fn (mut tp TimingPoint) get_beat_duration(time f64) f32 {
+pub fn (mut tp TimingPoint) get_point_at(time f64) TimingPointInfo {
 	for timing in tp.timings {
 		if time >= timing.offset { continue }
 
-		return timing.beatduration
+		return timing
 	}
-	
-	return 0
+
+	return TimingPointInfo{}
+}
+
+pub fn (mut tp TimingPoint) get_beat_duration(time f64) f32 {
+	return tp.get_point_at(time).beatduration
 }
