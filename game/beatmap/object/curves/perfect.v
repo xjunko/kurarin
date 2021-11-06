@@ -3,6 +3,7 @@ import framework.math.vector { Vector2 }
 
 import math
 
+/*
 const (
 	perfect_tolerance = f64(0.1)
 )
@@ -76,9 +77,10 @@ pub fn create_perfect(points []Vector2) []Vector2 {
 	}
 	return output
 }
+*/
 
 
-/*
+
 pub fn circle_t_at(pt Vector2, centre Vector2) f64 {
 	return math.atan2(pt.y - centre.y, pt.x - centre.x)
 }
@@ -104,11 +106,11 @@ pub fn circle_through_points(control_points []Vector2) (Vector2, f64, f64, f64) 
 	mut t_final := circle_t_at(c, centre)
 
 	for t_mid < t_initial {
-		t_mid += 2 * pi
+		t_mid += 2 * math.pi
 	}
 
 	for t_final < t_initial {
-		t_final += 2 * pi
+		t_final += 2 * math.pi
 	}
 
 	return centre, radius, t_initial, t_final
@@ -148,4 +150,3 @@ pub fn create_perfect(control_points []Vector2) []Vector2 {
 
 	return output
 }
-*/
