@@ -15,6 +15,10 @@ import game.animation
 import game.math.timing
 import game.math.difficulty
 
+const (
+	sample_name = ["normal", "soft", "drum"]
+)
+
 
 pub struct HitObject {
 	pub mut:
@@ -59,23 +63,25 @@ pub fn (mut hitobject HitObject) pre_init() {
 	hitobject.is_new_combo = (hitobject.data[3].int() & 4) > 0
 
 	// Hitsound
-	hitsound_index := hitobject.data[4].int()
+	hitobject_sample := hitobject.data[4].int()
+	timing := hitobject.timing.get_point_at(hitobject.time.start)
+	prefix := sample_name[int(timing.sampleset)]
 
-	if (hitsound_index & 1) > 0 || hitsound_index == 0 {
-		hitobject.hitsound = 'normal-hitnormal'
+	if (hitobject_sample & 1) > 0 || hitobject_sample == 0 {
+		hitobject.hitsound = '${prefix}-hitnormal'
 	}
 
-	if (hitsound_index & 2) > 0 {
-		hitobject.hitsound = 'normal-hitwhistle'
+	if (hitobject_sample & 2) > 0 {
+		hitobject.hitsound = '${prefix}-hitwhistle'
 	}
 
-	if (hitsound_index & 4) > 0 {
-		hitobject.hitsound = 'normal-hitfinish'
+	if (hitobject_sample & 4) > 0 {
+		hitobject.hitsound = '${prefix}-hitfinish'
 	}
 
-	if (hitsound_index & 8) > 0 {
-		hitobject.hitsound = 'normal-hitclap'
-	}
+	if (hitobject_sample & 8) > 0 {
+		hitobject.hitsound = '${prefix}-hitclap'
+	}	
 }
 
 pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_object IHitObject) {
