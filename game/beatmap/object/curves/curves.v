@@ -52,6 +52,10 @@ pub fn adjust_curve(vectors []Vector2, expected_length f64) []Vector2 {
 	mut total := f64(0)
 	mut path := vectors.clone()
 
+	unsafe {
+		vectors.free()
+	}
+
 	for i := 1; i < path.len; i++ {
 		total = distance(path[i - 1], path[i])
 	}
@@ -100,7 +104,7 @@ pub fn create_curve(typ string, vectors []Vector2, expected_length f64) []Vector
 		else { panic("WHAT: ${typ}") }
 	}
 
-	//path = adjust_curve(path, expected_length)
+	// path = adjust_curve(path, expected_length)
 
 	return path
 }
