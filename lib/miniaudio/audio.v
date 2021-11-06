@@ -88,7 +88,15 @@ pub fn (mut audio Audio) volume(v f32) {
 }
 
 pub fn (mut audio Audio) length() f64 {
-	return f64(0)
+	return (audio.pcm_length() / audio.sample_rate()) * f64(1000)
+}
+
+pub fn (mut audio Audio) pcm_length() f64 {
+	return f64(C.ma_decoder_get_length_in_pcm_frames(audio.decoder))
+}
+
+pub fn (mut audio Audio) sample_rate() f64 {
+	return f64(audio.decoder.outputSampleRate)
 }
 
 pub fn (mut audio Audio) free() {
