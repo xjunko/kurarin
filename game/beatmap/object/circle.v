@@ -57,6 +57,25 @@ pub fn (mut hitobject HitObject) draw(ctx &gg.Context, time f64) {
 
 pub fn (mut hitobject HitObject) pre_init() {
 	hitobject.is_new_combo = (hitobject.data[3].int() & 4) > 0
+
+	// Hitsound
+	hitsound_index := hitobject.data[4].int()
+
+	if (hitsound_index & 1) > 0 || hitsound_index == 0 {
+		hitobject.hitsound = 'normal-hitnormal'
+	}
+
+	if (hitsound_index & 2) > 0 {
+		hitobject.hitsound = 'normal-hitwhistle'
+	}
+
+	if (hitsound_index & 4) > 0 {
+		hitobject.hitsound = 'normal-hitfinish'
+	}
+
+	if (hitsound_index & 8) > 0 {
+		hitobject.hitsound = 'normal-hitclap'
+	}
 }
 
 pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_object IHitObject) {

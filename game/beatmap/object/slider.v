@@ -69,7 +69,7 @@ pub fn (mut slider Slider) process_points() {
 	}
 
 	if slider_type == 'P' {
-		slider_type = 'B' // Perfetc is fucked atm
+		slider_type = 'L' // Perfetc is fucked atm
 	}
 
 	slider.points = curves.create_curve(slider_type, vector_points, slider.pixel_length)
@@ -82,13 +82,54 @@ pub fn (mut slider Slider) process_points() {
 	
 
 	
-	// peppysliders lets goooo
-	// quality := 100
-
 	// last_position :=
 	slider_body_temp := gg.get_texture_from_skin('hitcircleoverlay')
+
+	/*
+	// peppysliders lets goooo
+	quality := 100
+	delta := slider.pixel_length / slider.points.len
+	// delta_per_curve := slider.points.len / quality
+	mut last_position := slider.points[0]
+	// Smoothen out the points
+	for i := f64(0); i < slider.pixel_length; i += delta {
+		current_position := slider.points[int(math.min((i/slider.pixel_length) * slider.points.len, slider.points.len))]
+		curve := curves.Linear{
+			last_position,
+			current_position
+		}
+
+		// TODO: figure out how to spread out the circles evenly
+		
+		for k := f64(0); k < 1000; k += quality {
+			position := curve.point_at(f64(k) / f64(1000))
+			mut sprite := &sprite.Sprite{
+				textures: [slider_body_temp]
+			}
+
+			//
+			sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [f64(1)])
+			sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
+			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
+			sprite.add_transform(typ: .move, time: time.Time{slider.time.start, slider.time.start}, before: [position.x, position.y])
+
+			//
+			sprite.after_add_transform_reset()
+			sprite.change_size(
+				size: vector.Vector2{
+					slider.hitcircle.image().width * size_ratio,
+					slider.hitcircle.image().height * size_ratio,
+				}
+			)
+			sprite.color = gx.Color{127, 127, 127, 255}
+			slider.sprites << sprite
+		}
+		last_position = current_position
+	}
+	*/
+
+	
 	for position in slider.points {
-		// t := (i / slider.points.len) * 1000
 		mut sprite := &sprite.Sprite{
 			textures: [slider_body_temp],
 		}
