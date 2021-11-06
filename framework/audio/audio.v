@@ -41,8 +41,15 @@ pub fn (mut audio AudioController) add_audio(arg AddAudioArgument) &miniaudio.Au
 pub fn (mut audio AudioController) add_audio_and_play(arg_ AddAudioArgument) {
 	mut sound := audio.add_audio(arg_)
 	mut arg := arg_
-	
+
 	sound.play()
+
+	// Free after finished
+	go fn (mut audio &miniaudio.Audio) {
+		time.sleep(audio.length() * time.millisecond)
+		audio.free()
+	}(mut sound)
+	
 
 	if !isnil(arg.time) {
 		arg.time.reset()
