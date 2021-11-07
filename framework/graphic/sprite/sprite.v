@@ -248,9 +248,9 @@ pub fn (s Sprite) draw(cfg DrawConfig) {
 	// height := f32(s.size.y * cfg.scale)
 	
 	// use vector methods
-	origin := s.size.scale_(cfg.scale).scale_origin_(s.origin)
-	position := s.position.scale_(cfg.scale).sub_(origin).add_(cfg.offset.scale_(cfg.scale))
 	size := s.size.scale_(cfg.scale)
+	origin := size.scale_origin_(s.origin)
+	position := s.position.scale_(cfg.scale).sub_(origin).add_(cfg.offset.scale_(cfg.scale))
 
 	match s.typ {
 		.image {
