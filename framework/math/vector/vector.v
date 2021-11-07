@@ -103,7 +103,7 @@ pub fn (v &Vector2) angle_rv(v1 Vector2) f64 {
 	return math.atan(v.y-v1.y + v.x-v1.x)
 }
 
-// from slider stuff
+// non mutable 
 pub fn (vector Vector2) add_(t Vector2) Vector2 {
 	return Vector2{vector.x + t.x, vector.y + t.y}
 }
@@ -140,5 +140,12 @@ pub fn (vector Vector2) scale_(s f64) Vector2 {
 	return Vector2{
 		vector.x * s,
 		vector.y * s
+	}
+}
+
+pub fn (vector Vector2) scale_origin_(v Vector2) Vector2 {
+	return Vector2{
+		vector.x * v.x,
+		vector.y * v.y
 	}
 }
