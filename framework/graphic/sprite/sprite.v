@@ -240,19 +240,17 @@ pub fn (s Sprite) draw(cfg DrawConfig) {
 	if !s.check_if_drawable(cfg.time) && !s.always_visible { return }
 
 	mut img := s.image()
+
+	// reference
+	// x := f32(((s.position.x * cfg.scale) -  x_pos.x) + cfg.offset.x * cfg.scale)
+	// y := f32(((s.position.y * cfg.scale) - y_pos.y) + cfg.offset.y * cfg.scale)
+	// width := f32(s.size.x * cfg.scale)
+	// height := f32(s.size.y * cfg.scale)
 	
-	// v moment (i cant stack methods)
-	mut x_pos := s.origin.copy()
-	mut y_pos := s.origin.copy()
-
-	x_pos.scale(s.size.x * cfg.scale)
-	y_pos.scale(s.size.y * cfg.scale)
-
-
-	x := f32(((s.position.x * cfg.scale) -  x_pos.x) + cfg.offset.x * cfg.scale)
-	y := f32(((s.position.y * cfg.scale) - y_pos.y) + cfg.offset.y * cfg.scale)
-	width := f32(s.size.x * cfg.scale)
-	height := f32(s.size.y * cfg.scale)
+	// use vector methods
+	origin := s.size.scale_(cfg.scale).scale_origin_(s.origin)
+	position := s.position.scale_(cfg.scale).sub_(origin).add_(cfg.offset.scale_(cfg.scale))
+	size := s.size.scale_(cfg.scale)
 
 	match s.typ {
 		.image {
@@ -260,10 +258,10 @@ pub fn (s Sprite) draw(cfg DrawConfig) {
 				img: img,
 				img_id: img.id,
 				img_rect: gg.Rect{
-					x: x,
-					y: y,
-					width: width,
-					height: height
+					x: f32(position.x),
+					y: f32(position.y),
+					width: f32(size.x),
+					height: f32(size.y)
 				}
 				color: s.color,
 				rotate: f32(s.angle),
@@ -273,12 +271,12 @@ pub fn (s Sprite) draw(cfg DrawConfig) {
 
 		.text {
 			cfg.ctx.draw_text(
-				int(x + (s.size.x * cfg.scale) / 2), 
-				int(y), 
+				int(position.x + (s.size.x * cfg.scale) / 2), 
+				int(position.y), 
 				s.text, 
 				gx.TextCfg{
 					color: s.color,
-					size: int(width),
+					size: int(size.x),
 					align: .center
 				}
 			)
