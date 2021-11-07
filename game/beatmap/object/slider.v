@@ -181,13 +181,13 @@ pub fn (mut slider Slider) process_points() {
 			slider.sprites << sprite
 		} else {
 		}*/
+
+		
 		// put the slider body first so itll be at the back of everything
-		/*
-		mut first := [sprite]
+		mut first := []sprite.IDrawable{}
+		first << sprite
 		first << slider.sprites
 		slider.sprites = first
-		*/
-		slider.sprites << sprite
 	}
 	
 
