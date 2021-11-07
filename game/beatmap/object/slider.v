@@ -11,11 +11,13 @@ import framework.graphic.sprite
 
 import curves
 import game.math.difficulty
+// import game.graphic
 
 pub struct Slider {
 	HitObject
 
 	pub mut:
+		// sliderrender &graphic.SliderRenderer = &graphic.SliderRenderer{}
 		end_position vector.Vector2
 		sliderend 	 &sprite.Sprite = &sprite.Sprite{}
 		points    	 []vector.Vector2
@@ -43,6 +45,16 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	slider.HitObject.initialize_object(mut ctx, last_object)
 	//
 	slider.process_points()
+
+	//
+	/*
+	slider.sliderrender.time = &slider.time
+	slider.sliderrender.points = slider.points
+	slider.sliderrender.process()
+
+	// 
+	slider.sprites << slider.sliderrender
+	*/
 }
 
 pub fn (mut slider Slider) check_if_mouse_clicked_on_hitobject(x f64, y f64, time f64, osu_space bool) {
@@ -52,7 +64,6 @@ pub fn (mut slider Slider) check_if_mouse_clicked_on_hitobject(x f64, y f64, tim
 // TODO: temporary
 // GOD BLESS ME
 pub fn (mut slider Slider) process_points() {
-	// mut last_position := slider.
 	mut size_ratio := (54.4 - 4.48 * slider.diff.cs) * 1.05 * 2 / 128
 
 	mut slider_points := slider.data[5].split('|')
@@ -81,11 +92,9 @@ pub fn (mut slider Slider) process_points() {
 	}
 	
 
-	
-	// last_position :=
 	slider_body_temp := gg.get_texture_from_skin('hitcircleoverlay')
-
 	/*
+	// last_position :=
 	// peppysliders lets goooo
 	quality := 100
 	delta := slider.pixel_length / slider.points.len
@@ -173,11 +182,14 @@ pub fn (mut slider Slider) process_points() {
 		} else {
 		}*/
 		// put the slider body first so itll be at the back of everything
+		/*
 		mut first := [sprite]
 		first << slider.sprites
 		slider.sprites = first
-		
+		*/
+		slider.sprites << sprite
 	}
+	
 
 	/*
 	unsafe {

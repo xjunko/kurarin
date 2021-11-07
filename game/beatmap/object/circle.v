@@ -27,7 +27,7 @@ pub struct HitObject {
 		position        vector.Vector2
 		end_position    vector.Vector2
 		time            time2.Time
-		sprites         []&sprite.Sprite
+		sprites         []sprite.IDrawable
 		stacking        int
 
 		logic           &logic.HitCircle
@@ -234,6 +234,8 @@ pub fn (mut hitobject HitObject) check_if_mouse_clicked_on_hitobject(x f64, y f6
 }
 
 // Common Functions
+/*
 pub fn (mut hitobject HitObject) sort_sprites_based_on_z_layer() {
 	hitobject.sprites.sort(a.z < b.z)
 }
+*/

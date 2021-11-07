@@ -16,7 +16,7 @@ pub interface IHitObject {
 	position     vector.Vector2
 	end_position vector.Vector2
 	time     time.Time
-	sprites  []&sprite.Sprite
+	sprites  []sprite.IDrawable
 	logic    &logic.HitCircle
 	diff     difficulty.Difficulty
 	stacking int
