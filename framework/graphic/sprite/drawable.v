@@ -17,6 +17,13 @@ pub struct DrawConfig {
 		draw_logic bool
 }
 
+// TODO: idfk
+pub fn (cfg DrawConfig) get_localize_position(size vector.Vector2, position vector.Vector2, origin vector.Vector2) vector.Vector2 {
+	origin_cved := size.scale_(cfg.scale).scale_origin_(origin)
+	return position.scale_(cfg.scale).sub_(origin_cved).add_(cfg.offset.scale_(cfg.scale))
+	
+}
+
 pub interface IDrawable {
 	mut:
 		time &time.Time
