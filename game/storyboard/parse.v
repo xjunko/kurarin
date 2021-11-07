@@ -173,7 +173,7 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 			sprite.after_add_transform_reset()
 			sprite.base_size.scale(1 / resolution.global.storyboard_scale)
 			sprite.size.scale(1 / resolution.global.storyboard_scale)
-			storyboard.background.add_sprite( sprite)
+			storyboard.background.add_drawable(sprite)
 		}
 		
 		// check for stuff that doesnt have scale tranforms

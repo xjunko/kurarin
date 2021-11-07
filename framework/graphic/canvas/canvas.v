@@ -14,12 +14,12 @@ pub struct Canvas {
 		size       &vector.Vector2 = &vector.Vector2{512, 384}
 		scale      f64 = 1
 		position   &vector.Vector2 = &vector.Vector2{0, 0}
-		sprites    []sprite.Sprite
+		drawables  []sprite.IDrawable
 		hitobjects []object.IHitObject
 }
 
-pub fn (mut c Canvas) add_sprite(s sprite.Sprite) {
-	c.sprites << s
+pub fn (mut c Canvas) add_drawable(mut s sprite.IDrawable) {
+	c.drawables << s
 }
 
 pub fn (mut c Canvas) add_hitobject(mut o object.IHitObject) {
@@ -48,8 +48,8 @@ pub fn (mut c Canvas) update(time f64) {
 	}
 	c.hitobjects = c.hitobjects[0 .. c.hitobjects.len - hitobjects_to_be_removed]
 
-	for mut sprite in c.sprites {
-		sprite.update(time)
+	for mut drawable in c.drawables {
+		drawable.update(time)
 	}
 
 }
@@ -63,8 +63,8 @@ pub fn (mut c Canvas) draw(ctx &gg.Context, time f64) {
 		}
 	}
 	
-	for mut sprite in c.sprites {
-		sprite.draw(ctx: ctx, time: time, offset: c.position, scale: c.scale, size: c.size)
+	for mut drawable in c.drawables {
+		drawable.draw(ctx: ctx, time: time, offset: c.position, scale: c.scale, size: c.size)
 	}
 }
 

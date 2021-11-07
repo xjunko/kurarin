@@ -29,7 +29,7 @@ pub fn generate_bullshit(mut window &GameWindow) {
 			sprite.after_add_transform_reset()
 
 			// add to game canvas
-			window.game_canvas.add_sprite(sprite)
+			window.game_canvas.add_drawable(sprite)
 
 			// println(target_time)
 		}

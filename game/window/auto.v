@@ -35,7 +35,7 @@ pub fn (mut window GameWindow) add_auto_player(args AddPlayerArg) {
 	player_sprite.after_add_transform_reset()
 
 	// add into canvas then listen to it
-	window.game_canvas.add_sprite(player_sprite)
+	window.game_canvas.add_drawable(player_sprite)
 
 	go fn (mut window &GameWindow, player_sprite &sprite.Sprite, events []auto.ReplayEvent) {
 		mut event_index := 0

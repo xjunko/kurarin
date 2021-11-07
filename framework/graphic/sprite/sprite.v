@@ -234,16 +234,7 @@ pub fn (s Sprite) check_if_drawable(time f64) bool {
 
 
 
-pub struct DrawConfig {
-	pub mut:
-		ctx    &gg.Context
-		time   f64
-		offset vector.Vector2
-		size   vector.Vector2
-		scale  f64 = 1
-		logic  logic.HitCircle
-		draw_logic bool
-}
+
 
 pub fn (s Sprite) draw(cfg DrawConfig) {
 	if !s.check_if_drawable(cfg.time) && !s.always_visible { return }
