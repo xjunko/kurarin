@@ -54,7 +54,7 @@ Options:
 i got school soontm so this might not be finished at all :trollface:
 
 * Actual slider renderer lmao
-* Slider curves
+* Slider curves [very close to finishing this, im stupid so itll take awhile]
 * Actual osu! gameplay hitsystem and not whatever the fuck placeholder shit Im using rn
 * Unfucked the codebase and make it stable overall
 * Replay support (kinda already there but not really, you just had to somehow give the replay event into auto listener and it should show up)
