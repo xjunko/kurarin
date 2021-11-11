@@ -13,6 +13,10 @@ import curves
 import game.math.difficulty
 // import game.graphic
 
+const (
+	fallback_slider = true
+)
+
 pub struct Slider {
 	HitObject
 
@@ -69,125 +73,127 @@ pub fn (mut slider Slider) process_points() {
 	mut slider_points := slider.data[5].split('|')
 	mut slider_type := slider_points[0]
 	slider_points = slider_points[1..]
-	
-
-	// NEW slider shit
-	mut vector_points := []vector.Vector2{}
-	vector_points << slider.position
-	for points in slider_points {
-		items := points.split(":")
-		vector_points << vector.Vector2{items[0].f64(), items[1].f64()}
-	}
-
-	if slider_type == 'P' {
-		slider_type = 'L' // Perfetc is fucked atm
-	}
-
-	slider.points = curves.create_curve(slider_type, vector_points, slider.pixel_length)
-	
-	slider.end_position = slider.points[slider.points.len - 1] // get the last points
-	slider.curve = curves.Linear{
-		slider.points[0],
-		slider.points[slider.points.len - 1]
-	}
-	
-
 	slider_body_temp := gg.get_texture_from_skin('hitcircleoverlay')
-	/*
-	// last_position :=
-	// peppysliders lets goooo
-	quality := 100
-	delta := slider.pixel_length / slider.points.len
-	// delta_per_curve := slider.points.len / quality
-	mut last_position := slider.points[0]
-	// Smoothen out the points
-	for i := f64(0); i < slider.pixel_length; i += delta {
-		current_position := slider.points[int(math.min((i/slider.pixel_length) * slider.points.len, slider.points.len))]
-		curve := curves.Linear{
-			last_position,
-			current_position
+	
+
+	if !fallback_slider {
+		// NEW slider shit
+		mut vector_points := []vector.Vector2{}
+		vector_points << slider.position
+		for points in slider_points {
+			items := points.split(":")
+			vector_points << vector.Vector2{items[0].f64(), items[1].f64()}
 		}
 
-		// TODO: figure out how to spread out the circles evenly
+		if slider_type == 'P' {
+			slider_type = 'L' // Perfetc is fucked atm
+		}
+
+		slider.points = curves.create_curve(slider_type, vector_points, slider.pixel_length)
 		
-		for k := f64(0); k < 1000; k += quality {
-			position := curve.point_at(f64(k) / f64(1000))
+		slider.end_position = slider.points[slider.points.len - 1] // get the last points
+		slider.curve = curves.Linear{
+			slider.points[0],
+			slider.points[slider.points.len - 1]
+		}
+		
+		for position in slider.points {
 			mut sprite := &sprite.Sprite{
-				textures: [slider_body_temp]
+				textures: [slider_body_temp],
+				color: gx.Color{127, 127, 127, 255}
 			}
 
-			//
+			// position := slider.curve.point_at(f64(t) / f64(1000))
 			sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [f64(1)])
 			sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
 			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
-			sprite.add_transform(typ: .move, time: time.Time{slider.time.start, slider.time.start}, before: [position.x, position.y])
+			sprite.add_transform(typ: .move, easing: easing.quad_out, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [slider.position.x, slider.position.y], after: [position.x, position.y])
 
 			//
-			sprite.after_add_transform_reset()
-			sprite.change_size(
-				size: vector.Vector2{
-					slider.hitcircle.image().width * size_ratio,
-					slider.hitcircle.image().height * size_ratio,
-				}
-			)
-			sprite.color = gx.Color{127, 127, 127, 255}
-			slider.sprites << sprite
-		}
-		last_position = current_position
-	}
-	*/
-
-	
-	for position in slider.points {
-		mut sprite := &sprite.Sprite{
-			textures: [slider_body_temp],
-		}
-
-		// position := slider.curve.point_at(f64(t) / f64(1000))
-		sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [f64(1)])
-		sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
-		sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
-		sprite.add_transform(typ: .move, easing: easing.quad_out, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [slider.position.x, slider.position.y], after: [position.x, position.y])
-
-		//
-		sprite.reset_time_based_on_transforms()
-		sprite.reset_attributes_based_on_transforms()
-		sprite.reset_image_size()
-		sprite.change_size(size: 
-			vector.Vector2{
-				slider.hitcircle.image().width * size_ratio, 
-				slider.hitcircle.image().height * size_ratio
-			}
-		)
-
-		sprite.color = gx.Color{127, 127, 127, 255}
-
-		// if the last one
-		/*
-		if (t + quality) >= 1000 {
-			sprite.remove_all_transform_with_type(.fade)
-			sprite.remove_all_transform_with_type(.scale_factor)
-			
-			sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
-			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
-			sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(1)], after: [f64(1.4)])
-			sprite.add_transform(typ: .color, time: time.Time{slider.time.start, slider.time.start}, before: slider.HitObject.color)
-
 			sprite.reset_time_based_on_transforms()
 			sprite.reset_attributes_based_on_transforms()
+			sprite.reset_image_size()
+			sprite.change_size(size: 
+				vector.Vector2{
+					slider.hitcircle.image().width * size_ratio, 
+					slider.hitcircle.image().height * size_ratio
+				}
+			)
 
-			// on top
-			slider.sliderend = sprite
-			slider.sprites << sprite
-		} else {
-		}*/
+			//
+			mut first := []sprite.IDrawable{}
+			first << sprite
+			first << slider.sprites
+			slider.sprites = first
+		}
+	} else {
+		if slider_points.len == 0 {
+			println('> Fucked slider data: ${slider.data}')
+			return // huh
+		}
 
-		
-		// put the slider body first so itll be at the back of everything
-		mut first := []sprite.IDrawable{}
-		first << sprite
-		first << slider.sprites
-		slider.sprites = first
+		// Old chiller slider code
+		last_point := slider_points[slider_points.len - 1].split(':')
+
+		start_position := slider.position
+		end_position := vector.Vector2{last_point[0].f64(), last_point[1].f64()}
+		slider.curve = curves.Linear{
+			start_position,
+			end_position
+		}
+
+		// HACKHACKHACK: Duplicate code
+		quality := 100
+
+		for t := 0; t < 1000; t += quality {
+			mut sprite := &sprite.Sprite{
+				textures: [slider_body_temp],
+			}
+
+			position := slider.curve.point_at(f64(t) / f64(1000))
+			sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [f64(1)])
+			sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
+			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
+			sprite.add_transform(typ: .move, easing: easing.quad_out, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [slider.position.x, slider.position.y], after: [position.x, position.y])
+
+			//
+			sprite.reset_time_based_on_transforms()
+			sprite.reset_attributes_based_on_transforms()
+			sprite.reset_image_size()
+			sprite.change_size(size: 
+				vector.Vector2{
+					slider.hitcircle.image().width * size_ratio, 
+					slider.hitcircle.image().height * size_ratio
+				}
+			)
+
+			sprite.color = gx.Color{127, 127, 127, 255}
+
+			// if the last one
+			
+			if (t + quality) >= 1000 {
+				sprite.remove_all_transform_with_type(.fade)
+				sprite.remove_all_transform_with_type(.scale_factor)
+				
+				sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
+				sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
+				sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(1)], after: [f64(1.4)])
+				sprite.add_transform(typ: .color, time: time.Time{slider.time.start, slider.time.start}, before: slider.HitObject.color)
+
+				sprite.reset_time_based_on_transforms()
+				sprite.reset_attributes_based_on_transforms()
+
+				// on top
+				slider.sliderend = sprite
+				slider.sprites << sprite
+			} else {
+				// put the slider body first so itll be at the back of everything
+				mut first := []sprite.IDrawable{}
+				first << sprite
+				first << slider.sprites
+				slider.sprites = first
+			}
+		}
 	}
 	
 
