@@ -51,6 +51,7 @@ pub fn make_hit_animation(typ HitType, position vector.Vector2, time_ f64) &spri
 	if typ == .hmiss {
 		sprite.add_transform(typ: .move, easing: easing.quad_out, time: time.Time{time_, time_ + 200}, before: [position.x, position.y], after: [position.x, position.y + 16])
 	} else {
+		sprite.remove_all_transform_with_type(.move)
 		sprite.add_transform(typ: .move, easing: easing.linear, time: time.Time{time_, time_}, before: [position.x, position.y])
 	}
 	
