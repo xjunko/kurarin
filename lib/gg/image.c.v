@@ -83,7 +83,11 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		label: img.path.str
-		d3d11_texture: 0
+		d3d11_texture: 0,
+
+		// bullshit filter for image
+		min_filter: .linear,
+		mag_filter: .linear
 	}
 	img_desc.data.subimage[0][0] = C.sg_range{
 		ptr: img.data
