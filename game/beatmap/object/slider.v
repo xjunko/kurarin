@@ -167,10 +167,16 @@ pub fn (mut slider Slider) process_points() {
 				}
 			)
 
-			sprite.color = gx.Color{127, 127, 127, 255}
-
-			// if the last one
 			
+
+			// Coloring
+			if (t + quality) >= 1000 || t == 0 {
+				sprite.add_transform(typ: .color, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0), 0, 0], after: slider.HitObject.color)
+			} else {
+				sprite.color = gx.Color{127, 127, 127, 255}
+			}
+
+			// if the last one or the first one
 			if (t + quality) >= 1000 {
 				sprite.remove_all_transform_with_type(.fade)
 				sprite.remove_all_transform_with_type(.scale_factor)
@@ -178,7 +184,6 @@ pub fn (mut slider Slider) process_points() {
 				sprite.add_transform(typ: .fade, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0)], after: [f64(255)])
 				sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(255)], after: [f64(0)])
 				sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + difficulty.hit_fade_out}, before: [f64(1)], after: [f64(1.4)])
-				sprite.add_transform(typ: .color, time: time.Time{slider.time.start, slider.time.start}, before: slider.HitObject.color)
 
 				sprite.reset_time_based_on_transforms()
 				sprite.reset_attributes_based_on_transforms()
