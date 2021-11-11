@@ -194,7 +194,19 @@ pub fn (mut hitobject HitObject) check_if_mouse_clicked_on_hitobject(x f64, y f6
 
 		end_scale := f64(1.4)
 		// TODO: skin version < 2 = end_scale := 1.8
-		animation.modify_hit_animation(mut hitobject.hitanimation, .h300, start_time)
+
+		// animation
+		relative := i64(math.abs(time - hitobject.time.start))
+		mut hitanimationtype := animation.HitType.hmiss
+
+		if relative < hitobject.diff.hit300 {
+			hitanimationtype = .h300
+		} else if relative < hitobject.diff.hit100 {
+			hitanimationtype = .h100
+		} else if relative < hitobject.diff.hit50 {
+			hitanimationtype = .h50
+		}
+		animation.modify_hit_animation(mut hitobject.hitanimation, hitanimationtype, start_time)
 
 		if !hitobject.is_hidden {
 			end_time := start_time + difficulty.hit_fade_out

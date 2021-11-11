@@ -167,8 +167,6 @@ pub fn (mut slider Slider) process_points() {
 				}
 			)
 
-			
-
 			// Coloring
 			if (t + quality) >= 1000 || t == 0 {
 				sprite.add_transform(typ: .color, time: time.Time{slider.time.start - slider.diff.preempt, slider.time.start}, before: [f64(0), 0, 0], after: slider.HitObject.color)

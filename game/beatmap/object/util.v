@@ -42,14 +42,14 @@ pub fn make_circle(arg MakeArguments) &HitObject {
 		id: arg.id,
 		position: position,
 		end_position: position,
-		logic: &logic.HitCircle{position: &position, time: time},
+		logic: &logic.HitCircle{position: &position, time: time, diff: arg.diff},
 		time: time,
 		is_spinner: arg.is_spinner,
 		is_slider: arg.is_slider,
 		diff: arg.diff,
 		timing: arg.timing,
 		data: arg.items,
-		color: arg.color
+		color: arg.color,
 	}
 	hitobject.pre_init()
 
@@ -68,7 +68,7 @@ pub fn make_spinner(arg MakeArguments) &Spinner {
 		id: arg.id,
 		position: position,
 		end_position: position,
-		logic: &logic.HitCircle{position: &position, time: time},
+		logic: &logic.HitCircle{position: &position, time: time, diff: arg.diff},
 		time: time
 	}
 
@@ -87,7 +87,7 @@ pub fn make_slider(arg MakeArguments) &Slider {
 		id: arg.id,
 		position: position,
 		end_position: position,
-		logic: &logic.HitCircle{position: &position, time: time},
+		logic: &logic.HitCircle{position: &position, time: time, diff: arg.diff},
 		time: time
 	}
 

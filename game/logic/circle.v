@@ -6,6 +6,8 @@ import gx
 import framework.math.vector
 import framework.math.time
 
+import game.math.difficulty
+
 // TODO: proper logic lmao
 
 pub struct HitCircle {
@@ -15,6 +17,7 @@ pub struct HitCircle {
 		radius   f64 = 50
 		range    f64 = 1 // this is stupid
 		clicked  bool
+		diff     difficulty.Difficulty
 
 		// canvas bullshit
 		canvas_offset vector.Vector2
@@ -52,8 +55,8 @@ pub fn (hitcircle HitCircle) draw_debug_hitbox(ctx &gg.Context, time f64) {
 pub fn (hitcircle HitCircle) is_cursor_on_hitcircle(x f64, y f64, using_osu_space bool) bool {
 	if using_osu_space {
 		return 
-				((x > hitcircle.position.x - hitcircle.radius / 2) && (x < (hitcircle.position.x + hitcircle.radius / 2))) &&
-				((y > hitcircle.position.y - hitcircle.radius / 2) && (y < (hitcircle.position.y + hitcircle.radius / 2)))
+			((x > hitcircle.position.x - hitcircle.radius / 2) && (x < (hitcircle.position.x + hitcircle.radius / 2))) &&
+			((y > hitcircle.position.y - hitcircle.radius / 2) && (y < (hitcircle.position.y + hitcircle.radius / 2)))
 	}
 	return 
 		((x > ((hitcircle.position.x + hitcircle.canvas_offset.x) - hitcircle.radius / 2) * hitcircle.canvas_scale) && (x < ((hitcircle.position.x + hitcircle.canvas_offset.x) + hitcircle.radius / 2) * hitcircle.canvas_scale)) &&
@@ -62,6 +65,6 @@ pub fn (hitcircle HitCircle) is_cursor_on_hitcircle(x f64, y f64, using_osu_spac
 
 pub fn (hitcircle HitCircle) is_hittable(time f64) bool {
 	return 
-			(time > (hitcircle.time.start - hitcircle.range)) && 
-			(time < (hitcircle.time.start + 100)) // yes
+			(time > (hitcircle.time.start - hitcircle.diff.hit50)) && 
+			(time < (hitcircle.time.end + hitcircle.diff.hit50))
 }
