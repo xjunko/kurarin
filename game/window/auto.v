@@ -15,6 +15,10 @@ pub struct AddPlayerArg {
 }
 
 pub fn (mut window GameWindow) add_auto_player(args AddPlayerArg) {
+	if args.events.len == 0 {
+		return
+	}
+
 	// Turn it into a sprite object
 	mut player_sprite := &sprite.Sprite{
 		textures: [gg.get_texture_from_skin('cursor')]

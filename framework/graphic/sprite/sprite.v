@@ -134,6 +134,9 @@ pub fn (mut s Sprite) update(time f64) {
 	}
 	*/
 	for i := 0; i < s.transforms.len; i++ {
+		if i >= s.transforms.len { return } // gdb told me that this loop cause panic somehow... not sure if this is my code or its v doing v thing
+
+		//
 		if time >= s.transforms[i].time.start && time <= s.transforms[i].time.end {
 			s.apply_transform(s.transforms[i], time)
 		}
