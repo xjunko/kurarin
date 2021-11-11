@@ -26,27 +26,48 @@ pub fn make_auto(bmap beatmap.Beatmap) []ReplayEvent {
 				key: 1 << 1
 			}
 			
-			// Follow the curves 
+
+			// attr
 			steps := 100
 			offset := 10
-			for i in 0 .. 1000 {
-				if (i % steps) == 0 {
-					// Get slider points
-					// position := object.curve.point_at(f64(i) / f64(1000))
-					position := object.points[int(math.min(int(object.points.len * (f64(i) / f64(1000))), object.points.len))]
-					time_offset := (object.time.end - object.time.start - offset) * (f64(i) / f64(1000))
+			
+			// Follow the curves 
+			if object.points.len != 0 {
+				for i in 0 .. 1000 {
+					if (i % steps) == 0 {
+						// Get slider points
+						// position := object.curve.point_at(f64(i) / f64(1000))
+						position := object.points[int(math.min(int(object.points.len * (f64(i) / f64(1000))), object.points.len))]
+						time_offset := (object.time.end - object.time.start - offset) * (f64(i) / f64(1000))
 
-					events << ReplayEvent{
-						position: position,
-						time: time.Time{object.time.start + offset + time_offset, object.time.start + offset + time_offset},
+						events << ReplayEvent{
+							position: position,
+							time: time.Time{object.time.start + offset + time_offset, object.time.start + offset + time_offset},
+						}
+					}
+				}
+
+				// Free points
+				unsafe {
+					object.points.free()
+				}
+			} else {
+				// HACKHACHACK: DUPLICAT CODE!!!!
+				// Assuming curves is valid so lets use that instead
+				for i in 0 .. 1000 {
+					if (i % steps) == 0 {
+						position := object.curve.point_at(f64(i) / f64(1000))
+						time_offset := (object.time.end - object.time.start - offset) * (f64(i) / f64(1000))
+
+						events << ReplayEvent{
+							position: position,
+							time: time.Time{object.time.start + offset + time_offset, object.time.start + offset + time_offset},
+						}
 					}
 				}
 			}
 
-			// Free points
-			unsafe {
-				object.points.free()
-			}
+			
 			
 
 			// just go to the end position
