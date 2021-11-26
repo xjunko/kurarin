@@ -39,7 +39,7 @@ pub fn parse_beatmap(path string) &Beatmap {
 	
 	//
 	mut combo_index := 1
-	mut color_index := 0
+	mut color_index := 1
 
 	for line in lines {
 		if line.trim_space().len == 0 || line.starts_with('//') { continue }
@@ -94,6 +94,8 @@ pub fn parse_beatmap(path string) &Beatmap {
 				if !beatmap.difficulty.created {
 					// Make difficulty and timing
 					beatmap.difficulty_math = beatmap.difficulty.make_difficulty()
+					beatmap.timing.slider_multiplier = beatmap.difficulty_math.slider_multiplier
+					beatmap.timing.slider_tick_rate = beatmap.difficulty_math.slider_tick_rate
 					beatmap.timing.process()
 				}
 
