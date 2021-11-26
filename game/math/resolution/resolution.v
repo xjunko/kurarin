@@ -49,5 +49,4 @@ pub fn (mut r Resolution) calculate() {
 pub fn init() {
 	mut r := global
 	r.calculate()
-	println('${global}')
 }
