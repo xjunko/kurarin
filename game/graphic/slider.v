@@ -11,7 +11,7 @@ import stbi
 import math
 import sokol
 import sokol.gfx
-import sokol.sgl
+// import sokol.sgl // ok v... ok...
 // import sokol.sapp
 
 
