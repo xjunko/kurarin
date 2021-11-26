@@ -2,7 +2,6 @@ module object
 
 import lib.gg
 
-import game.logic
 import game.math.difficulty
 
 import framework.math.vector
@@ -17,7 +16,6 @@ pub interface IHitObject {
 	end_position vector.Vector2
 	time     time.Time
 	sprites  []sprite.IDrawable
-	logic    &logic.HitCircle
 	diff     difficulty.Difficulty
 	stacking int
 
@@ -30,6 +28,6 @@ pub interface IHitObject {
 	// FNs
 	draw(ctx &gg.Context, time f64) 
 	initialize_object(mut ctx &gg.Context, last_object IHitObject)
-	check_if_mouse_clicked_on_hitobject(x f64, y f64, time f64, osu_space bool)
+	get_hit_object() &HitObject
 }
 

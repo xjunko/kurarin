@@ -11,20 +11,31 @@ import game.math.difficulty
 
 pub struct Canvas {
 	pub mut:
-		size       &vector.Vector2 = &vector.Vector2{512, 384}
-		scale      f64 = 1
-		position   &vector.Vector2 = &vector.Vector2{0, 0}
-		drawables  []sprite.IDrawable
-		hitobjects []object.IHitObject
+		size              &vector.Vector2 = &vector.Vector2{512, 384}
+		scale             f64 = 1
+		position   		  &vector.Vector2 = &vector.Vector2{0, 0}
+		drawables  		  []sprite.IDrawable
+		special_drawables []sprite.IDrawable
+		hitobjects        []object.IHitObject
 }
 
 pub fn (mut c Canvas) add_drawable(mut s sprite.IDrawable) {
+	if s.special {
+		c.special_drawables << s
+		return
+	}
 	c.drawables << s
 }
 
 pub fn (mut c Canvas) add_hitobject(mut o object.IHitObject) {
-	o.logic.add_canvas(c.position, c.scale, c.size)
 	c.hitobjects << o
+
+	// SLIDERRRR
+	for mut sprite in o.sprites {
+		if sprite.special {
+			c.add_drawable(mut sprite)
+		}
+	}
 }
 
 pub fn (mut c Canvas) update(time f64) {
@@ -34,10 +45,9 @@ pub fn (mut c Canvas) update(time f64) {
 
 	// Optimization
 	mut hitobjects_to_be_removed := 0
-	for i := c.hitobjects.len - 1; i >= 0; i-- {
-		mut object := &c.hitobjects[i]
+	for mut object in c.hitobjects {
 
-		if time > object.time.end + difficulty.hit_fade_out * 2 {
+		if time > object.time.end + difficulty.hit_fade_out * 2 { // 4/2/1
 			hitobjects_to_be_removed++
 			continue
 		}
@@ -46,20 +56,22 @@ pub fn (mut c Canvas) update(time f64) {
 			sprite.update(time)
 		}
 	}
-	c.hitobjects = c.hitobjects[0 .. c.hitobjects.len - hitobjects_to_be_removed]
+	c.hitobjects = c.hitobjects[hitobjects_to_be_removed ..]
 
 	for mut drawable in c.drawables {
 		drawable.update(time)
 	}
-
 }
 
 pub fn (mut c Canvas) draw(ctx &gg.Context, time f64) {
-	for mut object in c.hitobjects {
-		mut once := false
-		for mut sprite in object.sprites {
-			sprite.draw(ctx: ctx, time: time, offset: c.position, scale: c.scale, size: c.size, logic: object.logic, draw_logic: once)
-			once = false
+	// Render this backwards cuz yes
+	for i := c.hitobjects.len - 1; i >= 0; i-- {
+		if i >= c.hitobjects.len || i < 0 { println("> ${@FN}: fucked index: i=${i} - max=${c.hitobjects.len}") break}
+
+		mut hitobject := &c.hitobjects[i]
+		for mut sprite in hitobject.sprites {
+			if sprite.special { continue }
+			sprite.draw(ctx: ctx, time: time, offset: c.position, scale: c.scale, size: c.size)
 		}
 	}
 	

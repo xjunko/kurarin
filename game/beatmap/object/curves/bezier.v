@@ -1,133 +1,78 @@
 module curves
 
-import framework.math.vector { Vector2 }
+import math
+import framework.math.vector
 
-
-// import math
-
-const (
-	bezier_tolerance = f64(0.25)
-)
-
-pub fn bezier_is_flat_enough(points []Vector2) bool {
-	for i := 1; i < points.len - 1; i++ {
-		tmp := points[i - 1].sub_(points[i].multiply_(2)).add_(points[i + 1])
-
-		if tmp.length_squared() > bezier_tolerance {
-			return false
-		}
-	}
-
-	return true
+pub struct Bezier {
+	pub mut:
+		points []vector.Vector2
+		approx_length f64
 }
 
+pub fn make_bezier(points []vector.Vector2) &Bezier {
+	mut bezier := &Bezier{points: points}
 
-pub fn bezier_subdivide(points []Vector2, mut l []Vector2, mut r []Vector2, mut subdivision_buffer []Vector2, count int) {
-	mut midpoints := unsafe { subdivision_buffer }
-
-
-	for i := 0; i < count; i++ {
-		unsafe {
-			midpoints[i] = points[i]
-		}
+	for i := 1; i <= 250; i++ {
+		bezier.approx_length += bezier.n_point_at(f64(i)/250.0).distance(bezier.n_point_at(f64(i - 1)/250.0))
 	}
-
-	for i := 0; i < count; i++ {
-		unsafe {
-			l[i] = midpoints[0]
-			r[count - i - 1] = midpoints[count - i - 1]
-		}
-
-		for j := 0; j < count - i - 1; j++ {
-			unsafe {
-				midpoints[j] = midpoints[j].add_(midpoints[j + 1])
-				midpoints[j] = midpoints[j].divide_(2)
-			}
-		}
-	}
+	return bezier
 }
 
-pub fn bezier_aproximate(points []Vector2, mut output []Vector2, mut subdivision_buffer1 []Vector2, mut subdivision_buffer2 []Vector2, count int) {
-	mut l := unsafe { subdivision_buffer1 }
-	mut r := unsafe { subdivision_buffer2 } 
+pub fn (bezier Bezier) n_point_at(time f64) vector.Vector2 {
+	mut x := f64(0)
+	mut y := f64(0)
+	n := bezier.points.len - 1
 
-	bezier_subdivide(points, mut l, mut r, mut subdivision_buffer1, count)
+	for i := 0; i <= n; i++ {
+		b := bernstein(i64(i), i64(n), time)
+		x += bezier.points[i].x * b
+		y += bezier.points[i].y * b
+	}
+	return vector.Vector2{x, y}
+}
+
+pub fn (bezier Bezier) point_at(time f64) vector.Vector2 {
+	desired_width := bezier.approx_length * time
+	mut width := f64(0.0)
+	mut c := f64(0.0)
+	mut pos := bezier.points[0]
 	
-	for i := 0; i < count - 1; i++ {
-		for l.len < count + i + 1 {
-			l << Vector2{}
+	for width < desired_width {
+		pt := bezier.n_point_at(c)
+		width += pt.distance(pos)
+		if width > desired_width {
+			return pos
 		}
-		// Fill
-		unsafe {	
-			l[count + i] = r[i + 1]
-		}
+		pos = pt
+		c += 1.0 / f64(bezier.points.len * 50 - 1)
 	}
-
-	output << points[0]
-
-	for i := 1; i < count - 1; i++ {
-		unsafe {
-			index := 2 * i
-			mut p := l[index].add_(l[index].multiply_(2)).add_(l[index + 1])
-			// mut p := l[index].multiply_(2).add_(l[index - 1]).add_(l[index + 1])
-			p = p.multiply_(0.25)
-			output << p
-		}
-	}
-
-	
+	return pos
 }
 
-pub fn create_bezier(control_points []Vector2) []Vector2 {
-	mut output := []Vector2{}
-	mut n := control_points.len - 1
+pub fn (bezier Bezier) get_length() f64 {
+	return bezier.approx_length
+}
 
-	if n < 0 {
-		return output
+// Utils ?
+pub fn binomial_coeff(n i64, k i64) i64 {
+	if k < 0 || k > n {
+		return 0
 	}
 
-	mut to_flatten := [][]Vector2{}
-	mut free_buffer := [][]Vector2{}
-
-	// copy
-	mut points := control_points.clone()
-
-	//
-	to_flatten << points
-
-	//
-	mut subdivision_buffer1 := []Vector2{len: n + 1}
-	mut subdivision_buffer2 := []Vector2{len: n * 2 + 1}
-	mut left_child := subdivision_buffer2.clone()
-
-	for to_flatten.len > 0 {
-		mut parent := to_flatten.pop()
-
-		if bezier_is_flat_enough(parent) {
-			bezier_aproximate(parent, mut output, mut subdivision_buffer1, mut subdivision_buffer2, n + 1)
-			free_buffer << parent
-			continue
-		}
-
-		mut right_child := []Vector2{}
-		if free_buffer.len > 0 {
-			right_child = free_buffer.pop()
-		} else {
-			right_child = []Vector2{len: n + 1}
-		}
-		
-		bezier_subdivide(parent, mut left_child, mut right_child, mut subdivision_buffer1, n + 1)
-
-
-
-		for i := 0; i < n + 1; i++ {
-			parent[i] = left_child[i]
-		}
-
-		to_flatten << right_child
-		to_flatten << parent
+	if k == 0 || k == n {
+		return 1
 	}
-	output << control_points[n]
 
-	return output
+	kk := math.min(k, n-k)
+	mut c := i64(1)
+	mut i := 0
+	for ;i < kk; i++ {
+		c = c * (n - i) / (i + 1)
+	}
+
+	return c
+}
+
+pub fn bernstein(i i64, n i64, time f64) f64 {
+	return f64(binomial_coeff(n, i)) * math.pow(time, f64(i)) * math.pow(1.0 - time, f64(n - i))
 }

@@ -1,21 +1,22 @@
 module curves
 
-import framework.math.vector { Vector2 }
+import framework.math.vector
 
-pub fn create_linear(control_points []Vector2) []Vector2 {
-	mut output := []Vector2{}
+pub struct Linear {
+	pub mut:
+		p1 vector.Vector2
+		p2 vector.Vector2
+}
 
-	for i := 1; i < control_points.len; i++ {
-		l1 := control_points[i - 1]
-		l2 := control_points[i]
-		
-		mut segments := 1
+pub fn make_linear(p1 vector.Vector2, p2 vector.Vector2) &Linear {
+	mut linear := &Linear{p1, p2}
+	return linear
+}
 
-		for j := 0; j <= segments; j++ {
-			v1 := l1.add_(l2.sub_(l1).multiply_(j / segments))
-			output << v1
-		}
-	}
+pub fn (ln Linear) point_at(time f64) vector.Vector2 {
+	return ln.p2.sub(ln.p1).scale(time).add(ln.p1)
+}
 
-	return output
+pub fn (ln Linear) get_length() f64 {
+	return ln.p1.distance(ln.p2)
 }

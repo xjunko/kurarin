@@ -128,15 +128,9 @@ pub fn (mut beatmap Beatmap) initialize_sprite_component(mut ctx &gg.Context) {
 	
 	// Sort from last circle to first
 	// This way itll render correctly without me fucking with z index
-	beatmap.objects.sort(a.time.end > b.time.end)
+	// beatmap.objects.sort(a.time.end > b.time.end) // ok nvm this is gay
 
 	beatmap.ready = true
-}
-
-pub fn (mut beatmap Beatmap) check_if_clicked(x f64, y f64, time f64, use_osu_space bool) {
-	for mut object in beatmap.objects {
-		object.check_if_mouse_clicked_on_hitobject(x, y, time, use_osu_space)
-	}
 }
 
 // Storyboard

@@ -3,7 +3,6 @@ module object
 import framework.math.vector
 import framework.math.time
 
-import game.logic
 import game.math.difficulty
 import game.math.timing
 
@@ -42,7 +41,6 @@ pub fn make_circle(arg MakeArguments) &HitObject {
 		id: arg.id,
 		position: position,
 		end_position: position,
-		logic: &logic.HitCircle{position: &position, time: time, diff: arg.diff},
 		time: time,
 		is_spinner: arg.is_spinner,
 		is_slider: arg.is_slider,
@@ -68,7 +66,6 @@ pub fn make_spinner(arg MakeArguments) &Spinner {
 		id: arg.id,
 		position: position,
 		end_position: position,
-		logic: &logic.HitCircle{position: &position, time: time, diff: arg.diff},
 		time: time
 	}
 
@@ -87,7 +84,6 @@ pub fn make_slider(arg MakeArguments) &Slider {
 		id: arg.id,
 		position: position,
 		end_position: position,
-		logic: &logic.HitCircle{position: &position, time: time, diff: arg.diff},
 		time: time
 	}
 

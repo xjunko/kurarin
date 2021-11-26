@@ -41,6 +41,6 @@ pub fn (mut spinner Spinner) initialize_object(mut ctx &gg.Context, last_object 
 	spinner.sprites = [spinner.spinnercircle]
 }
 
-pub fn (mut spinner Spinner) check_if_mouse_clicked_on_hitobject(x f64, y f64, time f64, osu_space bool) {
-
+pub fn (mut spinner Spinner) get_hit_object() &HitObject {
+	return spinner.HitObject.get_hit_object()
 }

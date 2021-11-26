@@ -9,8 +9,6 @@ import framework.math.time
 import framework.math.vector
 import framework.math.easing
 
-import game.logic
-
 // had to do this since interface doesnt support embedded struct :ihatemylife:
 pub enum SpriteType {
 	image
@@ -36,8 +34,10 @@ pub struct Sprite {
 		// Text
 		font       string // idk yet
 		text       string
+		special    bool
 
 		always_visible bool
+		skip_offset    bool
 		transforms []transform.Transform
 		transforms_i int // mmmmmm idk
 }
@@ -124,21 +124,9 @@ pub fn (mut s Sprite) add_transform(arg AddTransformArgument) {
 }
 
 pub fn (mut s Sprite) update(time f64) {
-	// Optimize this
-	/*
-	for t in s.transforms {
-		if time >= t.time.start && time <= t.time.end {
-			s.apply_transform(t, time)
-			// println('${t.time.start} - ${t.time.end} - ${time}, ${s.color.a}')
-		}
-	}
-	*/
-	for i := 0; i < s.transforms.len; i++ {
-		if i >= s.transforms.len { return } // gdb told me that this loop cause panic somehow... not sure if this is my code or its v doing v thing
-
-		//
-		if time >= s.transforms[i].time.start && time <= s.transforms[i].time.end {
-			s.apply_transform(s.transforms[i], time)
+	for transform in s.transforms {
+		if time >= transform.time.start && time <= transform.time.end {
+			s.apply_transform(transform, time)
 		}
 	}
 }
@@ -228,7 +216,7 @@ pub fn (s Sprite) check_if_drawable(time f64) bool {
 			return true
 		}
 	*/
-	if time >= s.time.start && time <= s.time.end {
+	if time >= s.time.start && time <= s.time.end && s.color.a > 0 {
 		return true
 	}
 
@@ -251,9 +239,19 @@ pub fn (s Sprite) draw(cfg DrawConfig) {
 	// height := f32(s.size.y * cfg.scale)
 	
 	// use vector methods
-	size := s.size.scale_(cfg.scale)
-	origin := size.scale_origin_(s.origin)
-	position := s.position.scale_(cfg.scale).sub_(origin).add_(cfg.offset.scale_(cfg.scale))
+	size := s.size.scale(cfg.scale)
+	origin := size.multiply(s.origin)
+
+	mut position := s.position.scale(cfg.scale).sub(origin).add(cfg.offset.scale(cfg.scale))
+
+	if s.skip_offset {
+		// real
+		// position = s.position.sub_(s.size.scale_origin_(s.origin))
+		//cfg.ctx.draw_rect(f32(position.x), f32(position.y), 32, 32, gx.red)
+		// cved
+		//mut position_cv := s.position.scale_(cfg.scale).sub_(origin).add_(cfg.offset.scale_(cfg.scale))
+		//cfg.ctx.draw_rect(f32(position_cv.x), f32(position_cv.y), 32, 32, gx.yellow)
+	}
 
 	match s.typ {
 		.image {
@@ -284,10 +282,6 @@ pub fn (s Sprite) draw(cfg DrawConfig) {
 				}
 			)
 		}
-	}
-
-	if cfg.draw_logic {
-		cfg.logic.draw_debug_hitbox(cfg.ctx, cfg.time)
 	}
 }	
 

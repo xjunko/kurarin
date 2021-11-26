@@ -78,7 +78,7 @@ pub mut:
 
 fn gg_init_sokol_window(user_data voidptr) {
 	mut g := unsafe { &Context(user_data) }
-	desc := sapp.create_desc()
+	mut desc := sapp.create_desc()
 	/*
 	desc := C.sg_desc{
 		mtl_device: sapp.metal_get_device()
@@ -90,6 +90,17 @@ fn gg_init_sokol_window(user_data voidptr) {
 		d3d11_depth_stencil_view_cb: sapp.d3d11_get_depth_stencil_view
 	}
 	*/
+
+	// Up the limit of everything
+	power := 14 // 16k ... should be enough lol
+	desc = C.sg_desc{
+		context: desc.context,
+		image_pool_size: (1 << power) - 1 // some storyboard is really stupid so i had to do this
+		buffer_pool_size: (1 << power) - 1 // for now just increase these 3 below until i add
+		shader_pool_size: (1 << power) - 1 // slider pooling or something like that
+		pipeline_pool_size: (1 << power) - 1 // :troll:
+	}
+	
 	gfx.setup(&desc)
 	sgl_desc := C.sgl_desc_t{}
 	sgl.setup(&sgl_desc)

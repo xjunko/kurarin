@@ -10,6 +10,7 @@ import gx
 import framework.audio
 import framework.math.time as ktime
 import framework.graphic.canvas
+import framework.graphic.sprite
 
 //
 import game.beatmap
@@ -31,10 +32,16 @@ pub struct GameWindow {
 		game_time   &ktime.TimeCounter = &ktime.TimeCounter{}
 		render_time &ktime.TimeCounter = &ktime.TimeCounter{}
 
+		//
+		auto_repr   &sprite.Sprite = voidptr(0)
 
 		// canvas
-		game_canvas &canvas.Canvas = &canvas.Canvas{}
+		game_canvas    &canvas.Canvas = &canvas.Canvas{}
 		beatmap_canvas &canvas.Canvas = voidptr(0)
+
+		//
+		player         &auto.IPlayer = &auto.AutoPlayer{player: 0, logic: 0} // V SHUT THE FUCK UP PLEASE
+		players        []auto.IPlayer
 
 		//
 		video_writer &VideoWriter = voidptr(0)
@@ -78,11 +85,35 @@ pub fn (mut window GameWindow) start_game_loop(args StartTimeArg) {
 					println("> GameWindow: Starting GameTime")
 				}
 
+				// Ready
+				if window.global_time.time >= 1000 && !window.is_ready {
+					window.is_ready = true
+				}
+
 				// tick game time also
 				window.game_time.tick()
 
 				// timelib.sleep(1 * timelib.millisecond)
 				// Uncomment this if you want your cpu to not die lol
+			}
+		}(mut window)
+
+		go fn (mut window GameWindow) {
+			storyboard_valid := !isnil(window.beatmap.storyboard)
+			for {
+				// Updates
+				window.game_canvas.update(window.game_time.time)
+				
+				if storyboard_valid {
+					window.beatmap.storyboard.background.update(window.game_time.time)
+				}
+
+				window.beatmap.background_sprite.update(window.game_time.time)
+
+				// Logic
+				for mut player in window.players {
+					player.update(window.game_time.time)
+				}
 			}
 		}(mut window)
 	} else {
@@ -120,11 +151,9 @@ pub fn (mut window GameWindow) load_beatmap() {
 
 	// add auto player if enabled
 	if window.auto {
-		window.add_auto_player(events: auto.make_auto(window.beatmap))
+		window.players << auto.make_auto(window.beatmap, mut window.game_canvas, mut window.game_time)
+		window.player = &window.players[0]
 	}
-
-	// ready
-	window.is_ready = true
 }
 
 // draw
@@ -135,20 +164,37 @@ pub fn (mut window GameWindow) draw_time_info() {
 	window.ctx.draw_text(0, 16, 'Global Update: ${window.global_time.fps:.2f}fps [${window.global_time.delta:.2f}ms] | Game Update: ${window.game_time.fps:.2f}fps [${window.game_time.delta}ms] | Draw Update: ${window.render_time.fps:.2f}fps [${window.render_time.delta}ms]', gx.TextCfg{color: gx.white})
 }
 
-pub fn (mut window GameWindow) draw() {
+[inline]
+pub fn (mut window GameWindow) draw_back_layer() {
 	// Background
-	window.beatmap.background_sprite.draw_and_update(ctx: window.ctx, time: window.game_time.time)
+	window.beatmap.background_sprite.draw(ctx: window.ctx, time: window.game_time.time)
 
 	// Storyboard
 	if !isnil(window.beatmap.storyboard) {
-		window.beatmap.storyboard.background.draw_and_update(window.ctx, window.game_time.time)
+		window.beatmap.storyboard.background.draw(window.ctx, window.game_time.time)
 	}
+}
 
+[inline]
+pub fn (mut window GameWindow) draw_game_layer() {
 	// Game canvas
-	window.game_canvas.draw_and_update(window.ctx, window.game_time.time)
+	window.game_canvas.draw(window.ctx, window.game_time.time)
+}
 
-	// time
+pub fn (mut window GameWindow) draw() {
+	// window.draw_back_layer()
+	window.draw_game_layer()
 	window.draw_time_info()
+}
+
+pub fn (mut window GameWindow) draw_special() {
+	// Render this backwards... nvm it fucks with the other slider alpha
+	// for i := window.game_canvas.special_drawables.len - 1; i >= 0; i-- {
+	// 	window.game_canvas.special_drawables[i].draw(ctx: 0, time: window.game_time.time)
+	// }
+	for mut drawable in window.game_canvas.special_drawables {
+		drawable.draw(ctx: window.ctx, time: window.game_time.time)
+	}
 }
 
 pub struct MakeWindowArg {
@@ -164,4 +210,5 @@ pub fn make_game_window(arg MakeWindowArg) &GameWindow {
 
 	return window
 }
+
 

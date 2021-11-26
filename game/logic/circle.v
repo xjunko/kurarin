@@ -1,70 +1,133 @@
 module logic
 
-import lib.gg
-import gx
-
-import framework.math.vector
+import math
+import game.beatmap.object
 import framework.math.time
+import framework.math.vector
 
-import game.math.difficulty
-
-// TODO: proper logic lmao
 
 pub struct HitCircle {
 	pub mut:
-		position &vector.Vector2 = voidptr(0)
-		time     time.Time
-		radius   f64 = 50
-		range    f64 = 1 // this is stupid
-		clicked  bool
-		diff     difficulty.Difficulty
+		logic     &StandardLogic = voidptr(0)
+		circle    &object.HitObject = voidptr(0)
+		player    &PlayerReprensent = voidptr(0)
+		fade_time f64
+		is_hit    bool
 
-		// canvas bullshit
-		canvas_offset vector.Vector2
-		canvas_scale  f64
-		canvas_size   vector.Vector2
-		
+		//
+		global_position vector.Vector2
+
 }
 
-// Circular import bullshit so had to do this
-pub fn (mut hitcircle HitCircle) add_canvas(position vector.Vector2, scale f64, size vector.Vector2) {
-	unsafe { // unsafe code very unsafe !!!! unsafe !!!! 11111
-		hitcircle.canvas_offset = position
-		hitcircle.canvas_size = size
+pub fn (mut hitcircle HitCircle) init(logic &StandardLogic, circle &object.IHitObject, player &PlayerReprensent) {
+	unsafe {
+		hitcircle.logic = logic
+		hitcircle.player = player
+
+		if circle is object.HitObject {
+			hitcircle.circle = circle
+		} else if circle is object.Slider {
+			hitcircle.circle = &circle.HitObject
+		}
 	}
-	hitcircle.canvas_scale = scale
+
+	hitcircle.fade_time = f64(1000000)
+	hitcircle.fade_time = f64(math.min(
+		hitcircle.fade_time, player.difficulty.preempt
+	))
+
+	// HACK: TEMP
+	// hitcircle.fade_time += f64(300)
+
+	hitcircle.init_old()
+}
+
+pub fn (mut hitcircle HitCircle) update_for(time f64, _ bool) bool {
+	// HACK: remove this or put it somewhere else
 	
-}
-
-pub fn (hitcircle HitCircle) draw_debug_hitbox(ctx &gg.Context, time f64) {
-	if hitcircle.is_hittable(time) && !hitcircle.clicked {
-		ctx.draw_rect(
-            f32(((hitcircle.position.x + hitcircle.canvas_offset.x) - hitcircle.radius / 2) * hitcircle.canvas_scale),
-            f32(((hitcircle.position.y + hitcircle.canvas_offset.y) - hitcircle.radius / 2) * hitcircle.canvas_scale),
-            f32(hitcircle.radius * hitcircle.canvas_scale),
-            f32(hitcircle.radius * hitcircle.canvas_scale),
-            gx.Color{255, 0, 0, 50}
-        )
+	if time >= hitcircle.circle.time.start && !hitcircle.is_hit && force_hit {
+		hitcircle.circle.arm(true, time)
+		hitcircle.is_hit = true
 	}
+	
+	
+	return true
 }
 
-/*
-((x > hitcircle.position.x - hitcircle.radius / 2) && (x < (hitcircle.position.x + hitcircle.radius / 2))) &&
-((y > hitcircle.position.y - hitcircle.radius / 2) && (y < (hitcircle.position.y + hitcircle.radius / 2)))
-*/
-pub fn (hitcircle HitCircle) is_cursor_on_hitcircle(x f64, y f64, using_osu_space bool) bool {
-	if using_osu_space {
-		return 
-			((x > hitcircle.position.x - hitcircle.radius / 2) && (x < (hitcircle.position.x + hitcircle.radius / 2))) &&
-			((y > hitcircle.position.y - hitcircle.radius / 2) && (y < (hitcircle.position.y + hitcircle.radius / 2)))
+pub fn (mut hitcircle HitCircle) init_old() {
+	// PlayerMode
+	// convert hitcircle position to global
+	// size := vector.Vector2{hitcircle.player.difficulty.circleradius, hitcircle.player.difficulty.circleradius}.scale_(hitcircle.logic.canvas.scale)
+	// origin := size.scale_origin_(vector.centre)
+	// position := hitcircle.circle.position.scale_(hitcircle.logic.canvas.scale).sub_(origin).add_(hitcircle.logic.canvas.position.scale_(hitcircle.logic.canvas.scale))
+	// hitcircle.global_position = position
+}
+
+pub fn (mut hitcircle HitCircle) update_click_for(time f64) bool {
+	if force_hit { return true } // ignore hitsystem
+
+	if !hitcircle.is_hit {
+		clicked := hitcircle.player.left_cond_e || hitcircle.player.right_cond_e
+		radius := hitcircle.player.difficulty.circleradius
+
+		in_range := hitcircle.player.position.distance(hitcircle.circle.position) <= radius
+		// in_range := hitcircle.player.position.distance(hitcircle.global_position) <= radius // PlayerMode
+		if clicked {
+			action := hitcircle.logic.can_be_hit(time, mut hitcircle)
+			if in_range {
+				if action == .click {
+					if hitcircle.player.left_cond_e {
+						hitcircle.player.left_cond_e = false
+					} else if hitcircle.player.right_cond_e {
+						hitcircle.player.right_cond_e = false
+					}
+
+					mut hit := HitResult.miss
+					relative := f64(math.abs(time - hitcircle.circle.time.end))
+
+					if relative < hitcircle.player.difficulty.hit300 {
+						hit = .hit300
+					} else if relative < hitcircle.player.difficulty.hit100 {
+						hit = .hit100
+					} else if relative < hitcircle.player.difficulty.hit50 {
+						hit = .hit50
+					}
+
+					if hit != .ignore {
+						hitcircle.circle.arm(hit != .miss, time)
+						hitcircle.is_hit = true
+					}
+				} else {
+					hitcircle.player.left_cond_e = false
+					hitcircle.player.right_cond_e = false
+
+					if action == .shake {
+						hitcircle.circle.shake(time)
+					}
+				}
+			}
+		}
 	}
-	return 
-		((x > ((hitcircle.position.x + hitcircle.canvas_offset.x) - hitcircle.radius / 2) * hitcircle.canvas_scale) && (x < ((hitcircle.position.x + hitcircle.canvas_offset.x) + hitcircle.radius / 2) * hitcircle.canvas_scale)) &&
-		((y > ((hitcircle.position.y + hitcircle.canvas_offset.y) - hitcircle.radius / 2) * hitcircle.canvas_scale) && (y < ((hitcircle.position.y + hitcircle.canvas_offset.y) + hitcircle.radius / 2) * hitcircle.canvas_scale))
+
+	return !hitcircle.is_hit
 }
 
-pub fn (hitcircle HitCircle) is_hittable(time f64) bool {
-	return 
-			(time > (hitcircle.time.start - hitcircle.diff.hit50)) && 
-			(time < (hitcircle.time.end + hitcircle.diff.hit50))
+pub fn (mut hitcircle HitCircle) update_post_for(time f64) bool {
+	if time >= hitcircle.circle.time.end + hitcircle.player.difficulty.hit50 && !hitcircle.is_hit {
+		hitcircle.circle.arm(false, time)
+
+		hitcircle.is_hit = true
+	}
+
+	return hitcircle.is_hit
+}
+
+pub fn (hitcircle HitCircle) get_fade_time() f64 {
+	return f64(
+		hitcircle.circle.time.start - hitcircle.fade_time
+	)
+}
+
+pub fn (hitcircle HitCircle) get_number() int {
+	return hitcircle.circle.id
 }
