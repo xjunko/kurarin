@@ -59,10 +59,6 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	// Process them pointsss
 	slider.process_points()
 
-	if slider.time.start >= 65000 && slider.time.start <= 70000 {
-		println(slider.time.start)
-		println(slider.timing.get_point_at(slider.time.start))
-	}
 	// from osr2mp4
 	slider.duration = slider.timing.get_point_at(slider.time.start).beatduration * slider.pixel_length / (100 * slider.timing.slider_multiplier)
 	slider.time.end += slider.duration * slider.repeated
