@@ -50,19 +50,37 @@ pub fn (mut slider Slider) get_curves() []vector.Vector2 {
 }
 
 pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IHitObject) {
-	// duration and shit - not accurate
+	/* the old method
 	slider.repeated = slider.data[6].f64()
 	slider.pixel_length = slider.data[7].f64()
 	slider.duration = (
 		slider.timing.get_beat_duration(slider.time.start) * slider.pixel_length / (100 * slider.diff.slider_multiplier)
 	)
-	
 	slider.time.end += slider.duration * slider.repeated
+	*/
 
 	// why do i need to do this again lol
 	slider.HitObject.initialize_object(mut ctx, last_object)
-	//
+
+	// more info
+	slider.repeated = slider.data[6].f64()
+	slider.pixel_length = slider.data[7].f64()
+	
+	// Process them pointsss
 	slider.process_points()
+
+	if slider.time.start >= 65000 && slider.time.start <= 70000 {
+		println(slider.time.start)
+		println(slider.timing.get_point_at(slider.time.start))
+	}
+	// from osr2mp4
+	slider.duration = slider.timing.get_point_at(slider.time.start).beatduration * slider.pixel_length / (100 * slider.timing.slider_multiplier)
+	slider.time.end += slider.duration * slider.repeated
+
+	// println('${slider.time.start} ${slider.time.end} - ${point} ${velocity} ${cum_length} ${slider.repeated}')
+
+	// make slider follow circle eee
+	slider.make_slider_follow_circle()
 
 	// Make slider renderrrrrrer
 	slider.sliderrender.time = &slider.time
@@ -75,27 +93,7 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	slider.sprites << slider.sliderrender
 }
 
-// TODO: temporary
-// GOD BLESS ME
-pub fn (mut slider Slider) process_points() {
-	// mut size_ratio := (54.4 - 4.48 * slider.diff.cs) * 1.05 * 2 / 128
-	mut slider_points := slider.data[5].split('|')
-	mut slider_type := slider_points[0]
-	slider_points = slider_points[1..]
-	
-
-	// NEW slider shit
-	mut vector_points := []vector.Vector2{}
-	vector_points << slider.position
-	for points in slider_points {
-		items := points.split(":")
-		vector_points << vector.Vector2{items[0].f64(), items[1].f64()}
-	}
-	
-	// println("${vector_points.len} points, Type: ${slider_type}")
-	slider.curve = curves.new_slider_curve(slider_type, vector_points)		
-	slider.end_position = slider.curve.point_at(1.0)
-
+pub fn (mut slider Slider) make_slider_follow_circle() {
 	// Overlay
 	slider_overlay := gg.get_texture_from_skin("sliderfollowcircle")
 	mut slider_overlay_sprite := &sprite.Sprite{
@@ -129,6 +127,25 @@ pub fn (mut slider Slider) process_points() {
 
 	//
 	slider.sprites << slider_overlay_sprite
+}
+pub fn (mut slider Slider) process_points() {
+	// mut size_ratio := (54.4 - 4.48 * slider.diff.cs) * 1.05 * 2 / 128
+	mut slider_points := slider.data[5].split('|')
+	mut slider_type := slider_points[0]
+	slider_points = slider_points[1..]
+	
+
+	// NEW slider shit
+	mut vector_points := []vector.Vector2{}
+	vector_points << slider.position
+	for points in slider_points {
+		items := points.split(":")
+		vector_points << vector.Vector2{items[0].f64(), items[1].f64()}
+	}
+	
+	// println("${vector_points.len} points, Type: ${slider_type}")
+	slider.curve = curves.new_slider_curve(slider_type, vector_points)		
+	slider.end_position = slider.curve.point_at(math.fmod(slider.repeated, 2))
 }
 
 pub fn (mut slider Slider) arm(clicked bool, time f64) {
