@@ -41,23 +41,25 @@ Options:
 
 ## Bugs
 
-* ~~Due to some bug in v-miniaudio I had to disable hitsounds for now, it gets updated recently so ill update it sooner or later.~~ Fixed in dev branch
+* ~~Due to some bug in v-miniaudio I had to disable hitsounds for now, it gets updated recently so ill update it sooner or later.~~ Fixed
 * The entire thing is a bug and error-prone
-* Slider is not accurate at all since I barely put any time into it
-* Storyboard is not accurate at all since I am stupid
-* Compiling with `-prod` fucks with the HitCircle's "logic"
-* Compiling with `-gc boehm` makes audio glitchy for a millisecond randomly
+* ~~Slider is not accurate at all since I barely put any time into it~~ Fixed but timing is still wrong sometimes
+* ~~Storyboard is not accurate at all since I am stupid~~ Kinda fixed
+* ~~Compiling with `-prod` fucks with the HitCircle's "logic"~~ Not anymore
+* ~~Compiling with `-gc boehm` makes audio glitchy for a millisecond randomly~~ Not anymore
 * And so on...
 
 ## TODOs
 
 i got school soontm so this might not be finished at all :trollface:
 
-* Actual slider renderer lmao
-* Slider curves [very close to finishing this, im stupid so itll take awhile]
-* Actual osu! gameplay hitsystem and not whatever the fuck placeholder shit Im using rn
-* Unfucked the codebase and make it stable overall
-* Replay support (kinda already there but not really, you just had to somehow give the replay event into auto listener and it should show up)
+* ~~Actual slider renderer lmao~~ Done
+* ~~Slider curves~~
+* ~~Actual osu! gameplay hitsystem and not whatever the fuck placeholder shit Im using rn~~ Partly done
+* Fix timings fucking up sometimes
+* Fix slider renderer alpha thingy since im doing it wrong
+* Unfucked the codebase and make it stable overall [Nope]
+* Replay support (kinda already there but not really, you just had to somehow give the replay event into auto listener and it should show up) [Nope]
 
 ## Credits
 
