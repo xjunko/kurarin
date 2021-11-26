@@ -1,5 +1,5 @@
 # Kurarin - barely working osu! beatmap visualizer made in V
-
+lots of changes has been made in dev branch btw :trollface: so check it out
 ![logo](assets/screenshots/logo.png)
 
 ## About
