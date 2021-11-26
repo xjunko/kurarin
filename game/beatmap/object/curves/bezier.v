@@ -7,28 +7,37 @@ pub struct Bezier {
 	pub mut:
 		points []vector.Vector2
 		approx_length f64
+		control_length f64
 }
 
 pub fn make_bezier(points []vector.Vector2) &Bezier {
 	mut bezier := &Bezier{points: points}
 
-	for i := 1; i <= 250; i++ {
-		bezier.approx_length += bezier.n_point_at(f64(i)/250.0).distance(bezier.n_point_at(f64(i - 1)/250.0))
+	for i := 1; i < bezier.points.len; i++ {
+		bezier.control_length += bezier.points[i].distance(bezier.points[i-1])
+	}
+
+	sections := math.ceil(bezier.control_length)
+	
+	mut previous := bezier.points[0]
+	for i := 1; i <= sections; i++ {
+		current := bezier.n_point_at(f64(i) / sections)
+		bezier.approx_length += current.distance(previous)
+		previous = current
 	}
 	return bezier
 }
 
 pub fn (bezier Bezier) n_point_at(time f64) vector.Vector2 {
-	mut x := f64(0)
-	mut y := f64(0)
+	mut p := vector.Vector2{}
 	n := bezier.points.len - 1
 
 	for i := 0; i <= n; i++ {
 		b := bernstein(i64(i), i64(n), time)
-		x += bezier.points[i].x * b
-		y += bezier.points[i].y * b
+		p.x += bezier.points[i].x * b
+		p.y += bezier.points[i].y * b
 	}
-	return vector.Vector2{x, y}
+	return p
 }
 
 pub fn (bezier Bezier) point_at(time f64) vector.Vector2 {
