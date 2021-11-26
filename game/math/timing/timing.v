@@ -18,6 +18,10 @@ pub struct TimingPoint {
 		timings   []TimingPointInfo
 		data      [][]f32
 		inherited f32
+		
+		// more info
+		slider_multiplier f64
+		slider_tick_rate  f64
 }
 
 pub fn (mut tp TimingPoint) add_line(data []f32) {
@@ -26,25 +30,6 @@ pub fn (mut tp TimingPoint) add_line(data []f32) {
 
 pub fn (mut tp TimingPoint) add(data []f32) {
 	tp.add_line(data)
-	/*
-	mut timing := TimingPointInfo{}
-	timing.offset = data[0]
-
-	if data.len < 7 || data[6] == 1 {
-		timing.beatduration = data[1]
-		tp.inherited = data[1]
-	} else {
-		timing.beatduration = f32(math.max(10.0, math.min(1000.0, data[1])) * tp.inherited / 1000)
-	}
-
-	timing.base = tp.inherited
-	timing.meter = data[2]
-	timing.sampleset = data[3]
-	timing.sampleindex = data[4]
-	timing.volume = data[5]
-
-	tp.timings << timing
-	*/
 }
 
 pub fn (mut tp TimingPoint) process() {
@@ -55,9 +40,9 @@ pub fn (mut tp TimingPoint) process() {
 
 		timing.offset = items[0]
 
-		if items.len < 7 || items[6] == 1 {
+		if items.len < 7 || items[6] == 1.0 {
 			timing.beatduration = items[1]
-			inherited = items[1]
+			inherited = timing.beatduration
 		} else {
 			timing.beatduration = f32(
 				math.max(10.0, math.min(1000.0, -items[1])) * inherited / 100
@@ -72,19 +57,45 @@ pub fn (mut tp TimingPoint) process() {
 
 		tp.timings << timing
 	}
+
+	unsafe {
+		tp.data.free()
+	}
 }
 
 
 pub fn (mut tp TimingPoint) get_point_at(time f64) TimingPointInfo {
-	for timing in tp.timings {
-		if time >= timing.offset { continue }
+	// its 3am rn and my brain is not working
+	// this is stupid but i cant think of better idea to do this
+	mut last_highest := &TimingPointInfo{}
 
-		return timing
+	for i := tp.timings.len - 1; i >= 0; i-- {
+		if time >= tp.timings[i].offset { last_highest = &tp.timings[i] break }
+		last_highest = &tp.timings[i]
 	}
-
-	return TimingPointInfo{}
+	
+	return *last_highest
 }
 
 pub fn (mut tp TimingPoint) get_beat_duration(time f64) f32 {
 	return tp.get_point_at(time).beatduration
+}
+
+pub fn (tp TimingPoint) get_scoring_distance() f64 {
+	return (100.0 * tp.slider_multiplier) / tp.slider_tick_rate
+}
+
+pub fn (tp TimingPoint) get_velocity(point TimingPointInfo) f64 {
+	mut velocity := tp.get_scoring_distance() * tp.slider_tick_rate
+	beatduration := point.beatduration
+
+	if beatduration >= 0 {
+		velocity *= 1000.0 / beatduration
+	}
+
+	return velocity
+}
+
+pub fn (tp TimingPoint) get_slider_time(pixel_length f64, point TimingPointInfo) f64 {
+	return point.beatduration * pixel_length / (100.0 * tp.slider_multiplier)
 }
