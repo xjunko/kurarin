@@ -122,7 +122,7 @@ pub fn (mut slider SliderRenderer) make_vertex() {
 			ptr: slider.vertices.data,
 			size: usize(slider.vertices.len * int(sizeof(f32)))
 		},
-		label: "THEFUCKINGSHIT".str
+		label: &byte(0)
 	})
 }
 
@@ -144,15 +144,32 @@ pub fn (mut slider SliderRenderer) make_pipeline(cs f64) {
 
 	// Pipeline
 	mut pipeline_desc := &C.sg_pipeline_desc{
-		shader: slider.state.shader
+		shader: slider.state.shader,
+		depth: C.sg_depth_state{ // had to do this for the slider to look right
+			compare: .less,
+			write_enabled: true
+		}
 	}
+	
+	// Blend - this fix the alpha "bug"
+	/*
+	`_default`, `_num`, `blend_alpha`, `blend_color`, `dst_alpha`, 
+	`dst_color`, `one_minus_blend_alpha`, `one_minus_blend_color`, 
+	`one_minus_dst_alpha`, `one_minus_dst_color`, `one_minus_src_alpha`, 
+	`one_minus_src_color`, `one`, `src_alpha_saturated`, `src_alpha`, 
+	`src_color`, `zero`.
+	*/
+	pipeline_desc.colors[0].blend.enabled = true
+	pipeline_desc.colors[0].blend.op_rgb = .add
+	pipeline_desc.colors[0].blend.dst_factor_rgb = .one_minus_src_alpha
+	// pipeline_desc.colors[0].blend.src_factor_alpha = .src_alpha
+	// pipeline_desc.colors[0].blend.dst_factor_alpha = .one_minus_src_alpha
+
+	// attrs
 	pipeline_desc.layout.attrs[0].format = .float3 // pos
 	pipeline_desc.layout.attrs[1].format = .float3 // centre
 	pipeline_desc.layout.attrs[2].format = .float2 // texture coord
 	slider.state.pip = C.sg_make_pipeline(pipeline_desc)
-
-	// Make them vertecisss
-	slider.make_vertex()
 
 	// // Test shader - to see if the shader even working
 	// slider.state = &State{}
@@ -190,6 +207,9 @@ pub fn (mut slider SliderRenderer) make_pipeline(cs f64) {
 	// Dnone
 	slider.init = true
 	slider.is_visible = false
+
+	// Make them vertecisss
+	slider.make_vertex()
 }
 
 pub fn (mut slider SliderRenderer) update(time f64) {
@@ -207,8 +227,8 @@ pub fn (mut slider SliderRenderer) update(time f64) {
 	}
 
 	// TODO: this crashes if enabled
-	// Init slider stuff
-	// if time >= slider.time.start - 2000 {
+	// Init slider stuff dynamically
+	// if time >= slider.time.start - 2000 && slider.vertices.len == 0 {
 	// 	slider.make_vertex()
 	// }
 
@@ -216,11 +236,11 @@ pub fn (mut slider SliderRenderer) update(time f64) {
 	if (time >= slider.time.end + 500) && (slider.vertices.len > 0) && slider.init && false {
 		slider.is_visible = false
 		slider.init = false
+		slider.state.bind.vertex_buffers[0].free()
+		slider.state.shader.free()
+		slider.state.pip.free()
 		unsafe {
 			slider.vertices.free()
-			C.sg_destroy_buffer(slider.state.bind.vertex_buffers[0])
-			C.sg_destroy_shader(slider.state.shader)
-			C.sg_destroy_pipeline(slider.state.pip)
 		}
 	}
 }
@@ -229,32 +249,8 @@ pub fn (mut slider SliderRenderer) draw(arg sprite.DrawConfig) {
 	slider.update(arg.time)
 
 	if !slider.init || !slider.is_visible || slider.vertices.len == 0 || slider.alpha <= 0.0 { return }
-	// C.sg_begin_default_pass(&slider.state.pass_action, 1280, 720)
 	gfx.apply_pipeline(slider.state.pip)
 	gfx.apply_bindings(&slider.state.bind)
-
-	// DOnt need this anymore since its in the shader itslef
-	/*
-	mut fucking_projection_and_transformation_shit := [
-		f32(0.1628), 0.000000, 0.000000, -0.0416667,
-		0.000000, -0.2894, 0.000000, 0.555556,
-		0.000000, 0.000000, 1.000000, 0.0,
-		0.000000, 0.000000, 0.000000, 20.000000
-	]
-	fucking_projection_and_transformation_shit << [
-		f32(1),0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1
-	]
-	// println(fucking_projection_and_transformation_shit)
-
-	vs_params := C.sg_range{
-		ptr: fucking_projection_and_transformation_shit.data,
-		size: usize(fucking_projection_and_transformation_shit.len * int(sizeof(f32)))
-	}
-	gfx.apply_uniforms(C.SG_SHADERSTAGE_VS, C.SLOT_vs_params, &vs_params)
-	*/
 
 	// fs params
 	mut fs_params_arg := [
@@ -268,8 +264,6 @@ pub fn (mut slider SliderRenderer) draw(arg sprite.DrawConfig) {
 	gfx.apply_uniforms(C.SG_SHADERSTAGE_FS, C.SLOT_fs_params, &fs_params)
 
 	gfx.draw(0, slider.vertices.len, 1)
-	// gfx.end_pass()
-	// gfx.commit()
 }
 
 pub fn (mut slider SliderRenderer) draw_and_update(arg sprite.DrawConfig) {
@@ -289,7 +283,7 @@ pub fn load_image(path string) C.sg_image {
 		wrap_u: .clamp_to_edge,
 		wrap_v: .clamp_to_edge,
 		label: path.str,
-		d3d11_texture: 0
+		d3d11_texture: 0,
 	}
 	img_desc.data.subimage[0][0] = C.sg_range{
 		ptr: stb_img.data,
