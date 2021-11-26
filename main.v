@@ -158,7 +158,7 @@ fn main() {
 	// get beatmap path
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application('Kurarin')
-	fp.version('v0.0.1')
+	fp.version('v0.0.2')
 	fp.description('Plays an osu! beatmap! (User mode soontm maybe)')
 
 	beatmap_path := fp.string('beatmap_file', `b`, '', 'Path to the .osu file.')
