@@ -24,24 +24,28 @@ pub struct MainWindow {
 		// temp stuff
 		game_speed f64 = 1.0
 		test_stage int
+		stage_name string
+		is_running_test bool
 }
 
-pub fn (mut main_window MainWindow) draw_testing_mode() {
-	stage_name := match main_window.test_stage {
+pub fn (mut main_window MainWindow) run_tests() {
+	if main_window.is_running_test {
+		return
+	}
+
+	main_window.is_running_test = true
+	main_window.stage_name = match main_window.test_stage {
 		0 { 'Hitsound test' }
 		else { 'None' }
 	}
 
-	// main_window.ctx.draw_text(0, 16, 'Currently testing: ${stage_name}', gx.TextCfg{color: gx.white})
-
 	// do the test
-	println('Currently testing: ${stage_name}')
+	println('Currently testing: ${main_window.stage_name}')
 	match main_window.test_stage {
 		0 { tests.stress_test_audio() main_window.test_stage++}
 		1 { println('Done testing!') exit(1)}
 		else {}
-	}
-	
+	}	
 }
 
 pub fn frame_init(mut main_window &MainWindow) {
@@ -67,6 +71,17 @@ pub fn frame_init(mut main_window &MainWindow) {
 }
 
 pub fn frame_update(mut main_window &MainWindow) {
+	if main_window.mode == 1 {
+		if !main_window.is_running_test {
+			go main_window.run_tests()
+		}
+		main_window.ctx.begin()
+		main_window.ctx.draw_text(0, 0, "Kurarin test mode (v 0.0.2)", gx.TextCfg{color: gx.white})
+		main_window.ctx.draw_text(0, 16, "Running: ${main_window.stage_name}", gx.TextCfg{color: gx.white})
+		main_window.ctx.end()
+		return
+	}
+
 	if !main_window.game.is_ready {
 		main_window.ctx.begin()
 		main_window.ctx.draw_text(0, 0, "Loading!", gx.TextCfg{color: gx.white})

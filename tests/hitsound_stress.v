@@ -8,8 +8,8 @@ pub fn stress_test_audio() {
 	mut master := miniaudio.make_device()
 	mut x := 0
 
-	master.volume(.1)
-	// This should atleast play to 5000 without crashing.
+	master.volume(.05)
+	// This should atleast play to 2000 without crashing.
 	for x < 2000 {
 		mut sound := master.add_audio(path: 'assets/skins/default/drum-hitclap2.wav')
 		sound.play()
@@ -19,4 +19,6 @@ pub fn stress_test_audio() {
 	}
 	master.free()
 	println('Hitsound test passed!\t')
+
+	exit(1) // Force exit
 }
