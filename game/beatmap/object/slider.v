@@ -10,7 +10,6 @@ import framework.graphic.sprite
 
 import curves
 import game.graphic
-import game.math.resolution
 
 const (
 	fallback_slider = false
@@ -50,15 +49,6 @@ pub fn (mut slider Slider) get_curves() []vector.Vector2 {
 }
 
 pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IHitObject) {
-	/* the old method
-	slider.repeated = slider.data[6].f64()
-	slider.pixel_length = slider.data[7].f64()
-	slider.duration = (
-		slider.timing.get_beat_duration(slider.time.start) * slider.pixel_length / (100 * slider.diff.slider_multiplier)
-	)
-	slider.time.end += slider.duration * slider.repeated
-	*/
-
 	// why do i need to do this again lol
 	slider.HitObject.initialize_object(mut ctx, last_object)
 
