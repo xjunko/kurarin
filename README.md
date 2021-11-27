@@ -11,7 +11,10 @@ Anyway heres some screenshots I guess.
 
 ## Screenshots
 
+https://user-images.githubusercontent.com/44401509/143672143-24291c30-66c7-41bd-a846-c132b975d788.mp4
+
 https://user-images.githubusercontent.com/44401509/143533114-8c228841-791d-4871-ad7f-07307cd4d56d.mp4
+
 
 ![1](assets/screenshots/1.png)
 ![2](assets/screenshots/3.png)
