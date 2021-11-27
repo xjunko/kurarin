@@ -1,4 +1,4 @@
-# Kurarin - barely working osu! beatmap visualizer made in V
+# Kurarin - (kinda working) osu! beatmap visualizer made in V
 
 ![logo](assets/screenshots/logo.png)
 
@@ -59,8 +59,8 @@ i got school soontm so this might not be finished at all :trollface:
 * ~~Actual slider renderer lmao~~ Done
 * ~~Slider curves~~
 * ~~Actual osu! gameplay hitsystem and not whatever the fuck placeholder shit Im using rn~~ Partly done
-* Fix timings fucking up sometimes
-* Fix slider renderer alpha thingy since im doing it wrong
+* ~~Fix timings fucking up sometimes~~ Done
+* ~~Fix slider renderer alpha thingy since im doing it wrong~~ Done but it looks kinda weird now but eh idc
 * Unfucked the codebase and make it stable overall [Nope]
 * Replay support (kinda already there but not really, you just had to somehow give the replay event into auto listener and it should show up) [Nope]
 
