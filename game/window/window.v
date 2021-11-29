@@ -138,8 +138,8 @@ pub fn (mut window GameWindow) load_beatmap() {
 
 	// Canvas
 	window.game_canvas.scale = resolution.global.playfield_scale
-	window.game_canvas.position.x = ((resolution.global.width - resolution.global.playfield_width) / 2) / resolution.global.playfield_scale
-	window.game_canvas.position.y = ((resolution.global.height - resolution.global.playfield_height) / 2) / resolution.global.playfield_scale
+	window.game_canvas.position.x = ((resolution.global.width - resolution.global.playfield_width) / 2.0) / resolution.global.playfield_scale
+	window.game_canvas.position.y = ((resolution.global.height - resolution.global.playfield_height) / 1.9) / resolution.global.playfield_scale
 
 	// Add flying shit before beatmap objects
 	// generate_bullshit(mut window)
