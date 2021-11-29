@@ -1,4 +1,4 @@
-# Kurarin - barely working osu! beatmap visualizer made in V
+# Kurarin - (kinda working) osu! beatmap visualizer made in V
 ![logo](assets/screenshots/logo.png)
 
 ## Releases
