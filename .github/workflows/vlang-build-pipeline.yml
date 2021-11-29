@@ -1,5 +1,4 @@
 name: Build Pipeline
-uses: nocturlab/setup-vlang-action@v1.2.0
 
 on:
   push:
