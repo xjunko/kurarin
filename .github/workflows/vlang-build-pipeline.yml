@@ -54,15 +54,13 @@ jobs:
         with:
           name: windows_x64
           path: ./windows_x64
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        name: Create Release and Upload Assets
-        id: create_release
+          
+      - uses: actions/checkout@master
+      - name: Upload as zip
+        uses: thedoctor0/zip-release@master
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          prerelease: true
-          title: "Latest Development Build"
-          files: |
-            windows_x64/
+          type: 'zip'
+          path: './windows_x64'
+          filename: 'kurarin_winx64.zip'
 
   
