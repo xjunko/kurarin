@@ -128,7 +128,7 @@ pub fn calculate_difficulty(diff f32, min f32, mid f32, max f32) f32 {
 		return mid - (mid - min) * (5 - diff) / 5
 	}
 
-	return diff
+	return mid
 }
 
 pub fn calculate_difficulty_from_rate(rate f32, min f32, mid f32, max f32) f32 {
