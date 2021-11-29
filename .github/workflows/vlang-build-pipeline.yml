@@ -34,6 +34,10 @@ jobs:
           mkdir kurarin_release
           move assets kurarin_release/assets
           move kurarin_win_x64.exe kurarin_release
+          echo Deleting useless stuff
+          cd kurarin_release
+          rm assets/screenshots -r
+          rm assets/*.png
       - name: Upload the thing
         uses: actions/upload-artifact@v2
         with:
