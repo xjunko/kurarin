@@ -11,10 +11,6 @@ import stbi
 import math
 import sokol
 import sokol.gfx
-// import sokol.sgl // ok v... ok...
-// import sokol.sapp
-
-
 
 import framework.graphic.sprite
 import framework.math.vector
@@ -32,7 +28,7 @@ fn C.test_shader_desc(gfx.Backend) &C.sg_shader_desc
 
 const (
 	state = &GlobalState{}
-	fade = transform.Transform{typ: .fade, time: time.Time{0, 500}, before: [0.0], after: [1.0]}
+	slider_quality = 30 // Lower this if viewing retarded map
 )
 
 pub struct GlobalState {
@@ -89,7 +85,7 @@ pub fn (mut slider SliderRenderer) make_vertex() {
 
 	// make the thing
 	for v in slider.curves {
-		tab := slider.make_circle(v.x, v.y, 64 * slider.cs, 30)
+		tab := slider.make_circle(v.x, v.y, 64 * slider.cs, slider_quality)
 		for j, _ in tab {
 			if j >= 2 {
 				p1, p2, p3 := tab[j - 1], tab[j], tab[0]
@@ -126,7 +122,7 @@ pub fn (mut slider SliderRenderer) make_vertex() {
 	})
 }
 
-pub fn (mut slider SliderRenderer) make_pipeline(cs f64) {
+pub fn (mut slider SliderRenderer) make_pipeline() {
 	if !state.init {
 		mut state_g := state
 		state_g.slider_gradient = load_image("assets/shaders/gradient2.png")
@@ -135,7 +131,6 @@ pub fn (mut slider SliderRenderer) make_pipeline(cs f64) {
 	}
 
 	// Init shader
-	slider.cs = cs
 	slider.state = &State{}
 	slider.state.shader = C.sg_make_shader(C.fuck_shader_desc(C.sg_query_backend()))
 
@@ -208,6 +203,17 @@ pub fn (mut slider SliderRenderer) make_pipeline(cs f64) {
 	slider.init = true
 	slider.is_visible = false
 
+	// Slider is fucked: this usually happens with aspire maps (ie: Monstrata's Transform)
+	if slider.curves.len == 0 {
+		slider.init = false
+		slider.is_visible = false
+		unsafe {
+			slider.curves.free()
+		}
+		slider.free()
+		return 
+	}
+
 	// Make them vertecisss
 	slider.make_vertex()
 }
@@ -233,15 +239,21 @@ pub fn (mut slider SliderRenderer) update(time f64) {
 	// }
 
 	// Unitialize the slider stuff after 500ms
-	if (time >= slider.time.end + 500) && (slider.vertices.len > 0) && slider.init && false {
-		slider.is_visible = false
-		slider.init = false
-		slider.state.bind.vertex_buffers[0].free()
-		slider.state.shader.free()
-		slider.state.pip.free()
-		unsafe {
-			slider.vertices.free()
-		}
+	if (time >= slider.time.end + 500) && (slider.vertices.len > 0) && slider.init {
+		slider.free()
+	}
+}
+
+pub fn (mut slider SliderRenderer) free() {
+	slider.is_visible = false
+	slider.init = false
+	for mut buffer in slider.state.bind.vertex_buffers {
+		buffer.free()
+	}
+	slider.state.shader.free()
+	slider.state.pip.free()
+	unsafe {
+		slider.vertices.free()
 	}
 }
 
