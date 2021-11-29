@@ -1,0 +1,19 @@
+- name: Build Pipeline
+  uses: nocturlab/setup-vlang-action@v1.2.0
+
+jobs:
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Set up V version latest
+      uses: nocturlab/setup-vlang-action@v1
+      with:
+        v-version: latest
+      id: v
+    - name: Build repository app
+      run: v .
+    - name: Run V tests
+      run: v test .
