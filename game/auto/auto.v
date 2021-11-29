@@ -73,8 +73,13 @@ pub fn make_auto(beatmap beatmap.Beatmap, mut canvas canvas.Canvas, mut game_tim
 				time: time.Time{object.time.start, object.time.start},
 				key: 1 << 1
 			}
+
+			//
+			auto.sprite.add_transform(typ: .move, time: time.Time{prev_object.time.end, object.time.start}, before: [prev_object.end_position.x, prev_object.end_position.y], after: [object.position.x, object.position.y])
+
 			// Use curve
 			offset := 16
+			mut last_position := object.position
 			for temp_time := int(object.time.start); temp_time <= int(object.time.end); temp_time += offset {
 				times := int(((temp_time - object.time.start) / object.duration) + 1)
 				t_time := (f64(temp_time) - object.time.start - (times - 1) * object.duration)
@@ -86,29 +91,30 @@ pub fn make_auto(beatmap beatmap.Beatmap, mut canvas canvas.Canvas, mut game_tim
 				} else {
 					pos = object.curve.point_at((1.0 - t_time / object.duration) * rt)
 				}
-				auto.sprite.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [pos.x, pos.y])
+				auto.sprite.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [last_position.x, last_position.y], after: [pos.x, pos.y])
+				last_position = pos
 			}
 		} else if object is game_object.Spinner {
-			speed := f64(0.85)
-			radius := f64(50)
-			timeframe := f64(16)
-			mut rot := f64(0)
+			// speed := f64(0.85)
+			// radius := f64(50)
+			// timeframe := f64(16)
+			// mut rot := f64(0)
 
-			mut last_position := vector.Vector2{
-				math.cos(rot) * radius + 512 / 2,
-				math.sin(rot) * radius + 384 / 2
-			}
-			for i := object.time.start; i < object.time.end; i += timeframe {
-				position := vector.Vector2{
-					math.cos(rot) * radius + 512 / 2,
-					math.sin(rot) * radius + 384 / 2
-				}
+			// mut last_position := vector.Vector2{
+			// 	math.cos(rot) * radius + 512 / 2,
+			// 	math.sin(rot) * radius + 384 / 2
+			// }
+			// for i := object.time.start; i < object.time.end; i += timeframe {
+			// 	position := vector.Vector2{
+			// 		math.cos(rot) * radius + 512 / 2,
+			// 		math.sin(rot) * radius + 384 / 2
+			// 	}
 
-				auto.sprite.add_transform(typ: .move, easing: easing.linear, time: time.Time{object.time.start + i, object.time.start + timeframe + i}, before: [last_position.x, last_position.y], after: [position.x, position.y])
+			// 	auto.sprite.add_transform(typ: .move, easing: easing.linear, time: time.Time{object.time.start + i, object.time.start + timeframe + i}, before: [last_position.x, last_position.y], after: [position.x, position.y])
 
-				rot += speed
-				last_position = position
-			}
+			// 	rot += speed
+			// 	last_position = position
+			// }
 		} else {
 			auto.events << ReplayEvent{
 				position: object.position,
