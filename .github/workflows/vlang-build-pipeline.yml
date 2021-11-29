@@ -1,23 +1,33 @@
-name: Build Pipeline
+# Derived from: https://github.com/vlang/vls/blob/use-tree-sitter/.github/workflows/prerelease.yml
+name: Compile Kurarin
 
 on:
   push:
-    paths-ignore:
-      - '**.md'
+    branches:
+      - dev
 
 jobs:
-  run:
-    name: Run
+  build-linux-x64:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VFLAGS: -cg -cc gcc
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Set up V version latest
-      uses: nocturlab/setup-vlang-action@v1
-      with:
-        v-version: latest
-      id: v
-    - name: Build repository app
-      run: v .
-    - name: Run V tests
-      run: v test .
+      - name: Install Boehm GC
+        run: sudo apt-get install libgc-dev
+      - name: Checkout V
+        uses: actions/checkout@v2
+        with:
+          repository: vlang/v
+      - name: Build local V
+        run: make && sudo ./v symlink
+      - name: Compile Kurarin
+        run: |
+          v -o kurarin_linux .
+      - name: Create binary only artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux_x64
+          path: ./kurarin_linux
+
+  
