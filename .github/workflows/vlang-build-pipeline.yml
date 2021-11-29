@@ -32,7 +32,7 @@ jobs:
           cd kurarin
           echo Setting Up Folders
           mkdir kurarin_release
-          xcopy assets kurarin_release/assets /E
+          move assets kurarin_release/assets
           move kurarin_win_x64.exe kurarin_release
       - name: Upload the thing
         uses: actions/upload-artifact@v2
