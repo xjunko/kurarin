@@ -27,10 +27,17 @@ jobs:
         run: |
           cd kurarin
           ..\v.exe -cg -o kurarin_win_x64.exe .
-      - name: Create binary only artifact
+      - name: Set up assets and shit
+        run: |
+          cd kurarin
+          echo Setting Up Folders
+          mkdir kurarin_release
+          xcopy assets kurarin_release/assets /E
+          move kurarin_win_x64.exe kurarin_release
+      - name: Upload the thing
         uses: actions/upload-artifact@v2
         with:
           name: windows_x64
-          path: ./kurarin/kurarin_win_x64.exe
+          path: ./kurarin/kurarin_release
 
   
