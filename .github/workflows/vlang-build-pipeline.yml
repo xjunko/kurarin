@@ -1,5 +1,10 @@
-- name: Build Pipeline
-  uses: nocturlab/setup-vlang-action@v1.2.0
+name: Build Pipeline
+uses: nocturlab/setup-vlang-action@v1.2.0
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
 
 jobs:
   run:
