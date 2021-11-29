@@ -31,7 +31,6 @@ pub struct Slider {
 }
 
 pub fn (mut slider Slider) draw(ctx &gg.Context, time f64) {
-	slider.sliderrender.draw(ctx: ctx)
 }
 
 pub fn (mut slider Slider) get_curves() []vector.Vector2 {
@@ -73,7 +72,8 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	slider.sliderrender.difficulty = slider.diff
 	slider.sliderrender.color = [f32(slider.color[0] / 255), f32(slider.color[1] / 255), f32(slider.color[2] / 255)]
 	slider.sliderrender.curves = slider.get_curves()
-	slider.sliderrender.make_pipeline( (slider.diff.circleradius / 64.0) ) // * resolution.global.playfield_scale )
+	slider.sliderrender.cs = slider.diff.circleradius / 64.0
+	slider.sliderrender.make_pipeline()
 	slider.sliderrender.special = true
 
 	slider.sprites << slider.sliderrender
