@@ -64,6 +64,10 @@ pub fn make_auto(beatmap beatmap.Beatmap, mut canvas canvas.Canvas, mut game_tim
 	}
 	auto.sprite.textures << gg.get_texture_from_skin('cursor')
 	auto.logic.initialize()
+	
+	// cursor size relative to circle size
+	auto.sprite.add_transform(typ: .scale_factor, time: time.Time{0,0}, before: [f64(1.0-0.7*(1.0 + beatmap.difficulty_math.cs - 5)/5)])
+
 
 	mut prev_object := beatmap.objects[0]
 	for object in beatmap.objects {
