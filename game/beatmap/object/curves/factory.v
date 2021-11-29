@@ -43,7 +43,7 @@ pub fn new_slider_curve(typp string, points []vector.Vector2) SliderCurve {
 			length += c.get_length()
 		}
 		else {
-			panic("THE FUCK")
+			println("> THE FUCK: Slider type: ${typ}")
 		}
 	}
 	mut sections := []f64{len: curves_list.len + 1}
