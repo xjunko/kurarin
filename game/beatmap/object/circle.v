@@ -102,7 +102,6 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 	clickable << hitobject.combo_sprite
 
 	diff := hitobject.diff
-	// size_ratio := ((diff.circleradius) * 1.05 * 2 / 128) // this is about the same value as the size_ratio below but idk man
 	mut size_ratio := (54.4 - 4.48 * diff.cs) * 1.05 * 2 / 128
 	// size_ratio *= resolution.global.playfield_scale
 	
