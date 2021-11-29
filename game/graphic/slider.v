@@ -85,7 +85,7 @@ pub fn (mut slider SliderRenderer) make_vertex() {
 
 	// make the thing
 	for v in slider.curves {
-		tab := slider.make_circle(v.x, v.y, 64 * slider.cs, slider_quality)
+		tab := slider.make_circle(v.x, v.y, slider.cs, slider_quality)
 		for j, _ in tab {
 			if j >= 2 {
 				p1, p2, p3 := tab[j - 1], tab[j], tab[0]
