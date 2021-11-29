@@ -81,6 +81,7 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 
 pub fn (mut slider Slider) make_slider_follow_circle() {
 	// Overlay
+	size_ratio := ((slider.diff.circleradius) * 1.05 * 2 / 128)
 	slider_overlay := gg.get_texture_from_skin("sliderfollowcircle")
 	mut slider_overlay_sprite := &sprite.Sprite{
 			textures: [slider_overlay],
@@ -103,7 +104,7 @@ pub fn (mut slider Slider) make_slider_follow_circle() {
 	}
 
 	// fade in
-	slider_overlay_sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{slider.time.start, slider.time.start}, before: [f64(0.6)])
+	slider_overlay_sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{slider.time.start, slider.time.start}, before: [f64(size_ratio)])
 	// slider_overlay_sprite.add_transform(typ: .fade, time: time.Time{slider.time.start, slider.time.start}, before: [f64(0)], after: [f64(255)])
 
 	// DDONNEEE
