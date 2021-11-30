@@ -25,6 +25,11 @@ pub fn (mut ctx Context) get_texture_from_skin(name string) Image {
 	return skin.get_texture_from_skin(name)
 }
 
+pub fn (mut ctx Context) get_texture_expecting_animation_from_skin(name string) []Image {
+	mut skin := current_skin
+	return skin.get_texture_expecting_animation_from_skin(name)
+}
+
 // Skin shit
 pub struct Skin {
 	pub mut:
@@ -44,4 +49,27 @@ pub fn (mut s Skin) get_texture_from_skin(name string) Image {
 	}
 
 	return s.skin_cache[name]
+}
+
+pub fn (mut s Skin) get_texture_expecting_animation_from_skin(name string) []Image {
+	mut animations := []Image{}
+	animation_filename := os.glob('assets/skins/default/${name}-*.png') or { return []Image{} }
+
+	// yknow what fuck checking for fucked animation, just let them pass for now
+	// mut highest_index := 0
+	// mut prev_index := 0
+
+	// // check the index
+	// if animation_filename[0][name.len + 1].str() != "0" {
+	// 	// well... idk how to handle this one... just return only this image ig
+	// 	println("> yoo fucked animation: ${name}")
+	// 	return [s.get_texture_from_skin("${name}-${animation_filename[0][name.len + 1]}")]
+	// }
+
+	
+	for filename in animation_filename {
+		animations << s.get_texture_from_skin(filename.split(".png")[0])
+	}
+
+	return animations
 }
