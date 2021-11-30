@@ -31,13 +31,15 @@ pub struct Sprite {
 		textures   []gg.Image
 		texture_i  int
 
-		// Text
-		font       string // idk yet
-		text       string
-		special    bool
+		// text
+		text	string
 
+		// attr
+		special    	   bool
 		always_visible bool
 		skip_offset    bool
+
+		// transform
 		transforms []transform.Transform
 		transforms_i int // mmmmmm idk
 }
