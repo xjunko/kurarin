@@ -53,7 +53,8 @@ pub fn (mut s Skin) get_texture_from_skin(name string) Image {
 
 pub fn (mut s Skin) get_texture_expecting_animation_from_skin(name string) []Image {
 	mut animations := []Image{}
-	animation_filename := os.glob('assets/skins/default/${name}-*.png') or { return []Image{} }
+	mut animation_filename := os.glob('assets/skins/default/${name}-*.png') or { return []Image{} }
+	animation_filename.sort()
 
 	// yknow what fuck checking for fucked animation, just let them pass for now
 	// mut highest_index := 0
