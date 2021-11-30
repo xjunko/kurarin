@@ -36,7 +36,7 @@ pub struct HitObject {
 		hitcircleoverlay &sprite.Sprite = &sprite.Sprite{}
 		approachcircle   &sprite.Sprite = &sprite.Sprite{}
 		hitanimation     &sprite.Sprite = &sprite.Sprite{}
-		combo_sprite     &sprite.Sprite = &sprite.Sprite{}
+		combo_sprite     &sprite.ComboSprite = &sprite.ComboSprite{}
 
 		hitsound          string = 'drum-hitnormal'
 		color             []f64
@@ -90,16 +90,14 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 	hitobject.hitcircleoverlay = &sprite.Sprite{textures: [ctx.get_texture_from_skin('hitcircleoverlay')]}
 
 	// combo
-	hitobject.combo_sprite = &sprite.Sprite{
-		typ: .text, 
-		text: hitobject.combo_index.str()
-	}
+	hitobject.combo_sprite.Sprite.textures = ctx.get_texture_expecting_animation_from_skin("default")
+	hitobject.combo_sprite.number = hitobject.combo_index
 
 	// MAN
 	mut clickable := []&sprite.Sprite{}
 	clickable << hitobject.hitcircle
 	clickable << hitobject.hitcircleoverlay
-	clickable << hitobject.combo_sprite
+	clickable << &hitobject.combo_sprite.Sprite
 
 	diff := hitobject.diff
 	size_ratio := ((diff.circleradius) * 1.05 * 2 / 128)
@@ -135,7 +133,9 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 		sprite.change_size(size: size)
 	}
 
-	mut combo_sprite_size := size.clone().scale(0.7)
+
+	hitobject.combo_sprite.pre_init()
+	combo_sprite_size := hitobject.combo_sprite.size.clone().scale(size_ratio * 0.8)
 	hitobject.combo_sprite.change_size(size: combo_sprite_size)
 
 	if !hitobject.is_hidden || hitobject.id == 0 {
@@ -163,8 +163,8 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 		hitobject.hitcircleoverlay,
 		hitobject.approachcircle,
 		hitobject.hitanimation,
-		hitobject.combo_sprite
 	]
+	hitobject.sprites << hitobject.combo_sprite // gcc failed if i mix them with normal sprites /shrug
 }
 
 pub fn (mut hitobject HitObject) arm(clicked bool, time f64) {
