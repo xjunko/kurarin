@@ -48,7 +48,7 @@ pub fn (mut slider Slider) get_curves() []vector.Vector2 {
 }
 
 pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IHitObject) {
-	// why do i need to do this again lol
+	// Init hitobject
 	slider.HitObject.initialize_object(mut ctx, last_object)
 
 	// more info
@@ -61,8 +61,6 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	// from osr2mp4
 	slider.duration = slider.timing.get_point_at(slider.time.start).beatduration * slider.pixel_length / (100 * slider.timing.slider_multiplier)
 	slider.time.end += slider.duration * slider.repeated
-
-	// println('${slider.time.start} ${slider.time.end} - ${point} ${velocity} ${cum_length} ${slider.repeated}')
 
 	// make slider follow circle eee
 	slider.make_slider_follow_circle()
