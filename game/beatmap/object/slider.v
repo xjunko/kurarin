@@ -80,41 +80,47 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 pub fn (mut slider Slider) make_slider_follow_circle() {
 	// Overlay
 	size_ratio := ((slider.diff.circleradius) * 1.05 * 2 / 128)
-	slider_overlay := gg.get_texture_from_skin("sliderfollowcircle")
 	mut slider_overlay_sprite := &sprite.Sprite{
-			textures: [slider_overlay],
+			textures: [gg.get_texture_from_skin("sliderfollowcircle")],
+	}
+	mut sliderb_sprite := &sprite.Sprite{
+		textures: [gg.get_texture_from_skin("sliderb")]
 	}
 
-	// Movement
-	offset := 16
-	for temp_time := int(slider.time.start); temp_time <= int(slider.time.end); temp_time += offset {
-		times := int(((temp_time - slider.time.start) / slider.duration) + 1)
-		t_time := (f64(temp_time) - slider.time.start - (times - 1) * slider.duration)
-		rt := slider.pixel_length / slider.curve.length
+	mut slider_objects := []&sprite.Sprite{}
+	slider_objects << slider_overlay_sprite
+	slider_objects << sliderb_sprite
 
-		mut pos := vector.Vector2{}
-		if (times % 2) == 1 {
-			pos = slider.curve.point_at(rt * t_time / slider.duration)
-		} else {
-			pos = slider.curve.point_at((1.0 - t_time / slider.duration) * rt)
+	for mut object in slider_objects {
+		// Movement
+		offset := 16
+		for temp_time := int(slider.time.start); temp_time <= int(slider.time.end); temp_time += offset {
+			times := int(((temp_time - slider.time.start) / slider.duration) + 1)
+			t_time := (f64(temp_time) - slider.time.start - (times - 1) * slider.duration)
+			rt := slider.pixel_length / slider.curve.length
+
+			mut pos := vector.Vector2{}
+			if (times % 2) == 1 {
+				pos = slider.curve.point_at(rt * t_time / slider.duration)
+			} else {
+				pos = slider.curve.point_at((1.0 - t_time / slider.duration) * rt)
+			}
+			object.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [pos.x, pos.y])
 		}
-		slider_overlay_sprite.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [pos.x, pos.y])
+
+		// fade in
+		object.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{slider.time.start, slider.time.start}, before: [f64(size_ratio)])
+
+		// DDONNEEE
+		object.reset_time_based_on_transforms()
+		object.reset_image_size()
+		object.reset_attributes_based_on_transforms()
 	}
-
-	// fade in
-	slider_overlay_sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{slider.time.start, slider.time.start}, before: [f64(size_ratio)])
-	// slider_overlay_sprite.add_transform(typ: .fade, time: time.Time{slider.time.start, slider.time.start}, before: [f64(0)], after: [f64(255)])
-
-	// DDONNEEE
-	slider_overlay_sprite.reset_time_based_on_transforms()
-	slider_overlay_sprite.reset_image_size()
-	slider_overlay_sprite.reset_attributes_based_on_transforms()
-
-	//
+	slider.sprites << sliderb_sprite
 	slider.sprites << slider_overlay_sprite
+	
 }
 pub fn (mut slider Slider) process_points() {
-	// mut size_ratio := (54.4 - 4.48 * slider.diff.cs) * 1.05 * 2 / 128
 	mut slider_points := slider.data[5].split('|')
 	mut slider_type := slider_points[0]
 	slider_points = slider_points[1..]
