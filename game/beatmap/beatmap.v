@@ -106,8 +106,8 @@ pub fn (mut beatmap Beatmap) initialize_sprite_component(mut ctx &gg.Context) {
 		always_visible: true
 	}
 
-	bg_height := f64(beatmap.background_sprite.image().height)
-	ratio := f64(f64(resolution.global.height) / f64(bg_height)) * 1.1 // epic trolling
+	bg_width := f64(beatmap.background_sprite.image().width)
+	ratio := f64(f64(resolution.global.width) / f64(bg_width)) * 1.1 // epic trolling
 	beatmap.background_sprite.add_transform(typ: .move, time: time2.Time{0, 1}, before: [f64(resolution.global.width/2), f64(resolution.global.height/2)])
 	beatmap.background_sprite.add_transform(typ: .scale_factor, time: time2.Time{0, 1}, before: [ratio])
 
