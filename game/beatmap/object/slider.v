@@ -91,6 +91,7 @@ pub fn (mut slider Slider) make_slider_follow_circle() {
 	slider_objects << slider_overlay_sprite
 	slider_objects << sliderb_sprite
 
+	mut last_position := slider.position
 	for mut object in slider_objects {
 		// Movement
 		offset := 16
@@ -102,12 +103,13 @@ pub fn (mut slider Slider) make_slider_follow_circle() {
 			mut pos := vector.Vector2{}
 			if (times % 2) == 1 {
 				pos = slider.curve.point_at(rt * t_time / slider.duration)
+				last_position = slider.curve.point_at(rt * (t_time - offset) / slider.duration)
 			} else {
 				pos = slider.curve.point_at((1.0 - t_time / slider.duration) * rt)
+				last_position = slider.curve.point_at((1.0 - (t_time - offset) / slider.duration) * rt)
 			}
-			object.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [pos.x, pos.y])
+			object.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [last_position.x, last_position.y], after: [pos.x, pos.y])
 		}
-
 		// fade in
 		object.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{slider.time.start, slider.time.start}, before: [f64(size_ratio)])
 
