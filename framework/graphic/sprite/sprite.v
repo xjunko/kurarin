@@ -66,8 +66,8 @@ pub fn (mut s Sprite) apply_transform(t transform.Transform, time f64) {
 
 		.scale {
 			val := t.as_vector(time)
-			s.size.x = val.x
-			s.size.y = val.y
+			s.size.x = s.base_size.x * val.x
+			s.size.y = s.base_size.y * val.y
 		}
 
 		.move_x {
