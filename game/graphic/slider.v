@@ -35,11 +35,13 @@ pub struct GlobalState {
 	pub mut:
 		init bool
 		slider_gradient C.sg_image
+		shader C.sg_shader
+		
 }
 
 pub struct State {
 	mut:
-		shader C.sg_shader
+		shader &C.sg_shader = voidptr(0)
 		pip C.sg_pipeline
 		bind C.sg_bindings
 		pass_action C.sg_pass_action
@@ -124,15 +126,16 @@ pub fn (mut slider SliderRenderer) make_vertex() {
 
 pub fn (mut slider SliderRenderer) make_pipeline() {
 	if !state.init {
+		println('> SliderRender: Initialized!')
 		mut state_g := state
 		state_g.slider_gradient = load_image("assets/shaders/gradient2.png")
+		state_g.shader = C.sg_make_shader(C.fuck_shader_desc(C.sg_query_backend()))
 		state_g.init = true
-		println('> SliderRender: Gradient loaded!')
 	}
 
 	// Init shader
 	slider.state = &State{}
-	slider.state.shader = C.sg_make_shader(C.fuck_shader_desc(C.sg_query_backend()))
+	slider.state.shader = &state.shader // Use global state shader instead of making a new one
 
 	// SliderGradient
 	slider.state.bind.fs_images[C.SLOT_texture_in] = state.slider_gradient
@@ -250,7 +253,7 @@ pub fn (mut slider SliderRenderer) free() {
 	for mut buffer in slider.state.bind.vertex_buffers {
 		buffer.free()
 	}
-	slider.state.shader.free()
+	
 	slider.state.pip.free()
 	unsafe {
 		slider.vertices.free()
