@@ -95,10 +95,10 @@ fn gg_init_sokol_window(user_data voidptr) {
 	power := 14 // 16k ... should be enough lol
 	desc = C.sg_desc{
 		context: desc.context,
-		image_pool_size: (1 << power) - 1 // some storyboard is really stupid so i had to do this
-		buffer_pool_size: (1 << power) - 1 // for now just increase these 3 below until i add
-		shader_pool_size: (1 << power) - 1 // slider pooling or something like that
-		pipeline_pool_size: (1 << power) - 1 // :troll:
+		image_pool_size: (1 << power) - 1 // some storyboard is really stupid so i had to do this.
+		buffer_pool_size: (1 << power) - 1 // for now just increase these 2 below until i figured out
+		pipeline_pool_size: (1 << power) - 1 // a better way for this
+		shader_pool_size: 0 // Shader pool can just use default values cuz SliderRenderer only use one shader now
 	}
 	
 	gfx.setup(&desc)
