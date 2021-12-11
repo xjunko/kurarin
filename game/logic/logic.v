@@ -13,12 +13,16 @@ import framework.graphic.canvas
 import framework.math.vector
 
 const (
-	force_hit = true
+	force_hit = false // ignore hitsystem completely
 )
 
 pub enum HitResult {
 	ignore
 	slidermiss
+	sliderpoint
+	sliderstart
+	sliderrepeat
+	sliderend
 	miss
 	hit50
 	hit100
@@ -70,6 +74,7 @@ pub interface HitObject {
 	update_post_for(f64) bool
 	get_fade_time() f64
 	get_number() int
+	get_object() &game_object.IHitObject
 
 }
 
@@ -83,10 +88,20 @@ pub struct StandardLogic {
 }
 
 pub fn (mut logic StandardLogic) update(time f64) {
+	if logic.processed.len > 0 {
+		for i := 0; i < logic.processed.len; i++ {
+			mut g := &logic.processed[i]
+
+			if g.is_hit {
+				logic.processed = logic.processed[1 ..]
+			}
+
+			i += -1
+		}
+	}
+
 	if logic.queue.len > 0 {
 		for i := 0; i < logic.queue.len; i++ {
-			if i >= logic.queue.len { println("> ${@FN}: fucked index: i=${i} - max=${logic.queue.len}") return } // ????
-
 			mut g := &logic.queue[i]
 
 			if g.get_fade_time() > time {
@@ -103,8 +118,19 @@ pub fn (mut logic StandardLogic) update(time f64) {
 }
 
 pub fn (mut logic StandardLogic) update_normal_for(time f64, process_slider_ends_ahead bool) {
+	mut was_slider_already := false
 	if logic.processed.len > 0 {
 		for mut hitobject in logic.processed {
+
+			if hitobject.get_object().is_slider {
+				if was_slider_already {
+					continue
+				}
+
+				if hitobject.is_hit {
+					was_slider_already = true
+				}
+			}
 			hitobject.update_for(time, process_slider_ends_ahead)
 		}
 	}
@@ -179,14 +205,13 @@ pub fn (mut logic StandardLogic) can_be_hit(time f64, mut object HitObject) Clic
 
 pub fn (mut logic StandardLogic) initialize() {
 	for mut object in logic.beatmap.objects {
-		// Slider to hitcircle cuz these objects is a subtype of hitcircle
 		if object is game_object.Slider {
-			mut circle_logic := HitCircle{}
-			circle_logic.init(logic, object.get_hit_object(), logic.player)
-			logic.queue << circle_logic
+			mut slider_logic := Slider{}
+			slider_logic.init(logic, mut object, logic.player)
+			logic.queue << slider_logic
 		}
 		else if object is game_object.Spinner {
-			// panic("No")
+			continue
 		}
 		else {
 			mut circle_logic := HitCircle{}
@@ -195,40 +220,3 @@ pub fn (mut logic StandardLogic) initialize() {
 		} 
 	}
 }
-
-/*
-pub fn make_standard_logic(mut beatmap &beatmap.Beatmap, mut player &PlayerReprensent, time_ptr &time2.TimeCounter, mut canvas &canvas.Canvas) &StandardLogic {
-	mut logic := &StandardLogic{beatmap: unsafe { beatmap }, player: unsafe { player }, canvas: unsafe { canvas }}
-	logic.initialize()
-
-
-	/*
-	go fn (mut logic &StandardLogic, mut player &PlayerReprensent, time_ptr &time2.TimeCounter) {
-		mut mutex := sync.new_mutex()
-		mut input_time := &time2.TimeCounter{}
-		mut max_delta := 0.0
-		input_time.reset()
-		
-		for {
-			mutex.@lock()
-
-			logic.update_click_for(time_ptr.time)
-			logic.update_normal_for(time_ptr.time, false)
-			logic.update_post_for(time_ptr.time)
-			logic.update(time_ptr.time)
-
-			input_time.tick()
-
-			if input_time.delta > max_delta {
-				max_delta = input_time.delta
-				println('> ${max_delta} highest delta')
-			}
-			
-			mutex.unlock()
-		}
-	}(mut logic, mut player, time_ptr)
-	*/
-
-	return logic
-}
-*/

@@ -14,11 +14,6 @@ import game.animation
 import game.math.timing
 import game.math.difficulty
 
-const (
-	sample_name = ["normal", "soft", "drum"]
-)
-
-
 pub struct HitObject {
 	pub mut:
 		id              int
@@ -47,6 +42,10 @@ pub struct HitObject {
 		combo_index       int
 		data              []string
 		ratiod_scale      vector.Vector2
+
+		// TODO: put this somewhere else
+		sample 	   int
+		sample_set int
 }
 
 pub fn (mut hitobject HitObject) draw(ctx &gg.Context, time f64) {
@@ -60,25 +59,25 @@ pub fn (mut hitobject HitObject) pre_init() {
 	hitobject.is_new_combo = (hitobject.data[3].int() & 4) > 0
 
 	// Hitsound
-	hitobject_sample := hitobject.data[4].int()
+	hitobject.sample = hitobject.data[4].int()
 	timing := hitobject.timing.get_point_at(hitobject.time.start)
-	prefix := sample_name[int(timing.sampleset) % 3] // TODO: make it accurate or somethign idk
 
-	if (hitobject_sample & 1) > 0 || hitobject_sample == 0 {
-		hitobject.hitsound = '${prefix}-hitnormal'
+	if hitobject.data.len > 5 && (hitobject.data[3].int() & 1) > 0 {
+		hitobject.sample_set = hitobject.data[5].split(":")[0].int()
+	} else {
+		// Use timing sampleset
+		hitobject.sample_set = int(timing.sampleset)
 	}
 
-	if (hitobject_sample & 2) > 0 {
-		hitobject.hitsound = '${prefix}-hitwhistle'
+	// TODO: unfuck sampleset
+	if hitobject.sample_set == 0 {
+		hitobject.sample_set = 1 
 	}
+}
 
-	if (hitobject_sample & 4) > 0 {
-		hitobject.hitsound = '${prefix}-hitfinish'
-	}
-
-	if (hitobject_sample & 8) > 0 {
-		hitobject.hitsound = '${prefix}-hitclap'
-	}	
+pub fn (mut hitobject HitObject) play_hitsound() {
+	mut audio_ptr := audio.global
+	audio_ptr.play_osu_sample(hitobject.sample, hitobject.sample_set)
 }
 
 pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_object IHitObject) {
@@ -112,7 +111,7 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 
 	// combo colour
 	hitobject.hitcircle.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color)
-	hitobject.hitcircleoverlay.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color)
+	// hitobject.hitcircleoverlay.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color) // HitCircleOverlay dont use combo colors
 
 	hitobject.ratiod_scale = size
 	for mut sprite in clickable {
@@ -169,8 +168,9 @@ pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_obj
 
 pub fn (mut hitobject HitObject) arm(clicked bool, time f64) {
 	if clicked {
-		mut audio_ptr := audio.global
-		audio_ptr.add_audio_and_play_blocking(path: 'assets/skins/default/${hitobject.hitsound}.wav')
+		if !hitobject.is_slider { // Handled by slider
+			hitobject.play_hitsound()
+		}
 		
 		// resets
 		hitobject.hitcircle.reset_transforms()
@@ -218,10 +218,6 @@ pub fn (mut hitobject HitObject) arm(clicked bool, time f64) {
 	}  else {
 		end_time := time + 60
 		animation.modify_hit_animation(mut hitobject.hitanimation, animation.HitType.hmiss, time)
-
-		hitobject.hitcircle.remove_all_transform_with_type(.fade)
-		hitobject.hitcircleoverlay.remove_all_transform_with_type(.fade)
-		hitobject.combo_sprite.remove_all_transform_with_type(.fade)
 		hitobject.hitcircle.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, end_time}, before: [f64(0)])
 		hitobject.hitcircleoverlay.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, end_time}, before: [f64(0)])
 		hitobject.combo_sprite.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, end_time}, before: [f64(0)])

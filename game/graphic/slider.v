@@ -224,7 +224,7 @@ pub fn (mut slider SliderRenderer) make_pipeline() {
 pub fn (mut slider SliderRenderer) update(time f64) {
 	// Alpha thingy
 	if time < (slider.time.start - slider.difficulty.preempt / 2) {
-		slider.alpha = f64(time - (slider.time.start-i64(slider.difficulty.preempt)))/(slider.difficulty.preempt/2)
+		slider.alpha = f64(time - (slider.time.start-i64(slider.difficulty.preempt)))/(slider.difficulty.preempt/2) 
 	} else if time >= slider.time.end {
 		slider.alpha = 1.0 - f64(time - slider.time.end)/(slider.difficulty.preempt/4)
 	} 

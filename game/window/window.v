@@ -15,7 +15,7 @@ import framework.graphic.sprite
 //
 import game.beatmap
 import game.math.resolution
-import game.auto
+import game.players as player2
 
 pub struct GameWindow {
 	pub mut:
@@ -40,8 +40,8 @@ pub struct GameWindow {
 		beatmap_canvas &canvas.Canvas = voidptr(0)
 
 		//
-		player         &auto.IPlayer = &auto.AutoPlayer{player: 0, logic: 0} // V SHUT THE FUCK UP PLEASE
-		players        []auto.IPlayer
+		player         &player2.IPlayer = &player2.AutoPlayer{player: 0, logic: 0} // V SHUT THE FUCK UP PLEASE
+		players        []player2.IPlayer
 
 		//
 		video_writer &VideoWriter = voidptr(0)
@@ -138,8 +138,8 @@ pub fn (mut window GameWindow) load_beatmap() {
 
 	// Canvas
 	window.game_canvas.scale = resolution.global.playfield_scale
-	window.game_canvas.position.x = ((resolution.global.width - resolution.global.playfield_width) / 2.0) / resolution.global.playfield_scale
-	window.game_canvas.position.y = ((resolution.global.height - resolution.global.playfield_height) / 1.9) / resolution.global.playfield_scale
+	window.game_canvas.position.x = ((resolution.global.width - resolution.global.playfield_width) / 2.1) / resolution.global.playfield_scale // 2.1
+	window.game_canvas.position.y = ((resolution.global.height - resolution.global.playfield_height) / 2.27) / resolution.global.playfield_scale // 1.9
 
 	// Add flying shit before beatmap objects
 	// generate_bullshit(mut window)
@@ -151,7 +151,7 @@ pub fn (mut window GameWindow) load_beatmap() {
 
 	// add auto player if enabled
 	if window.auto {
-		window.players << auto.make_auto(window.beatmap, mut window.game_canvas, mut window.game_time)
+		window.players << player2.make_auto(window.beatmap, mut window.game_canvas, mut window.game_time)
 		window.player = &window.players[0]
 	}
 }
@@ -162,6 +162,9 @@ pub fn (mut window GameWindow) draw_time_info() {
 	window.render_time.tick()
 	window.ctx.draw_text(0, 0, 'Time: ${window.global_time.time} | Gametime: ${window.game_time.time}', gx.TextCfg{color: gx.white})
 	window.ctx.draw_text(0, 16, 'Global Update: ${window.global_time.fps:.2f}fps [${window.global_time.delta:.2f}ms] | Game Update: ${window.game_time.fps:.2f}fps [${window.game_time.delta}ms] | Draw Update: ${window.render_time.fps:.2f}fps [${window.render_time.delta}ms]', gx.TextCfg{color: gx.white})
+
+	// Extra
+	window.ctx.draw_text(0, 32, "Keys: ${window.player.player.left_key} ${window.player.player.right_key}", gx.TextCfg{color: gx.white})
 }
 
 [inline]

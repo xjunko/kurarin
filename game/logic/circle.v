@@ -26,8 +26,8 @@ pub fn (mut hitcircle HitCircle) init(logic &StandardLogic, circle &object.IHitO
 
 		if circle is object.HitObject {
 			hitcircle.circle = circle
-		} else if circle is object.Slider {
-			hitcircle.circle = &circle.HitObject
+		} else {
+			panic("THE FUCK: ${circle.type_name()}")
 		}
 	}
 
@@ -35,9 +35,6 @@ pub fn (mut hitcircle HitCircle) init(logic &StandardLogic, circle &object.IHitO
 	hitcircle.fade_time = f64(math.min(
 		hitcircle.fade_time, player.difficulty.preempt
 	))
-
-	// HACK: TEMP
-	// hitcircle.fade_time += f64(300)
 
 	hitcircle.init_old()
 }
@@ -115,7 +112,6 @@ pub fn (mut hitcircle HitCircle) update_click_for(time f64) bool {
 pub fn (mut hitcircle HitCircle) update_post_for(time f64) bool {
 	if time >= hitcircle.circle.time.end + hitcircle.player.difficulty.hit50 && !hitcircle.is_hit {
 		hitcircle.circle.arm(false, time)
-
 		hitcircle.is_hit = true
 	}
 
@@ -130,4 +126,8 @@ pub fn (hitcircle HitCircle) get_fade_time() f64 {
 
 pub fn (hitcircle HitCircle) get_number() int {
 	return hitcircle.circle.id
+}
+
+pub fn (hitcircle &HitCircle) get_object() &object.IHitObject {
+	return hitcircle.circle
 }

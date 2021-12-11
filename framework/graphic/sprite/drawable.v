@@ -12,6 +12,7 @@ pub struct DrawConfig {
 		offset vector.Vector2
 		size   vector.Vector2
 		scale  f64 = 1
+		extra  vector.Vector2
 }
 
 // TODO: idfk

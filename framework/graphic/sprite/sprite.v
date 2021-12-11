@@ -65,6 +65,7 @@ pub fn (mut s Sprite) apply_transform(t transform.Transform, time f64) {
 		}
 
 		.scale {
+			// Bruh
 			val := t.as_vector(time)
 			s.size.x = s.base_size.x * val.x
 			s.size.y = s.base_size.y * val.y
@@ -218,7 +219,7 @@ pub fn (s Sprite) check_if_drawable(time f64) bool {
 			return true
 		}
 	*/
-	if time >= s.time.start && time <= s.time.end && s.color.a > 0 {
+	if time >= s.time.start && time <= s.time.end && s.color.a > 0.0 {
 		return true
 	}
 

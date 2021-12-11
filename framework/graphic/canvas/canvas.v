@@ -8,6 +8,7 @@ import framework.graphic.sprite
 
 import game.beatmap.object
 import game.math.difficulty
+// import game.math.resolution
 
 pub struct Canvas {
 	pub mut:
@@ -78,6 +79,10 @@ pub fn (mut c Canvas) draw(ctx &gg.Context, time f64) {
 	for mut drawable in c.drawables {
 		drawable.draw(ctx: ctx, time: time, offset: c.position, scale: c.scale, size: c.size)
 	}
+
+	// if c.hitobjects.len > 0 {
+	// 	c.draw_canvas_debug(ctx)
+	// }
 }
 
 pub fn (mut c Canvas) draw_and_update(ctx &gg.Context, time f64) {

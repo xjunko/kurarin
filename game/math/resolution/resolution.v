@@ -31,7 +31,7 @@ pub fn (mut r Resolution) calculate() {
 	r.playfield_height = r.height * r.playfield_scale
 	r.playfield_width = r.playfield_height * 4/3
 	r.scale = r.height / 768
-	r.playfield_scale *= r.scale * 2
+	r.playfield_scale *= r.scale * 2.055 // HACK: TO match with mcosu (kinda) and sliders
 
 	// sb
 	r.storyboard_scale = r.height / 480

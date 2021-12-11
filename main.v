@@ -114,43 +114,20 @@ pub fn frame_update(mut main_window &MainWindow) {
 /*
 pub fn frame_mouse_move(x f32, y f32, mut main_window &MainWindow) {
 	if true { return }
-	main_window.game.auto_repr.position.x = f64(x)
-	main_window.game.auto_repr.position.y = f64(y)
-}
-
-pub fn frame_key_down(key gg.KeyCode, _ gg.Modifier, mut main_window &MainWindow) {
-	if !main_window.game.is_ready || (key != .z && key != .x) || true { return }
-
-
-	if key == .z {
-		// println('> Clicked Input1')
-		main_window.game.logic.player.left_key = true
-	}
-
-	if key == .x {
-		// println('> Clicked Input2')
-		main_window.game.logic.player.right_key = true
-	}
-
-	main_window.game.logic.update_click_for(main_window.game.game_time.time)
-}
-
-pub fn frame_key_up(key gg.KeyCode, _ gg.Modifier, mut main_window &MainWindow) {
-	if !main_window.game.is_ready || (key != .z && key != .x) || true { return }
-	
-
-	if key == .z {
-		// println('> Left Input1')
-		main_window.game.logic.player.left_key = false
-	}
-
-	if key == .x {
-		// println('> Left Input2')
-		main_window.game.logic.player.right_key = false
-	}
+	main_window.game.player_repr.position.x = f64(x)
+	main_window.game.player_repr.position.y = f64(y)
 }
 */
 
+// pub fn frame_key_down(key gg.KeyCode, _ gg.Modifier, mut main_window &MainWindow) {
+// 	if !main_window.game.is_ready || (key != .z && key != .x) { return }
+// 	main_window.game.player.receive_keys_click(key)
+// }
+
+// pub fn frame_key_up(key gg.KeyCode, _ gg.Modifier, mut main_window &MainWindow) {
+// 	if !main_window.game.is_ready || (key != .z && key != .x) { return }
+// 	main_window.game.player.receive_keys_unclick(key)
+// }
 
 
 [console]
@@ -191,11 +168,10 @@ fn main() {
 		// FNs
 		init_fn: frame_init,
 		frame_fn: frame_update
-		/*
-		keydown_fn: frame_key_down,
-		keyup_fn: frame_key_up,
-		move_fn: frame_mouse_move
-		*/
+		
+		// keydown_fn: frame_key_down,
+		// keyup_fn: frame_key_up,
+		// move_fn: frame_mouse_move
 	)
 
 	// Init audio

@@ -23,13 +23,14 @@ void main() {
     )
     */
     // TODO: unhardcode this or maybe dont idk 
-    float playfield_scale = 1.453857;
+    float playfield_scale = 1.453857; // HACK: not dynamic (1280x720)
     mat4 proj = mat4(
         0.001628 * playfield_scale, 0.0, 0.0, 0.0,
         0.0, -0.002894 * playfield_scale, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         -0.416667 * playfield_scale, 0.555556 * playfield_scale, 0.000000, 1.0
     );
+    
 
     mat4 trans = mat4(
         1.0, 0.0, 0.0, 0.0,
@@ -54,7 +55,6 @@ in vec2 texture_coord_out;
 out vec4 color;
 
 void main() {
-    float alpha = 1;
     vec4 in_color = texture(texture_in, texture_coord_out);
     in_color *= bullshit.x;
 	color = in_color * col_border;

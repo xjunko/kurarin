@@ -7,6 +7,7 @@ import framework.math.easing
 import framework.math.vector
 import framework.math.time
 import framework.graphic.sprite
+import framework.audio
 
 import curves
 import game.graphic
@@ -19,6 +20,10 @@ pub struct Slider {
 	HitObject
 
 	pub mut:
+		samples 	  []int
+		sample_sets   []int
+		addition_sets []int
+
 		sliderrender &graphic.SliderRenderer = &graphic.SliderRenderer{}
 		end_position  vector.Vector2
 		sliderend 	  &sprite.Sprite = &sprite.Sprite{}
@@ -28,9 +33,52 @@ pub struct Slider {
 		duration      f64
 		skip_offset   bool
 
+		// HACKHACK
+		last_time int
+		temp_done bool
+}
+
+pub fn (mut slider Slider) play_hitsound(index int) {
+	mut audio_ptr := audio.global
+	mut sample := slider.samples[index]
+	mut sample_set := slider.sample_sets[index]
+	mut addition_sets := slider.addition_sets[index]
+	point := slider.timing.get_point_at(slider.time.start + math.floor(index * slider.duration + 5))
+
+	if sample_set == 0 {
+		sample_set = slider.sample_set
+
+		if sample_set == 0 {
+			sample_set = int(point.sampleset)
+		}
+	}
+
+	if addition_sets == 0 {
+		addition_sets = 0 // TODO: addition set
+	}
+
+	audio_ptr.play_osu_sample(
+		sample,
+		sample_set
+	)
 }
 
 pub fn (mut slider Slider) draw(ctx &gg.Context, time f64) {
+	// HACK: fn abuse
+
+	if time >= slider.time.start && time <= slider.time.end {
+		times := int(((time - slider.time.start) / slider.duration) + 1)
+
+		if slider.last_time != times {
+			slider.play_hitsound(times - 1)
+			slider.last_time = times
+		}
+
+		return
+	}
+
+	slider.play_hitsound(int(slider.repeated))
+	slider.temp_done = true
 }
 
 pub fn (mut slider Slider) get_curves() []vector.Vector2 {
@@ -62,6 +110,29 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	slider.duration = slider.timing.get_point_at(slider.time.start).beatduration * slider.pixel_length / (100 * slider.timing.slider_multiplier)
 	slider.time.end += slider.duration * slider.repeated
 
+	// samples
+	slider.samples = []int{len: int(slider.repeated) + 1}
+	slider.sample_sets = []int{len: int(slider.repeated) + 1}
+	slider.addition_sets = []int{len: int(slider.repeated) + 1}
+
+
+	if slider.data.len > 8 {
+		data := slider.data[8].split('|')
+		for i, v in data {
+			slider.samples[i] = v.int()
+		}
+	}
+
+	// sets
+	if slider.data.len > 9 {
+		data := slider.data[9].split('|')
+		for i, v in data {
+			items := v.split(':')
+			slider.sample_sets[i] = items[0].int()
+			slider.addition_sets[i] = items[1].int()
+		}
+	}
+
 	// make slider follow circle eee
 	slider.make_slider_follow_circle()
 
@@ -90,6 +161,9 @@ pub fn (mut slider Slider) make_slider_follow_circle() {
 	mut slider_objects := []&sprite.Sprite{}
 	slider_objects << slider_overlay_sprite
 	slider_objects << sliderb_sprite
+
+	// color
+	sliderb_sprite.add_transform(typ: .color, time: time.Time{slider.time.start, slider.time.start}, before: slider.color)
 
 	mut last_position := slider.position
 	for mut object in slider_objects {
@@ -141,8 +215,23 @@ pub fn (mut slider Slider) process_points() {
 	slider.end_position = slider.curve.point_at(math.fmod(slider.repeated, 2))
 }
 
-pub fn (mut slider Slider) arm(clicked bool, time f64) {
+pub fn (mut slider Slider) hit_edge(index int, time f64, is_hit bool) {
+	if index == 0 {
+		slider.arm_start(is_hit, time)
+	} else {
+		// TODO
+	}
+
+	if is_hit {
+		// slider.play_hitsound(index)
+	}
+}
+
+pub fn (mut slider Slider) arm_start(clicked bool, time f64) {
 	slider.HitObject.arm(clicked, time)
+}
+
+pub fn (mut slider Slider) arm(clicked bool, time f64) {
 }
 
 pub fn (mut slider Slider) get_hit_object() &HitObject {
