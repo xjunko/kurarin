@@ -18,8 +18,6 @@ pub struct MainWindow {
 		ctx &gg.Context = voidptr(0)
 		game &window.GameWindow = voidptr(0)
 		mode int
-		pass C.sg_pass_action
-		pass_dc C.sg_pass_action
 
 		// temp stuff
 		game_speed f64 = 1.0
@@ -58,16 +56,6 @@ pub fn frame_init(mut main_window &MainWindow) {
 		main_window.game.game_speed = main_window.game_speed
 		main_window.game.start_game_loop(writer: 0)
 	}
-
-	// Pass
-	main_window.pass.colors[0] = C.sg_color_attachment_action{
-		action: .clear,
-		value: C.sg_color{0.0, 0.0, 0.0, 1.0}
-	}
-	main_window.pass_dc.colors[0] = C.sg_color_attachment_action{
-		action: .load,
-		value: C.sg_color{0.0, 0.0, 0.0, 1.0}
-	}
 }
 
 pub fn frame_update(mut main_window &MainWindow) {
@@ -96,38 +84,21 @@ pub fn frame_update(mut main_window &MainWindow) {
 	sgl.ortho(0.0, 1280, 720, 0.0, -1.0, 1.0)
 
 	// Background
-	gfx.begin_default_pass(main_window.pass, 1280, 720)
-	main_window.game.draw_back_layer()
-	sgl.draw()
+	gfx.begin_default_pass(main_window.ctx.clear_pass, 1280, 720)
 	gfx.end_pass()
 	gfx.commit()
+
+	// Background
+	main_window.game.draw_back_layer()
 
 	// Front
-	gfx.begin_default_pass(main_window.pass_dc, 1280, 720)
 	main_window.game.draw()
-	main_window.game.draw_special()
+	// main_window.game.draw_special()
+	gfx.begin_default_pass(main_window.ctx.clear_pass_dc, 1280, 720)
 	sgl.draw()
 	gfx.end_pass()
 	gfx.commit()
 }
-
-/*
-pub fn frame_mouse_move(x f32, y f32, mut main_window &MainWindow) {
-	if true { return }
-	main_window.game.player_repr.position.x = f64(x)
-	main_window.game.player_repr.position.y = f64(y)
-}
-*/
-
-// pub fn frame_key_down(key gg.KeyCode, _ gg.Modifier, mut main_window &MainWindow) {
-// 	if !main_window.game.is_ready || (key != .z && key != .x) { return }
-// 	main_window.game.player.receive_keys_click(key)
-// }
-
-// pub fn frame_key_up(key gg.KeyCode, _ gg.Modifier, mut main_window &MainWindow) {
-// 	if !main_window.game.is_ready || (key != .z && key != .x) { return }
-// 	main_window.game.player.receive_keys_unclick(key)
-// }
 
 
 [console]
@@ -168,10 +139,6 @@ fn main() {
 		// FNs
 		init_fn: frame_init,
 		frame_fn: frame_update
-		
-		// keydown_fn: frame_key_down,
-		// keyup_fn: frame_key_up,
-		// move_fn: frame_mouse_move
 	)
 
 	// Init audio

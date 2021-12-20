@@ -164,7 +164,7 @@ pub fn (mut window GameWindow) draw_time_info() {
 	window.ctx.draw_text(0, 16, 'Global Update: ${window.global_time.fps:.2f}fps [${window.global_time.delta:.2f}ms] | Game Update: ${window.game_time.fps:.2f}fps [${window.game_time.delta}ms] | Draw Update: ${window.render_time.fps:.2f}fps [${window.render_time.delta}ms]', gx.TextCfg{color: gx.white})
 
 	// Extra
-	window.ctx.draw_text(0, 32, "Keys: ${window.player.player.left_key} ${window.player.player.right_key}", gx.TextCfg{color: gx.white})
+	// window.ctx.draw_text(0, 32, "Keys: ${window.player.player.left_key} ${window.player.player.right_key}", gx.TextCfg{color: gx.white})
 }
 
 [inline]

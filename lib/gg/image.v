@@ -159,6 +159,13 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 	}
 
 	sgl.disable_texture()
+
+	// Force draw
+	gfx.begin_default_pass(ctx.clear_pass_dc, 1280, 720)
+	sgl.draw()
+	gfx.end_pass()
+	gfx.commit()
+	
 }
 
 // Draw part of an image using uv coordinates

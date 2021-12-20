@@ -194,11 +194,11 @@ pub fn (mut slider SliderRenderer) make_pipeline() {
 	// slider.state.pip = C.sg_make_pipeline(pipeline_desc)
 
 	// // Pass
-	// slider.state.pass_action = C.sg_pass_action{}
-	// slider.state.pass_action.colors[0] = C.sg_color_attachment_action{
-	// 	action: .load,
-	// 	value: C.sg_color{1.0, 1.0, 1.0, 1.0}
-	// }
+	slider.state.pass_action = C.sg_pass_action{}
+	slider.state.pass_action.colors[0] = C.sg_color_attachment_action{
+		action: .dontcare,
+		value: C.sg_color{1.0, 1.0, 1.0, 1.0}
+	}
 	// slider.vertices << [f32(1), 2, 3]
 
 
@@ -264,6 +264,7 @@ pub fn (mut slider SliderRenderer) draw(arg sprite.DrawConfig) {
 	slider.update(arg.time)
 
 	if !slider.init || !slider.is_visible || slider.vertices.len == 0 || slider.alpha <= 0.0 { return }
+	gfx.begin_default_pass(slider.state.pass_action, 1280, 720)
 	gfx.apply_pipeline(slider.state.pip)
 	gfx.apply_bindings(&slider.state.bind)
 
@@ -279,6 +280,8 @@ pub fn (mut slider SliderRenderer) draw(arg sprite.DrawConfig) {
 	gfx.apply_uniforms(C.SG_SHADERSTAGE_FS, C.SLOT_fs_params, &fs_params)
 
 	gfx.draw(0, slider.vertices.len, 1)
+	gfx.end_pass()
+	gfx.commit()
 }
 
 pub fn (mut slider SliderRenderer) draw_and_update(arg sprite.DrawConfig) {

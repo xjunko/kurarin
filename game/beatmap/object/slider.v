@@ -145,7 +145,11 @@ pub fn (mut slider Slider) initialize_object(mut ctx &gg.Context, last_object IH
 	slider.sliderrender.make_pipeline()
 	slider.sliderrender.special = true
 
-	slider.sprites << slider.sliderrender
+	mut temp_sprites := []sprite.IDrawable{}
+	temp_sprites << slider.sliderrender
+	temp_sprites << slider.sprites
+
+	slider.sprites = temp_sprites
 }
 
 pub fn (mut slider Slider) make_slider_follow_circle() {

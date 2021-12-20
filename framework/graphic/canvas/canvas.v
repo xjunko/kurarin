@@ -71,7 +71,6 @@ pub fn (mut c Canvas) draw(ctx &gg.Context, time f64) {
 
 		mut hitobject := &c.hitobjects[i]
 		for mut sprite in hitobject.sprites {
-			if sprite.special { continue }
 			sprite.draw(ctx: ctx, time: time, offset: c.position, scale: c.scale, size: c.size)
 		}
 	}

@@ -52,6 +52,7 @@ pub mut:
 	width       int
 	height      int
 	clear_pass  C.sg_pass_action
+	clear_pass_dc C.sg_pass_action
 	window      C.sapp_desc
 	timage_pip  C.sgl_pipeline
 	config      Config
