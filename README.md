@@ -12,7 +12,7 @@ i cant keep up with the old codebase cuz its so bad so yea thats why
 
 ## Preview
 
-* to be added
+https://user-images.githubusercontent.com/44401509/150633211-4424db2b-8cef-44a0-92a8-bafe7a9f33a1.mp4
 
 ## Misc
 
