@@ -1,294 +1,171 @@
 module sprite
 
-import lib.gg
+import library.gg
 import gx
 import math
 
-import framework.transform
 import framework.math.time
+import framework.math.transform
 import framework.math.vector
-import framework.math.easing
-
-// had to do this since interface doesnt support embedded struct :ihatemylife:
-pub enum SpriteType {
-	image
-	text
-}
-
 
 pub struct Sprite {
 	pub mut:
-		typ        SpriteType = SpriteType.image
-		time 	   &time.Time = &time.Time{}
-		position   &vector.Vector2 = &vector.Vector2{}
-		origin     vector.Vector2 = vector.centre
-		size       vector.Vector2
-		base_size  vector.Vector2
-		color      gx.Color = gx.white
-		angle      f64
-		z          int
-
+		time       time.Time
+		transforms []transform.Transform
 		textures   []gg.Image
 		texture_i  int
 
-		// text
-		text	string
-
-		// attr
-		special    	   bool
+		// Attrs
+		additive       bool
 		always_visible bool
-		skip_offset    bool
-
-		// transform
-		transforms []transform.Transform
-		transforms_i int // mmmmmm idk
+		origin    vector.Vector2 = vector.centre
+		position  vector.Vector2
+		size      vector.Vector2
+		raw_size  vector.Vector2
+		color     gx.Color = gx.white
+		angle     f64
 }
 
-pub fn (s Sprite) image() &gg.Image {
-	if s.texture_i < s.textures.len {
-		return &s.textures[s.texture_i]
-	}
 
-	return &gg.Image{}
-}
-
-// Event FNs
-// bullshit
-pub fn (mut s Sprite) apply_transform(t transform.Transform, time f64) {
+// Transform FNs
+pub fn (mut sprite Sprite) apply_event(t transform.Transform, time f64) {
 	match t.typ {
-		.fade {
-			s.color.a = byte(t.as_one(time))
-		}
-
-		.angle {
-			s.angle = (t.as_one(time) * 180 / math.pi) * -1.0 // this looks retarded why not just use 360 isntead of this
-		}
-
-		.scale {
-			// Bruh
-			val := t.as_vector(time)
-			s.size.x = s.base_size.x * val.x
-			s.size.y = s.base_size.y * val.y
+		.move {
+			pos := t.as_vector(time)
+			sprite.position.x = pos.x
+			sprite.position.y = pos.y
+			// logging.info(pos)
 		}
 
 		.move_x {
-			val := t.as_one(time)
-			s.position.x = val
+			sprite.position.x = t.as_one(time)
 		}
-
+		
 		.move_y {
-			val := t.as_one(time)
-			s.position.y = val
+			sprite.position.y = t.as_one(time) 
 		}
 
-		.move {
-			val := t.as_vector(time)
-			s.position.x = val.x
-			s.position.y = val.y
-		}
-
-		.scale_factor {
-			val := t.as_one(time)
-			s.size.x = s.base_size.x * val
-			s.size.y = s.base_size.y * val
+		.angle {
+			sprite.angle = (t.as_one(time) * 180 / math.pi) * -1.0
 		}
 
 		.color {
-			val := t.as_three(time)
-			s.color.r = byte(val[0])
-			s.color.g = byte(val[1])
-			s.color.b = byte(val[2])
+			pos := t.as_three(time)
+			sprite.color.r = byte(pos[0])
+			sprite.color.g = byte(pos[1])
+			sprite.color.b = byte(pos[2])
 		}
-
 		
+		.fade {
+			sprite.color.a = byte(t.as_one(time))
+		}
+
+		.scale {
+			v := t.as_vector(time)
+			sprite.size.x = sprite.raw_size.x * v.x
+			sprite.size.y = sprite.raw_size.y * v.y
+		}
+
+		.scale_factor {
+			factor := t.as_one(time)
+			sprite.size.x = sprite.raw_size.x * factor
+			sprite.size.y = sprite.raw_size.y * factor
+		}
+
+		// else {}
 	}
 }
 
-pub struct AddTransformArgument {
-	typ 	transform.TransformType
-	easing 	easing.EasingFunction = easing.linear // this is fucking repetitive to write
-	time    time.Time
-	before  []f64
-	after   []f64
-}
-
-pub fn (mut s Sprite) add_transform(arg AddTransformArgument) {
-	mut transform := transform.Transform{
-		typ: arg.typ,
-		easing: arg.easing,
-		time: arg.time,
-		before: arg.before,
-		after: arg.after
-	}
-	transform.ensure_safe()
-	s.transforms << transform
-
-	// s.reset_time_based_on_transforms() // what if
-}
-
-pub fn (mut s Sprite) update(time f64) {
-	for transform in s.transforms {
-		if time >= transform.time.start && time <= transform.time.end {
-			s.apply_transform(transform, time)
+pub fn (mut sprite Sprite) remove_transform_by_type(t transform.TransformType) {
+	for mut transform in sprite.transforms {
+		if transform.typ == t {
+			sprite.transforms.delete(sprite.transforms.index(transform))
 		}
 	}
 }
 
-
-
-//
-pub fn (mut s Sprite) reset_transforms() {
-	s.transforms = []transform.Transform{}
+pub fn (mut sprite Sprite) reset_transform() {
+	sprite.transforms = []transform.Transform{} // TODO: better way to clear transforms 
 }
 
-pub fn (mut s Sprite) after_add_transform_reset() {
-	s.reset_time_based_on_transforms()
-	s.reset_image_size()
-	s.reset_attributes_based_on_transforms()
+pub fn (mut sprite Sprite) add_transform(_t transform.Transform) {
+	mut t := _t
+	t.ensure_both_slots_is_filled_in()
+	sprite.transforms << t
 }
 
-pub fn (mut s Sprite) reset_time_based_on_transforms() {
-	// lol
-	s.transforms.sort(a.time.start < b.time.start)
-	s.time.start = s.transforms[0].time.start
-	s.transforms.sort(a.time.end > b.time.end)
-	s.time.end = s.transforms[0].time.end
+pub fn (mut sprite Sprite) reset_size_based_on_texture(arg CommonSpriteSizeResetArgument) {
+	if arg.size.x != 0 || arg.size.y != 0 {
+		sprite.raw_size.x = arg.size.x
+		sprite.raw_size.y = arg.size.y
 
-	// sort normally
-	s.transforms.sort(a.time.start < b.time.start)
+		sprite.size.x = arg.size.x
+		sprite.size.y = arg.size.y
+	} else {
+		texture := sprite.get_texture()
+
+		sprite.raw_size.x = texture.width * arg.factor
+		sprite.raw_size.y = texture.height * arg.factor
+
+		sprite.size.x = texture.width * arg.factor
+		sprite.size.y = texture.height * arg.factor
+	}
 }
 
-pub fn (mut s Sprite) reset_attributes_based_on_transforms() {
+pub fn (mut sprite Sprite) reset_attributes_based_on_transforms() {
 	mut applied := []transform.TransformType{}
 
-	for transform in s.transforms {
-		if transform.typ !in applied {
-			s.apply_transform(transform, transform.time.start)
-			applied << transform.typ
-			// println('applying ${transform.typ}, time: ${transform.time.start}, value: ${transform.before} - ${transform.after}, duration: ${transform.time.duration()}')
-		}
-	}
-}
+	// Might as well sort the transforms while we're at it
+	sprite.transforms.sort(a.time.start < b.time.start)
 
-pub fn (mut s Sprite) reset_image_size() {
-	if s.textures.len > 0 {
-		s.change_size(size: vector.Vector2{s.image().width, s.image().height})
-	} else {
-		// No scale factor??? just use 1x1 i guess
-		s.change_size(size: vector.Vector2{1, 1})
-	}
-}
-
-pub struct ChangeSizeArg {
-	size vector.Vector2
-	keep_ratio bool
-}
-
-pub fn (mut s Sprite) change_size(arg ChangeSizeArg) {
-	if arg.keep_ratio {
-		mut height := s.base_size.y
-
-		// use image hieght if base size is not there
-		if s.base_size.y == 0 {
-			height = f64(s.image().height)
-		}
-	
-		ratio := arg.size.y / height
-		s.base_size.x = s.base_size.x * ratio
-		s.base_size.y = s.base_size.y * ratio
-		s.size.x = s.size.x * ratio
-		s.size.y = s.size.y * ratio
-		return
-	}
-
-	s.base_size.x = arg.size.x
-	s.base_size.y = arg.size.y
-	s.size.x = arg.size.x
-	s.size.y = arg.size.y
-}
-
-pub fn (mut s Sprite) remove_all_transform_with_type(typ transform.TransformType) {
-	s.transforms = s.transforms.filter(it.typ != typ)
-}
-
-//
-pub fn (s Sprite) check_if_drawable(time f64) bool {
-	/*
-	for transform in s.transforms {
-		if time >= transform.time.start && time <= transform.time.end {
-			return true
-		}
-	*/
-	if time >= s.time.start && time <= s.time.end && s.color.a > 0.0 {
-		return true
-	}
-
-	return false
-}
-
-
-
-
-
-pub fn (s Sprite) draw(cfg DrawConfig) {
-	if !s.check_if_drawable(cfg.time) && !s.always_visible { return }
-
-	mut img := s.image()
-
-	// reference
-	// x := f32(((s.position.x * cfg.scale) -  x_pos.x) + cfg.offset.x * cfg.scale)
-	// y := f32(((s.position.y * cfg.scale) - y_pos.y) + cfg.offset.y * cfg.scale)
-	// width := f32(s.size.x * cfg.scale)
-	// height := f32(s.size.y * cfg.scale)
-	
-	// use vector methods
-	size := s.size.scale(cfg.scale)
-	origin := size.multiply(s.origin)
-
-	mut position := s.position.scale(cfg.scale).sub(origin).add(cfg.offset.scale(cfg.scale))
-
-	if s.skip_offset {
-		// real
-		// position = s.position.sub_(s.size.scale_origin_(s.origin))
-		//cfg.ctx.draw_rect(f32(position.x), f32(position.y), 32, 32, gx.red)
-		// cved
-		//mut position_cv := s.position.scale_(cfg.scale).sub_(origin).add_(cfg.offset.scale_(cfg.scale))
-		//cfg.ctx.draw_rect(f32(position_cv.x), f32(position_cv.y), 32, 32, gx.yellow)
-	}
-
-	match s.typ {
-		.image {
-			cfg.ctx.draw_image_with_config(
-				img: img,
-				img_id: img.id,
-				img_rect: gg.Rect{
-					x: f32(position.x),
-					y: f32(position.y),
-					width: f32(size.x),
-					height: f32(size.y)
-				}
-				color: s.color,
-				rotate: f32(s.angle),
-				z: s.z
-			)
+	for i, t in sprite.transforms {
+		if t.typ !in applied {
+			applied << t.typ
+			sprite.apply_event(t, t.time.start)
 		}
 
-		.text {
-			cfg.ctx.draw_text(
-				int(position.x + (s.size.x * cfg.scale) / 2), 
-				int(position.y), 
-				s.text, 
-				gx.TextCfg{
-					color: s.color,
-					size: int(size.x),
-					align: .center
-				}
-			)
+		// Time
+		if i == 0 {
+			sprite.time.start = t.time.start	
+		}
+
+		sprite.time.start = math.min(sprite.time.start, t.time.start)
+		sprite.time.end = math.max(sprite.time.end, t.time.end)
+	}
+}
+
+// 
+pub fn (mut sprite Sprite) is_drawable_at(time f64) bool {
+	return time >= sprite.time.start && time <= sprite.time.end
+}
+
+// Texture
+pub fn (mut sprite Sprite) get_texture() &gg.Image {
+	return &sprite.textures[sprite.texture_i]
+}
+
+
+// Draw/Update FNs
+pub fn (mut sprite Sprite) update(time f64) {
+	// Old style: wont show up properly if time is too fast
+	// TODO: make better updater
+	for t in sprite.transforms {
+		if time >= t.time.start && time <= t.time.end + 100 {
+			sprite.apply_event(t, math.min(time, t.time.end)) // HACKHACHKHACK: extra 100ms to make sure the transform doesnt get skipped
 		}
 	}
-}	
 
-pub fn (mut s Sprite) draw_and_update(cfg DrawConfig) {
-	s.update(cfg.time)
-	s.draw(cfg)
+	//for mut t in sprite.transforms {
+	// 	if time >= t.time.start {
+	// 		sprite.apply_event(t, time)
+
+	// 		if time >= t.time.end {
+	// 			sprite.apply_event(t, time)
+	// 			sprite.transforms.delete(sprite.transforms.index(t))
+	// 			continue
+	// 		}
+	// 	}
+	// }
 }
+pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {}
+pub fn (mut sprite Sprite) draw_and_update(arg CommonSpriteArgument) {}

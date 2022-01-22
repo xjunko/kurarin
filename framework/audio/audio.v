@@ -1,75 +1,47 @@
 module audio
 
-
 import time
-import lib.miniaudio
+import library.miniaudio
 
-import framework.math.time as time2
+//
+import framework.logging
 
 pub const (
-	global = &AudioController{master: 0}
+	global = &AudioAttr{}
 )
 
-pub struct AudioController {
+// HACK: Globals
+struct AudioAttr {
 	pub mut:
-		master &miniaudio.AudioDevice = voidptr(0)
-		sounds []&miniaudio.Audio
+		main  	  &miniaudio.AudioDevice = voidptr(0)
 }
 
-pub struct AddAudioArgument {
-	mut:
-		path string
-		time &time2.TimeCounter = 0
-		volume f32 = 0.1
-		speed  f64 = 1.0
+// Play FNs
+fn internal_play(arg miniaudio.AddAudioArg, mut device &miniaudio.AudioDevice) {
+	mut audio := device.add_audio(arg)
+	// logging.debug("Playing path=${arg.path}, speed=${arg.speed}")
 
-}
-
-pub fn (mut audio AudioController) add_audio(arg AddAudioArgument) &miniaudio.Audio {
-	mut sound := audio.master.add_audio(path: arg.path, speed: arg.speed)
-	sound.volume(arg.volume)
-
-	// add into sounds list
-	audio.sounds << sound
-
-	// add into miniaudio master
-	// audio.master.add('${audio.sounds.len}::${rand.int()}', sound)
-
-	return sound
-}
-
-pub fn (mut audio AudioController) add_audio_and_play(arg_ AddAudioArgument) {
-	mut sound := audio.add_audio(arg_)
-	mut arg := arg_
-
-	sound.play()
-
-	// Free after finished
 	go fn (mut audio &miniaudio.Audio) {
+		audio.play()
 		time.sleep(audio.length() * time.millisecond)
 		audio.free()
-	}(mut sound)
-	
-
-	if !isnil(arg.time) {
-		arg.time.reset()
-	}
+		// logging.debug("Done playing path=${audio.path}")
+	}(mut audio)
 }
 
-pub fn (mut audio AudioController) add_audio_and_play_blocking(arg_ AddAudioArgument) {
-	audio.add_audio_and_play(arg_)
+pub fn play(arg miniaudio.AddAudioArg) {
+	mut device := get_main_device()
+	internal_play(arg, mut device)
 }
 
-pub fn get_audio_controller() &AudioController {
-	mut audio := &AudioController{
-		master: miniaudio.make_device()
-	}
-
-	return audio
+// 
+pub fn get_main_device() &miniaudio.AudioDevice {
+	return global.main
 }
 
-pub fn init_audio() {
-	mut audio_ptr := global
-	audio_ptr.master = miniaudio.make_device()
-	println('> Global AudioController Initialized!')
+// Init
+fn init() {
+	mut global_ptr := global
+	global_ptr.main = miniaudio.make_device()
+	logging.info("AudioDevice initialized!")
 }

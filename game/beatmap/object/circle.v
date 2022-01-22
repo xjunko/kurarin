@@ -1,246 +1,218 @@
 module object
 
-import math
-import lib.gg
+import library.gg
 
 import framework.audio
-import framework.math.time as time2
+import framework.logging
+import framework.math.time
 import framework.math.easing
-import framework.math.vector
 import framework.graphic.sprite
 
 
-import game.animation
-import game.math.timing
-import game.math.difficulty
+import game.beatmap.difficulty
+import game.beatmap.timing
+import game.skin
+import game.x
 
-pub struct HitObject {
+const (
+	default_hitcircle_size = 128.0
+)
+
+pub struct Circle {
+	HitObject
+
 	pub mut:
-		id              int
-		ctx             &gg.Context = voidptr(0)
-		position        vector.Vector2
-		end_position    vector.Vector2
-		time            time2.Time
-		sprites         []sprite.IDrawable
-		stacking        int
+		timing           timing.Timings
 
-		diff            difficulty.Difficulty
-		timing          timing.TimingPoint
+		hitcircle        &sprite.Sprite = &sprite.Sprite{additive: true}
+		hitcircleoverlay &sprite.Sprite = &sprite.Sprite{additive: true}
+		approachcircle   &sprite.Sprite = &sprite.Sprite{additive: true}
+		combotext        &sprite.NumberSprite = voidptr(0)
 
-		hitcircle        &sprite.Sprite = &sprite.Sprite{}
-		hitcircleoverlay &sprite.Sprite = &sprite.Sprite{}
-		approachcircle   &sprite.Sprite = &sprite.Sprite{}
-		hitanimation     &sprite.Sprite = &sprite.Sprite{}
-		combo_sprite     &sprite.ComboSprite = &sprite.ComboSprite{}
+		sprites []sprite.ISprite
+		diff    difficulty.Difficulty
+		silent  bool
 
-		hitsound          string = 'drum-hitnormal'
-		color             []f64
-		is_hidden 		  bool
-		is_spinner        bool
-		is_slider 		  bool
-		is_new_combo      bool
-		combo_index       int
-		data              []string
-		ratiod_scale      vector.Vector2
-
-		// TODO: put this somewhere else
-		sample 	   int
-		sample_set int
+		// temp shit
+		last_time f64
+		done      bool
 }
 
-pub fn (mut hitobject HitObject) draw(ctx &gg.Context, time f64) {
-	// for mut sprite in hitobject.sprites {
-	// 	sprite.draw_and_update(ctx: ctx, time: time)
-	// }
+pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
+	for mut sprite in circle.sprites {
+		if sprite.is_drawable_at(circle.last_time) {
+			pos := sprite.position.sub(sprite.origin.multiply(x: sprite.size.x, y: sprite.size.y))
+			arg.ctx.draw_image_with_config(gg.DrawImageConfig{
+					img: sprite.get_texture(),
+					img_id: sprite.get_texture().id,
+					img_rect: gg.Rect{
+						x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
+						y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
+						width: f32(sprite.size.x * x.resolution.playfield_scale),
+						height: f32(sprite.size.y * x.resolution.playfield_scale)
+					},
+					color: sprite.color,
+					additive: sprite.additive
+			})
+		}
+	}
+
+	// Combo
+	if circle.combotext.is_drawable_at(circle.last_time) {
+		// God awful
+		pos := circle.combotext.position.sub(
+				circle.combotext.origin
+					.multiply(x: circle.combotext.size.x * circle.combotext.number_len, y: circle.combotext.size.y)
+			)
+
+		for n, img in circle.combotext.number_img {
+			arg.ctx.draw_image_with_config(
+				img: img,
+				img_id: img.id,
+				img_rect: gg.Rect{
+					x: f32((pos.x + (circle.combotext.size.x * n)) * x.resolution.playfield_scale + x.resolution.offset.x),
+					y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
+					width: f32(circle.combotext.size.x * x.resolution.playfield_scale),
+					height: f32(circle.combotext.size.y * x.resolution.playfield_scale)
+				},
+				color: circle.combotext.color,
+				additive: circle.combotext.additive
+			)
+		}
+	}
 }
 
-pub fn (mut hitobject HitObject) pre_init() {
-	if hitobject.data.len <= 4 { return } // ?????????
-	hitobject.is_new_combo = (hitobject.data[3].int() & 4) > 0
+pub fn (mut circle Circle) update(time f64) bool {
+	circle.last_time = time
+
+	for mut sprite in circle.sprites {
+		sprite.update(time)
+	}
+	circle.combotext.update(time)
+
+	// Hitanimation, we're done
+	if time >= circle.get_start_time() && !circle.done {
+		circle.arm(true, time)
+		circle.hitsystem.increment_combo()
+		audio.play_osu_sample(circle.sample, circle.sample_set)
+		circle.done = true
+
+		return true
+	}
+
+	return false
+}
+
+pub fn (mut circle Circle) set_timing(t timing.Timings) {
+	circle.timing = t
 
 	// Hitsound
-	hitobject.sample = hitobject.data[4].int()
-	timing := hitobject.timing.get_point_at(hitobject.time.start)
-
-	if hitobject.data.len > 5 && (hitobject.data[3].int() & 1) > 0 {
-		hitobject.sample_set = hitobject.data[5].split(":")[0].int()
+	if circle.data.len > 5 && (circle.data[3].int() & 1) > 0 {
+		circle.sample_set = circle.data[5].split(':')[0].int()
 	} else {
-		// Use timing sampleset
-		hitobject.sample_set = int(timing.sampleset)
+		circle.sample_set = int(t.get_point_at(circle.get_start_time()).sample_set)
 	}
 
 	// TODO: unfuck sampleset
-	if hitobject.sample_set == 0 {
-		hitobject.sample_set = 1 
+	if circle.sample_set == 0 {
+		circle.sample_set = 1 
 	}
 }
 
-pub fn (mut hitobject HitObject) play_hitsound() {
-	mut audio_ptr := audio.global
-	audio_ptr.play_osu_sample(hitobject.sample, hitobject.sample_set)
-}
+pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
+	circle.diff = diff
 
-pub fn (mut hitobject HitObject) initialize_object(mut ctx &gg.Context, last_object IHitObject) {
-	hitobject.ctx = ctx
-	hitobject.end_position = hitobject.position // unless its a slider
+	//
+	start_time := circle.time.start - diff.preempt
+	end_time := circle.time.start
 
-	// HitCircle
-	hitobject.hitcircle = &sprite.Sprite{textures: [ctx.get_texture_from_skin('hitcircle')]}
-	hitobject.hitcircleoverlay = &sprite.Sprite{textures: [ctx.get_texture_from_skin('hitcircleoverlay')]}
-
-	// combo
-	hitobject.combo_sprite.Sprite.textures = ctx.get_texture_expecting_animation_from_skin("default")
-	hitobject.combo_sprite.number = hitobject.combo_index
-
-	// MAN
-	mut clickable := []&sprite.Sprite{}
-	clickable << hitobject.hitcircle
-	clickable << hitobject.hitcircleoverlay
-	clickable << &hitobject.combo_sprite.Sprite
-
-	diff := hitobject.diff
-	size_ratio := ((diff.circleradius) * 1.05 * 2 / 128)
+	// init combo sprite
+	circle.combotext = sprite.make_number_sprite(circle.combo_number)
 	
-	size := vector.Vector2{
-		hitobject.hitcircle.image().width * size_ratio,
-		hitobject.hitcircle.image().height * size_ratio
+	//
+	circle.hitcircle.textures << skin.get_texture("hitcircle")
+	circle.hitcircleoverlay.textures << skin.get_texture("hitcircleoverlay")
+	circle.approachcircle.textures << skin.get_texture("approachcircle")
+
+	circle.sprites << circle.hitcircle
+	circle.sprites << circle.hitcircleoverlay
+	// circle.sprites << circle.combotext
+	circle.sprites << circle.approachcircle
+
+
+	//
+	mut circles := []sprite.ISprite{}
+	circles << circle.hitcircle
+	circles << circle.hitcircleoverlay
+	circles << circle.combotext
+
+	// Color
+	circle.hitcircle.add_transform(typ: .color, time: time.Time{start_time, start_time}, before: circle.color)
+	circle.approachcircle.add_transform(typ: .color, time: time.Time{start_time, start_time}, before: circle.color)
+
+	for mut s in circles {
+		s.add_transform(typ: .move, time: time.Time{start_time, start_time}, before: [circle.position.x, circle.position.y])
+		s.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [0.0], after: [255.0])
+
+
+		// Done
+		s.reset_size_based_on_texture(factor: (circle.diff.circle_radius * 1.05 * 2) / 128)
+		s.reset_attributes_based_on_transforms()
 	}
 
-	start_time := hitobject.time.start - diff.preempt
-	end_time := hitobject.time.start	
 
-	// combo colour
-	hitobject.hitcircle.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color)
-	// hitobject.hitcircleoverlay.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color) // HitCircleOverlay dont use combo colors
-
-	hitobject.ratiod_scale = size
-	for mut sprite in clickable {
-		sprite.add_transform(typ: .move, easing: easing.linear, time: time2.Time{start_time, start_time}, before: [hitobject.position.x, hitobject.position.y])
-		sprite.add_transform(typ: .scale_factor, easing: easing.linear, time: time2.Time{start_time, start_time}, before: [f64(1)])
-
-		if hitobject.is_hidden {
-			sprite.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, start_time + diff.preempt * 0.4}, before: [f64(0)], after: [f64(255)])
-			sprite.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time + diff.preempt * 0.4, start_time + diff.preempt * 0.7}, before: [f64(255)], after: [f64(0)])
-		}
-		else {
-			sprite.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, start_time + difficulty.hit_fade_in}, before: [f64(0)], after: [f64(255)])
-			sprite.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{end_time + diff.hit100, end_time + diff.hit50}, before: [f64(255)], after: [f64(0)])
-			// println("${start_time + difficulty.hit_fade_in} ${end_time} | ${end_time + diff.hit100} ${end_time + diff.hit50}")
-		}
-
-		sprite.after_add_transform_reset()
-		sprite.change_size(size: size)
-	}
-
-
-	hitobject.combo_sprite.pre_init()
-	combo_sprite_size := hitobject.combo_sprite.size.clone().scale(size_ratio * 0.8)
-	hitobject.combo_sprite.change_size(size: combo_sprite_size)
-
-	if !hitobject.is_hidden || hitobject.id == 0 {
-		// fake ass approach rate
-		hitobject.approachcircle = &sprite.Sprite{textures: [ctx.get_texture_from_skin('approachcircle')]}
-		hitobject.approachcircle.add_transform(typ: .move, easing: easing.linear, time: time2.Time{start_time, start_time}, before: [hitobject.position.x, hitobject.position.y])
-		hitobject.approachcircle.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, math.min(end_time, end_time - diff.preempt + difficulty.hit_fade_in * 2)}, before: [f64(0)], after: [f64(229)])
-		hitobject.approachcircle.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{end_time, end_time}, before: [f64(0)], after: [f64(0)])
-		hitobject.approachcircle.add_transform(typ: .scale_factor, easing: easing.linear, time: time2.Time{start_time, end_time}, before: [f64(4)], after: [f64(0.9)])		
-
-		hitobject.approachcircle.add_transform(typ: .color, time: time2.Time{start_time, start_time}, before: hitobject.color)
-		
-		hitobject.approachcircle.after_add_transform_reset()
-		hitobject.approachcircle.change_size(size: size)
-	}
-
-	hitobject.hitanimation = &sprite.Sprite{}
-	hitobject.hitanimation.position.x = hitobject.position.x
-	hitobject.hitanimation.position.y = hitobject.position.y
-	// hitobject.hitanimation.add_transform(typ: .move, time: time2.Time{hitobject.time.start, hitobject.time.start}, before: [hitobject.position.x, hitobject.position.y])
-	// hitobject.hitanimation.change_size(size: size, keep_ratio: true)
-
-	hitobject.sprites = [
-		hitobject.hitcircle,
-		hitobject.hitcircleoverlay,
-		hitobject.approachcircle,
-		hitobject.hitanimation,
-	]
-	hitobject.sprites << hitobject.combo_sprite // gcc failed if i mix them with normal sprites /shrug
+	// Approach circle 
+	// TODO: make this accurate or smth idk
+	circle.approachcircle.add_transform(typ: .move, time: time.Time{start_time, start_time}, before:[circle.position.x, circle.position.y])
+	circle.approachcircle.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [0.0], after: [255.0])
+	circle.approachcircle.add_transform(typ: .scale_factor, time: time.Time{start_time, end_time}, before: [4.0], after: [1.0])
+	circle.approachcircle.reset_size_based_on_texture(factor: (circle.diff.circle_radius * 1.05 * 2)/ 128)
+	circle.approachcircle.reset_attributes_based_on_transforms()
 }
 
-pub fn (mut hitobject HitObject) arm(clicked bool, time f64) {
-	if clicked {
-		if !hitobject.is_slider { // Handled by slider
-			hitobject.play_hitsound()
-		}
-		
-		// resets
-		hitobject.hitcircle.reset_transforms()
-		hitobject.hitcircleoverlay.reset_transforms()
-		hitobject.combo_sprite.reset_transforms()
-		
-		start_time := time
-		//
-		hitobject.approachcircle.reset_transforms()
-		hitobject.approachcircle.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, start_time}, before: [f64(0)])
+pub fn (mut circle Circle) arm(clicked bool, _time f64) {
+	circle.approachcircle.reset_transform()
+	circle.combotext.reset_transform()
+	circle.hitcircleoverlay.reset_transform()
+	circle.hitcircle.reset_transform()
+	
 
-		end_scale := f64(1.4)
-		// TODO: skin version < 2 = end_scale := 1.8
+	start_time := _time
+	end_scale := 1.4
 
-		// animation
-		relative := i64(math.abs(time - hitobject.time.start))
-		mut hitanimationtype := animation.HitType.hmiss
+	// bye bye approach circle
+	circle.approachcircle.add_transform(typ: .fade, time: time.Time{start_time, start_time}, before: [0.0])
 
-		if relative < hitobject.diff.hit300 {
-			hitanimationtype = .h300
-		} else if relative < hitobject.diff.hit100 {
-			hitanimationtype = .h100
-		} else if relative < hitobject.diff.hit50 {
-			hitanimationtype = .h50
-		}
-		animation.modify_hit_animation(mut hitobject.hitanimation, hitanimationtype, start_time)
+	// no hidden support yet so yea
+	// TODO: hidden support
+	if true {
+		end_time := start_time + difficulty.hit_fade_out
 
-		if !hitobject.is_hidden {
-			end_time := start_time + difficulty.hit_fade_out
-			// scale
-			hitobject.hitcircle.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time2.Time{start_time, end_time}, before: [f64(1)], after: [end_scale])
-			hitobject.hitcircleoverlay.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time2.Time{start_time, end_time}, before: [f64(1)], after: [end_scale])
+		// scale
+		circle.hitcircle.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{start_time, end_time}, before: [1.0], after: [end_scale])
+		circle.hitcircleoverlay.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{start_time, end_time}, before: [1.0], after: [end_scale])
 
-			// fade
-			hitobject.hitcircle.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, end_time}, before: [f64(255)], after: [f64(0)])
-			hitobject.hitcircleoverlay.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, end_time}, before: [f64(255)], after: [f64(0)])
-			hitobject.combo_sprite.add_transform(typ: .fade, easing: easing.linear, time: time2.Time{start_time, end_time}, before: [f64(255)], after: [f64(0)])
-		}
-		else {
-			end_time := start_time + 60
-			hitobject.hitcircle.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{start_time, end_time}, before: [f64(hitobject.hitcircle.color.a)], after: [f64(0)])
-			hitobject.hitcircleoverlay.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{start_time, end_time}, before: [f64(hitobject.hitcircleoverlay.color.a)], after: [f64(0)])
-			hitobject.combo_sprite.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{start_time, end_time}, before: [f64(hitobject.hitcircleoverlay.color.a)], after: [f64(0)])
-		}
-	}  else {
-		end_time := time + 60
-		animation.modify_hit_animation(mut hitobject.hitanimation, animation.HitType.hmiss, time)
-		hitobject.hitcircle.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, end_time}, before: [f64(0)])
-		hitobject.hitcircleoverlay.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, end_time}, before: [f64(0)])
-		hitobject.combo_sprite.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, end_time}, before: [f64(0)])
+		// fade
+		circle.hitcircle.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
+		circle.hitcircleoverlay.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
+		circle.combotext.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
+	} else {
+		logging.error("Circle.arm has no hidden support yet.")
 	}
+
+	// 
+	circle.hitcircle.reset_attributes_based_on_transforms()
+	circle.hitcircleoverlay.reset_attributes_based_on_transforms()
+	circle.approachcircle.reset_attributes_based_on_transforms()
 
 }
 
-pub fn (mut hitobject HitObject) shake(time f64) {
-	hitobject.hitcircle.reset_transforms()
-	hitobject.hitcircleoverlay.reset_transforms()
-	hitobject.combo_sprite.reset_transforms()
-
-	start_time := time
-
-	for i in 0 .. 3 {
-		hitobject.hitcircle.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{start_time + (100*i), start_time + (300*i)}, before: [hitobject.position.x, hitobject.position.y], after: [hitobject.position.x + [30, -30][int(i % 2 == 0)], hitobject.position.y])
-		hitobject.hitcircleoverlay.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{start_time + (100*i), start_time + (300*i)}, before: [hitobject.position.x, hitobject.position.y], after: [hitobject.position.x + [30, -30][int(i % 2 == 0)], hitobject.position.y])
-		hitobject.combo_sprite.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{start_time + (100*i), start_time + (300*i)}, before: [hitobject.position.x, hitobject.position.y], after: [hitobject.position.x + [30, -30][int(i % 2 == 0)], hitobject.position.y])
+pub fn make_circle(items []string) &Circle {
+	mut hcircle := &Circle{
+		HitObject: common_parse(items)
 	}
+
+
+	return hcircle
 }
 
-pub fn (mut hitobject HitObject) get_hit_object() &HitObject {
-	unsafe {
-		return &hitobject
-	}
-}

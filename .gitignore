@@ -1,3 +1,6 @@
-assets/maps/*
-assets/skins/default_real
-*.exe
+videos/*
+*.mp4
+*.mp3
+assets/*
+videos/*
+*.log

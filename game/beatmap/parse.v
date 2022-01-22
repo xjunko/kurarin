@@ -1,130 +1,189 @@
 module beatmap
 
 import os
-import math
+import difficulty
 import object
 
-import game.math.difficulty
-
-pub fn parse_header(line string) string {
-	if line.starts_with('[') {
-		return line.trim_space().replace(']', '').replace('[', '')
-	}
-
-	return ''
-}
-
-pub fn parse_commas(line string) []string {
-	return line.trim_space().split(',')
-}
-
-pub fn parse_k_v(line string, delimiter string, limit int) []string {
-	mut result := line.split_nth(delimiter, limit)
-	for i, value in result {
-		result[i] = value.trim_space().to_lower()
-	}
-
-	return result
-}
+import framework.logging
 
 pub fn parse_beatmap(path string) &Beatmap {
-	mut beatmap := &Beatmap{
-		root: os.dir(path),
-		filename: os.base(path)
+	if !os.exists(path) {
+		logging.fatal("Beatmap file: ${path} doesnt exists.")
+		exit(1)
 	}
-	beatmap.sb_extra << '[Events]\n'
 
-	mut lines := os.read_lines(path) or { panic(err) }
-	mut current_category := ''
-	
-	//
-	mut combo_index := 1
-	mut color_index := 1
+	mut lines := os.read_lines(path) or {
+		logging.fatal("Failed to read file: ${path}, reason: ${err}")
+		exit(1)
+	}
 
-	for line in lines {
+	logging.info("Parsing beatmap!")
+
+	mut beatmap := &Beatmap{}
+	beatmap.root = os.dir(path)
+	beatmap.filename = os.base(path)
+
+	// temp attrs
+	mut category := ""
+	mut background_done := false
+
+	for mut line in lines {
 		if line.trim_space().len == 0 || line.starts_with('//') { continue }
 
-		category := parse_header(line)
-		if category.len > 0 {
-			current_category = category
+		if temp_category := parse_category(line) {
+			category = temp_category
 			continue
 		}
 
-		match current_category {
-			'General' {
-				items := parse_k_v(line, ":", 2)
-				parse_common_struct_generic_bullshit<BeatmapGeneralInfo>(mut beatmap.general, items[0], items[1])
+		match category {
+			"General" {
+				items := common_parse_with_key_value(line, ":")
+				general_beatmap_parser<BeatmapGeneralInfo>(mut beatmap.general, items[0], items[1])
 			}
 
-			'Difficulty' {
-				items := parse_k_v(line, ":", 2)
-				parse_common_struct_generic_bullshit<difficulty.DifficultyInfo>(mut beatmap.difficulty, items[0], items[1])
+			"Metadata" {
+				items := common_parse_with_key_value(line, ":")
+				general_beatmap_parser<BeatmapMetadataInfo>(mut beatmap.metadata, items[0], items[1])
+			}
+
+			"Difficulty" {
+				items := common_parse_with_key_value(line, ":")
+				general_beatmap_parser<difficulty.Difficulty>(mut beatmap.difficulty.Difficulty, items[0], items[1])
+			}
+
+			"TimingPoints" {
+				items := common_parse_with_key_value(line, ",")
+
+				point_time := items[0].f64()
+				bpm := items[1].f64()
+
+				mut signature := 4
+				mut sample_set := beatmap.timing.last_set
+				mut sample_index := 1
+				mut sample_volume := 1.0
+				mut inherited := false
+				mut kiai := false
+
+				if items.len > 2 {
+					signature = items[2].int()
+
+					if signature == 0 {
+						signature = 4
+					}
+				}
+
+				if items.len > 3 {
+					sample_set = items[3].int()
+				}
+
+				if items.len > 4 {
+					sample_index = items[4].int()
+				}
+
+				if items.len > 5 {
+					sample_volume = items[5].f64() / 100
+				}
+
+				if items.len > 6 {
+					inherited = items[6] == "0"
+				}
+
+				if items.len > 7 {
+					kiai = (items[7].int() & 1) > 0
+				}
+
+				beatmap.timing.add_point(
+					point_time, bpm, sample_set, sample_index, sample_volume,
+					signature, inherited, kiai
+				)
+				beatmap.timing.last_set = sample_set
+				
 			}
 
 			"Events" {
-				if (line.starts_with("0") || line.starts_with("Sprite")) && beatmap.background.len == 0{
-					items := parse_k_v(line, ",", -1)
-					beatmap.background = items[2].replace('"', '')
+				if (line.starts_with("0") || line.starts_with("Sprite")) && !background_done {
+					items := common_parse_with_key_value(line, ",")
+					beatmap.general.bg_filename = items[2].replace('"', "")
+					background_done = true
 				}
 
-				// add to temp
-				beatmap.sb_extra << line
+				beatmap.temp_beatmap_sb << line
 			}
 
-			'TimingPoints' {
-				items := parse_k_v(line, ",", -1)
-				mut vals := []f32{}
+			"HitObjects" {
+				// Calculate difficulty and timing if havent
+				if !beatmap.difficulty.calculated {
+					beatmap.difficulty.calculate()
+					beatmap.timing.calculate()
 
-				for item in items { vals << item.f32() }
-				beatmap.timing.add(vals)
-			}
+					//
+					beatmap.timing.slider_multiplier = beatmap.difficulty.slider_multiplier
+					beatmap.timing.slider_tick_rate = beatmap.difficulty.slider_tick_rate
 
-			'Colours' {
-				items := parse_k_v(line, ":", 2)
-				mut colors := []f64{}
-
-				for value in items[1].split(",") {
-					colors << value.f64()
+					//
+					logging.info("Beatmap difficulty calculated.")
 				}
 
-				beatmap.colors << colors
+				mut object := object.make_object(common_parse_with_key_value(line, ","))
+				if object.id == -10 { continue }
+
+				beatmap.objects << &object
+
+
 			}
 
-			'HitObjects' {
-				if !beatmap.difficulty.created {
-					// Make difficulty and timing
-					beatmap.difficulty_math = beatmap.difficulty.make_difficulty()
-					beatmap.timing.slider_multiplier = beatmap.difficulty_math.slider_multiplier
-					beatmap.timing.slider_tick_rate = beatmap.difficulty_math.slider_tick_rate
-					beatmap.timing.process()
-				}
-
-				// Some color index fallback cuz its not completed
-				if beatmap.colors.len == 0 {
-					beatmap.colors << [f64(26), 116, 242]
-					beatmap.colors << [f64(164), 32, 240]
-					beatmap.colors << [f64(37), 185, 239]
-					beatmap.colors << [f64(23), 209, 116]
-					beatmap.colors << [f64(255), 75, 255]
-				}
-
-				combo_index++		
-				
-				items := parse_commas(line)
-				mut object := object.make_hitobject(id: beatmap.objects.len, items: items, diff: beatmap.difficulty_math, timing: beatmap.timing, color: beatmap.colors[color_index % beatmap.colors.len])
-				object.combo_index = combo_index
-
-				if object.is_new_combo {
-					combo_index = 1
-					color_index++
-				}				
-
-				beatmap.objects << object
-			}
-			else { }
+			else {}
 		}
 	}
 
+	logging.info("Done parsing beatmap!")
 
 	return beatmap
+}
+
+// Utils
+pub fn common_parse_with_key_value(line string, split string) []string {
+	return line.split(split).map(it.trim_space())
+}
+
+pub fn parse_category(line string) ?string {
+	if line.starts_with('[') {
+		return line.replace('[', '').replace(']', '').trim_space()
+	}
+
+	return none
+}
+
+pub fn general_beatmap_parser<T>(mut cls T, name string, value string) {
+	$for field in T.fields {
+		// No attrs defined       // Attrs Defined										// No _SKIP defined in attrs
+		if (field.name == name || (field.attrs.len > 0 && field.attrs[0] == name)) && !field.attrs.contains("_SKIP"){
+			// V cant do this... for now....... :trolldecai:
+			// match field.typ {
+			// 	string  { cls.$field.name = value }
+			// 	int { cls.$field.name = value.int() }
+			// 	f32 { cls.$field.name = value.f32() }
+			// 	i64 { cls.$field.name = value.i64() }
+			// 	f64 { cls.$field.name = value.f64() }
+			// 	else { panic("Type not supported: ${field.typ}")}
+			// }
+
+			// This is ugly but itll do for now
+			$if field.typ is string {
+				cls.$(field.name) = value
+			} $else $if field.typ is int {
+				cls.$(field.name) = value.int()
+			} $else $if field.typ is f32 {
+				cls.$(field.name) = value.f32()
+			} $else $if field.typ is i64 {
+				cls.$(field.name) = value.i64()
+			} $else $if field.typ is f64 {
+				cls.$(field.name) = value.f64()
+			} $else $if field.typ is bool {
+				cls.$(field.name) = value == '1'
+			} $else {
+				panic("Type not supported: ${field.typ}")
+			}
+		}
+	}
 }

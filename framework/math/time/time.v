@@ -8,6 +8,7 @@ pub struct Time {
 		end   f64
 }
 
-pub fn (t Time) duration() f64 {
-	return math.max(t.end - t.start, 1)
+pub fn (time &Time) duration() f64 {
+	return math.max(time.end - time.start, 1.0)
 }
+

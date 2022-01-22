@@ -1,3 +1,7 @@
+// Copy pasted straight from the old code since
+// this code isnt that bad, it just eats alot of ram
+// (i dont want to do this part of the codebase again, im bad at math ;P)
+
 module curves
 
 import framework.math.vector

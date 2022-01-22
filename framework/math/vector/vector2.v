@@ -8,6 +8,11 @@ pub struct Vector2 {
 		y f64
 }
 
+// Property
+pub fn (v &Vector2) str() string {
+	return 'Vector{x: ${v.x}: y:${v.y}}'
+}
+
 
 // Factory
 pub fn new_vec_rad(rad f64, length f64) Vector2 {
@@ -118,6 +123,13 @@ pub fn (v Vector2) scale(by f64) Vector2 {
 	return Vector2{
 		v.x * by,
 		v.y * by
+	}
+}
+
+pub fn (v Vector2) scale_normal(x f64, y f64) Vector2 {
+	return Vector2{
+		v.x * x,
+		v.y * y
 	}
 }
 
