@@ -225,7 +225,7 @@ pub fn make_device() &AudioDevice {
 	audio_device.device = device
 
 	audio_device.start()
-	audio_device.volume(0.1)
+	audio_device.volume(0.5)
 
 	return audio_device
 }
