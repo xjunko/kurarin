@@ -37,7 +37,7 @@ pub fn make_window_settings() &Window {
 	mut window_ := &Window{
 		speed: 1.0,
 		fps: 60,
-		record: true,
+		record: false,
 		record_fps: 60
 	}
 
@@ -49,7 +49,7 @@ pub fn make_gameplay_settings() &Gameplay {
 		lead_in_time: 3.0 * 1000.0, // n Seconds
 		background_dim: 0,
 
-		disable_hitsound: true, // Miniaudio doesnt work well rn so yea
+		disable_hitsound: false,
 		disable_hitobject: false,
 		disable_storyboard: false,
 
@@ -57,7 +57,7 @@ pub fn make_gameplay_settings() &Gameplay {
 		cursor_size: 0.75,
 		cursor_trail_update_rate: 16.6667, // 60FPS delta
 		cursor_trail_length: 1000, // Maximum length
-		cursor_style: 2, // 0: Normal, 1: Particle (terrible), 2: Long (bootleg style 0)
+		cursor_style: 2, // 0: Normal, 1: Particle (terrible), 2: Long (Like style 0 but the trail is smoother)
 
 		auto_update_rate: 16.6667
 	}
