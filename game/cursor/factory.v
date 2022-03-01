@@ -41,7 +41,7 @@ pub fn make_replay(mut beatmap &beatmap.Beatmap, mut cursor &Cursor) {
 				mover = &movers.HalfCircleMover{} // Uncomment to use 
 			}
 
-			mover.init(last_object, object, direction)
+			mover.init(mut last_object, mut object, direction)
 			direction *= -1 // Invert direction
 
 			for i := mover.time.start; i < mover.time.end; i += offset {
