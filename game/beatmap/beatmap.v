@@ -169,9 +169,6 @@ pub fn (mut beatmap Beatmap) update(time f64) {
 		beatmap.queue[i].update(time)
 	}
 
-	// POST Update (how the fuck do i free slider stuff)
-	beatmap.post_update(beatmap.last_update)
-
 	// Storyboard
 	beatmap.storyboard.update(time)
 
@@ -180,11 +177,12 @@ pub fn (mut beatmap Beatmap) update(time f64) {
 
 	// Playfield size update
 	// TODO: make this customizeable or smth
-	// Since this is math based animation instead of transformation (if that makes sense), run it before the lead_in_time finished
+	// Since this is math based animation instead of transformation (if that makes sense), we need to set the actual size after the lead_in_time ends
 	if beatmap.last_update + settings.gameplay.lead_in_time >= settings.gameplay.lead_in_time - 2000 && beatmap.last_update + settings.gameplay.lead_in_time < settings.gameplay.lead_in_time {
 		beatmap.playfield_size.x = x.resolution.playfield.x * 0.25 + beatmap.playfield_size.x - beatmap.playfield_size.x * 0.25
 		beatmap.playfield_size.y = x.resolution.playfield.y * 0.25 + beatmap.playfield_size.y - beatmap.playfield_size.y * 0.25
-	} else {
+	} else if beatmap.last_update + settings.gameplay.lead_in_time > settings.gameplay.lead_in_time {
+		// Over the lead_in_time, put actual size
 		beatmap.playfield_size.x = x.resolution.playfield.x
 		beatmap.playfield_size.y = x.resolution.playfield.y
 	}
@@ -245,6 +243,11 @@ pub fn (mut beatmap Beatmap) draw() {
 			gfx.commit()
 		}
 	}
+
+	// POST update, only used for freeing slider
+	// Note that in linux: this doesnt matter, it can be placed in draw or update loop
+	// But on windows: This NEED to be in here or everything shits itself and crash.
+	beatmap.post_update(beatmap.last_update)
 	
 	//
 	beatmap.update_lock.unlock()
@@ -262,7 +265,7 @@ pub fn (beatmap &Beatmap) get_bg_path() string {
 pub fn (beatmap &Beatmap) get_sb_path() string {
 	// TODO: per-difficulty sb
 	if files := os.glob(os.join_path(beatmap.root, "*.osb")) {
-		return files[0] or { "" }
+		return os.join_path(beatmap.root, files[0] or { "" })
 	}
 
 	return ""
