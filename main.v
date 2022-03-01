@@ -1,11 +1,12 @@
 module main
 
 import os
-import library.gg
 import gx
+import flag
 import math
 import sokol.gfx
 import sokol.sgl
+import library.gg
 import time as timelib
 
 import game.skin
@@ -15,7 +16,14 @@ import game.settings
 import game.beatmap.object.graphic
 
 import framework.audio
+import framework.logging
 import framework.math.time
+
+// TODO: lol
+pub struct GameArgument {
+	pub mut:
+		beatmap_path string
+}
 
 pub struct Window {
 	pub mut:
@@ -25,17 +33,18 @@ pub struct Window {
 		proc    	&os.Process = voidptr(0)
 		record 		bool
 		record_data &byte = voidptr(0)
+		argument    &GameArgument = voidptr(0)
 }
 
 pub fn window_init(mut window &Window) {
 	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/546820 YUC'e - Future Candy/YUC'e - Future Candy (Nathan) [Sugar Rush].osu")
 	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/27107 IOSYS - The Lovely, Freezing, Tomboyish Bath, Cirno's Hot Spring/IOSYS - The Lovely, Freezing, Tomboyish Bath, Cirno's Hot Spring (Mafiamaster) [Hot Spring].osu")
 	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/483606 NOMA - LOUDER MACHINE/NOMA - LOUDER MACHINE (Skystar) [Axarious' EX EX].osu")
-	mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/179323 Sakamoto Maaya - Okaerinasai (tomatomerde Remix)/Sakamoto Maaya - Okaerinasai (tomatomerde Remix) (Azer) [Collab].osu")
+	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/179323 Sakamoto Maaya - Okaerinasai (tomatomerde Remix)/Sakamoto Maaya - Okaerinasai (tomatomerde Remix) (Azer) [Collab].osu")
 	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/470977 Mili - worldexecute(me);/Mili - world.execute(me); (Exile-) [mapset.insane(Exile-);].osu")
-	
-	
+	mut beatmap := beatmap.parse_beatmap(window.argument.beatmap_path)
 
+	
 	// init slider renderer
 	graphic.init_slider_renderer()
 
@@ -68,8 +77,6 @@ pub fn window_init(mut window &Window) {
 			g_time.set_speed(settings.window.speed)
 			mut played := false
 			time.reset()
-
-			// g_time.time = 50000.0
 			
 			for {
 				if g_time.time >= settings.gameplay.lead_in_time && !played {
@@ -124,9 +131,10 @@ pub fn window_draw(mut window &Window) {
 	}
 }
 
-[console]
-fn main() {
+pub fn initiate_game_loop(argument GameArgument) {
 	mut window := &Window{}
+	window.argument = &argument
+
 	window.ctx = gg.new_context(
 		width: 1280,
 		height: 720,
@@ -153,4 +161,34 @@ fn main() {
 	if window.record {
 		window.close_pipe_process()
 	}
+}
+
+[console]
+fn main() {
+	mut fp := flag.new_flag_parser(os.args)
+	fp.application("Kurarin")
+	fp.version("0.0.1a-dementia")
+	fp.description("Kurarin rewrite Codename Dementia")
+
+	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file")
+
+	fp.finalize() or {
+		println(fp.usage())
+		return
+	}
+
+	// Checks
+	if !os.exists(beatmap_path) {
+		logging.error("Invalid beatmap path: ${beatmap_path}")
+		return
+	}
+
+	// Create GameArgument
+	argument := &GameArgument{
+		beatmap_path: beatmap_path
+	}
+
+	logging.info("Beatmap: ${beatmap_path}")
+
+	initiate_game_loop(argument)
 }
