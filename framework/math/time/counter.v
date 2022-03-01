@@ -3,12 +3,25 @@ module time
 import time as timelib // To avoid confusion (or make more)
 import game.settings
 
+
+// Not too sure about this one, for some reason in windowz I need to 
+// double the deltatime to get the actual delta. 
+// For example: 60fps delta is 16ms but to make this works in windows I need to divide (or multiply the fps) by two to make it match the actual FPS, weird shit.
+fn fix_window_specific_time_sleep_bug() f64 {
+	$if windows {
+		return 2.0
+	} $else {
+		return 1.0
+	}
+}
+
 pub const (
 	update_rate_fps = settings.window.fps
-	update_rate_ms = (f64(1000.0) / update_rate_fps) * timelib.millisecond
+	update_rate_ms = (f64(1000.0) / (update_rate_fps * fix_window_specific_time_sleep_bug())) * timelib.millisecond
 
 	global = &TimeCounter{}
 )
+
 
 //
 pub fn get_time() &TimeCounter {
