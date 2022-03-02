@@ -49,6 +49,7 @@ pub fn (mut window Window) init_pipe_process() {
 		"-color_trc", "1",
 		"-color_primaries", "1",
 		"-movflags", "+write_colr",
+		"-pix_fmt", "yuv420p"
 
 		"test.mp4" // output
 	]
