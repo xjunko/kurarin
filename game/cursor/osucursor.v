@@ -19,6 +19,15 @@ import game.movers
 import game.skin
 import game.x
 
+const (
+	used_imports = gameobject.used_imports
+)
+
+// V updated its rand library and now its returning optionals (?)
+fn random_f64_in_range(min f64, max f64) f64 {
+	return rand.f64_in_range(min, max) or { 0.0 }
+}
+
 pub struct Cursor {
 	sprite.Sprite
 
@@ -175,12 +184,12 @@ pub fn (mut cursor Cursor) update(time f64) {
 		distance_real := cursor.position.sub(cursor.last_position)
 
 		if distance != 0.0 {
-			for _ in 0 .. rand.int_in_range(10, 100) {
+			for _ in 0 .. rand.int_in_range(10, 100) or { 0 } {
 				mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
-				trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + rand.f64_in_range(100, math.max(distance * 25.0, 150))}, before: [255.0], after: [0.0])
-				trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + rand.f64_in_range(100, math.max(distance * 32.0, 150))}, before: [cursor.position.x, cursor.position.y], after: [cursor.position.x - distance_real.x + rand.f64_in_range(-distance, distance), cursor.position.y - distance_real.y + rand.f64_in_range(-distance, distance)])
-				trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [rand.f64_in_range(0.05, settings.gameplay.cursor_size)])
-				trail.add_transform(typ: .color, time: time2.Time{time, time}, before: [rand.f64_in_range(0, 255), rand.f64_in_range(0, 255), rand.f64_in_range(0, 255)])
+				trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 25.0, 150))}, before: [255.0], after: [0.0])
+				trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 32.0, 150))}, before: [cursor.position.x, cursor.position.y], after: [cursor.position.x - distance_real.x + random_f64_in_range(-distance, distance), cursor.position.y - distance_real.y + random_f64_in_range(-distance, distance)])
+				trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [random_f64_in_range(0.05, settings.gameplay.cursor_size)])
+				trail.add_transform(typ: .color, time: time2.Time{time, time}, before: [random_f64_in_range(0, 255), random_f64_in_range(0, 255), random_f64_in_range(0, 255)])
 				trail.reset_size_based_on_texture()
 				trail.reset_attributes_based_on_transforms()
 				cursor.trails << trail

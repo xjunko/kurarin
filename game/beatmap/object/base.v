@@ -12,6 +12,10 @@ import game.beatmap.difficulty
 
 import game.beatmap.hitsystem
 
+pub const (
+	used_imports = true
+)
+
 pub interface IHitObject {
 	mut:
 		id   int
