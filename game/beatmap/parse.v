@@ -105,6 +105,7 @@ pub fn parse_beatmap(path string) &Beatmap {
 					items := common_parse_with_key_value(line, ",")
 					beatmap.general.bg_filename = items[2].replace('"', "")
 					background_done = true
+					continue
 				}
 
 				beatmap.temp_beatmap_sb << line
