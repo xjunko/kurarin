@@ -19,13 +19,11 @@ struct AudioAttr {
 // Play FNs
 fn internal_play(arg miniaudio.AddAudioArg, mut device &miniaudio.AudioDevice) {
 	mut audio := device.add_audio(arg)
-	// logging.debug("Playing path=${arg.path}, speed=${arg.speed}")
 
 	go fn (mut audio &miniaudio.Audio) {
 		audio.play()
 		time.sleep(audio.length() * time.millisecond)
 		audio.free()
-		// logging.debug("Done playing path=${audio.path}")
 	}(mut audio)
 }
 
