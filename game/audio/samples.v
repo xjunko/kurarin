@@ -138,7 +138,7 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 }
 
 pub fn play_sample(sample_set int, _addition_set int, hitsound int, index int) {
-	if settings.gameplay.disable_hitobject { return }
+	if settings.gameplay.disable_hitsound { return }
 
 	mut addition_set := _addition_set
 
