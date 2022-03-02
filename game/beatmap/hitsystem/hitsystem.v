@@ -11,7 +11,7 @@ import os
 
 const (
 	binary_path = os.join_path(@VMODROOT, "assets/binary/oppai")
-	update_rate = f64(200.0)
+	update_rate = f64(-1.0)
 )
 
 pub struct HitSystem {
@@ -32,6 +32,11 @@ pub fn (mut hitsystem HitSystem) increment_combo() {
 }
 
 pub fn (mut hitsystem HitSystem) update(time f64) {
+	// Dont update
+	if update_rate == -1.0 {
+		return
+	}
+
 	// Check if reach delta
 	hitsystem.last_delta += (time - hitsystem.last_time)
 
