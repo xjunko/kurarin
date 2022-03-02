@@ -191,8 +191,6 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 		logging.debug('> sus filepath in storyboard: ${img_path}')
 		img_path += ".png"
 	}
-
-	println(img_path)
 	
 	// real shit
 	if items[0] == 'Sprite' {
