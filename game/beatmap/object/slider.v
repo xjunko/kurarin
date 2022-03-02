@@ -7,11 +7,11 @@ import framework.graphic.sprite
 import framework.math.vector
 import framework.math.time
 import framework.logging
-import framework.audio
 
 import game.beatmap.difficulty
 import game.beatmap.hitsystem
 import game.beatmap.timing
+import game.audio
 import game.skin
 import game.x
 
@@ -93,18 +93,28 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 pub fn (mut slider Slider) play_hitsound(index int) {
 	mut sample := slider.samples[index]
 	mut sample_set := slider.sample_sets[index]
+	mut sample_index := slider.hitsound.custom_index
 	
 	point := slider.timing.get_point_at(slider.time.start + math.floor(index * slider.duration + 5))
 
+	if sample_index == 0 {
+		sample_index = point.sample_index
+	}
+
 	if sample_set == 0 {
-		sample_set = slider.sample_set
+		sample_set = slider.hitsound.sample_set
 
 		if sample_set == 0 {
 			sample_set = point.sample_set
 		}
 	}
 
-	audio.play_osu_sample(sample, sample_set)
+	audio.play_sample(
+		sample_set, 
+		0,
+		sample,
+		sample_index
+	)
 }
 
 pub fn (mut slider Slider) update(time f64) bool {
@@ -309,7 +319,7 @@ pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
 
 pub fn make_slider(items []string) &Slider {
 	mut hslider := &Slider{
-		HitObject: common_parse(items),
+		HitObject: common_parse(items, 10),
 		hitcircle: make_circle(items)
 	}
 

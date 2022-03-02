@@ -2,7 +2,6 @@ module object
 
 import library.gg
 
-import framework.audio
 import framework.logging
 import framework.math.time
 import framework.math.easing
@@ -11,6 +10,7 @@ import framework.graphic.sprite
 
 import game.beatmap.difficulty
 import game.beatmap.timing
+import game.audio
 import game.skin
 import game.x
 
@@ -32,6 +32,8 @@ pub struct Circle {
 		sprites []sprite.ISprite
 		diff    difficulty.Difficulty
 		silent  bool
+
+		sample int
 
 		// temp shit
 		last_time f64
@@ -94,8 +96,29 @@ pub fn (mut circle Circle) update(time f64) bool {
 	if time >= circle.get_start_time() && !circle.done {
 		circle.arm(true, time)
 		circle.hitsystem.increment_combo()
-		audio.play_osu_sample(circle.sample, circle.sample_set)
 		circle.done = true
+
+		// play hitsound
+		point := circle.timing.get_point_at(circle.time.start)
+
+		mut index := circle.hitsound.custom_index
+		mut sample_set := circle.hitsound.sample_set
+
+		if index == 0 {
+			index = point.sample_index
+		}
+
+		if sample_set == 0 {
+			sample_set = point.sample_set
+		}
+
+
+		audio.play_sample(
+			sample_set,
+			circle.hitsound.addition_set,
+			circle.sample,
+			index
+		)
 
 		return true
 	}
@@ -105,18 +128,6 @@ pub fn (mut circle Circle) update(time f64) bool {
 
 pub fn (mut circle Circle) set_timing(t timing.Timings) {
 	circle.timing = t
-
-	// Hitsound
-	if circle.data.len > 5 && (circle.data[3].int() & 1) > 0 {
-		circle.sample_set = circle.data[5].split(':')[0].int()
-	} else {
-		circle.sample_set = int(t.get_point_at(circle.get_start_time()).sample_set)
-	}
-
-	// TODO: unfuck sampleset
-	if circle.sample_set == 0 {
-		circle.sample_set = 1 
-	}
 }
 
 pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
@@ -209,9 +220,9 @@ pub fn (mut circle Circle) arm(clicked bool, _time f64) {
 
 pub fn make_circle(items []string) &Circle {
 	mut hcircle := &Circle{
-		HitObject: common_parse(items)
+		HitObject: common_parse(items, 5)
 	}
-
+	hcircle.sample = items[4].int()
 
 	return hcircle
 }

@@ -4,10 +4,10 @@ import library.gg
 
 import framework.graphic.sprite
 import framework.math.time
-import framework.audio
 
 import game.x
 import game.skin
+import game.audio
 import game.beatmap.difficulty
 
 pub struct Spinner {
@@ -53,7 +53,12 @@ pub fn (mut spinner Spinner) update(time f64) bool {
 	// Play hitsound when finished
 	if time >= spinner.get_end_time() && !spinner.done {
 		spinner.done = true
-		audio.play_osu_sample(spinner.sample, spinner.sample_set)
+		audio.play_sample(
+			spinner.hitsound.sample_set,
+			spinner.hitsound.addition_set,
+			0,
+			spinner.hitsound.custom_index
+		)
 	}
 
 	return true
@@ -96,7 +101,7 @@ pub fn (mut spinner Spinner) set_difficulty(diff difficulty.Difficulty) {
 //
 pub fn make_spinner(items []string) &Spinner {
 	mut hspinner := &Spinner{
-		HitObject: common_parse(items)
+		HitObject: common_parse(items, 6)
 	}
 
 	return hspinner

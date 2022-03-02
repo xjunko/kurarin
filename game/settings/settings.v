@@ -23,6 +23,8 @@ pub struct Gameplay {
 		disable_hitobject  bool
 		disable_storyboard bool
 
+		use_beatmap_hitsound bool
+
 		disable_cursor     		 bool
 		cursor_size        	     f64
 		cursor_trail_update_rate f64
@@ -47,17 +49,19 @@ pub fn make_window_settings() &Window {
 pub fn make_gameplay_settings() &Gameplay {
 	mut gameplay_ := &Gameplay{
 		lead_in_time: 3.0 * 1000.0, // n Seconds
-		background_dim: 0,
+		background_dim: 50,
 
-		disable_hitsound: false,
+		disable_hitsound: true,
 		disable_hitobject: false,
 		disable_storyboard: false,
+
+		use_beatmap_hitsound: false,
 
 		disable_cursor: false,
 		cursor_size: 0.75,
 		cursor_trail_update_rate: 16.6667, // 60FPS delta
 		cursor_trail_length: 1000, // Maximum length
-		cursor_style: 2, // 0: Normal, 1: Particle (terrible), 2: Long (Like style 0 but the trail is smoother)
+		cursor_style: 0, // 0: Normal, 1: Particle (terrible), 2: Long (Like style 0 but the trail is smoother)
 
 		auto_update_rate: 16.6667
 	}

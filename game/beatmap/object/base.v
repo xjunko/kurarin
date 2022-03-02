@@ -58,6 +58,14 @@ pub interface IHitObject {
 		set_combo_number(int)
 }
 
+pub struct HitSoundInfo {
+	pub mut:
+		sample_set   int
+		addition_set int
+		custom_index int
+		custom_vol   f64
+}
+
 pub struct HitObject {
 	pub mut:
 		id   int
@@ -77,10 +85,6 @@ pub struct HitObject {
 		combo_number int
 		color        []f64 = [255.0, 255.0, 255.0]
 		color_offset int
-	
-		// samples set
-		sample      int
-		sample_set  int
 
 		// Types
 		is_slider   bool
@@ -89,6 +93,7 @@ pub struct HitObject {
 		// Internal
 		done        bool
 		data        []string
+		hitsound    HitSoundInfo
 		hitsystem   &hitsystem.HitSystem = voidptr(0)
 }
 
@@ -112,7 +117,7 @@ pub fn (mut hitobject HitObject) set_new_combo(b bool) { hitobject.new_combo = b
 
 
 // Utils
-pub fn common_parse(items []string) &HitObject {
+pub fn common_parse(items []string, extra_index int) &HitObject {
 	position := vector.Vector2{
 		items[0].f64()
 		items[1].f64()
@@ -137,19 +142,21 @@ pub fn common_parse(items []string) &HitObject {
 		is_spinner: (object_type & spinner) > 0
 	}
 
-	// basic hitsound
-	if items.len > 4 {
-		hitobject.sample = items[4].int()
+	// Extra data
+	if extra_index < items.len && items[extra_index].len > 0 {
+		extras := items[extra_index].split(":")
 
-		if items.len > 5 && (items[3].int() & 1) > 0 {
-			hitobject.sample_set = items[5].split(":")[0].int()
+		hitobject.hitsound.sample_set = extras[0].int()
+		hitobject.hitsound.addition_set = extras[1].int()
+
+		if extras.len > 2 {
+			hitobject.hitsound.custom_index = extras[2].int()
+		}
+
+		if extras.len > 3 {
+			hitobject.hitsound.custom_vol = extras[0].f64() / 100.0
 		}
 	}
-
-	// HACK: unfuck sample set
-	if hitobject.sample_set == 0 {
-		hitobject.sample_set = 1
-	}
-
+	
 	return hitobject
 }

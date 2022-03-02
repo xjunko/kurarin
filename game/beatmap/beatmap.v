@@ -17,6 +17,8 @@ import framework.math.vector
 import framework.graphic.sprite
 
 import game.x
+import game.skin
+import game.audio
 import game.settings
 
 import hitsystem
@@ -66,7 +68,7 @@ pub struct Beatmap {
 		playfield_size   vector.Vector2
 		temp_beatmap_sb  []string
 		last_update  	 f64
-		update_lock  	 &sync.Mutex = sync.new_mutex() // data race
+		update_lock  	 &sync.Mutex = sync.new_mutex() // To prevent race, note that this might block the entire thing if draw or update method got stuck
 }
 
 // Method
@@ -110,6 +112,12 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 	}
 }
 
+pub fn (mut beatmap Beatmap) ensure_hitsound_loaded() {
+	logging.debug("Loading hitsounds!")
+	audio.init_samples(skin.get_skin().fallback, beatmap.root)
+	logging.debug("Loaded hitsound")
+}
+
 pub fn (mut beatmap Beatmap) reset() {
 	// PP n shit
 	beatmap.hitsystem.update_map_path(os.join_path(beatmap.root, beatmap.filename))
@@ -140,6 +148,7 @@ pub fn (mut beatmap Beatmap) reset() {
 	logging.info("Storyboard loaded!")
 
 	beatmap.ensure_background_loaded()
+	beatmap.ensure_hitsound_loaded()
 }
 
 pub fn (mut beatmap Beatmap) update(time f64) {
@@ -265,7 +274,7 @@ pub fn (beatmap &Beatmap) get_bg_path() string {
 pub fn (beatmap &Beatmap) get_sb_path() string {
 	// TODO: per-difficulty sb
 	if files := os.glob(os.join_path(beatmap.root, "*.osb")) {
-		return os.join_path(beatmap.root, files[0] or { "" })
+		return files[0] or { "" }
 	}
 
 	return ""
