@@ -161,6 +161,7 @@ pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 				
 				if line.starts_with("Sprite") || line.starts_with("Animation") {
 					if current_sprite.len != 0 {
+						// logging.debug("Loading sprite: ${current_sprite} - ${commands.len} events!")
 						storyboard.load_sprite(current_sprite, commands)
 					}
 
@@ -212,8 +213,6 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 		if sprite.transforms.len > 0 {
 			sprite.reset_size_based_on_texture()
 			sprite.reset_attributes_based_on_transforms()
-			// sprite.raw_size = sprite.raw_size.scale(1 / storyboard_scale)
-			// sprite.size = sprite.size.scale(1 /storyboard_scale)
 			storyboard.sprites << sprite 
 		}	
 
