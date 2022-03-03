@@ -108,6 +108,10 @@ pub fn parse_beatmap(path string) &Beatmap {
 					continue
 				}
 
+				// TODO: huh?
+				if beatmap.temp_beatmap_sb.len == 0 {
+					beatmap.temp_beatmap_sb << "[Events]"
+				}
 				beatmap.temp_beatmap_sb << line
 			}
 
