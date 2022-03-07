@@ -9,7 +9,6 @@ import framework.math.time
 import framework.logging
 
 import game.beatmap.difficulty
-import game.beatmap.hitsystem
 import game.beatmap.timing
 import game.audio
 import game.skin
@@ -193,7 +192,6 @@ pub fn (mut slider Slider) update(time f64) bool {
 
 		// Dont play the first hitsound (as we already play it with hitcircle)
 		if times != 1 && slider.last_slider_time != times {
-			slider.hitsystem.increment_combo()
 			slider.play_hitsound(times - 1)
 			slider.last_slider_time = times
 		}
@@ -204,7 +202,6 @@ pub fn (mut slider Slider) update(time f64) bool {
 
 	// Last hit
 	if time >= slider.time.end && !slider.done {
-		slider.hitsystem.increment_combo()
 		slider.play_hitsound(int(slider.repeated))
 		slider.done = true
 
@@ -254,11 +251,6 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 			slider.addition_sets[i] = items[1].int()
 		}
 	}
-}
-
-pub fn (mut slider Slider) set_hitsystem(h &hitsystem.HitSystem) {
-	slider.hitsystem = unsafe { h }
-	slider.hitcircle.set_hitsystem(h)
 }
 
 pub fn (mut slider Slider) generate_slider_points() {

@@ -10,8 +10,6 @@ import framework.math.vector
 import game.beatmap.timing
 import game.beatmap.difficulty
 
-import game.beatmap.hitsystem
-
 pub const (
 	used_imports = true
 )
@@ -38,14 +36,12 @@ pub interface IHitObject {
 		is_spinner  bool
 
 		done        bool
-		hitsystem   &hitsystem.HitSystem
 		
 		draw(sprite.CommonSpriteArgument)
 		update(f64) bool
 		post_update(f64)
 		set_timing(timing.Timings)
 		set_difficulty(difficulty.Difficulty)
-		set_hitsystem(&hitsystem.HitSystem)
 
 		get_start_time() f64
 		get_end_time() f64
@@ -98,7 +94,6 @@ pub struct HitObject {
 		done        bool
 		data        []string
 		hitsound    HitSoundInfo
-		hitsystem   &hitsystem.HitSystem = voidptr(0)
 }
 
 // pub fn (mut hitobject HitObject) draw(arg sprite.CommonSpriteArgument) // :trolldecai: looks like i need to uncomment one of these (interface methods) for the code to compile bruh moment
@@ -106,7 +101,6 @@ pub fn (mut hitobject HitObject) update(time f64) bool { return true }
 pub fn (mut hitobject HitObject) post_update(time f64) {}
 pub fn (mut hitobject HitObject) set_timing(t timing.Timings) {}
 pub fn (mut hitobject HitObject) set_difficulty(d difficulty.Difficulty) {}
-pub fn (mut hitobject HitObject) set_hitsystem(h &hitsystem.HitSystem) { hitobject.hitsystem = unsafe { h } }
 pub fn (hitobject &HitObject) get_start_time() f64 { return hitobject.time.start }
 pub fn (hitobject &HitObject) get_end_time() f64 { return hitobject.time.end }
 pub fn (hitobject &HitObject) get_duration() f64 { return hitobject.time.duration() }

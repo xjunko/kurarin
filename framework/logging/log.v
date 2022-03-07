@@ -3,7 +3,7 @@ module logging
 import log
 
 const (
-	global = &log.Log{level: .info, output_target: .console}
+	global = &log.Log{level: .debug, output_target: .console}
 )
 
 interface Any { str() string }

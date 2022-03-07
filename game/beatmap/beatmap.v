@@ -21,7 +21,6 @@ import game.skin
 import game.audio
 import game.settings
 
-import hitsystem
 import storyboard
 import object.graphic
 
@@ -60,9 +59,6 @@ pub struct Beatmap {
 		queue      []object.IHitObject
 		finished   []object.IHitObject
 		objects_i  int
-
-		// Put this somewhere else once the code is good enough
-		hitsystem  &hitsystem.HitSystem = hitsystem.get_hitsystem()
 
 		// Temporary
 		playfield_size   vector.Vector2
@@ -119,9 +115,6 @@ pub fn (mut beatmap Beatmap) ensure_hitsound_loaded() {
 }
 
 pub fn (mut beatmap Beatmap) reset() {
-	// PP n shit
-	beatmap.hitsystem.update_map_path(os.join_path(beatmap.root, beatmap.filename))
-
 	// Normal shit
 	beatmap.process_stack_position()
 
@@ -135,7 +128,6 @@ pub fn (mut beatmap Beatmap) reset() {
 		o.set_combo_number(combo_number)
 		o.set_timing(beatmap.timing)
 		o.set_difficulty(beatmap.difficulty.Difficulty)
-		o.set_hitsystem(beatmap.hitsystem)
 
 		combo_number++
 	}
@@ -180,9 +172,6 @@ pub fn (mut beatmap Beatmap) update(time f64) {
 
 	// Storyboard
 	beatmap.storyboard.update(time)
-
-	// Hitsystem
-	beatmap.hitsystem.update(time)
 
 	// Playfield size update
 	// TODO: make this customizeable or smth
@@ -230,10 +219,6 @@ pub fn (mut beatmap Beatmap) draw() {
 
 	// Outline
 	beatmap.ctx.draw_rect_empty(f32((1280 - beatmap.playfield_size.x) / 2), f32((720 - beatmap.playfield_size.y) / 2), f32(beatmap.playfield_size.x), f32(beatmap.playfield_size.y), gx.white)
-
-	// "Combos"
-	beatmap.ctx.draw_text(0, 688, "Combo: ${beatmap.hitsystem.combo}x", gx.TextCfg{color: gx.white})
-	beatmap.ctx.draw_text(0, 704, "PP: ${beatmap.hitsystem.pp}pp", gx.TextCfg{color: gx.white})
 
 	// Done
 	sgl.draw()

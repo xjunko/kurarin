@@ -95,7 +95,6 @@ pub fn (mut circle Circle) update(time f64) bool {
 	// Hitanimation, we're done
 	if time >= circle.get_start_time() && !circle.done {
 		circle.arm(true, time)
-		circle.hitsystem.increment_combo()
 		circle.done = true
 
 		// play hitsound
