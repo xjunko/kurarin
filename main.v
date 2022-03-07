@@ -37,14 +37,8 @@ pub struct Window {
 }
 
 pub fn window_init(mut window &Window) {
-	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/546820 YUC'e - Future Candy/YUC'e - Future Candy (Nathan) [Sugar Rush].osu")
-	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/27107 IOSYS - The Lovely, Freezing, Tomboyish Bath, Cirno's Hot Spring/IOSYS - The Lovely, Freezing, Tomboyish Bath, Cirno's Hot Spring (Mafiamaster) [Hot Spring].osu")
-	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/483606 NOMA - LOUDER MACHINE/NOMA - LOUDER MACHINE (Skystar) [Axarious' EX EX].osu")
-	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/179323 Sakamoto Maaya - Okaerinasai (tomatomerde Remix)/Sakamoto Maaya - Okaerinasai (tomatomerde Remix) (Azer) [Collab].osu")
-	// mut beatmap := beatmap.parse_beatmap(r"/run/media/junko/2nd/Games/osu!/Songs/470977 Mili - worldexecute(me);/Mili - world.execute(me); (Exile-) [mapset.insane(Exile-);].osu")
 	mut beatmap := beatmap.parse_beatmap(window.argument.beatmap_path)
 
-	
 	// init slider renderer
 	graphic.init_slider_renderer()
 
@@ -80,7 +74,10 @@ pub fn window_init(mut window &Window) {
 			
 			for {
 				if g_time.time >= settings.gameplay.lead_in_time && !played {
-					audio.play(path: window.beatmap.get_audio_path(), speed: settings.window.speed)
+					mut bg_music := audio.new_track(window.beatmap.get_audio_path())
+					bg_music.play()
+					bg_music.set_volume(f32((settings.window.audio_volume / 100.0) * (settings.window.overall_volume / 100.0)))
+					bg_music.set_speed(settings.window.speed)
 					played = true
 				}
 
