@@ -34,6 +34,7 @@ pub const (
 pub struct SliderRendererAttr {
 	pub mut:
 		cs       f64
+		length   f64
 		points   []vector.Vector2
 		vertices []f32
 		bindings C.sg_bindings
@@ -70,13 +71,13 @@ pub fn make_circle_vertices(position vector.Vector2, cs f64) []vector.Vector2 {
 	return points
 }
 
-pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2) &SliderRendererAttr {
+pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f64) &SliderRendererAttr {
 	mut attr := &SliderRendererAttr{}
 
 	// Attributes
 	attr.cs = cs
 	attr.points = points
-	attr.bindings.fs_images[C.SLOT_texture_in] = global_renderer.gradient
+	attr.length = pixel_length
 
 	return attr
 
@@ -89,29 +90,68 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 
 	if attr.has_been_initialized { return }
 
+	attr.vertices = []f32{}//len: int(attr.length * 30 * 24)}
+
 	// Make the fuckng verticds sss
-	for v in attr.points {
+	for i, v in attr.points {
 		tab := make_circle_vertices(v, attr.cs)
 		for j, _ in tab {
 			if j >= 2 {
 				p1, p2, p3 := tab[j - 1], tab[j], tab[0]
 				// Format
 				// Position [vec3], Centre [vec3], TextureCoord [vec2]
-				attr.vertices << [
+				attr.vertices << &[
 					f32(p1.x), f32(p1.y), 1.0,
-					f32(p3.x), f32(p3.y), 0.0,
-					0.0, 0.0,
-					f32(p2.x), f32(p2.y), 1.0,
-					f32(p3.x), f32(p3.y), 0.0,
-					0.0, 0.0,
-					f32(p3.x), f32(p3.y), 0.0,
-					f32(p3.x), f32(p3.y), 0.0,
-					1.0, 0.0,
+					f32(p3.x), f32(p3.y), 0.0, 
+					0.0, 0.0, 
+
+					f32(p2.x), f32(p2.y), 1.0, 
+					f32(p3.x), f32(p3.y), 0.0, 
+					0.0, 0.0, 
+					
+					f32(p3.x), f32(p3.y), 0.0, 
+					f32(p3.x), f32(p3.y), 0.0, 
+					1.0, 0.0
 				]
+
+				// 1
+				// attr.vertices[(24 * i) + 0] = f32(p1.x)
+				// attr.vertices[(24 * i) + 1] = f32(p1.y)
+				// attr.vertices[(24 * i) + 2] = 1.0
+
+				// attr.vertices[(24 * i) + 3] = f32(p3.x)
+				// attr.vertices[(24 * i) + 4] = f32(p3.y)
+				// attr.vertices[(24 * i) + 5] = 0.0
+
+				// attr.vertices[(24 * i) + 6] = 0.0
+				// attr.vertices[(24 * i) + 7] = 0.0
+
+				// // 2
+				// attr.vertices[(24 * i) + 8] = f32(p2.x)
+				// attr.vertices[(24 * i) + 9] = f32(p2.y)
+				// attr.vertices[(24 * i) + 10] = 1.0
+
+				// attr.vertices[(24 * i) + 11] = f32(p3.x)
+				// attr.vertices[(24 * i) + 12] = f32(p3.y)
+				// attr.vertices[(24 * i) + 13] = 0.0
+
+				// attr.vertices[(24 * i) + 14] = 0.0
+				// attr.vertices[(24 * i) + 15] = 0.0
+
+				// // 3
+				// attr.vertices[(24 * i) + 16] = f32(p3.x)
+				// attr.vertices[(24 * i) + 17] = f32(p3.y)
+				// attr.vertices[(24 * i) + 18] = 0.0
+
+				// attr.vertices[(24 * i) + 19] = f32(p3.x)
+				// attr.vertices[(24 * i) + 20] = f32(p3.y)
+				// attr.vertices[(24 * i) + 21] = 0.0
+
+				// attr.vertices[(24 * i) + 22] = 1.0
+				// attr.vertices[(24 * i) + 23] = 0.0
 			}
 		}
 	}
-
 
 	// // Test shader vertices
 	// attr.vertices = [
@@ -127,8 +167,8 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 		data: C.sg_range{
 			ptr: attr.vertices.data,
 			size: usize(attr.vertices.len * int(sizeof(f32)))
-		},
-		label: &byte(0)
+		}
+		label: &byte(0),
 	})
 
 	// Failed to create vertex_buffers
@@ -142,6 +182,22 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 	attr.has_been_initialized = true
 }
 
+pub fn (mut attr SliderRendererAttr) update_vertex_progress(start int, end int) {
+	// TODO: come back to this
+	// if !attr.has_been_initialized { 
+	// 	attr.make_vertices()
+	// }
+
+	// if attr.vertices[start * 30 * 24 .. end * 30 * 24].len != 0 {	
+		// C.sg_update_buffer(&attr.bindings.vertex_buffers[0], &C.sg_range{
+			// ptr: &attr.vertices[start * 30 * 24 .. (end * 30 * 24) - 1][0],
+			// size: usize((attr.vertices[start * 30 * 24 .. end * 30 * 24].len) * int(sizeof(f32)))
+			// ptr: attr.vertices.data,
+			// size: usize(attr.vertices.len * int(sizeof(f32)))
+		// })	
+	// }
+}
+
 // Draw
 pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64) {
 	if !global_renderer.has_been_initialized { panic("global_renderer.has_been_initialized == False; This should not happen.") }
@@ -150,26 +206,9 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64) {
 		return
 	}
 
-	// I like how everything but the drawing part is easy
-	// gfx.begin_default_pass(&global_renderer.pass, 1280, 720)
 	gfx.apply_pipeline(global_renderer.pip)
 	gfx.apply_bindings(&attr.bindings)
-
-	// Colors n Shit
-	// fs params
-	mut fs_params_arg := [
-		f32(1.0), 1, 1, 1
-		f32(alpha / 255.0), 0, 0, 0,
-	]
-	fs_params := C.sg_range{
-		ptr: fs_params_arg.data,
-		size: usize(fs_params_arg.len * int(sizeof(f32)))
-	}
-	gfx.apply_uniforms(.fs, C.SLOT_fs_params, &fs_params)
-
 	gfx.draw(0, attr.vertices.len, 1)
-	// gfx.end_pass()
-	// gfx.commit()
 }
 
 pub fn (mut attr SliderRendererAttr) free() {
