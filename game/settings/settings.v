@@ -65,7 +65,7 @@ pub fn make_gameplay_settings() &Gameplay {
 		disable_hitobject: false,
 		disable_storyboard: false,
 
-		use_beatmap_hitsound: true,
+		use_beatmap_hitsound: false,
 
 		disable_cursor: false,
 		cursor_size: 0.75,
