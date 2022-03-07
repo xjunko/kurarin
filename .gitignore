@@ -1,7 +1,7 @@
 videos/*
 *.mp4
 *.mp3
-assets/*
+assets/shaders/*.h
 videos/*
 *.log
 dementia
