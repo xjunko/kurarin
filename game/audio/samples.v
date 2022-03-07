@@ -26,50 +26,52 @@ const (
 
 pub struct GameSamples {
 	pub mut:
-		base     	 [3][7]string
-		beatmap 	 [3][7]map[int]string
+		base     	 [3][7]audio.Sample
+		beatmap 	 [3][7]map[int]audio.Sample
 		skin_path    string
 		beatmap_path string
 }
 
 pub fn (mut sample GameSamples) load_base_sample() {
-	sample.base[0][0] = "normal-hitnormal"
-	sample.base[0][1] = "normal-hitwhistle"
-	sample.base[0][2] = "normal-hitfinish"
-	sample.base[0][3] = "normal-hitclap"
-	sample.base[0][4] = "normal-slidertick"
-	sample.base[0][5] = "normal-sliderslide"
-	sample.base[0][6] = "normal-sliderwhistle"
+	mut filename := [3][7]string
 
-	sample.base[1][0] = "soft-hitnormal"
-	sample.base[1][1] = "soft-hitwhistle"
-	sample.base[1][2] = "soft-hitfinish"
-	sample.base[1][3] = "soft-hitclap"
-	sample.base[1][4] = "soft-slidertick"
-	sample.base[1][5] = "soft-sliderslide"
-	sample.base[1][6] = "soft-sliderwhistle"
+	filename[0][0] = "normal-hitnormal"
+	filename[0][1] = "normal-hitwhistle"
+	filename[0][2] = "normal-hitfinish"
+	filename[0][3] = "normal-hitclap"
+	filename[0][4] = "normal-slidertick"
+	filename[0][5] = "normal-sliderslide"
+	filename[0][6] = "normal-sliderwhistle"
 
-	sample.base[2][0] = "drum-hitnormal"
-	sample.base[2][1] = "drum-hitwhistle"
-	sample.base[2][2] = "drum-hitfinish"
-	sample.base[2][3] = "drum-hitclap"
-	sample.base[2][4] = "drum-slidertick"
-	sample.base[2][5] = "drum-sliderslide"
-	sample.base[2][6] = "drum-sliderwhistle"
+	filename[1][0] = "soft-hitnormal"
+	filename[1][1] = "soft-hitwhistle"
+	filename[1][2] = "soft-hitfinish"
+	filename[1][3] = "soft-hitclap"
+	filename[1][4] = "soft-slidertick"
+	filename[1][5] = "soft-sliderslide"
+	filename[1][6] = "soft-sliderwhistle"
+
+	filename[2][0] = "drum-hitnormal"
+	filename[2][1] = "drum-hitwhistle"
+	filename[2][2] = "drum-hitfinish"
+	filename[2][3] = "drum-hitclap"
+	filename[2][4] = "drum-slidertick"
+	filename[2][5] = "drum-sliderslide"
+	filename[2][6] = "drum-sliderwhistle"
 
 	// Append skin path
 	for x in 0 .. 3 {
 		for y in 0 .. 7 {
 			for format in ["mp3", "wav", "ogg"] {
-				if os.exists(os.join_path(sample.skin_path, sample.base[x][y] + ".${format}")) {
-					sample.base[x][y] = os.join_path(sample.skin_path, sample.base[x][y]) + ".${format}"
+				if os.exists(os.join_path(sample.skin_path, filename[x][y] + ".${format}")) {
+					sample.base[x][y] = audio.new_sample(os.join_path(sample.skin_path, filename[x][y]) + ".${format}")
+					sample.base[x][y].set_volume(f32((settings.window.effect_volume / 100.0) * (settings.window.overall_volume / 100.0)))
 					break
 				}
 			}
 		}
 	}
 
-	println(sample.base)
 }
 
 pub fn (mut sample GameSamples) load_beatmap_sample() {
@@ -129,10 +131,11 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 			
 			// Re-Init the dict again (segmentation error w/o this)
 			if g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1].len == 0 {
-				g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1] = map[int]string{}
+				g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1] = map[int]audio.Sample{}
 			}
 	
-			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index] = path
+			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index] = audio.new_sample(path)
+			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index].set_volume(f32((settings.window.effect_volume / 100.0) * (settings.window.overall_volume / 100.0)))
 		}
 	})
 }
@@ -153,17 +156,17 @@ pub fn play_sample(sample_set int, _addition_set int, hitsound int, index int) {
 
 	// Whistle
 	if hitsound & 2 > 0 {
-		play_sample_internal(sample_set, 1, index)
+		play_sample_internal(addition_set, 1, index)
 	}
 
 	// Finish
 	if hitsound & 4 > 0 {
-		play_sample_internal(sample_set, 2, index)
+		play_sample_internal(addition_set, 2, index)
 	}
 
 	// Clap
 	if hitsound & 8 > 0 {
-		play_sample_internal(sample_set, 3, index)
+		play_sample_internal(addition_set, 3, index)
 	}
 }
 
@@ -176,14 +179,11 @@ pub fn play_sample_internal(_sample_set int, hitsound_index int, index int) {
 		sample_set = 1
 	}
 
-	if global_sample.beatmap[sample_set -1][hitsound_index].len > 0 && index in global_sample.beatmap[sample_set -1][hitsound_index] && settings.gameplay.use_beatmap_hitsound {
-		audio.play(
-			path: global_sample.beatmap[sample_set - 1][hitsound_index][index]
-		)
+	mut g_sample := global_sample
+	if global_sample.beatmap[sample_set - 1][hitsound_index].len > 0 && index in global_sample.beatmap[sample_set -1][hitsound_index] && settings.gameplay.use_beatmap_hitsound {
+		g_sample.beatmap[sample_set - 1][hitsound_index][index].play()
 	} else {
-		audio.play(
-			path: global_sample.base[sample_set - 1][hitsound_index]
-		)
+		g_sample.base[sample_set - 1][hitsound_index].play()
 	}
 }
 
