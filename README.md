@@ -22,10 +22,7 @@ By default most of these flags are disable to get the best performance out of th
 
 ### Audio
 
-Most of these are disabled cuz of creaking audio (prolly just a lunix thing) and offsync audio after playing it for awhile, could be fixed but i cba to do it for now...
-
-* safe_audio [off]: use mutex when adding or mixing pcm frames (i dont really think this matter that much)
-* mix_audio [off]: mix the pcm frames (without this, the hitsounds will overlap the music and itll sound retarded)
+Removed in favour of BASS.
 
 ### Graphic
 
