@@ -130,7 +130,7 @@ pub fn common_parse(items []string, extra_index int) &HitObject {
 		items[2].f64(),
 		items[2].f64()
 	}
-	object_type := items[3].i8()
+	object_type := items[3].int()
 
 	mut hitobject := &HitObject{
 		data: items,
