@@ -262,23 +262,6 @@ pub fn init_slider_renderer() {
 	pipeline_desc.layout.attrs[C.ATTR_vs_texture_coord].format = .float2 // texture coord
 	renderer.pip = C.sg_make_pipeline(pipeline_desc)
 
-	// Slider texture
-	stb_img := stbi.load("assets/textures/slider_gradient_stable.png") or { panic(err) }
-	mut img_desc := C.sg_image_desc{
-		width: stb_img.width,
-		height: stb_img.height,
-		num_mipmaps: 0,
-		wrap_u: .clamp_to_edge,
-		wrap_v: .clamp_to_edge,
-		label: &byte(0),
-		d3d11_texture: 0,
-	}
-	img_desc.data.subimage[0][0] = C.sg_range{
-		ptr: stb_img.data,
-		size: usize(stb_img.nr_channels * stb_img.width * stb_img.height)
-	}
-	renderer.gradient = C.sg_make_image(&img_desc)
-
 	// // Test Shader
 	// renderer.shader = C.sg_make_shader(
 	// 	C.test_shader_desc(
