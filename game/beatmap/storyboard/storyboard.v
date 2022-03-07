@@ -188,7 +188,7 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 	mut img_path := os.join_path(storyboard.root, items[3].replace('"', '').trim_space()).replace("\\", "/") // Weird linux thing
 
 	// ??? what
-	if !img_path.ends_with('.png') && !img_path.ends_with('.jpg') {
+	if !img_path.to_lower().ends_with('.png') && !img_path.to_lower().ends_with('.jpg') {
 		logging.debug('> sus filepath in storyboard: ${img_path}')
 		img_path += ".png"
 	}
