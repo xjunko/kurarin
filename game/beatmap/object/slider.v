@@ -77,29 +77,81 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 		}
 	}
 
-	mut once := false
+	// Slider Vertex shit
+	mut start_index := 0
+	mut end_index := int(slider.pixel_length / 2.0)
+
+	if slider.last_time < slider.time.start - slider.diff.preempt / 2.0 {
+		progress := f64(slider.last_time - (slider.time.start-(slider.diff.preempt)))/(slider.diff.preempt/2)
+		end_index = int(f64(end_index) * progress)
+	} else if slider.last_time >= slider.time.start && slider.last_time <= slider.time.end {
+		times := int(((slider.last_time - slider.time.start) / slider.duration) + 1)
+
+		if times == slider.repeated {
+			ttime := slider.last_time - slider.time.start - f64(times-1) * slider.duration
+
+			if (times % 2) == 1 {
+				progress := ttime / slider.duration
+				start_index = int(f64(end_index)*progress)
+			} else {
+				progress := 1.0 - ttime / slider.duration
+				end_index = int(f64(end_index) * progress)
+			}
+		}
+	} else if slider.last_time > slider.time.end {
+		start_index = end_index
+	}
+
 	// Draw slider body following by slider.hitcircle and slider_overlay_sprite
-	if slider.last_time <= slider.get_start_time() && slider.hitcircle.hitcircle.is_drawable_at(slider.last_time) && !once {
+	if slider.last_time <= slider.get_start_time() && slider.hitcircle.hitcircle.is_drawable_at(slider.last_time) {
+		slider.slider_renderer_attr.update_vertex_progress(start_index, end_index)
 		slider.slider_renderer_attr.draw_slider(slider.hitcircle.hitcircle.color.a)
-		once = true
+		return
 	}
 	
-	if slider.last_time >= slider.get_start_time() && slider.slider_overlay_sprite.is_drawable_at(slider.last_time) && !once {
+	if slider.last_time >= slider.get_start_time() && slider.slider_overlay_sprite.is_drawable_at(slider.last_time) {
+		slider.slider_renderer_attr.update_vertex_progress(start_index, end_index)
 		slider.slider_renderer_attr.draw_slider(slider.slider_overlay_sprite.color.a)
-		once = true
+		return
 	}
 }
 
 pub fn (mut slider Slider) play_hitsound(index int) {
-	mut sample := slider.samples[index]
-	mut sample_set := slider.sample_sets[index]
-	mut sample_index := slider.hitsound.custom_index
+	// mut sample := slider.samples[index]
+	// mut sample_set := slider.sample_sets[index]
+	// mut sample_index := slider.hitsound.custom_index
 	
-	point := slider.timing.get_point_at(slider.time.start + math.floor(index * slider.duration + 5))
+	// point := slider.timing.get_point_at(slider.time.start + math.floor(index * slider.duration + 5))
 
-	if sample_index == 0 {
-		sample_index = point.sample_index
-	}
+	// if sample_index == 0 {
+	// 	sample_index = point.sample_index
+	// }
+
+	// if sample_set == 0 {
+	// 	sample_set = slider.hitsound.sample_set
+
+	// 	if sample_set == 0 {
+	// 		sample_set = point.sample_set
+	// 	}
+	// }
+
+	// audio.play_sample(
+	// 	sample_set, 
+	// 	0,
+	// 	sample,
+	// 	sample_index
+	// )
+	slider.play_hitsound_generic(
+		slider.sample_sets[index],
+		slider.addition_sets[index],
+		slider.samples[index],
+		slider.timing.get_point_at(slider.time.start + math.floor(f64(index) * slider.duration) + 5)
+	)
+}
+
+pub fn (mut slider Slider) play_hitsound_generic(sample_set_ int, addition_set_ int, sample int, point timing.TimingPoint) {
+	mut sample_set := sample_set_
+	mut addition_set := addition_set_
 
 	if sample_set == 0 {
 		sample_set = slider.hitsound.sample_set
@@ -109,11 +161,15 @@ pub fn (mut slider Slider) play_hitsound(index int) {
 		}
 	}
 
+	if addition_set == 0 {
+		addition_set = slider.hitsound.addition_set
+	}
+
 	audio.play_sample(
-		sample_set, 
-		0,
+		sample_set,
+		addition_set,
 		sample,
-		sample_index
+		point.sample_index
 	)
 }
 
@@ -124,6 +180,11 @@ pub fn (mut slider Slider) update(time f64) bool {
 
 	for mut sprite in slider.sprites {
 		sprite.update(time)
+	}
+
+	// Generate shader -1000ms before
+	if time >= (slider.time.start - 1000) && isnil(slider.slider_renderer_attr) {
+		slider.generate_slider_renderer()
 	}
 
 	// Hitsounds
@@ -149,6 +210,7 @@ pub fn (mut slider Slider) update(time f64) bool {
 
 		return true
 	}
+
 
 	return false
 }
@@ -288,7 +350,7 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 
 pub fn (mut slider Slider) generate_slider_renderer() {
 	slider.slider_renderer_attr = graphic.make_slider_renderer_attr(
-		slider.diff.circle_radius, slider.get_slider_points()
+		slider.diff.circle_radius, slider.get_slider_points(), slider.pixel_length
 	)
 }
 
@@ -313,7 +375,6 @@ pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
 	// Make points n shit
 	slider.generate_slider_points()
 	slider.generate_slider_follow_circles()
-	slider.generate_slider_renderer()
 }
 
 
