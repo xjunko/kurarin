@@ -24,9 +24,9 @@ pub struct Circle {
 	pub mut:
 		timing           timing.Timings
 
-		hitcircle        &sprite.Sprite = &sprite.Sprite{additive: true}
-		hitcircleoverlay &sprite.Sprite = &sprite.Sprite{additive: true}
-		approachcircle   &sprite.Sprite = &sprite.Sprite{additive: true}
+		hitcircle        &sprite.Sprite = &sprite.Sprite{}
+		hitcircleoverlay &sprite.Sprite = &sprite.Sprite{}
+		approachcircle   &sprite.Sprite = &sprite.Sprite{}
 		combotext        &sprite.NumberSprite = voidptr(0)
 
 		sprites []sprite.ISprite
@@ -38,6 +38,7 @@ pub struct Circle {
 		// temp shit
 		last_time f64
 		done      bool
+		inherited bool
 }
 
 pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
@@ -140,8 +141,14 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 	circle.combotext = sprite.make_number_sprite(circle.combo_number)
 	
 	//
-	circle.hitcircle.textures << skin.get_texture("hitcircle")
-	circle.hitcircleoverlay.textures << skin.get_texture("hitcircleoverlay")
+	if circle.inherited {
+		circle.hitcircle.textures << skin.get_texture("sliderstartcircle")
+		circle.hitcircleoverlay.textures << skin.get_texture("sliderstartcircleoverlay")
+	} else {
+		circle.hitcircle.textures << skin.get_texture("hitcircle")
+		circle.hitcircleoverlay.textures << skin.get_texture("hitcircleoverlay")
+	}
+
 	circle.approachcircle.textures << skin.get_texture("approachcircle")
 
 	circle.sprites << circle.hitcircle

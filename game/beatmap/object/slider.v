@@ -376,5 +376,7 @@ pub fn make_slider(items []string) &Slider {
 		hitcircle: make_circle(items)
 	}
 
+	hslider.hitcircle.inherited = true
+
 	return hslider
 }
