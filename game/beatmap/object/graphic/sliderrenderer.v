@@ -93,7 +93,7 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 	attr.vertices = []f32{}//len: int(attr.length * 30 * 24)}
 
 	// Make the fuckng verticds sss
-	for i, v in attr.points {
+	for _, v in attr.points {
 		tab := make_circle_vertices(v, attr.cs)
 		for j, _ in tab {
 			if j >= 2 {

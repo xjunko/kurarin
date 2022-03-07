@@ -33,7 +33,7 @@ pub struct GameSamples {
 }
 
 pub fn (mut sample GameSamples) load_base_sample() {
-	mut filename := [3][7]string
+	mut filename := [3][7]string{}
 
 	filename[0][0] = "normal-hitnormal"
 	filename[0][1] = "normal-hitwhistle"

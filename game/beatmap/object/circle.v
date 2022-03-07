@@ -112,7 +112,7 @@ pub fn (mut circle Circle) update(time f64) bool {
 			sample_set = point.sample_set
 		}
 
-
+		
 		audio.play_sample(
 			sample_set,
 			circle.hitsound.addition_set,
