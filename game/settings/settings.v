@@ -43,7 +43,7 @@ pub struct Gameplay {
 // Factory
 pub fn make_window_settings() &Window {
 	mut window_ := &Window{
-		speed: 1.5,
+		speed: 1.0,
 		fps: 60,
 		record: false,
 		record_fps: 60
