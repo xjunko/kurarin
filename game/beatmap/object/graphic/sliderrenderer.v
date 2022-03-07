@@ -20,10 +20,10 @@ import framework.math.vector
 
 #flag -I @VMODROOT/
 #include "assets/shaders/slider.h"
-#include "assets/shaders/test.h"
+// #include "assets/shaders/test.h"
 
 fn C.fuck_shader_desc(gfx.Backend) &C.sg_shader_desc
-fn C.test_shader_desc(gfx.Backend) &C.sg_shader_desc
+// fn C.test_shader_desc(gfx.Backend) &C.sg_shader_desc
 
 pub const (
 	used_import = gfx.used_import + sokol.used_import
