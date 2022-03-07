@@ -164,7 +164,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application("Kurarin")
-	fp.version("0.0.1a-dementia")
+	fp.version("0.2.2-dementia")
 	fp.description("Kurarin rewrite Codename Dementia")
 
 	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file")

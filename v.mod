@@ -1,7 +1,7 @@
 Module {
 	name: 'dementia'
 	description: ''
-	version: ''
+	version: '0.2.2'
 	license: ''
 	dependencies: []
 }
