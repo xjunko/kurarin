@@ -16,7 +16,7 @@ const (
 	offset = settings.gameplay.auto_update_rate
 )
 
-[deprecated: "TODO: remove this after we got realtime auto."]
+// [deprecated: "TODO: remove this after we got realtime auto."]
 pub fn make_replay(mut beatmap &beatmap.Beatmap, mut cursor &Cursor) {
 	mut last_object := unsafe { &beatmap.objects[0] }
 	mut last_position := beatmap.objects[0].get_start_position()
