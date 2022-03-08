@@ -1,9 +1,11 @@
 # Kurarin - (kinda working) osu! beatmap visualizer made in V
 ![logo](assets/screenshots/logo.png)
 
+## Disclaimer
+`master` branch is no longer maintained, check [`rewrite`](https://github.com/FireRedz/kurarin/tree/rewrite) branch for the new stuff. </br>
+
 ## Releases
 You can get the latest development build from [here](https://github.com/FireRedz/kurarin/releases/tag/latest). </br>
-Also lots of changes has been made in dev branch btw :trollface:
 
 ## About
 
