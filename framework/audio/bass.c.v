@@ -3,6 +3,7 @@ module audio
 #flag -I @VMODROOT/audio/bass
 #include "bass.h"
 #include "bass_fx.h"
+#flag -Wl,-L/usr/lib -lbass -lbass_fx
 
 // Important bits
 fn C.BASS_Init(int, int, int, int, int) int
