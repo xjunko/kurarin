@@ -168,7 +168,8 @@ pub fn (mut slider Slider) play_hitsound_generic(sample_set_ int, addition_set_ 
 		sample_set,
 		addition_set,
 		sample,
-		point.sample_index
+		point.sample_index,
+		point.sample_volume
 	)
 }
 

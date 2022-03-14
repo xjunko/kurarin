@@ -117,7 +117,8 @@ pub fn (mut circle Circle) update(time f64) bool {
 			sample_set,
 			circle.hitsound.addition_set,
 			circle.sample,
-			index
+			index,
+			point.sample_volume
 		)
 
 		return true
@@ -153,7 +154,6 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 
 	circle.sprites << circle.hitcircle
 	circle.sprites << circle.hitcircleoverlay
-	// circle.sprites << circle.combotext
 	circle.sprites << circle.approachcircle
 
 

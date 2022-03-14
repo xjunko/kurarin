@@ -65,7 +65,6 @@ pub fn (mut sample GameSamples) load_base_sample() {
 			for format in ["mp3", "wav", "ogg"] {
 				if os.exists(os.join_path(sample.skin_path, filename[x][y] + ".${format}")) {
 					sample.base[x][y] = audio.new_sample(os.join_path(sample.skin_path, filename[x][y]) + ".${format}")
-					sample.base[x][y].set_volume(f32((settings.window.effect_volume / 100.0) * (settings.window.overall_volume / 100.0)))
 					break
 				}
 			}
@@ -135,12 +134,11 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 			}
 	
 			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index] = audio.new_sample(path)
-			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index].set_volume(f32((settings.window.effect_volume / 100.0) * (settings.window.overall_volume / 100.0)))
 		}
 	})
 }
 
-pub fn play_sample(sample_set int, _addition_set int, hitsound int, index int) {
+pub fn play_sample(sample_set int, _addition_set int, hitsound int, index int, volume f64) {
 	if settings.gameplay.disable_hitsound { return }
 
 	mut addition_set := _addition_set
@@ -151,26 +149,26 @@ pub fn play_sample(sample_set int, _addition_set int, hitsound int, index int) {
 
 	// Normal
 	if hitsound & 1 > 0 || hitsound == 0 {
-		play_sample_internal(sample_set, 0, index)
+		play_sample_internal(sample_set, 0, index, volume)
 	}
 
 	// Whistle
 	if hitsound & 2 > 0 {
-		play_sample_internal(addition_set, 1, index)
+		play_sample_internal(addition_set, 1, index, volume)
 	}
 
 	// Finish
 	if hitsound & 4 > 0 {
-		play_sample_internal(addition_set, 2, index)
+		play_sample_internal(addition_set, 2, index, volume)
 	}
 
 	// Clap
 	if hitsound & 8 > 0 {
-		play_sample_internal(addition_set, 3, index)
+		play_sample_internal(addition_set, 3, index, volume)
 	}
 }
 
-pub fn play_sample_internal(_sample_set int, hitsound_index int, index int) {
+pub fn play_sample_internal(_sample_set int, hitsound_index int, index int, volume f64) {
 	mut sample_set := _sample_set
 
 	if sample_set == 0 {
@@ -181,9 +179,9 @@ pub fn play_sample_internal(_sample_set int, hitsound_index int, index int) {
 
 	mut g_sample := global_sample
 	if global_sample.beatmap[sample_set - 1][hitsound_index].len > 0 && index in global_sample.beatmap[sample_set -1][hitsound_index] && settings.gameplay.use_beatmap_hitsound {
-		g_sample.beatmap[sample_set - 1][hitsound_index][index].play()
+		g_sample.beatmap[sample_set - 1][hitsound_index][index].play_volume(f32(volume))
 	} else {
-		g_sample.base[sample_set - 1][hitsound_index].play()
+		g_sample.base[sample_set - 1][hitsound_index].play_volume(f32(volume))
 	}
 }
 

@@ -57,7 +57,8 @@ pub fn (mut spinner Spinner) update(time f64) bool {
 			spinner.hitsound.sample_set,
 			spinner.hitsound.addition_set,
 			0,
-			spinner.hitsound.custom_index
+			spinner.hitsound.custom_index,
+			1.0 // TODO: proper spinner hitsound
 		)
 	}
 
