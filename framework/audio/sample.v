@@ -10,7 +10,7 @@ pub fn new_sample(path string) &Sample {
 
 pub struct SampleChannel {
 	pub mut:
-		source C.HSTREAM
+		source C.HSAMPLE
 		channel C.HSTREAM
 }
 
@@ -18,7 +18,7 @@ pub struct Sample {
 	Track
 
 	pub mut:
-		bass_sample C.HSTREAM
+		bass_sample C.HSAMPLE
 }
 
 pub fn (mut sample Sample) play_volume(vol f32) {
