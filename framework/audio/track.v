@@ -15,6 +15,7 @@ pub struct Track {
 		channel C.HSTREAM
 		pitch   f64
 		speed   f64
+		fft     []f32 = []f32{len: 512}
 }
 
 pub fn (mut track Track) play() {
@@ -31,4 +32,9 @@ pub fn (mut track Track) set_speed(speed f64) {
 	}
 
 	C.BASS_ChannelSetAttribute(track.channel, C.BASS_ATTRIB_FREQ, 44100 * speed)
+}
+
+pub fn (mut track Track) update(time f64) {
+	// Get FFT data
+	C.BASS_ChannelGetData(track.channel, &track.fft[0], C.BASS_DATA_FFT1024)
 }
