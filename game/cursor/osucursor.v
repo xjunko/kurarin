@@ -87,7 +87,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 					height: f32(trail.size.y * x.resolution.playfield_scale)
 				},
 				color: trail.color,
-				additive: true
+				additive: [true, false][int(settings.gameplay.cursor_style == 0)]
 			})
 		}
 	}
