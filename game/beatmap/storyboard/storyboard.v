@@ -1,6 +1,7 @@
 module storyboard
 
 import os
+import math
 import library.gg
 
 import framework.logging
@@ -251,6 +252,14 @@ pub fn parse_sprite_commands(mut spr &sprite.Sprite, commands []string) {
 
 		mut end_time := items[3].f64()
 		mut arguments := 0
+
+		// Make sure end_time is greater than start
+		end_time = math.max(start_time, end_time)
+
+		if end_time == start_time {
+			end_time = start_time + 1
+		}
+		
 
 		match command_type {
 			'F', 'R', 'S', 'MX', 'MY' {
