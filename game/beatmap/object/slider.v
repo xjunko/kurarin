@@ -101,16 +101,11 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 		start_index = end_index
 	}
 
-	// Draw slider body following by slider.hitcircle and slider_overlay_sprite
-	if slider.last_time <= slider.get_start_time() && slider.hitcircle.hitcircle.is_drawable_at(slider.last_time) {
+	// Draw slider body
+	// TODO: alpha
+	if slider.last_time >= slider.time.start - slider.diff.preempt && slider.last_time <= slider.time.end + difficulty.hit_fade_out {
 		slider.slider_renderer_attr.update_vertex_progress(start_index, end_index)
 		slider.slider_renderer_attr.draw_slider(slider.hitcircle.hitcircle.color.a)
-		return
-	}
-	
-	if slider.last_time >= slider.get_start_time() && slider.slider_overlay_sprite.is_drawable_at(slider.last_time) {
-		slider.slider_renderer_attr.update_vertex_progress(start_index, end_index)
-		slider.slider_renderer_attr.draw_slider(slider.slider_overlay_sprite.color.a)
 		return
 	}
 }
