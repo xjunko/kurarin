@@ -1,8 +1,9 @@
 module object
 
+import math
 import library.gg
 
-import framework.logging
+// import framework.logging
 import framework.math.time
 import framework.math.easing
 import framework.graphic.sprite
@@ -16,6 +17,7 @@ import game.x
 
 const (
 	default_hitcircle_size = 128.0
+	is_hidden = false
 )
 
 pub struct Circle {
@@ -96,30 +98,8 @@ pub fn (mut circle Circle) update(time f64) bool {
 	// Hitanimation, we're done
 	if time >= circle.get_start_time() && !circle.done {
 		circle.arm(true, time)
+		circle.play_hitsound()
 		circle.done = true
-
-		// play hitsound
-		point := circle.timing.get_point_at(circle.time.start)
-
-		mut index := circle.hitsound.custom_index
-		mut sample_set := circle.hitsound.sample_set
-
-		if index == 0 {
-			index = point.sample_index
-		}
-
-		if sample_set == 0 {
-			sample_set = point.sample_set
-		}
-
-		
-		audio.play_sample(
-			sample_set,
-			circle.hitsound.addition_set,
-			circle.sample,
-			index,
-			point.sample_volume
-		)
 
 		return true
 	}
@@ -169,8 +149,14 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 
 	for mut s in circles {
 		s.add_transform(typ: .move, time: time.Time{start_time, start_time}, before: [circle.position.x, circle.position.y])
-		s.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [0.0], after: [255.0])
-
+		
+		if is_hidden {
+			s.add_transform(typ: .fade, time: time.Time{start_time, start_time + diff.preempt * 0.4}, before: [0.0], after: [255.0])
+			s.add_transform(typ: .fade, time: time.Time{start_time + diff.preempt * 0.4, start_time + diff.preempt * 0.7}, before: [255.0], after: [0.0])
+		} else {
+			s.add_transform(typ: .fade, time: time.Time{start_time, start_time + diff.fade_in}, before: [0.0], after: [255.0])
+			s.add_transform(typ: .fade, time: time.Time{end_time, end_time}, before: [0.0], after: [255.0])
+		}
 
 		// Done
 		s.reset_size_based_on_texture(factor: (circle.diff.circle_radius * 1.05 * 2) / 128)
@@ -179,12 +165,14 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 
 
 	// Approach circle 
-	// TODO: make this accurate or smth idk
-	circle.approachcircle.add_transform(typ: .move, time: time.Time{start_time, start_time}, before:[circle.position.x, circle.position.y])
-	circle.approachcircle.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [0.0], after: [255.0])
-	circle.approachcircle.add_transform(typ: .scale_factor, time: time.Time{start_time, end_time}, before: [4.0], after: [1.0])
-	circle.approachcircle.reset_size_based_on_texture(factor: (circle.diff.circle_radius * 1.05 * 2)/ 128)
-	circle.approachcircle.reset_attributes_based_on_transforms()
+	if !is_hidden || circle.id == 0 {
+		circle.approachcircle.add_transform(typ: .move, time: time.Time{start_time, start_time}, before:[circle.position.x, circle.position.y])
+		circle.approachcircle.add_transform(typ: .fade, time: time.Time{start_time, math.min(end_time, end_time - diff.preempt + diff.fade_in * 2.0)}, before: [0.0], after: [229.5]) // 0.9
+		circle.approachcircle.add_transform(typ: .fade, time: time.Time{end_time, end_time}, before: [0.0], after: [0.0])
+		circle.approachcircle.add_transform(typ: .scale_factor, time: time.Time{start_time, end_time}, before: [4.0], after: [1.0])
+		circle.approachcircle.reset_size_based_on_texture(factor: (circle.diff.circle_radius * 1.05 * 2)/ 128)
+		circle.approachcircle.reset_attributes_based_on_transforms()
+	}
 }
 
 pub fn (mut circle Circle) arm(clicked bool, _time f64) {
@@ -197,12 +185,10 @@ pub fn (mut circle Circle) arm(clicked bool, _time f64) {
 	start_time := _time
 	end_scale := 1.4
 
-	// bye bye approach circle
+	// sayonara approach circle-kun >w<
 	circle.approachcircle.add_transform(typ: .fade, time: time.Time{start_time, start_time}, before: [0.0])
 
-	// no hidden support yet so yea
-	// TODO: hidden support
-	if true {
+	if clicked && !is_hidden {
 		end_time := start_time + difficulty.hit_fade_out
 
 		// scale
@@ -214,14 +200,43 @@ pub fn (mut circle Circle) arm(clicked bool, _time f64) {
 		circle.hitcircleoverlay.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
 		circle.combotext.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
 	} else {
-		logging.error("Circle.arm has no hidden support yet.")
+		// Hidden or missed, same shit
+		end_time := start_time + 60.0
+		circle.hitcircle.add_transform(typ: .fade, easing: easing.quad_out, time: time.Time{start_time, end_time}, before: [f64(circle.hitcircle.color.a)], after: [0.0])
+		circle.hitcircleoverlay.add_transform(typ: .fade, easing: easing.quad_out, time: time.Time{start_time, end_time}, before: [f64(circle.hitcircleoverlay.color.a)], after: [0.0])
+		circle.combotext.add_transform(typ: .fade, easing: easing.quad_out, time: time.Time{start_time, end_time}, before: [f64(circle.combotext.color.a)], after: [0.0])
 	}
 
-	// 
+	//  resets
 	circle.hitcircle.reset_attributes_based_on_transforms()
 	circle.hitcircleoverlay.reset_attributes_based_on_transforms()
 	circle.approachcircle.reset_attributes_based_on_transforms()
 
+}
+
+pub fn (mut circle Circle) play_hitsound() {
+	// play hitsound
+	point := circle.timing.get_point_at(circle.time.start)
+
+	mut index := circle.hitsound.custom_index
+	mut sample_set := circle.hitsound.sample_set
+
+	if index == 0 {
+		index = point.sample_index
+	}
+
+	if sample_set == 0 {
+		sample_set = point.sample_set
+	}
+
+	
+	audio.play_sample(
+		sample_set,
+		circle.hitsound.addition_set,
+		circle.sample,
+		index,
+		point.sample_volume
+	)
 }
 
 pub fn make_circle(items []string) &Circle {
