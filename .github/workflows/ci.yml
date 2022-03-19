@@ -25,8 +25,8 @@ jobs:
                 
             - name: Install BASS
               run: |
-                wget https://github.com/Wieku/danser-go/raw/master/libbass.so -O /usr/lib/libbass.so
-                wget https://github.com/Wieku/danser-go/raw/master/libbass_fx.so -O /usr/lib/libbass_fx.so
+                sudo wget https://github.com/Wieku/danser-go/raw/master/libbass.so -O /usr/lib/libbass.so
+                sudo wget https://github.com/Wieku/danser-go/raw/master/libbass_fx.so -O /usr/lib/libbass_fx.so
             
             - name: Checkout ${{ github.event.repository.name }}
               uses: actions/checkout@v2
