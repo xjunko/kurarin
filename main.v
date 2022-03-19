@@ -36,6 +36,10 @@ pub struct Window {
 		record 		bool
 		record_data &byte = voidptr(0)
 		argument    &GameArgument = voidptr(0)
+
+		// HACK: move this to somewhere else
+		beatmap_song &audio.Track = voidptr(0)
+		status       int
 }
 
 pub fn window_init(mut window &Window) {
@@ -73,19 +77,31 @@ pub fn window_init(mut window &Window) {
 			g_time.set_speed(settings.global.window.speed)
 			mut played := false
 			time.reset()
+
+			window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
+
+			mut slider_renderer := graphic.global_renderer
 			
 			for {
 				if g_time.time >= settings.global.gameplay.lead_in_time && !played {
-					mut bg_music := audio.new_track(window.beatmap.get_audio_path())
-					bg_music.set_pitch(1.0)
-					bg_music.set_speed(settings.global.window.speed)
-					bg_music.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
-					bg_music.play()
+					window.beatmap_song.set_pitch(1.0)
+					window.beatmap_song.set_speed(settings.global.window.speed)
+					window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
+					window.beatmap_song.play()
 					played = true
 				}
 
 				window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
 				window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time)
+
+				// HACK: move this somewhre elese
+				// Math below is for smoothing the thing
+				// current = target * smoothing + current - current * smoothing
+				if settings.global.miscellaneous.scale_to_beat {
+					window.beatmap_song.update(0.0)
+					slider_renderer.uniform_values[0] = (1.0 + (1.0 * window.beatmap_song.boost)) * 0.1 + slider_renderer.uniform_values[0] - slider_renderer.uniform_values[0] * 0.1
+				}
+				
 				timelib.sleep(time.update_rate_ms)
 			}
 		}(mut window)

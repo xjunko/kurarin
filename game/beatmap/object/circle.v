@@ -10,6 +10,7 @@ import framework.graphic.sprite
 
 
 import game.settings
+import game.beatmap.object.graphic
 import game.beatmap.difficulty
 import game.beatmap.timing
 import game.audio
@@ -59,15 +60,17 @@ pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
 
 	for mut sprite in circle.sprites {
 		if sprite.is_drawable_at(circle.last_time) {
-			pos := sprite.position.sub(sprite.origin.multiply(x: sprite.size.x, y: sprite.size.y))
+			// HACK: get bg music boost data from somewhere else
+			size := sprite.size.scale(graphic.global_renderer.uniform_values[0])
+			pos := sprite.position.sub(sprite.origin.multiply(size))
 			arg.ctx.draw_image_with_config(gg.DrawImageConfig{
 					img: sprite.get_texture(),
 					img_id: sprite.get_texture().id,
 					img_rect: gg.Rect{
-						x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
+						x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x) ,
 						y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-						width: f32(sprite.size.x * x.resolution.playfield_scale),
-						height: f32(sprite.size.y * x.resolution.playfield_scale)
+						width: f32(size.x * x.resolution.playfield_scale),
+						height: f32(size.y * x.resolution.playfield_scale)
 					},
 					color: sprite.color,
 					additive: sprite.additive
