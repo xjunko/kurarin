@@ -25,7 +25,7 @@ pub struct Gameplay {
 pub fn make_gameplay_settings() Gameplay {
 	mut gameplay_ := Gameplay{
 		global_offset: 0,
-		lead_in_time: 3.0 * 1000.0, // n Seconds
+		lead_in_time: 3.0, // n Seconds
 		background_dim: 100,
 
 		disable_hitsound: false,

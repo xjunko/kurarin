@@ -1,6 +1,7 @@
 module settings
 
 import os
+import math
 import json
 
 import framework.logging
@@ -35,6 +36,10 @@ fn init() {
 		crap := os.read_file('settings.json') or { panic(err) }
 		settings = json.decode(Settings, crap) or { panic(err) }
 	}
+
+	// Post-Fix
+	settings.gameplay.lead_in_time = math.max(1.0, settings.gameplay.lead_in_time)
+	settings.gameplay.lead_in_time *= 1000.0
 
 	// lmaooo
 	mut g_settings := global
