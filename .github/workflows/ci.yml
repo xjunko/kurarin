@@ -13,15 +13,15 @@ jobs:
 
         steps:
             - name: Setup V
-            uses: vlang/setup-v@v1
-            with:
+              uses: vlang/setup-v@v1
+              with:
                 check-latest: true
             
             - name: Checkout ${{ github.event.repository.name }}
-            uses: actions/checkout@v2
+              uses: actions/checkout@v2
 
             - name: Build ${{ github.event.repository.name }}
-            run: ./ext/build.sh
+              run: ./ext/build.sh
                 
 
         
