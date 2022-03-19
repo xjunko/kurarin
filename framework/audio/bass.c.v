@@ -22,3 +22,7 @@ fn C.BASS_ChannelSeconds2Bytes(C.HSTREAM, f64) C.QWORD
 
 // FFT
 fn C.BASS_ChannelGetData(C.HSTREAM, &voidptr, int)
+
+
+// FX
+fn C.BASS_FX_TempoCreate(C.HSTREAM, int) C.HSTREAM
