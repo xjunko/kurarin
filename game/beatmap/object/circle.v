@@ -9,6 +9,7 @@ import framework.math.easing
 import framework.graphic.sprite
 
 
+import game.settings
 import game.beatmap.difficulty
 import game.beatmap.timing
 import game.audio
@@ -44,6 +45,18 @@ pub struct Circle {
 }
 
 pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
+	if settings.global.miscellaneous.rainbow_hitcircle {
+		time := circle.last_time / 100.0
+		circle.hitcircle.color.r = byte(f32(math.sin(0.3*time + 0 + 1 * 1) * 127.0 + 128.0))
+		circle.hitcircle.color.g = byte(f32(math.sin(0.3*time + 2 + 1 * 1) * 127.0 + 128.0))
+		circle.hitcircle.color.b = byte(f32(math.sin(0.3*time + 4 + 1 * 1) * 127.0 + 128.0))
+
+		circle.combotext.color = circle.hitcircle.color
+		circle.approachcircle.color = circle.hitcircle.color
+		circle.hitcircleoverlay.color = circle.hitcircle.color // HACK: i dont think this will fuck with anything but considering this 
+		                                                       //       is v and its kinda buggy, might as well put up a notice here
+	}
+
 	for mut sprite in circle.sprites {
 		if sprite.is_drawable_at(circle.last_time) {
 			pos := sprite.position.sub(sprite.origin.multiply(x: sprite.size.x, y: sprite.size.y))
