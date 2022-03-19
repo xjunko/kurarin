@@ -163,9 +163,8 @@ pub fn (mut slider Slider) update(time f64) bool {
 	// Hitsounds
 	if time >= slider.time.start && time <= slider.time.end {
 		times := int(((time - slider.time.start) / slider.duration) + 1)
-
-		// Dont play the first hitsound (as we already play it with hitcircle)
-		if times != 1 && slider.last_slider_time != times {
+		
+		if slider.last_slider_time != times {
 			slider.play_hitsound(times - 1)
 			slider.last_slider_time = times
 		}

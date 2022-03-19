@@ -111,7 +111,12 @@ pub fn (mut circle Circle) update(time f64) bool {
 	// Hitanimation, we're done
 	if time >= circle.get_start_time() && !circle.done {
 		circle.arm(true, time)
-		circle.play_hitsound()
+
+		// Dont play if this is inherited from a slider
+		if !circle.inherited {
+			circle.play_hitsound()
+		}
+		
 		circle.done = true
 
 		return true
