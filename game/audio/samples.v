@@ -139,7 +139,7 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 }
 
 pub fn play_sample(sample_set int, _addition_set int, hitsound int, index int, volume f64) {
-	if settings.gameplay.disable_hitsound { return }
+	if settings.global.gameplay.disable_hitsound { return }
 
 	mut addition_set := _addition_set
 
@@ -178,7 +178,7 @@ pub fn play_sample_internal(_sample_set int, hitsound_index int, index int, volu
 	}
 
 	mut g_sample := global_sample
-	if global_sample.beatmap[sample_set - 1][hitsound_index].len > 0 && index in global_sample.beatmap[sample_set -1][hitsound_index] && settings.gameplay.use_beatmap_hitsound {
+	if global_sample.beatmap[sample_set - 1][hitsound_index].len > 0 && index in global_sample.beatmap[sample_set -1][hitsound_index] && settings.global.gameplay.use_beatmap_hitsound {
 		g_sample.beatmap[sample_set - 1][hitsound_index][index].play_volume(f32(volume))
 	} else {
 		g_sample.base[sample_set - 1][hitsound_index].play_volume(f32(volume))

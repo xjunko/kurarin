@@ -13,7 +13,7 @@ import framework.math.easing
 import game.settings
 
 const (
-	offset = settings.gameplay.auto_update_rate
+	offset = settings.global.gameplay.auto_update_rate
 )
 
 // [deprecated: "TODO: remove this after we got realtime auto."]

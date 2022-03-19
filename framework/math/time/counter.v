@@ -4,7 +4,7 @@ import time as timelib // To avoid confusion (or make more)
 import game.settings
 
 pub const (
-	update_rate_fps = settings.window.fps
+	update_rate_fps = settings.global.window.fps
 	update_rate_ms = (f64(1000.0) / update_rate_fps) * timelib.millisecond
 
 	global = &TimeCounter{}

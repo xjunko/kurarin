@@ -1,5 +1,7 @@
 module main
 
+import game.settings // Load this first
+
 import os
 import sokol.sapp
 import time as timelib
@@ -7,11 +9,9 @@ import time as timelib
 import framework.logging
 import framework.math.time
 
-import game.settings
-
 const (
 	used_import = sapp.used_import
-	fps = settings.window.record_fps
+	fps = settings.global.window.record_fps
 	frametime = 1000.0 / fps
 )
 
@@ -74,7 +74,7 @@ pub fn (mut window Window) close_pipe_process() {
 
 	// Merge audio (for now we'll do it over here instead of doing it on pipe)
 	audio_path := window.beatmap.get_audio_path()
-	result := os.execute('ffmpeg -i test.mp4 -itsoffset ${settings.gameplay.lead_in_time / 1000.0} -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -filter:a "atempo=${settings.window.speed}" -to ${time.get_time().time / 1000.0} -async 1 "audiotest.mp4" -y')
+	result := os.execute('ffmpeg -i test.mp4 -itsoffset ${settings.global.gameplay.lead_in_time / 1000.0} -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -filter:a "atempo=${settings.global.window.speed}" -to ${time.get_time().time / 1000.0} -async 1 "audiotest.mp4" -y')
 	println(result)
 }
 

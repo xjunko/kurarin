@@ -51,7 +51,7 @@ pub struct Cursor {
 pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	cursor.mutex.@lock()
 
-	if settings.gameplay.cursor_style == 2 {
+	if settings.global.gameplay.cursor_style == 2 {
 		for i, trail in cursor.delta_pos {
 			size := cursor.size.scale(
 				0.75 * (0.5 + f64(i) / f64(cursor.delta_pos.len) * 0.4)
@@ -87,7 +87,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 					height: f32(trail.size.y * x.resolution.playfield_scale)
 				},
 				color: trail.color,
-				additive: [true, false][int(settings.gameplay.cursor_style == 0)]
+				additive: [true, false][int(settings.global.gameplay.cursor_style == 0)]
 			})
 		}
 	}
@@ -168,17 +168,17 @@ pub fn (mut cursor Cursor) update(time f64) {
 
 	cursor.sixty_delta += delta
 	// Normal trails
-	if settings.gameplay.cursor_style == 0 && cursor.sixty_delta >= settings.gameplay.cursor_trail_update_rate {
+	if settings.global.gameplay.cursor_style == 0 && cursor.sixty_delta >= settings.global.gameplay.cursor_trail_update_rate {
 		mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
 		trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [255.0], after: [0.0])
 		trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [cursor.position.x, cursor.position.y])
-		trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [settings.gameplay.cursor_size])
+		trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [settings.global.gameplay.cursor_size])
 		trail.reset_size_based_on_texture()
 		trail.reset_attributes_based_on_transforms()
 		cursor.trails << trail
 
-		cursor.sixty_delta -= settings.gameplay.cursor_trail_update_rate
-	} else if settings.gameplay.cursor_style == 1 {
+		cursor.sixty_delta -= settings.global.gameplay.cursor_trail_update_rate
+	} else if settings.global.gameplay.cursor_style == 1 {
 		// God awful particle trail (Old)
 		distance := cursor.position.distance(cursor.last_position)
 		distance_real := cursor.position.sub(cursor.last_position)
@@ -188,7 +188,7 @@ pub fn (mut cursor Cursor) update(time f64) {
 				mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
 				trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 25.0, 150))}, before: [255.0], after: [0.0])
 				trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 32.0, 150))}, before: [cursor.position.x, cursor.position.y], after: [cursor.position.x - distance_real.x + random_f64_in_range(-distance, distance), cursor.position.y - distance_real.y + random_f64_in_range(-distance, distance)])
-				trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [random_f64_in_range(0.05, settings.gameplay.cursor_size)])
+				trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [random_f64_in_range(0.05, settings.global.gameplay.cursor_size)])
 				trail.add_transform(typ: .color, time: time2.Time{time, time}, before: [random_f64_in_range(0, 255), random_f64_in_range(0, 255), random_f64_in_range(0, 255)])
 				trail.reset_size_based_on_texture()
 				trail.reset_attributes_based_on_transforms()
@@ -198,7 +198,7 @@ pub fn (mut cursor Cursor) update(time f64) {
 	}
 
 	// Smoother cursor trail (wip)
-	if settings.gameplay.cursor_style == 2 && delta > 0.0 {
+	if settings.global.gameplay.cursor_style == 2 && delta > 0.0 {
 		points := int(cursor.position.distance(cursor.last_position)) * 2
 		cursor.delta_pos << cursor.last_position
 
@@ -252,7 +252,7 @@ pub fn make_cursor(mut ctx &gg.Context) &Cursor {
 	cursor.textures << skin.get_texture("cursor")
 	cursor.textures << skin.get_texture("cursortrail")
 	cursor.textures << skin.get_texture("cursor-top")
-	cursor.add_transform(typ: .scale_factor, time: time2.Time{0, 0}, before: [settings.gameplay.cursor_size])
+	cursor.add_transform(typ: .scale_factor, time: time2.Time{0, 0}, before: [settings.global.gameplay.cursor_size])
 
 	//
 	cursor.reset_size_based_on_texture()

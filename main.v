@@ -1,5 +1,7 @@
 module main
 
+import game.settings // Load this first
+
 import os
 import gx
 import flag
@@ -13,7 +15,6 @@ import game.x
 import game.skin
 import game.cursor
 import game.beatmap
-import game.settings
 import game.beatmap.object.graphic
 
 import framework.audio
@@ -59,7 +60,7 @@ pub fn window_init(mut window &Window) {
 
 		// Time shit
 		mut g_time := time.get_time()
-		g_time.set_speed(settings.window.speed)
+		g_time.set_speed(settings.global.window.speed)
 		g_time.use_custom_delta = true
 		g_time.custom_delta = frametime
 	}
@@ -69,22 +70,22 @@ pub fn window_init(mut window &Window) {
 	if !window.record {
 		go fn (mut window &Window) {
 			mut g_time := time.get_time()
-			g_time.set_speed(settings.window.speed)
+			g_time.set_speed(settings.global.window.speed)
 			mut played := false
 			time.reset()
 			
 			for {
-				if g_time.time >= settings.gameplay.lead_in_time && !played {
+				if g_time.time >= settings.global.gameplay.lead_in_time && !played {
 					mut bg_music := audio.new_track(window.beatmap.get_audio_path())
 					bg_music.set_pitch(1.0)
-					bg_music.set_speed(settings.window.speed)
-					bg_music.set_volume(f32((settings.window.audio_volume / 100.0) * (settings.window.overall_volume / 100.0)))
+					bg_music.set_speed(settings.global.window.speed)
+					bg_music.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
 					bg_music.play()
 					played = true
 				}
 
-				window.cursor.update(g_time.time - settings.gameplay.lead_in_time)
-				window.beatmap.update(g_time.time - settings.gameplay.lead_in_time)
+				window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
+				window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time)
 				timelib.sleep(time.update_rate_ms)
 			}
 		}(mut window)
@@ -100,7 +101,7 @@ pub fn window_draw(mut window &Window) {
 	window.beatmap.draw()
 	
 	// TODO: maybe move cursor to beatmap struct
-	if !settings.gameplay.disable_cursor {
+	if !settings.global.gameplay.disable_cursor {
 		window.cursor.draw()
 	}
 
@@ -118,8 +119,8 @@ pub fn window_draw(mut window &Window) {
 	if window.record {
 		// Update stuff
 		mut g_time := time.get_time()
-		window.cursor.update(g_time.time - settings.gameplay.lead_in_time)
-		window.beatmap.update(g_time.time - settings.gameplay.lead_in_time)
+		window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
+		window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time)
 
 		// TODO: separate video and update rate
 		// This way the update rate can be stupidly high
@@ -152,7 +153,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 	)
 
 	// Record or na
-	window.record = settings.window.record
+	window.record = settings.global.window.record
 
 	skin.bind_context(mut window.ctx)
 

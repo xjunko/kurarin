@@ -133,8 +133,8 @@ pub fn (mut beatmap Beatmap) reset() {
 	}
 
 	// Storyboard
-	beatmap.storyboard = storyboard.parse_storyboard([beatmap.get_sb_path(), ""][int(settings.gameplay.disable_storyboard)], mut beatmap.ctx)
-	if !settings.gameplay.disable_storyboard {
+	beatmap.storyboard = storyboard.parse_storyboard([beatmap.get_sb_path(), ""][int(settings.global.gameplay.disable_storyboard)], mut beatmap.ctx)
+	if !settings.global.gameplay.disable_storyboard {
 		beatmap.storyboard.parse_lines(beatmap.temp_beatmap_sb) // Parse beatmap's storyboard too (if theres any)
 	}
 	logging.info("Storyboard loaded!")
@@ -176,10 +176,10 @@ pub fn (mut beatmap Beatmap) update(time f64) {
 	// Playfield size update
 	// TODO: make this customizeable or smth
 	// Since this is math based animation instead of transformation (if that makes sense), we need to set the actual size after the lead_in_time ends
-	if beatmap.last_update + settings.gameplay.lead_in_time >= settings.gameplay.lead_in_time - 2000 && beatmap.last_update + settings.gameplay.lead_in_time < settings.gameplay.lead_in_time {
+	if beatmap.last_update + settings.global.gameplay.lead_in_time >= settings.global.gameplay.lead_in_time - 2000 && beatmap.last_update + settings.global.gameplay.lead_in_time < settings.global.gameplay.lead_in_time {
 		beatmap.playfield_size.x = x.resolution.playfield.x * 0.25 + beatmap.playfield_size.x - beatmap.playfield_size.x * 0.25
 		beatmap.playfield_size.y = x.resolution.playfield.y * 0.25 + beatmap.playfield_size.y - beatmap.playfield_size.y * 0.25
-	} else if beatmap.last_update + settings.gameplay.lead_in_time > settings.gameplay.lead_in_time {
+	} else if beatmap.last_update + settings.global.gameplay.lead_in_time > settings.global.gameplay.lead_in_time {
 		// Over the lead_in_time, put actual size
 		beatmap.playfield_size.x = x.resolution.playfield.x
 		beatmap.playfield_size.y = x.resolution.playfield.y
@@ -211,7 +211,7 @@ pub fn (mut beatmap Beatmap) draw() {
 	beatmap.storyboard.draw() // Includes background
 
 	// Shitty background dim
-	beatmap.ctx.draw_rect_filled(0, 0, 1280, 720, gx.Color{0,0,0, byte(settings.gameplay.background_dim)})
+	beatmap.ctx.draw_rect_filled(0, 0, 1280, 720, gx.Color{0,0,0, byte(settings.global.gameplay.background_dim)})
 
 	// Playfield
 	// Insides
@@ -228,7 +228,7 @@ pub fn (mut beatmap Beatmap) draw() {
 	
 	// Draw stuff on its own "layer" or whatever it was called in 
 	// sokol.
-	if !settings.gameplay.disable_hitobject { // We might want hitcircle hitsounds but not the hitcircle itself, so on draw calls ignored it but not on update calls
+	if !settings.global.gameplay.disable_hitobject { // We might want hitcircle hitsounds but not the hitcircle itself, so on draw calls ignored it but not on update calls
 		for i := beatmap.queue.len - 1; i >= 0; i-- {
 			gfx.begin_default_pass(graphic.global_renderer.pass, 1280, 720)
 			beatmap.queue[i].draw(ctx: beatmap.ctx, time: beatmap.last_update)

@@ -25,7 +25,7 @@ pub fn (mut sample Sample) play_volume(vol f32) {
 	mut channel := &SampleChannel{source: sample.bass_sample}
 	channel.channel = C.BASS_SampleGetChannel(channel.source, 0)
 
-	C.BASS_ChannelSetAttribute(channel.channel, C.BASS_ATTRIB_VOL, f32((settings.window.effect_volume / 100.0) * (settings.window.overall_volume / 100.0)) * vol)
+	C.BASS_ChannelSetAttribute(channel.channel, C.BASS_ATTRIB_VOL, f32((settings.global.window.effect_volume / 100.0) * (settings.global.window.overall_volume / 100.0)) * vol)
 	C.BASS_ChannelPlay(channel.channel, 1)
 }
 
