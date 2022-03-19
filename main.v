@@ -9,6 +9,7 @@ import sokol.sgl
 import library.gg
 import time as timelib
 
+import game.x
 import game.skin
 import game.cursor
 import game.beatmap
@@ -75,9 +76,10 @@ pub fn window_init(mut window &Window) {
 			for {
 				if g_time.time >= settings.gameplay.lead_in_time && !played {
 					mut bg_music := audio.new_track(window.beatmap.get_audio_path())
-					bg_music.play()
-					bg_music.set_volume(f32((settings.window.audio_volume / 100.0) * (settings.window.overall_volume / 100.0)))
+					bg_music.set_pitch(1.0)
 					bg_music.set_speed(settings.window.speed)
+					bg_music.set_volume(f32((settings.window.audio_volume / 100.0) * (settings.window.overall_volume / 100.0)))
+					bg_music.play()
 					played = true
 				}
 
@@ -141,6 +143,12 @@ pub fn initiate_game_loop(argument GameArgument) {
 		// FNs
 		init_fn: window_init,
 		frame_fn: window_draw
+
+		// Just a test, remove `cursor.make_replay` on line 54 to get this working
+		// move_fn: fn (x_ f32, y_ f32, mut window &Window) {
+		// 	window.cursor.position.x = (x_ - x.resolution.offset.x) / x.resolution.playfield_scale
+		// 	window.cursor.position.y = (y_ - x.resolution.offset.y) / x.resolution.playfield_scale
+		// }
 	)
 
 	// Record or na
@@ -170,6 +178,12 @@ fn main() {
 	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file")
 
 	fp.finalize() or {
+		println(fp.usage())
+		return
+	}
+
+	// TODO: im pretty sure theres a required tags for the fp.string method
+	if beatmap_path.len == 0 {
 		println(fp.usage())
 		return
 	}
