@@ -35,6 +35,18 @@ jobs:
 
             - name: Build ${{ github.event.repository.name }}
               run: v shader assets/shaders/slider.glsl && v -cc gcc -gc boehm .
+              
+            - name: Finish building, zipping.
+              run: |
+                mkdir Release
+                mv assets Release
+                mv dementia Release
+                
+            - name: Finish zipping, uploading.
+              uses: actions/upload-artifact@v2
+              with:
+                name: linux_x64
+                path: Release
                 
 
         
