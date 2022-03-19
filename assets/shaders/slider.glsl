@@ -6,6 +6,10 @@ in vec3 in_position;
 in vec3 centre;
 in vec2 texture_coord;
 
+uniform vs_uniform {
+    vec4 slider_beat_scale; // it was a float but idk sokol is being retarded so had to do this to workaround that
+};
+
 out vec2 v_uv;
 
 void main() {
@@ -28,8 +32,8 @@ void main() {
     
 
     mat4 trans = mat4(
-        1.0, 0.0, 0.0, 0.0,
-        0.0, 1.0, 0.0, 0.0,
+        slider_beat_scale.x, 0.0, 0.0, 0.0,
+        0.0, slider_beat_scale.x, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
     );
