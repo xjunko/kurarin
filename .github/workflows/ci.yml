@@ -40,7 +40,7 @@ jobs:
               run: |
                 mkdir Release
                 mv assets Release
-                mv dementia Release
+                mv kurarin Release
                 
             - name: Finish zipping, uploading.
               uses: actions/upload-artifact@v2
