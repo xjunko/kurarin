@@ -5,3 +5,5 @@ assets/shaders/*.h
 videos/*
 *.log
 dementia
+settings.json
+*.json
