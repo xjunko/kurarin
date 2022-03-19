@@ -215,11 +215,6 @@ pub fn (mut cursor Cursor) update(time f64) {
 				cursor.delta_pos = cursor.delta_pos[cursor.delta_pos.len ..]
 			}
 		}
-
-		// Dont go over the limit 
-		// "#" weird feature but okay
-		// TODO: fix thsi
-		// cursor.delta_pos = cursor.delta_pos#[0..settings.gameplay.cursor_trail_length] 
 	}
 
 
