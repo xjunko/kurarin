@@ -20,6 +20,20 @@ pub struct TimingPoint {
 		kiai bool
 }
 
+fn get_default_timing() TimingPoint {
+	return TimingPoint{
+		time: 0.0,
+		beatlengthbase: 60000.0 / 60.0,
+		beatlength: 60000.0 / 60.0,
+		sample_set: 0,
+		sample_index: 1,
+		sample_volume: 1,
+		signature: 4,
+		inherited: false,
+		kiai: false,
+	}
+}
+
 pub fn (t &TimingPoint) get_ratio() f64 {
 	if t.beatlength >= 0.0 || math.is_nan(t.beatlength) {
 		return 1.0
@@ -45,9 +59,13 @@ pub struct Timings {
 		slider_multiplier f64
 		slider_tick_rate  f64
 
-		points []TimingPoint
+		default_timing_point TimingPoint = get_default_timing()
 
-		last_set int
+		points          []TimingPoint
+		original_points []TimingPoint
+
+		base_set int =  1
+		last_set int = 1
 }
 
 pub fn (mut timing Timings) add_point(time f64, beatlength f64, sample_set int, sample_index int, sample_volume f64, signature int, inherited bool, kiai bool) {
@@ -72,6 +90,8 @@ pub fn (mut timing Timings) calculate() {
 			last_point := timing.points[i - 1]
 			point.beatlengthbase = last_point.beatlengthbase
 			timing.points[i] = point
+		} else {
+			timing.original_points << point
 		}
 	}
 }
