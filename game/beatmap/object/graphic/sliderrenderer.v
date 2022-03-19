@@ -8,6 +8,7 @@ module graphic
 	I FUCKING HATE SLIDER RENDER RER
 */
 
+import game.settings
 import library.stbi
 import math
 
@@ -17,6 +18,7 @@ import sokol.gfx
 
 import framework.logging
 import framework.math.vector
+import framework.math.time
 
 #flag -I @VMODROOT/
 #include "assets/shaders/slider.h"
@@ -37,6 +39,8 @@ pub struct SliderRendererAttr {
 		length   f64
 		points   []vector.Vector2
 		vertices []f32
+		colors   []f32 // [3]Body [3]Border
+		uniform  C.sg_range
 		bindings C.sg_bindings
 		has_been_initialized bool
 }
@@ -78,6 +82,18 @@ pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f
 	attr.cs = cs
 	attr.points = points
 	attr.length = pixel_length
+
+	// Color uniform
+	attr.colors = []f32{}
+	attr.colors << [
+		f32(0.0), f32(0.0), f32(0.0), 1.0,
+		f32(1.0), f32(1.0), f32(1.0), 1.0,
+	] // ghost numbers, dont ask my why its there
+
+	attr.uniform = C.sg_range{
+		ptr: attr.colors.data,
+		size: usize(attr.colors.len * int(sizeof(f32)))
+	}
 
 	return attr
 
@@ -206,8 +222,22 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64) {
 		return
 	}
 
+	// Fuck around with the colors
+	// Literally copy-pasted from mcosu lmaooo credit to mckay
+	if settings.global.miscellaneous.rainbow_slider {
+		time := time.global.time / 100.0
+		attr.colors[0] = f32(math.sin(0.3 * time + 0 + 10) * 127 + 128) / 255
+		attr.colors[1] = f32(math.sin(0.3 * time + 2 + 10) * 127 + 128) / 255
+		attr.colors[2] = f32(math.sin(0.3 * time + 4 + 10) * 127 + 128) / 255
+
+		attr.colors[4] = f32(math.sin(0.3 * time * 1.5 + 0 + 10) * 127 + 128) / 255
+		attr.colors[5] = f32(math.sin(0.3 * time * 1.5 + 2 + 10) * 127 + 128) / 255
+		attr.colors[6] = f32(math.sin(0.3 * time * 1.5 + 4 + 10) * 127 + 128) / 255
+	}
+
 	gfx.apply_pipeline(global_renderer.pip)
 	gfx.apply_bindings(&attr.bindings)
+	gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
 	gfx.draw(0, attr.vertices.len, 1)
 }
 
