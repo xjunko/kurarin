@@ -27,8 +27,8 @@ jobs:
               run: |
                 sudo wget https://github.com/Wieku/danser-go/raw/master/libbass.so -O /usr/lib/libbass.so
                 sudo wget https://github.com/Wieku/danser-go/raw/master/libbass_fx.so -O /usr/lib/libbass_fx.so
-                sudo wget https://raw.githubusercontent.com/Wieku/danser-go/master/framework/bass/bass.h /usr/include/bass.h
-                sudo wget https://raw.githubusercontent.com/Wieku/danser-go/master/framework/bass/bass_fx.h /usr/include/bass_fx.h
+                sudo wget https://raw.githubusercontent.com/Wieku/danser-go/master/framework/bass/bass.h -O /usr/include/bass.h
+                sudo wget https://raw.githubusercontent.com/Wieku/danser-go/master/framework/bass/bass_fx.h -O /usr/include/bass_fx.h
             
             - name: Checkout ${{ github.event.repository.name }}
               uses: actions/checkout@v2
