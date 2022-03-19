@@ -12,8 +12,9 @@ pub const (
 
 pub struct Settings {
 	pub mut:
-		window   Window = make_window_settings()
-		gameplay Gameplay = make_gameplay_settings()
+		window   	 Window = make_window_settings()
+		gameplay 	 Gameplay = make_gameplay_settings()
+		miscellaneous Miscellaneous = make_miscellaneous_settings()
 }
 
 pub fn (mut settings Settings) save() {
@@ -37,12 +38,20 @@ fn init() {
 		settings = json.decode(Settings, crap) or { panic(err) }
 	}
 
+	// Also save again, this way new shit can just get append into the json
+	settings.save()
+
 	// Post-Fix
 	settings.gameplay.lead_in_time = math.max(1.0, settings.gameplay.lead_in_time)
 	settings.gameplay.lead_in_time *= 1000.0
+
+	if settings.window.record {
+		settings.gameplay.disable_hitsound = true // TODO: remove this once we got BASS pipe to ffmpeg
+	}
 
 	// lmaooo
 	mut g_settings := global
 	g_settings.window = settings.window
 	g_settings.gameplay = settings.gameplay
+	g_settings.miscellaneous = settings.miscellaneous
 }
