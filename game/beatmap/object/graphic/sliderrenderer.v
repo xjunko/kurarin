@@ -55,6 +55,8 @@ pub struct SliderRenderer {
 		pip      C.sg_pipeline
 		pass     C.sg_pass_action
 		gradient C.sg_image
+		uniform  C.sg_range
+		uniform_values []f32
 }
 
 
@@ -237,6 +239,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64) {
 
 	gfx.apply_pipeline(global_renderer.pip)
 	gfx.apply_bindings(&attr.bindings)
+	gfx.apply_uniforms(.vs, C.SLOT_vs_uniform, global_renderer.uniform)
 	gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
 	gfx.draw(0, attr.vertices.len, 1)
 }
@@ -308,6 +311,17 @@ pub fn init_slider_renderer() {
 	renderer.pass.colors[0] = C.sg_color_attachment_action{
 		action: .dontcare,
 		value: C.sg_color{0.0, 0.0, 0.0, 0.0}
+	}
+	
+
+	// Uniform (for slider scale)
+	renderer.uniform_values = [
+		f32(1.0), 0.0, 0.0, 0.0,
+	]
+	
+	renderer.uniform = C.sg_range{
+		ptr: renderer.uniform_values.data,
+		size: usize(renderer.uniform_values.len * int(sizeof(f32)))
 	}
 
 	// Done
