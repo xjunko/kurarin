@@ -43,8 +43,7 @@ void main() {
 in vec2 v_uv;
 out vec4 color;
 
-// Lazer use 1.0 iirc
-const float defaultTransitionSize = 0.01;
+const float defaultTransitionSize = 0.011;
 const float defaultBorderSize = 0.11;
 const float outerShadowSize = 0.08;
 
