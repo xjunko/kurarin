@@ -35,7 +35,7 @@ pub fn (mut res Resolution) calculate() {
 	res.offset.x = (res.resolution.x - res.playfield.x) / 2.0
 	res.offset.y = (res.resolution.y * 0.1)
 
-	logging.info(res.str())
+	logging.debug(res.str())
 	logging.debug("Resolution calculated!")
 }
 
