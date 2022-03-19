@@ -250,7 +250,7 @@ pub fn init_slider_renderer() {
 	}
 
 	// Pipeline blending (for slider to appear correctly, well almost.)
-	pipeline_desc.colors[0].blend.enabled = true
+	pipeline_desc.colors[0].blend.enabled = false
 	pipeline_desc.colors[0].blend.op_rgb = .add
 	pipeline_desc.colors[0].blend.src_factor_rgb = .src_alpha
 	pipeline_desc.colors[0].blend.dst_factor_rgb = .one_minus_src_alpha
