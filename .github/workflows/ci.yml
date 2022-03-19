@@ -16,12 +16,23 @@ jobs:
               uses: vlang/setup-v@v1
               with:
                 check-latest: true
+                
+            - name: Install dependecies
+              run: |
+                sudo apt-get update
+                sudo apt-get install --quiet -y libgc-dev
+                sudo apt-get install --quiet -y libfreetype6-dev  libxi-dev libxcursor-dev libgl-dev
+                
+            - name: Install BASS
+              run: |
+                wget https://github.com/Wieku/danser-go/raw/master/libbass.so -O /usr/lib/libbass.so
+                wget https://github.com/Wieku/danser-go/raw/master/libbass_fx.so -O /usr/lib/libbass_fx.so
             
             - name: Checkout ${{ github.event.repository.name }}
               uses: actions/checkout@v2
 
             - name: Build ${{ github.event.repository.name }}
-              run: ./ext/build.sh
+              run: v shader assets/shaders/slider.glsl && v -cc gcc -gc boehm .
                 
 
         
