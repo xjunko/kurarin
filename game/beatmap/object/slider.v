@@ -113,30 +113,6 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 }
 
 pub fn (mut slider Slider) play_hitsound(index int) {
-	// mut sample := slider.samples[index]
-	// mut sample_set := slider.sample_sets[index]
-	// mut sample_index := slider.hitsound.custom_index
-	
-	// point := slider.timing.get_point_at(slider.time.start + math.floor(index * slider.duration + 5))
-
-	// if sample_index == 0 {
-	// 	sample_index = point.sample_index
-	// }
-
-	// if sample_set == 0 {
-	// 	sample_set = slider.hitsound.sample_set
-
-	// 	if sample_set == 0 {
-	// 		sample_set = point.sample_set
-	// 	}
-	// }
-
-	// audio.play_sample(
-	// 	sample_set, 
-	// 	0,
-	// 	sample,
-	// 	sample_index
-	// )
 	slider.play_hitsound_generic(
 		slider.sample_sets[index],
 		slider.addition_sets[index],
@@ -288,6 +264,7 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 	slider.slider_b_sprite.add_transform(typ: .color, time: time.Time{slider.time.start, slider.time.start}, before: slider.color)
 
 	// The thing taht slider circle does
+	slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start + 160.0}, before: [size_ratio * 0.75], after: [size_ratio])
 	slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + 160.0}, before: [size_ratio], after: [size_ratio * 0.75])
 
 	// Movement
