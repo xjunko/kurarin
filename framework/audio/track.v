@@ -43,7 +43,6 @@ pub fn (mut track Track) set_speed(speed f64) {
 		track.speed = speed
 	}
 
-	// TODO: this is not the best way to do this
 	C.BASS_ChannelSetAttribute(track.channel, C.BASS_ATTRIB_TEMPO, (speed-1.0)*100)
 }
 
