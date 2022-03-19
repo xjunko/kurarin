@@ -84,7 +84,7 @@ pub fn (mut spinner Spinner) set_difficulty(diff difficulty.Difficulty) {
 
 	// Animation
 	for mut t in spinner.sprites {
-		t.add_transform(typ: .move, time: time.Time{start_time, spinner.time.end}, before: [spinner.position.x, spinner.position.y])
+		t.add_transform(typ: .move, time: time.Time{start_time, start_time}, before: [spinner.position.x, spinner.position.y])
 		t.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [0.0], after: [255.5])
 		t.add_transform(typ: .fade, time: time.Time{spinner.time.end, spinner.time.end + difficulty.hit_fade_out}, before: [255.0], after: [0.0])
 		t.add_transform(typ: .scale_factor, time: time.Time{start_time, start_time}, before: [0.75])
