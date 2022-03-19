@@ -4,6 +4,7 @@ import library.gg
 import math
 
 import framework.graphic.sprite
+import framework.math.easing
 import framework.math.vector
 import framework.math.time
 import framework.logging
@@ -72,39 +73,40 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 						height: f32(sprite.size.y * x.resolution.playfield_scale)
 					},
 					color: sprite.color
+					rotate: f32(sprite.angle)
 			})
 		}
 	}
 
-	// Slider Vertex shit
-	mut start_index := 0
-	mut end_index := int(slider.pixel_length / 2.0)
+	// // Slider Vertex shit
+	// mut start_index := 0
+	// mut end_index := int(slider.pixel_length / 2.0)
 
-	if slider.last_time < slider.time.start - slider.diff.preempt / 2.0 {
-		progress := f64(slider.last_time - (slider.time.start-(slider.diff.preempt)))/(slider.diff.preempt/2)
-		end_index = int(f64(end_index) * progress)
-	} else if slider.last_time >= slider.time.start && slider.last_time <= slider.time.end {
-		times := int(((slider.last_time - slider.time.start) / slider.duration) + 1)
+	// if slider.last_time < slider.time.start - slider.diff.preempt / 2.0 {
+	// 	progress := f64(slider.last_time - (slider.time.start-(slider.diff.preempt)))/(slider.diff.preempt/2)
+	// 	end_index = int(f64(end_index) * progress)
+	// } else if slider.last_time >= slider.time.start && slider.last_time <= slider.time.end {
+	// 	times := int(((slider.last_time - slider.time.start) / slider.duration) + 1)
 
-		if times == slider.repeated {
-			ttime := slider.last_time - slider.time.start - f64(times-1) * slider.duration
+	// 	if times == slider.repeated {
+	// 		ttime := slider.last_time - slider.time.start - f64(times-1) * slider.duration
 
-			if (times % 2) == 1 {
-				progress := ttime / slider.duration
-				start_index = int(f64(end_index)*progress)
-			} else {
-				progress := 1.0 - ttime / slider.duration
-				end_index = int(f64(end_index) * progress)
-			}
-		}
-	} else if slider.last_time > slider.time.end {
-		start_index = end_index
-	}
+	// 		if (times % 2) == 1 {
+	// 			progress := ttime / slider.duration
+	// 			start_index = int(f64(end_index)*progress)
+	// 		} else {
+	// 			progress := 1.0 - ttime / slider.duration
+	// 			end_index = int(f64(end_index) * progress)
+	// 		}
+	// 	}
+	// } else if slider.last_time > slider.time.end {
+	// 	start_index = end_index
+	// }
 
 	// Draw slider body
 	// TODO: alpha
-	if slider.last_time >= slider.time.start - slider.diff.preempt && slider.last_time <= slider.time.end + difficulty.hit_fade_out {
-		slider.slider_renderer_attr.update_vertex_progress(start_index, end_index)
+	if slider.last_time >= slider.time.start - slider.diff.preempt && slider.last_time <= slider.time.end {
+		slider.slider_renderer_attr.update_vertex_progress(0, 0)
 		slider.slider_renderer_attr.draw_slider(slider.hitcircle.hitcircle.color.a)
 		return
 	}
@@ -336,6 +338,49 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 	slider.sprites << slider.slider_b_sprite
 }
 
+pub fn (mut slider Slider) generate_slider_repeat_circle() {
+	if slider.repeated < 2 { return }
+	
+	slider.get_slider_points() // Make slider points
+
+	size_ratio := f64((slider.diff.circle_radius * 1.05 * 2) / 128)
+
+	for i := 1; i <= slider.repeated; i++ {
+		if i == slider.repeated {
+			return // This is the last round, return
+		}
+
+		circle_time := slider.time.start + math.floor(slider.duration * f64(i))
+		mut appear_time := slider.time.start - math.floor(slider.diff.preempt)
+
+		if i > 1 {
+			appear_time = circle_time - math.floor(slider.duration * 2)
+		}
+
+		mut position := slider.position
+		mut look_at := slider.position
+
+		if (i % 2) == 1 {
+			position = slider.points[slider.points.len - 1]
+		} else {
+			look_at = slider.points[slider.points.len - 1]
+		}
+
+		mut sprite := &sprite.Sprite{}
+		sprite.textures << skin.get_texture("reversearrow")
+		sprite.add_transform(typ: .scale_factor, time: time.Time{appear_time, appear_time}, before: [size_ratio])
+		sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [look_at.angle_rv(position)])
+		sprite.add_transform(typ: .move, time: time.Time{appear_time, appear_time}, before: [position.x, position.y])
+		sprite.add_transform(typ: .fade, time: time.Time{appear_time, circle_time}, before: [0.0], after: [255.0])
+		sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [255.0], after: [0.0])
+		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [size_ratio], after: [size_ratio * 1.2])
+		sprite.reset_size_based_on_texture()
+		sprite.reset_attributes_based_on_transforms()
+
+		slider.sprites << sprite
+	}
+}
+
 pub fn (mut slider Slider) generate_slider_renderer() {
 	slider.slider_renderer_attr = graphic.make_slider_renderer_attr(
 		slider.diff.circle_radius, slider.get_slider_points(), slider.pixel_length
@@ -343,17 +388,19 @@ pub fn (mut slider Slider) generate_slider_renderer() {
 }
 
 pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
-	t0 := f64(2 / slider.pixel_length)
-	rt := f64(slider.pixel_length) / slider.curve.length
-	mut points := []vector.Vector2{len: int(slider.pixel_length / 2)}
-	mut t := 0.0
+	if slider.points.len == 0 {
+		t0 := f64(2 / slider.pixel_length)
+		rt := f64(slider.pixel_length) / slider.curve.length
+		slider.points = []vector.Vector2{len: int(slider.pixel_length / 2)}
+		mut t := 0.0
 
-	for i := 0; i < int(slider.pixel_length / 2); i++ {
-		points[i] = slider.curve.point_at(f64(t) * f64(rt))
-		t += t0
+		for i := 0; i < int(slider.pixel_length / 2); i++ {
+			slider.points[i] = slider.curve.point_at(f64(t) * f64(rt))
+			t += t0
+		}
 	}
 
-	return points
+	return slider.points
 }
 
 pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
@@ -362,6 +409,7 @@ pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
 
 	// Make points n shit
 	slider.generate_slider_points()
+	slider.generate_slider_repeat_circle()
 	slider.generate_slider_follow_circles()
 }
 
