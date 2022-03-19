@@ -1,0 +1,29 @@
+name: Project CI/CDeez nuts
+
+on:
+    push:
+        branches: [rewrite]
+
+jobs:
+    build:
+        strategy:
+            matrix: 
+                os: ["ubuntu-latest"]
+        runs-on: ${{ matrix.os }}
+
+        steps:
+            - name: Setup V
+            uses: vlang/setup-v@v1
+            with:
+                check-latest: true
+            
+            - name: Checkout ${{ github.event.repository.name }}
+            uses: actions/checkout@v2
+
+            - name: Build ${{ github.event.repository.name }}
+            run: ./ext/build.sh
+                
+
+        
+        
+
