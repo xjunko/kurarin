@@ -8,6 +8,14 @@ module graphic
 	I FUCKING HATE SLIDER RENDER RER
 */
 
+/*
+	BIG FUCKEN TODO
+
+	* figure out how the fuck to create a rendertarget (with depth test and blending)
+	* render slider on the rendertarget (with depth test and without blending) (pass 1)
+	* draw the rendertarget on the screen with (without depth test and with blending) (pass 2)
+*/
+
 import game.settings
 import library.stbi
 import math
