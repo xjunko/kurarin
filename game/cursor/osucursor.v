@@ -3,6 +3,7 @@
 module cursor
 
 import library.gg
+import gx
 import math
 import rand
 import sync
@@ -42,6 +43,7 @@ pub struct Cursor {
 		delta_pos_i int
 
 	mut:
+		trail_color   gx.Color = gx.Color{0, 25, 100, byte(255 * 0.5)}
 		sixty_delta   f64
 		last_time     f64
 		last_position vector.Vector2
@@ -54,19 +56,20 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	if settings.global.gameplay.cursor_style == 2 {
 		for i, trail in cursor.delta_pos {
 			size := cursor.size.scale(
-				0.75 * (0.5 + f64(i) / f64(cursor.delta_pos.len) * 0.4)
+				0.9 * (0.5 + f64(i) / f64(cursor.delta_pos.len) * 0.4)
 			)
+
 			pos := trail.sub(cursor.origin.multiply(x: size.x, y: size.y))
 			cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
-				img: &cursor.textures[1],
-				img_id: cursor.textures[1].id,
+				img: &cursor.textures[3],
+				img_id: cursor.textures[3].id,
 				img_rect: gg.Rect{
 					x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
 					y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
 					width: f32(size.x * x.resolution.playfield_scale),
 					height: f32(size.y * x.resolution.playfield_scale)
 				},
-				color: cursor.color,
+				color: cursor.trail_color,
 				additive: true
 			})
 		}
@@ -94,29 +97,35 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 
 	// Cursor
 	pos := cursor.position.sub(cursor.origin.multiply(x: cursor.size.x, y: cursor.size.y))
-	cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
-		img: &cursor.textures[0],
-		img_id: cursor.textures[0].id,
-		img_rect: gg.Rect{
-			x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
-			y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-			width: f32(cursor.size.x * x.resolution.playfield_scale),
-			height: f32(cursor.size.y * x.resolution.playfield_scale)
-		},
-		color: cursor.color,
-	})
-
-	// Cursor top
-	cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
-		img: &cursor.textures[2],
-		img_id: cursor.textures[2].id,
-		img_rect: gg.Rect{
-			x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
-			y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-			width: f32(cursor.size.x * x.resolution.playfield_scale),
-			height: f32(cursor.size.y * x.resolution.playfield_scale)
-		}
-	})
+	
+	if settings.global.gameplay.cursor_style == 2 {
+		// Fancy cursor
+		cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
+			img: &cursor.textures[2],
+			img_id: cursor.textures[2].id,
+			img_rect: gg.Rect{
+				x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
+				y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
+				width: f32(cursor.size.x * x.resolution.playfield_scale),
+				height: f32(cursor.size.y * x.resolution.playfield_scale)
+			},
+			additive: true
+		})
+	} else {
+		// Normal boring cursor
+		cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
+			img: &cursor.textures[0],
+			img_id: cursor.textures[0].id,
+			img_rect: gg.Rect{
+				x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
+				y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
+				width: f32(cursor.size.x * x.resolution.playfield_scale),
+				height: f32(cursor.size.y * x.resolution.playfield_scale)
+			},
+			color: cursor.color,
+		})
+	}
+	
 
 	cursor.mutex.unlock()
 }
@@ -247,6 +256,7 @@ pub fn make_cursor(mut ctx &gg.Context) &Cursor {
 	cursor.textures << skin.get_texture("cursor")
 	cursor.textures << skin.get_texture("cursortrail")
 	cursor.textures << skin.get_texture("cursor-top")
+	cursor.textures << skin.get_texture("cursortrailfx")
 	cursor.add_transform(typ: .scale_factor, time: time2.Time{0, 0}, before: [settings.global.gameplay.cursor_size])
 
 	//
