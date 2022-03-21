@@ -3,11 +3,15 @@ module audio
 #flag -I @VMODROOT/audio/bass
 #include "bass.h"
 #include "bass_fx.h"
-#flag -Wl,-L/usr/lib -lbass -lbass_fx
+#include "bassmix.h"
+#flag -Wl,-L/usr/lib -lbass -lbass_fx -lbassmix
 
 // Important bits
 fn C.BASS_Init(int, int, int, int, int) int
 fn C.BASS_SetConfig(int, int)
+fn C.BASS_GetDevice() int
+fn C.BASS_ChannelSetDevice(C.HSTREAM, int) bool
+fn C.BASS_ChannelSeconds2Bytes(C.HSTREAM, f64) u64
 
 // Track
 fn C.BASS_StreamCreateFile(int, &char, int, int, int) C.HSTREAM
@@ -26,3 +30,8 @@ fn C.BASS_ChannelGetData(C.HSTREAM, &voidptr, int)
 
 // FX
 fn C.BASS_FX_TempoCreate(C.HSTREAM, int) C.HSTREAM
+
+
+// MIX
+fn C.BASS_Mixer_StreamCreate(int, int, int) C.HSTREAM
+fn C.BASS_Mixer_StreamAddChannel(C.HSTREAM, C.HSTREAM, int) bool
