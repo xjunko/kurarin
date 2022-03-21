@@ -11,7 +11,6 @@ import sokol.sgl
 import library.gg
 import time as timelib
 
-import game.x
 import game.skin
 import game.cursor
 import game.beatmap

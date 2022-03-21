@@ -17,7 +17,6 @@ module graphic
 */
 
 import game.settings
-import library.stbi
 import math
 
 import sokol
