@@ -52,7 +52,7 @@ pub fn (mut window Window) init_video_pipe_process() {
 		"-movflags", "+write_colr",
 		"-pix_fmt", "yuv420p"
 
-		"test.mp4" // output
+		"temp.mp4" // output
 	]
 
 	window.video_proc.set_args(ffmpeg_arg)
@@ -105,8 +105,8 @@ pub fn (mut window Window) close_pipe_process() {
 	timelib.sleep(5 * timelib.second) // Wait for a few second just to make sure
 
 	// Merge audio (for now we'll do it over here instead of doing it on pipe)
-	audio_path := "temp.mp3" //window.beatmap.get_audio_path()
-	result := os.execute('ffmpeg -i test.mp4 -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -to ${time.get_time().time / 1000.0} -async 1 "audiotest.mp4" -y')
+	audio_path := "temp.mp3" 
+	result := os.execute('ffmpeg -i temp.mp4 -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -async 1 "output.mp4" -y')
 	println(result)
 }
 
