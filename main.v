@@ -32,10 +32,15 @@ pub struct Window {
 		ctx 		&gg.Context = voidptr(0)
 		beatmap 	&beatmap.Beatmap = voidptr(0)
 		cursor  	&cursor.Cursor = voidptr(0)
-		proc    	&os.Process = voidptr(0)
-		record 		bool
-		record_data &byte = voidptr(0)
 		argument    &GameArgument = voidptr(0)
+
+
+		// Recording stuff
+		record 		bool
+		video_proc  &os.Process = voidptr(0)
+		record_data &byte = voidptr(0)
+		audio_proc  &os.Process = voidptr(0)
+		audio_data  []byte
 
 		// HACK: move this to somewhere else
 		beatmap_song &audio.Track = voidptr(0)
@@ -58,9 +63,13 @@ pub fn window_init(mut window &Window) {
 	window.cursor.bind_beatmap(mut window.beatmap)
 	cursor.make_replay(mut window.beatmap, mut window.cursor)
 
+	// Init beatmap bg song
+	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
+
 	// If recording
 	if window.record {
-		window.init_pipe_process()
+		window.init_video_pipe_process()
+		window.init_audio_pipe_process()
 
 		// Time shit
 		mut g_time := time.get_time()
@@ -78,13 +87,10 @@ pub fn window_init(mut window &Window) {
 			mut played := false
 			time.reset()
 
-			window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
-
 			mut slider_renderer := graphic.global_renderer
 			
 			for {
 				if g_time.time >= settings.global.gameplay.lead_in_time && !played {
-					window.beatmap_song.set_pitch(1.0)
 					window.beatmap_song.set_speed(settings.global.window.speed)
 					window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
 					window.beatmap_song.play()
@@ -135,6 +141,13 @@ pub fn window_draw(mut window &Window) {
 	if window.record {
 		// Update stuff
 		mut g_time := time.get_time()
+
+		if g_time.time >= settings.global.gameplay.lead_in_time && !window.beatmap_song.playing {
+			window.beatmap_song.set_speed(settings.global.window.speed)
+			window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
+			window.beatmap_song.play()
+		}
+
 		window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
 		window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time)
 
@@ -142,6 +155,7 @@ pub fn window_draw(mut window &Window) {
 		// This way the update rate can be stupidly high
 		// so it doesnt skips transform on low fps
 		window.pipe_window() 
+		window.pipe_audio()
 
 		g_time.tick()
 	}

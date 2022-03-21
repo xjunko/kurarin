@@ -6,6 +6,7 @@ import os
 import sokol.sapp
 import time as timelib
 
+import framework.audio
 import framework.logging
 import framework.math.time
 
@@ -16,8 +17,8 @@ const (
 )
 
 // window_init and window_draw but for recording
-pub fn (mut window Window) init_pipe_process() {
-	window.proc = os.new_process(os.find_abs_path_of_executable('ffmpeg') or { panic(err) })
+pub fn (mut window Window) init_video_pipe_process() {
+	window.video_proc = os.new_process(os.find_abs_path_of_executable('ffmpeg') or { panic(err) })
 
 	// ffmpeg_arg := [
 	// 	"-r", "${fps}", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", "1280x720", "-i", "-", "-vf", "vflip", // Video
@@ -54,27 +55,58 @@ pub fn (mut window Window) init_pipe_process() {
 		"test.mp4" // output
 	]
 
-	window.proc.set_args(ffmpeg_arg)
-	window.proc.set_redirect_stdio()
-	window.proc.run()
+	window.video_proc.set_args(ffmpeg_arg)
+	window.video_proc.set_redirect_stdio()
+	window.video_proc.run()
 
 	// Init record buffer
 	img_size := 1280 * 720 * 4
 	window.record_data = unsafe { &byte(malloc(img_size)) }
 
-	logging.info("Pipe Process started!")
+	logging.info("VideoPipe Process started!")
+}
+
+pub fn (mut window Window) init_audio_pipe_process() {
+	audio_buffer_size := audio.get_required_buffer_size_for_mixer(1.0 / settings.global.window.fps)
+	window.audio_data = []byte{len: audio_buffer_size}
+
+	// Create the process
+	window.audio_proc = os.new_process(
+		os.find_abs_path_of_executable("ffmpeg") or { panic(err) }
+	)
+
+	ffmpeg_arg := [
+		"-y",
+		"-f", "f32le",
+		"-acodec", "pcm_f32le",
+		"-ar", "48000",
+		"-ac", "2",
+		"-i", "-",
+
+		"-nostats",
+		"-vn",
+		"temp.mp3"
+	]
+
+	window.audio_proc.set_args(ffmpeg_arg)
+	window.audio_proc.set_redirect_stdio()
+	window.audio_proc.run()
+
+	logging.info("AudioPipe Process started!")
 }
 
 pub fn (mut window Window) close_pipe_process() {
-	window.proc.close()
+	window.video_proc.close()
+	window.audio_proc.close()
 
 	// Wait till the process done
-	for window.proc.status == .running {}
+	for window.video_proc.status == .running {}
+	for window.audio_proc.status == .running {}
 	timelib.sleep(5 * timelib.second) // Wait for a few second just to make sure
 
 	// Merge audio (for now we'll do it over here instead of doing it on pipe)
-	audio_path := window.beatmap.get_audio_path()
-	result := os.execute('ffmpeg -i test.mp4 -itsoffset ${settings.global.gameplay.lead_in_time / 1000.0} -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -filter:a "atempo=${settings.global.window.speed}" -to ${time.get_time().time / 1000.0} -async 1 "audiotest.mp4" -y')
+	audio_path := "temp.mp3" //window.beatmap.get_audio_path()
+	result := os.execute('ffmpeg -i test.mp4 -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -to ${time.get_time().time / 1000.0} -async 1 "audiotest.mp4" -y')
 	println(result)
 }
 
@@ -85,7 +117,17 @@ pub fn (mut window Window) pipe_window() {
 	// hacky but works
 	unsafe {
 		temp := window.record_data.vbytes(1280 * 720 * 4).bytestr()
-		window.proc.stdin_write(temp)	
+		window.video_proc.stdin_write(temp)	
+		temp.free()
+	}
+}
+
+pub fn (mut window Window) pipe_audio() {
+	audio.get_mixer_data(mut window.audio_data)
+
+	unsafe {
+		temp := window.audio_data.bytestr()
+		window.audio_proc.stdin_write(temp)
 		temp.free()
 	}
 }

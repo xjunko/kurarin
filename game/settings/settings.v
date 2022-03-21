@@ -45,9 +45,9 @@ fn init() {
 	settings.gameplay.lead_in_time = math.max(1.0, settings.gameplay.lead_in_time)
 	settings.gameplay.lead_in_time *= 1000.0
 
-	if settings.window.record {
-		settings.gameplay.disable_hitsound = true // TODO: remove this once we got BASS pipe to ffmpeg
-	}
+	// if settings.window.record {
+	// 	settings.gameplay.disable_hitsound = true // TODO: remove this once we got BASS pipe to ffmpeg
+	// }
 
 	// lmaooo
 	mut g_settings := global
