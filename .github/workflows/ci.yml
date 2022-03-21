@@ -23,12 +23,14 @@ jobs:
                 sudo apt-get install --quiet -y libgc-dev
                 sudo apt-get install --quiet -y libfreetype6-dev  libxi-dev libxcursor-dev libgl-dev
                 
-            - name: Install BASS
+            - name: Install BASS | (TODO; get sources from BASS itself instead of danser)
               run: |
                 sudo wget https://github.com/Wieku/danser-go/raw/master/libbass.so -O /usr/lib/libbass.so
                 sudo wget https://github.com/Wieku/danser-go/raw/master/libbass_fx.so -O /usr/lib/libbass_fx.so
+                sudo wget https://github.com/Wieku/danser-go/raw/master/libbassmix.so -O /usr/lib/libbassmix.so
                 sudo wget https://raw.githubusercontent.com/FireRedz/kurarin/rewrite/framework/audio/bass.h -O /usr/include/bass.h
                 sudo wget https://raw.githubusercontent.com/FireRedz/kurarin/rewrite/framework/audio/bass_fx.h -O /usr/include/bass_fx.h
+                sudo wget https://raw.githubusercontent.com/FireRedz/kurarin/rewrite/framework/audio/bassmix.h -O /usr/include/bassmix.h
             
             - name: Checkout ${{ github.event.repository.name }}
               uses: actions/checkout@v2
