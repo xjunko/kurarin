@@ -5,7 +5,9 @@ This is my personal side project so updates is very random.
 
 (Slider is being reworked, so theres no alpha)
 
-https://user-images.githubusercontent.com/44401509/157165056-96fd4105-b993-4b67-9b5b-4570e041ba61.mp4
+https://user-images.githubusercontent.com/44401509/159151243-650d9e88-eef8-4109-b25e-a17eb2f3530e.mp4
+
+
 
 (Old)
 
