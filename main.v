@@ -157,6 +157,14 @@ pub fn window_draw(mut window &Window) {
 		window.pipe_window() 
 		window.pipe_audio()
 
+		// HACK: move this somewhre elese
+		// HACKHACK: copypasta galore
+		if settings.global.miscellaneous.scale_to_beat {
+			mut slider_renderer := graphic.global_renderer
+			window.beatmap_song.update(0.0)
+			slider_renderer.uniform_values[0] = (1.0 + (1.0 * window.beatmap_song.boost)) * 0.1 + slider_renderer.uniform_values[0] - slider_renderer.uniform_values[0] * 0.1
+		}
+
 		g_time.tick()
 	}
 }
