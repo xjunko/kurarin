@@ -35,3 +35,4 @@ fn C.BASS_FX_TempoCreate(C.HSTREAM, int) C.HSTREAM
 // MIX
 fn C.BASS_Mixer_StreamCreate(int, int, int) C.HSTREAM
 fn C.BASS_Mixer_StreamAddChannel(C.HSTREAM, C.HSTREAM, int) bool
+fn C.BASS_Mixer_ChannelGetData(C.HSTREAM, &voidptr, int)
