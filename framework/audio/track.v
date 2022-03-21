@@ -60,13 +60,13 @@ pub fn (mut track Track) set_pitch(pitch f64) {
 
 pub fn (mut track Track) update(time f64) {
 	// Get FFT data
-	// C.BASS_ChannelGetData(track.channel, &track.fft[0], C.BASS_DATA_FFT1024)
+	C.BASS_Mixer_ChannelGetData(track.channel, &track.fft[0], C.BASS_DATA_FFT1024)
 
-	// // calculate peak
-	// mut boost := f32(0.0)
-	// for i := 0; i < 10; i++ {
-	// 	boost += (track.fft[i] * track.fft[i]) * (10.0 - f32(i)) / 10.0
-	// }
+	// calculate peak
+	mut boost := f32(0.0)
+	for i := 0; i < 10; i++ {
+		boost += (track.fft[i] * track.fft[i]) * (10.0 - f32(i)) / 10.0
+	}
 
-	// track.boost = boost
+	track.boost = boost
 }
