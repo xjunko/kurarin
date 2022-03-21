@@ -2,6 +2,7 @@ module movers
 
 import math
 import framework.math.vector
+import framework.math.easing
 
 import game.beatmap.object
 
@@ -28,4 +29,8 @@ pub fn (mut halfcircle HalfCircleMover) get_point_at(time f64) vector.Vector2 {
 		halfcircle.middle.x + math.cos(ang) * halfcircle.radius,
 		halfcircle.middle.y + math.sin(ang) * halfcircle.radius,
 	}
+}
+
+pub fn (halfcircle &HalfCircleMover) get_multiplier(time f64) f64 {
+	return easing.quad_out(time - halfcircle.time.start, 0, 1.0, halfcircle.time.duration())
 }
