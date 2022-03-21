@@ -22,26 +22,13 @@ You can get the latest development build from the CI/CD [here](https://github.co
 
 * V
 * BASS
-* OpenGL >= 3.3 (iirc)
+* OpenGL >= 3.0
 
 #### On Linux (Arch)
 
 You might need to install a few library beforehand, [`libbass`](https://aur.archlinux.org/packages/libbass) and [`libbass_fx`](https://aur.archlinux.org/packages/libbass_fx). </br>
 
 Then after that use the [`ext/build.sh`](https://github.com/FireRedz/kurarin/blob/rewrite/ext/build.sh) script to build, no makefile fuckery or something like that.
-
-#### On Windows 
-
-LOL, you could try [`ext/build.bat`](https://github.com/FireRedz/kurarin/blob/rewrite/ext/build.bat) but I bet my left balls it wont work. </br>
-Some of the code just wont work in windows, for [example](https://cdn.discordapp.com/attachments/703552229680087042/937958943634890762/windowz_moment.mp4). <br/>
-Besides, I use arch (btw) so I dont really have a way to test it on windows without dualbooting or having another machine to test it.
-
-#### On Mac
-
-¯\\\_(ツ)\_\/¯
-
-
-
 ## Credits
 
 Some of the code is _derived_ or literally copy-pasted from these projects, so big credits to them.
