@@ -10,7 +10,6 @@ import framework.graphic.sprite
 
 
 import game.settings
-import game.beatmap.object.graphic
 import game.beatmap.difficulty
 import game.beatmap.timing
 import game.audio
