@@ -62,15 +62,16 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 	// Draw the easy stuff first
 	for mut sprite in slider.sprites {
 		if sprite.is_drawable_at(slider.last_time) {
-			pos := sprite.position.sub(sprite.origin.multiply(x: sprite.size.x, y: sprite.size.y))
+			size := sprite.size.scale(slider.music_boost)
+			pos := sprite.position.sub(sprite.origin.multiply(size))
 			arg.ctx.draw_image_with_config(gg.DrawImageConfig{
 					img: sprite.get_texture(),
 					img_id: sprite.get_texture().id,
 					img_rect: gg.Rect{
 						x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
 						y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-						width: f32(sprite.size.x * x.resolution.playfield_scale),
-						height: f32(sprite.size.y * x.resolution.playfield_scale)
+						width: f32(size.x * x.resolution.playfield_scale),
+						height: f32(size.y * x.resolution.playfield_scale)
 					},
 					color: sprite.color
 					rotate: f32(sprite.angle)
@@ -188,6 +189,11 @@ pub fn (mut slider Slider) update(time f64) bool {
 pub fn (mut slider Slider) post_update(time f64) {
 	logging.debug("Freeing slider.")
 	slider.slider_renderer_attr.free()
+}
+
+pub fn (mut slider Slider) set_boost_level(boost f32) {
+	slider.HitObject.set_boost_level(boost)
+	slider.hitcircle.set_boost_level(boost)
 }
 
 pub fn (mut slider Slider) set_timing(t timing.Timings) {
