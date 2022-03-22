@@ -60,8 +60,7 @@ pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
 
 	for mut sprite in circle.sprites {
 		if sprite.is_drawable_at(circle.last_time) {
-			// HACK: get bg music boost data from somewhere else
-			size := sprite.size.scale(graphic.global_renderer.uniform_values[0])
+			size := sprite.size.scale(circle.music_boost)
 			pos := sprite.position.sub(sprite.origin.multiply(size))
 			arg.ctx.draw_image_with_config(gg.DrawImageConfig{
 					img: sprite.get_texture(),
