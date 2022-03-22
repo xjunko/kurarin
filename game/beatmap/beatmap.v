@@ -143,7 +143,7 @@ pub fn (mut beatmap Beatmap) reset() {
 	beatmap.ensure_hitsound_loaded()
 }
 
-pub fn (mut beatmap Beatmap) update(time f64) {
+pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 	beatmap.update_lock.@lock()
 
 	for i := beatmap.objects_i; i < beatmap.objects.len; i++ {
@@ -168,7 +168,11 @@ pub fn (mut beatmap Beatmap) update(time f64) {
 		}
 
 		beatmap.queue[i].update(time)
+		beatmap.queue[i].set_boost_level(boost)
 	}
+
+	// Slider renderer scale
+	graphic.update_boost_level(boost)
 
 	// Storyboard
 	beatmap.storyboard.update(time)
