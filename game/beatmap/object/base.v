@@ -96,7 +96,7 @@ pub struct HitObject {
 		done        bool
 		data        []string
 		hitsound    HitSoundInfo
-		music_boost f32
+		music_boost f32 = f32(1.0)
 }
 
 // pub fn (mut hitobject HitObject) draw(arg sprite.CommonSpriteArgument) // :trolldecai: looks like i need to uncomment one of these (interface methods) for the code to compile bruh moment
