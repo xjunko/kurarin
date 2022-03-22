@@ -46,6 +46,14 @@ pub struct Window {
 		beatmap_song_boost f32 = f32(1.0)
 }
 
+pub fn (mut window Window) update_boost() {
+	if settings.global.miscellaneous.scale_to_beat {
+		target := math.clamp(window.beatmap_song.boost * (1.5 - 1.0) + 1.0, 1.0, 1.5)
+		rate := 0.15 * (time.global.delta / 8.33334) // 120fps
+		window.beatmap_song_boost = f32(target * rate + window.beatmap_song_boost - window.beatmap_song_boost * rate)
+	}
+}
+
 pub fn window_init(mut window &Window) {
 	mut beatmap := beatmap.parse_beatmap(window.argument.beatmap_path)
 
@@ -85,8 +93,6 @@ pub fn window_init(mut window &Window) {
 			g_time.set_speed(settings.global.window.speed)
 			mut played := false
 			time.reset()
-
-			// mut slider_renderer := graphic.global_renderer
 			
 			for {
 				if g_time.time >= settings.global.gameplay.lead_in_time && !played {
@@ -99,20 +105,7 @@ pub fn window_init(mut window &Window) {
 				window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
 				window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
 				window.beatmap_song.update(g_time.time) // doesnt care about time
-
-				// HACK: move this somewhre elese
-				// Math below is for smoothing the thing
-				// current = target * smoothing + current - current * smoothing
-				if settings.global.miscellaneous.scale_to_beat {
-					target := math.clamp(window.beatmap_song.boost * (1.5 - 1.0) + 1.0, 1.0, 1.5)
-					
-					if window.beatmap_song_boost < target {
-						window.beatmap_song_boost += f32((target - window.beatmap_song_boost) * 0.25 * g_time.delta / 16.6667)
-					} else if window.beatmap_song_boost > target {
-						window.beatmap_song_boost -= f32((window.beatmap_song_boost - target) * 0.15 * g_time.delta / 16.6667)
-					}
-
-				}
+				window.update_boost()
 				
 				timelib.sleep(time.update_rate_ms)
 			}
@@ -156,25 +149,14 @@ pub fn window_draw(mut window &Window) {
 
 		window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
 		window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
-		window.beatmap_song.update(g_time.time)
+		window.beatmap_song.update(g_time.time) // doesnt care about time
+		window.update_boost()
 
 		// TODO: separate video and update rate
 		// This way the update rate can be stupidly high
 		// so it doesnt skips transform on low fps
 		window.pipe_window() 
 		window.pipe_audio()
-
-		// HACK: move this somewhre elese
-		// HACKHACK: copypasta galore
-		if settings.global.miscellaneous.scale_to_beat {
-			target := math.clamp(window.beatmap_song.boost * (1.5 - 1.0) + 1.0, 1.0, 1.5)
-			
-			if window.beatmap_song_boost < target {
-				window.beatmap_song_boost += f32((target - window.beatmap_song_boost) * 0.25 * g_time.delta / 16.6667)
-			} else if window.beatmap_song_boost > target {
-				window.beatmap_song_boost -= f32((window.beatmap_song_boost - target) * 0.15 * g_time.delta / 16.6667)
-			}
-		}
 
 		g_time.tick()
 	}
