@@ -66,6 +66,12 @@ pub struct SliderRenderer {
 		uniform_values []f32
 }
 
+// Boost scaling thingy
+pub fn update_boost_level(boost f32) {
+	mut g_render := global_renderer
+	g_render.uniform_values[0] = boost
+}
+
 
 // Maker
 pub fn make_circle_vertices(position vector.Vector2, cs f64) []vector.Vector2 {
@@ -185,6 +191,10 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 	// 	.5, -.5, .0,				.0, 1.0, .0,
 	// 	.0, .5, .0,					.0, .0, 1.0,
 	// ]
+
+	if attr.vertices.len == 0 {
+		return // Something went wrong or the slider is just straitght up retadred
+	}
 
 	// Bind the shit
 	attr.bindings.vertex_buffers[0] = C.sg_make_buffer(&C.sg_buffer_desc{
