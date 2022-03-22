@@ -56,6 +56,8 @@ pub interface IHitObject {
 		is_new_combo() bool
 		set_new_combo(bool)
 		set_combo_number(int)
+
+		set_boost_level(f32)
 }
 
 pub struct HitSoundInfo {
@@ -94,6 +96,7 @@ pub struct HitObject {
 		done        bool
 		data        []string
 		hitsound    HitSoundInfo
+		music_boost f32
 }
 
 // pub fn (mut hitobject HitObject) draw(arg sprite.CommonSpriteArgument) // :trolldecai: looks like i need to uncomment one of these (interface methods) for the code to compile bruh moment
@@ -111,6 +114,7 @@ pub fn (mut hitobject HitObject) set_id(id int) { hitobject.id = id }
 pub fn (mut hitobject HitObject) set_combo_number(n int) { hitobject.combo_number = n }
 pub fn (hitobject &HitObject) is_new_combo() bool { return hitobject.new_combo }
 pub fn (mut hitobject HitObject) set_new_combo(b bool) { hitobject.new_combo = b }
+pub fn (mut hitobject HitObject) set_boost_level(boost f32) { hitobject.music_boost = boost}
 
 
 
