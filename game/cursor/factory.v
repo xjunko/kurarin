@@ -17,12 +17,21 @@ const (
 )
 
 // [deprecated: "TODO: remove this after we got realtime auto."]
-pub fn make_replay(mut beatmap &beatmap.Beatmap, mut cursor &Cursor) {
+pub fn make_replay(mut beatmap &beatmap.Beatmap, mut cursor &Cursor, player_number int, max_player int) {
 	mut last_object := unsafe { &beatmap.objects[0] }
 	mut last_position := beatmap.objects[0].get_start_position()
 	mut direction := 1
+	mut counter := 0
 
 	for mut object in beatmap.objects {
+		if object.is_new_combo() {
+			counter++
+		}
+
+		if ((counter - 1) % max_player) != (player_number - 1) {
+			continue
+		}
+
 		if mut object is gameobject.Circle || mut object is gameobject.Slider {
 			// Color
 			cursor.add_transform(
