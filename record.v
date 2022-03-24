@@ -125,6 +125,7 @@ pub fn (mut window Window) pipe_window() {
 pub fn (mut window Window) pipe_audio() {
 	audio.get_mixer_data(mut window.audio_data)
 
+	// hacky
 	unsafe {
 		temp := window.audio_data.bytestr()
 		window.audio_proc.stdin_write(temp)
