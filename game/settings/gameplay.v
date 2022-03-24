@@ -19,6 +19,7 @@ pub struct Gameplay {
 		cursor_style             f64
 
 		auto_update_rate         f64
+		auto_tag_cursors         int
 }
 
 // Factory 
@@ -40,7 +41,8 @@ pub fn make_gameplay_settings() Gameplay {
 		cursor_trail_length: 1000, // Maximum length
 		cursor_style: 2, // 0: Normal, 1: Particle (terrible), 2: Long (Like style 0 but the trail is smoother)
 
-		auto_update_rate: 16.6667
+		auto_update_rate: 16.6667,
+		auto_tag_cursors: 1
 	}
 
 	return gameplay_

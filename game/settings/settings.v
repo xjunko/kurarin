@@ -38,6 +38,9 @@ fn init() {
 		settings = json.decode(Settings, crap) or { panic(err) }
 	}
 
+	// Fix some weird stuff just incase
+	settings.gameplay.auto_tag_cursors = math.max(1, settings.gameplay.auto_tag_cursors)
+
 	// Also save again, this way new shit can just get append into the json
 	settings.save()
 
