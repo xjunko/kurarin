@@ -39,11 +39,11 @@ pub struct Cursor {
 		beatmap_i   int
 		mover       &movers.HalfCircleMover = &movers.HalfCircleMover{}
 		trails      []&sprite.Sprite
+		trail_color gx.Color = gx.Color{0, 25, 100, byte(255 * 0.5)}
 		delta_pos   []vector.Vector2
 		delta_pos_i int
 
 	mut:
-		trail_color   gx.Color = gx.Color{0, 25, 100, byte(255 * 0.5)}
 		sixty_delta   f64
 		last_time     f64
 		last_position vector.Vector2
