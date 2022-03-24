@@ -37,7 +37,7 @@ pub struct Cursor {
 		ctx 	    &gg.Context = voidptr(0)
 		beatmap     &beatmap.Beatmap = voidptr(0)
 		beatmap_i   int
-		mover       &movers.LinearMover = &movers.LinearMover{}
+		mover       &movers.HalfCircleMover = &movers.HalfCircleMover{}
 		trails      []&sprite.Sprite
 		delta_pos   []vector.Vector2
 		delta_pos_i int
@@ -133,41 +133,6 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 pub fn (mut cursor Cursor) update(time f64) {
 	cursor.mutex.@lock()
 
-	// Realtime "AUTO" cursor movement
-	// Looks abit janky compared to the pregenerated one.
-	// if cursor.beatmap_i < cursor.beatmap.objects.len {
-	// 	if cursor.beatmap.objects[cursor.beatmap_i].time.start <= time {
-	// 		if cursor.beatmap.objects[cursor.beatmap_i].done {
-	// 			cursor.beatmap_i++
-	// 			if cursor.beatmap_i + 1 < cursor.beatmap.objects.len {
-	// 				cursor.mover.init(
-	// 					mut &cursor.beatmap.objects[cursor.beatmap_i - 1], 
-	// 					mut &cursor.beatmap.objects[cursor.beatmap_i],
-	// 					1
-	// 				)
-	// 			}
-	// 		}
-	// 	}
-
-	// 	// Apply the position
-	// 	if (time - cursor.mover.time.start) >= 0.0 {
-	// 		// HitCircle mover
-	// 		if time <= cursor.mover.time.end {
-	// 			pos := cursor.mover.get_point_at(time)
-	// 			cursor.position.x = pos.x
-	// 			cursor.position.y = pos.y
-	// 		}
-
-	// 		// Bit of an hack cuz we dont want to calculate slider path on update (we can but i dont want to so...)
-	// 		// Slider mover
-	// 		mut cur_hitobject := &cursor.beatmap.objects[cursor.beatmap_i]
-	// 		if (time >= cursor.mover.time.end && time <= cur_hitobject.time.end) && mut cur_hitobject is gameobject.Slider {
-	// 			cursor.position.x = cur_hitobject.slider_b_sprite.position.x	
-	// 			cursor.position.y = cur_hitobject.slider_b_sprite.position.y
-	// 		}
-	// 	}
-	// }
-
 	// Delta
 	delta := time - cursor.last_time
 
@@ -242,6 +207,43 @@ pub fn (mut cursor Cursor) update(time f64) {
 	cursor.last_position.y = cursor.position.y
 
 	cursor.mutex.unlock()
+}
+
+pub fn (mut cursor Cursor) update_auto(time f64) {
+	// // Realtime "AUTO" cursor movement
+	// // Looks abit janky compared to the pregenerated one.
+	// if cursor.beatmap_i < cursor.beatmap.objects.len {
+	// 	if cursor.beatmap.objects[cursor.beatmap_i].time.start <= time {
+	// 		if cursor.beatmap.objects[cursor.beatmap_i].done {
+	// 			cursor.beatmap_i++
+	// 			if cursor.beatmap_i + 1 < cursor.beatmap.objects.len {
+	// 				cursor.mover.init(
+	// 					mut &cursor.beatmap.objects[cursor.beatmap_i - 1], 
+	// 					mut &cursor.beatmap.objects[cursor.beatmap_i],
+	// 					1
+	// 				)
+	// 			}
+	// 		}
+	// 	}
+
+	// 	// Apply the position
+	// 	if (time - cursor.mover.time.start) >= 0.0 {
+	// 		// HitCircle mover
+	// 		if time <= cursor.mover.time.end {
+	// 			pos := cursor.mover.get_point_at(time)
+	// 			cursor.position.x = pos.x
+	// 			cursor.position.y = pos.y
+	// 		}
+
+	// 		// Bit of an hack cuz we dont want to calculate slider path on update (we can but i dont want to so...)
+	// 		// Slider mover
+	// 		mut cur_hitobject := &cursor.beatmap.objects[cursor.beatmap_i]
+	// 		if (time >= cursor.mover.time.end && time <= cur_hitobject.time.end) && mut cur_hitobject is gameobject.Slider {
+	// 			cursor.position.x = cur_hitobject.slider_b_sprite.position.x	
+	// 			cursor.position.y = cur_hitobject.slider_b_sprite.position.y
+	// 		}
+	// 	}
+	// }
 }
 
 // AUTO stuff
