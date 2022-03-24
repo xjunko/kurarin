@@ -534,12 +534,12 @@ pub fn (gg &Context) begin() {
 	}
 	sgl.defaults()
 	sgl.matrix_mode_projection()
-	sgl.ortho(0.0, f32(sapp.width()), f32(sapp.height()), 0.0, -1.0, 1.0)
+	sgl.ortho(0.0, 1280, 720, 0.0, -1.0, 1.0)
 }
 
 // Finishes drawing for the context
 pub fn (gg &Context) end() {
-	gfx.begin_default_pass(gg.clear_pass, sapp.width(), sapp.height())
+	gfx.begin_default_pass(gg.clear_pass, 1280, 720)
 	sgl.draw()
 	gfx.end_pass()
 	gfx.commit()
