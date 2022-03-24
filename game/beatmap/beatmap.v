@@ -102,9 +102,6 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 
 		beatmap.storyboard.sprites << beatmap_bg
 		logging.info("No background, making one!")
-	} else {
-		// Make the first sprite the background
-		beatmap.storyboard.sprites[0].always_visible = true
 	}
 }
 
