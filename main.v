@@ -48,9 +48,11 @@ pub struct Window {
 
 pub fn (mut window Window) update_boost() {
 	if settings.global.miscellaneous.scale_to_beat {
-		target := math.clamp(window.beatmap_song.boost * (1.5 - 1.0) + 1.0, 1.0, 1.5)
-		rate := 0.15 * (time.global.delta / 8.33334) // 120fps
-		window.beatmap_song_boost = f32(target * rate + window.beatmap_song_boost - window.beatmap_song_boost * rate)
+		target := math.clamp(1.0 + (0.5 * window.beatmap_song.boost), 1.0, 2.0) // 2.0 is the max
+		window.beatmap_song_boost = f32(target * 0.1 + window.beatmap_song_boost - window.beatmap_song_boost * 0.1)
+
+		// rate := 0.15 * (time.global.delta / 8.33334) // 120fps
+		// window.beatmap_song_boost = f32(target * rate + window.beatmap_song_boost - window.beatmap_song_boost * rate)
 	}
 }
 
@@ -136,29 +138,30 @@ pub fn window_draw(mut window &Window) {
 	gfx.end_pass()
 	gfx.commit()
 
-	// Pipe the window stuff 
+	// We're recording.
 	if window.record {
-		// Update stuff
 		mut g_time := time.get_time()
 
+		// Start the music after the intro
 		if g_time.time >= settings.global.gameplay.lead_in_time && !window.beatmap_song.playing {
 			window.beatmap_song.set_speed(settings.global.window.speed)
 			window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
 			window.beatmap_song.play()
 		}
 
+		// Update cursor and beatmap
 		window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
 		window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
-		window.beatmap_song.update(g_time.time) // doesnt care about time
+		
+		// Update audio boost
+		window.beatmap_song.update(0.0) 
 		window.update_boost()
 
-		// TODO: separate video and update rate
-		// This way the update rate can be stupidly high
-		// so it doesnt skips transform on low fps
+		// Pipe 
 		window.pipe_window() 
 		window.pipe_audio()
 
-		g_time.tick()
+		g_time.tick() // Tick 16.6667ms then wait for gg to call this function again.
 	}
 }
 
