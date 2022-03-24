@@ -30,7 +30,7 @@ pub struct Window {
 	pub mut:
 		ctx 		&gg.Context = voidptr(0)
 		beatmap 	&beatmap.Beatmap = voidptr(0)
-		cursor  	&cursor.Cursor = voidptr(0)
+		cursors     []&cursor.Cursor
 		argument    &GameArgument = voidptr(0)
 
 
@@ -56,6 +56,39 @@ pub fn (mut window Window) update_boost() {
 	}
 }
 
+pub fn (mut window Window) update_cursor(time f64) {
+	for mut cursor in window.cursors {
+		cursor.update(time)
+	}
+}
+
+pub fn (mut window Window) draw() {
+	// Background
+	window.ctx.begin()
+	window.ctx.end()
+
+	// Game
+	window.beatmap.draw()
+	
+	// TODO: maybe move cursor to beatmap struct
+	if !settings.global.gameplay.disable_cursor {
+		for mut cursor in window.cursors {
+			cursor.draw()
+		}
+	}
+
+	// Texts
+	window.ctx.begin()
+	window.ctx.draw_text(0, 0, "Time: ${time.global.time:.0} [${time.global.delta:.0}ms, ${time.global.fps:.0}fps]", gx.TextCfg{color: gx.white})
+	window.ctx.draw_text(0, 16, "Recording: ${window.record}", gx.TextCfg{color: gx.white})
+
+	gfx.begin_default_pass(graphic.global_renderer.pass, 1280, 720)
+	sgl.draw()
+	gfx.end_pass()
+	gfx.commit()
+
+}
+
 pub fn window_init(mut window &Window) {
 	mut beatmap := beatmap.parse_beatmap(window.argument.beatmap_path)
 
@@ -68,9 +101,17 @@ pub fn window_init(mut window &Window) {
 	window.beatmap.reset()
 
 	// Make cursor
-	window.cursor = cursor.make_cursor(mut window.ctx)
-	window.cursor.bind_beatmap(mut window.beatmap)
-	cursor.make_replay(mut window.beatmap, mut window.cursor)
+	max_cursor := settings.global.gameplay.auto_tag_cursors
+	for cursor_i in 0 .. max_cursor {
+		mut current_cursor := cursor.make_cursor(mut window.ctx)
+		current_cursor.bind_beatmap(mut window.beatmap)
+		cursor.make_replay(mut window.beatmap, mut current_cursor, cursor_i + 1, max_cursor)
+		// idk colors
+		current_cursor.trail_color.r = byte((math.sin(cursor_i + 0) * 100) + 128 * 0.4)
+		current_cursor.trail_color.g = byte((math.sin(cursor_i + 2) * 75) + 128 * 0.2)
+		current_cursor.trail_color.b = byte((math.sin(cursor_i + 4) * 50) + 128 * 0.5)
+		window.cursors << current_cursor
+	}
 
 	// Init beatmap bg song
 	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
@@ -104,9 +145,9 @@ pub fn window_init(mut window &Window) {
 					played = true
 				}
 
-				window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
 				window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
-				window.beatmap_song.update(g_time.time) // doesnt care about time
+				window.update_cursor(g_time.time - settings.global.gameplay.lead_in_time)
+				window.beatmap_song.update(0.0)
 				window.update_boost()
 				
 				timelib.sleep(time.update_rate_ms)
@@ -116,32 +157,12 @@ pub fn window_init(mut window &Window) {
 }
 
 pub fn window_draw(mut window &Window) {
-	// Background
-	window.ctx.begin()
-	window.ctx.end()
+	window.draw()
+}
 
-	// Game
-	window.beatmap.draw()
-	
-	// TODO: maybe move cursor to beatmap struct
-	if !settings.global.gameplay.disable_cursor {
-		window.cursor.draw()
-	}
-
-	// Texts
-	window.ctx.begin()
-	window.ctx.draw_text(0, 0, "Time: ${time.global.time:.0} [${time.global.delta:.0}ms, ${time.global.fps:.0}fps]", gx.TextCfg{color: gx.white})
-	window.ctx.draw_text(0, 16, "Recording: ${window.record}", gx.TextCfg{color: gx.white})
-
-	gfx.begin_default_pass(graphic.global_renderer.pass, 1280, 720)
-	sgl.draw()
-	gfx.end_pass()
-	gfx.commit()
-
-	// We're recording.
-	if window.record {
-		mut g_time := time.get_time()
-
+pub fn window_draw_recording(mut window &Window) {
+	mut g_time := time.get_time()
+	for _ in 0 .. int(time.global.custom_delta) * 5 { // Exploit to make the rendering faster >:)), this will kill the pc but hey atleast the render is fast ;)
 		// Start the music after the intro
 		if g_time.time >= settings.global.gameplay.lead_in_time && !window.beatmap_song.playing {
 			window.beatmap_song.set_speed(settings.global.window.speed)
@@ -150,18 +171,21 @@ pub fn window_draw(mut window &Window) {
 		}
 
 		// Update cursor and beatmap
-		window.cursor.update(g_time.time - settings.global.gameplay.lead_in_time)
+		window.update_cursor(g_time.time - settings.global.gameplay.lead_in_time)
 		window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
 		
 		// Update audio boost
 		window.beatmap_song.update(0.0) 
 		window.update_boost()
 
+		// Update done, lets draw it
+		window.draw()
+
 		// Pipe 
 		window.pipe_window() 
 		window.pipe_audio()
 
-		g_time.tick() // Tick 16.6667ms then wait for gg to call this function again.
+		g_time.tick()
 	}
 }
 
@@ -177,7 +201,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 
 		// FNs
 		init_fn: window_init,
-		frame_fn: window_draw
+		frame_fn: [window_draw, window_draw_recording][int(settings.global.window.record)] // yea...
 
 		// Just a test, remove `cursor.make_replay` on line 54 to get this working
 		// move_fn: fn (x_ f32, y_ f32, mut window &Window) {
