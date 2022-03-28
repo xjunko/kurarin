@@ -14,6 +14,7 @@ import game.settings
 
 const (
 	offset = settings.global.gameplay.auto_update_rate
+	tag_on_new_combo = false
 )
 
 // [deprecated: "TODO: remove this after we got realtime auto."]
@@ -23,13 +24,20 @@ pub fn make_replay(mut beatmap &beatmap.Beatmap, mut cursor &Cursor, player_numb
 	mut direction := 1
 	mut counter := 0
 
-	for mut object in beatmap.objects {
-		if object.is_new_combo() {
+	for n, mut object in beatmap.objects {
+		if tag_on_new_combo {
+			if object.is_new_combo() {
 			counter++
-		}
+			}
 
-		if ((counter - 1) % max_player) != (player_number - 1) {
-			continue
+			if ((counter - 1) % max_player) != (player_number - 1) {
+				continue
+			}
+		} else {
+			// Tag for every N circles
+			if ((n + 1) % player_number) != 0 {
+				continue
+			}
 		}
 
 		if mut object is gameobject.Circle || mut object is gameobject.Slider {
