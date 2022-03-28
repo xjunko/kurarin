@@ -15,6 +15,7 @@ pub struct Settings {
 		window   	 Window = make_window_settings()
 		gameplay 	 Gameplay = make_gameplay_settings()
 		miscellaneous Miscellaneous = make_miscellaneous_settings()
+		video        Video = make_video_settings()
 }
 
 pub fn (mut settings Settings) save() {
@@ -30,6 +31,7 @@ fn init() {
 
 	if !os.exists("settings.json") {
 		logging.info("No settings.json file found, creating one.")
+		logging.info("Please change your settings.json file (if you wanted to), then run the program again.")
 		settings.save()
 		exit(1)
 	} else {
@@ -48,13 +50,11 @@ fn init() {
 	settings.gameplay.lead_in_time = math.max(1.0, settings.gameplay.lead_in_time)
 	settings.gameplay.lead_in_time *= 1000.0
 
-	// if settings.window.record {
-	// 	settings.gameplay.disable_hitsound = true // TODO: remove this once we got BASS pipe to ffmpeg
-	// }
 
 	// lmaooo
 	mut g_settings := global
 	g_settings.window = settings.window
 	g_settings.gameplay = settings.gameplay
 	g_settings.miscellaneous = settings.miscellaneous
+	g_settings.video = settings.video
 }
