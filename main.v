@@ -33,6 +33,9 @@ pub struct Window {
 		cursors     []&cursor.Cursor
 		argument    &GameArgument = voidptr(0)
 
+		// TODO: move this to somewhere else
+		audio_been_played bool
+
 
 		// Recording stuff
 		record 		bool
@@ -60,6 +63,20 @@ pub fn (mut window Window) update_cursor(time f64) {
 	for mut cursor in window.cursors {
 		cursor.update(time)
 	}
+}
+
+pub fn (mut window Window) update(time f64) {
+	if time >= settings.global.gameplay.lead_in_time && !window.audio_been_played {
+		window.audio_been_played = true
+		window.beatmap_song.set_speed(settings.global.window.speed)
+		window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
+		window.beatmap_song.play()
+	}
+
+	window.beatmap.update(time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
+	window.beatmap_song.update(time - settings.global.gameplay.lead_in_time)
+	window.update_cursor(time - settings.global.gameplay.lead_in_time)
+	window.update_boost()
 }
 
 pub fn (mut window Window) draw() {
@@ -100,6 +117,9 @@ pub fn window_init(mut window &Window) {
 	window.beatmap.bind_context(mut window.ctx)
 	window.beatmap.reset()
 
+	// Init beatmap bg song
+	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
+
 	// Make cursor
 	max_cursor := settings.global.gameplay.auto_tag_cursors
 	for cursor_i in 0 .. max_cursor {
@@ -112,9 +132,6 @@ pub fn window_init(mut window &Window) {
 		current_cursor.trail_color.b = byte((math.sin(cursor_i + 4) * 50) + 128 * 0.5)
 		window.cursors << current_cursor
 	}
-
-	// Init beatmap bg song
-	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
 
 	// If recording
 	if window.record {
@@ -133,23 +150,11 @@ pub fn window_init(mut window &Window) {
 	if !window.record {
 		go fn (mut window &Window) {
 			mut g_time := time.get_time()
+			g_time.reset()
 			g_time.set_speed(settings.global.window.speed)
-			mut played := false
-			time.reset()
 			
 			for {
-				if g_time.time >= settings.global.gameplay.lead_in_time && !played {
-					window.beatmap_song.set_speed(settings.global.window.speed)
-					window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
-					window.beatmap_song.play()
-					played = true
-				}
-
-				window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
-				window.update_cursor(g_time.time - settings.global.gameplay.lead_in_time)
-				window.beatmap_song.update(0.0)
-				window.update_boost()
-				
+				window.update(g_time.time)
 				timelib.sleep(time.update_rate_ms)
 			}
 		}(mut window)
@@ -162,23 +167,11 @@ pub fn window_draw(mut window &Window) {
 
 pub fn window_draw_recording(mut window &Window) {
 	mut g_time := time.get_time()
-	for _ in 0 .. int(time.global.custom_delta) * 5 { // Exploit to make the rendering faster >:)), this will kill the pc but hey atleast the render is fast ;)
-		// Start the music after the intro
-		if g_time.time >= settings.global.gameplay.lead_in_time && !window.beatmap_song.playing {
-			window.beatmap_song.set_speed(settings.global.window.speed)
-			window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
-			window.beatmap_song.play()
-		}
+	for _ in 0 .. int(time.global.custom_delta) * 2 { // Exploit to make the rendering faster >:)), this will kill the pc but hey atleast the render is fast ;)
+		// Update
+		window.update(g_time.time)
 
-		// Update cursor and beatmap
-		window.update_cursor(g_time.time - settings.global.gameplay.lead_in_time)
-		window.beatmap.update(g_time.time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
-		
-		// Update audio boost
-		window.beatmap_song.update(0.0) 
-		window.update_boost()
-
-		// Update done, lets draw it
+		// Draw
 		window.draw()
 
 		// Pipe 
