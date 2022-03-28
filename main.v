@@ -63,6 +63,14 @@ pub fn (mut window Window) update_cursor(time f64) {
 	for mut cursor in window.cursors {
 		cursor.update(time)
 	}
+
+	// Rainbow mode if theres only one cursor
+	if window.cursors.len == 1 {
+		color_index := (f32(math.fmod(time / 100.0, 10000)) / 10000.0) + 0.1
+		window.cursors[0].trail_color.r = byte(f32(math.sin(0.3*(time / 1000.0) + 0 + 1 * color_index) * 127.0 + 128.0))
+		window.cursors[0].trail_color.g = byte(f32(math.sin(0.3*(time / 1000.0) + 2 + 1 * color_index) * 127.0 + 128.0))
+		window.cursors[0].trail_color.b = byte(f32(math.sin(0.3*(time / 1000.0) + 4 + 1 * color_index) * 127.0 + 128.0))
+	}
 }
 
 pub fn (mut window Window) update(time f64) {
@@ -94,14 +102,17 @@ pub fn (mut window Window) draw() {
 		}
 	}
 
-	// Texts
-	window.ctx.begin()
-	window.ctx.draw_text(0, 0, "Time: ${time.global.time:.0} [${time.global.delta:.0}ms, ${time.global.fps:.0}fps]", gx.TextCfg{color: gx.white})
-	window.ctx.draw_text(0, 16, "Recording: ${window.record}", gx.TextCfg{color: gx.white})
 
+	window.ctx.begin()
+	// Texts (only on windowed mode)
+	if !settings.global.video.record {
+		window.ctx.draw_rect_filled(1200, 683, 100, 16, gx.Color{0, 0, 0, 100})
+		window.ctx.draw_text(1275, 683, "${time.global.fps:.0}fps [${time.global.delta:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
+	}
 	gfx.begin_default_pass(graphic.global_renderer.pass, 1280, 720)
 	sgl.draw()
 	gfx.end_pass()
+
 	gfx.commit()
 
 }
@@ -194,7 +205,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 
 		// FNs
 		init_fn: window_init,
-		frame_fn: [window_draw, window_draw_recording][int(settings.global.window.record)] // yea...
+		frame_fn: [window_draw, window_draw_recording][int(settings.global.video.record)] // yea...
 
 		// Just a test, remove `cursor.make_replay` on line 54 to get this working
 		// move_fn: fn (x_ f32, y_ f32, mut window &Window) {
@@ -204,7 +215,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 	)
 
 	// Record or na
-	window.record = settings.global.window.record
+	window.record = settings.global.video.record
 
 	skin.bind_context(mut window.ctx)
 
