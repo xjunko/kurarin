@@ -31,7 +31,7 @@ fn init() {
 	mut device_id := -1
 	mut mixer_flags := C.BASS_MIXER_NONSTOP
 
-	if settings.global.window.record {
+	if settings.global.video.record {
 		logging.info("BASS in recording mode")
 		device_id = 0
 		mixer_flags |= C.BASS_SAMPLE_FLOAT | C.BASS_STREAM_DECODE
