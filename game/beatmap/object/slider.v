@@ -368,17 +368,17 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 		mut sprite := &sprite.Sprite{}
 		sprite.textures << skin.get_texture("reversearrow")
 		sprite.add_transform(typ: .move, time: time.Time{appear_time, appear_time}, before: [position.x, position.y])
-
+		
 		sprite.add_transform(typ: .scale_factor, time: time.Time{appear_time, appear_time}, before: [size_ratio])
 		sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [look_at.angle_rv(position)])
-		sprite.add_transform(typ: .fade, time: time.Time{circle_time, math.min(circle_time, appear_time + 150)}, before: [0.0], after: [255.0])
+		sprite.add_transform(typ: .fade, time: time.Time{appear_time, circle_time}, before: [0.0], after: [255.0])
 		sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [255.0], after: [0.0])
 		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [size_ratio], after: [size_ratio * 1.2])
 		sprite.reset_size_based_on_texture()
 		sprite.reset_attributes_based_on_transforms()
 
-		for t := f64(slider.time.start); t < f64(slider.time.end); t += 300.0 {
-			length := math.min(300.0, slider.time.end - t)
+		for t := f64(slider.time.start); t < circle_time - 300; t += 300.0 {
+			length := math.min(300.0, circle_time - t)
 			sprite.add_transform(typ: .scale_factor, time: time.Time{t, t+length}, before: [size_ratio * 1.3], after: [size_ratio * 1.0])
 		}
 
