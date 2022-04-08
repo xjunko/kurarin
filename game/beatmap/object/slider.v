@@ -339,12 +339,16 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 			appear_time = circle_time - math.floor(slider.duration * 2)
 		}
 
+		// 
 		mut position := slider.position
 		mut look_at := slider.position
 
+		// O----<O Start to Finish
 		if (i % 2) == 1 {
 			position = slider.points[slider.points.len - 1]
-		} else {
+			look_at = slider.points[slider.points.len - 2] // Look one point behind instead of looking at start circle position
+		} else { // O>---O Finish to Start
+			position = slider.points[slider.points.len - 2] // Look one point behind ^^^
 			look_at = slider.points[slider.points.len - 1]
 		}
 
