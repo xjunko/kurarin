@@ -63,8 +63,6 @@ pub fn (mut video VideoSprite) update(time f64) {
 		video.need_update = true
 		video.update_video()
 	}
-
-	println('dicks')
 }
 
 pub fn (mut video VideoSprite) draw_and_update(arg sprite.CommonSpriteArgument) {
