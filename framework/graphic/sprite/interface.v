@@ -29,7 +29,9 @@ pub interface ISprite {
 		position vector.Vector2
 		size     vector.Vector2
 		color    gx.Color
+		angle    f64
 		additive bool
+		always_visible bool
 
 		update(f64)
 		draw(CommonSpriteArgument)
