@@ -50,8 +50,7 @@ fn init() {
 	settings.gameplay.lead_in_time = math.max(1.0, settings.gameplay.lead_in_time)
 	settings.gameplay.lead_in_time *= 1000.0
 
-
-	// lmaooo
+	// unepic global hack
 	mut g_settings := global
 	replace_attribute_from<Settings>(mut g_settings, mut settings)
 }

@@ -4,6 +4,7 @@ import os
 import math
 import library.gg
 
+import framework.ffmpeg
 import framework.logging
 
 import framework.math.time as time2
@@ -20,6 +21,7 @@ pub struct Storyboard {
 		ctx  	&gg.Context = voidptr(0)
 		root 	string
 		sprites []&sprite.Sprite
+		video   &ffmpeg.VideoSprite = voidptr(0)
 
 		last_time f64
 
@@ -76,6 +78,11 @@ pub fn (mut storyboard Storyboard) update(time f64) {
 			sprite.update(time)
 		}
 	}
+
+	// Background video
+	if storyboard.video != voidptr(0) {
+		storyboard.video.update(storyboard.last_time)	
+	}
 }
 
 pub fn (mut storyboard Storyboard) draw() {
@@ -100,6 +107,10 @@ pub fn (mut storyboard Storyboard) draw() {
 					additive: sprite.additive
 			})
 		}
+	}
+
+	if storyboard.video != voidptr(0) {
+		storyboard.video.draw(ctx: storyboard.ctx)	
 	}
 }
 

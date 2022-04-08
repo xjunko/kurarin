@@ -11,6 +11,7 @@ import sync
 import sokol.gfx
 import sokol.sgl
 
+import framework.ffmpeg
 import framework.logging
 import framework.math.time
 import framework.math.vector
@@ -27,6 +28,7 @@ import object.graphic
 pub struct BeatmapGeneralInfo {
 	pub mut:
 		bg_filename    string [_SKIP]
+		video_filename string [_SKIP]
 		audio_filename string [AudioFilename]
 		stack_leniency f64    [StackLeniency]
 		widescreen 	   bool   [WidescreenStoryboard]
@@ -75,6 +77,14 @@ pub fn (mut beatmap Beatmap) bind_context(mut ctx &gg.Context) {
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 	// TODO: use storyboard
 	if beatmap.storyboard.sprites.len == 0 {
+		mut has_video := false
+		if os.exists(beatmap.get_video_path()) && !settings.global.gameplay.disable_background_video {
+			has_video = true
+			mut video := ffmpeg.make_video_sprite(beatmap.get_video_path(), mut beatmap.ctx)
+			beatmap.storyboard.video = video
+		}
+
+
 		// Nothing on the storyboard, make our own background
 		image := beatmap.ctx.create_image(beatmap.get_bg_path())
 		mut ratio := (1280.0 / f64(image.width)) / storyboard.storyboard_scale
@@ -94,7 +104,12 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 		}
 
 		// fade
-		beatmap_bg.add_transform(typ: .fade, time: time.Time{-1500, -500}, before: [0.0], after: [255.0])
+		beatmap_bg.add_transform(typ: .fade, time: time.Time{-1500, -500}, before: [0.0], after: [255.0])	
+
+		if has_video {
+			beatmap_bg.add_transform(typ: .fade, time: time.Time{1100, 1200}, before: [0.0])	
+			beatmap_bg.always_visible = false
+		}
 
 		// done
 		beatmap_bg.reset_size_based_on_texture(size: end_size)
@@ -255,6 +270,10 @@ pub fn (beatmap &Beatmap) get_audio_path() string {
 
 pub fn (beatmap &Beatmap) get_bg_path() string {
 	return os.join_path(beatmap.root, beatmap.general.bg_filename)
+}
+
+pub fn (beatmap &Beatmap) get_video_path() string {
+	return os.join_path(beatmap.root, beatmap.general.video_filename)
 }
 
 pub fn (beatmap &Beatmap) get_sb_path() string {

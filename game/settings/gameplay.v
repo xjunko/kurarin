@@ -9,6 +9,7 @@ pub struct Gameplay {
 		disable_hitsound   bool
 		disable_hitobject  bool
 		disable_storyboard bool
+		disable_background_video bool
 
 		use_beatmap_hitsound bool
 
@@ -32,6 +33,7 @@ pub fn make_gameplay_settings() Gameplay {
 		disable_hitsound: false,
 		disable_hitobject: false,
 		disable_storyboard: false,
+		disable_background_video: true, // BG Video is pretty heavy rn
 
 		use_beatmap_hitsound: false,
 
