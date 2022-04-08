@@ -279,7 +279,7 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 		// Movement
 		offset := 16
 
-		for temp_time := int(slider.time.start); temp_time <= int(slider.time.end) + offset; temp_time += offset {
+		for temp_time := int(slider.time.start); temp_time <= int(slider.time.end); temp_time += offset {
 			times := int(((temp_time - slider.time.start) / slider.duration) + 1)
 			t_time := (f64(temp_time) - slider.time.start - (times - 1) * slider.duration)
 			rt := slider.pixel_length / slider.curve.length
