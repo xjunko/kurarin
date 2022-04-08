@@ -274,6 +274,7 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 
 	// Movement
 	mut last_position := slider.position
+	mut last_angle := 0.0
 
 	for i, mut sprite in slider_sprites {
 		// Movement
@@ -284,15 +285,28 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 			t_time := (f64(temp_time) - slider.time.start - (times - 1) * slider.duration)
 			rt := slider.pixel_length / slider.curve.length
 
+			mut is_reversing := false
 			mut pos := vector.Vector2{}
+
 			if (times % 2) == 1 {
 				pos = slider.curve.point_at(rt * t_time / slider.duration)
 				last_position = slider.curve.point_at(rt * (t_time - offset) / slider.duration)
 			} else {
 				pos = slider.curve.point_at((1.0 - t_time / slider.duration) * rt)
 				last_position = slider.curve.point_at((1.0 - (t_time - offset) / slider.duration) * rt)
+				is_reversing = true
 			}
 			sprite.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [last_position.x, last_position.y], after: [pos.x, pos.y])
+
+			// SliderB angle
+			mut current_angle := pos.angle_rv(slider.position)
+
+			if is_reversing {
+				current_angle -= math.pi
+			}
+
+			sprite.add_transform(typ: .angle, time: time.Time{temp_time, temp_time + offset}, before: [current_angle])
+			last_angle = current_angle
 		}
 
 		// Just incase
@@ -348,20 +362,25 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 			position = slider.points[slider.points.len - 1]
 			look_at = slider.points[slider.points.len - 2] // Look one point behind instead of looking at start circle position
 		} else { // O>---O Finish to Start
-			position = slider.points[slider.points.len - 2] // Look one point behind ^^^
-			look_at = slider.points[slider.points.len - 1]
+			look_at = slider.points[1]
 		}
 
 		mut sprite := &sprite.Sprite{}
 		sprite.textures << skin.get_texture("reversearrow")
+		sprite.add_transform(typ: .move, time: time.Time{appear_time, appear_time}, before: [position.x, position.y])
+
 		sprite.add_transform(typ: .scale_factor, time: time.Time{appear_time, appear_time}, before: [size_ratio])
 		sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [look_at.angle_rv(position)])
-		sprite.add_transform(typ: .move, time: time.Time{appear_time, appear_time}, before: [position.x, position.y])
-		sprite.add_transform(typ: .fade, time: time.Time{appear_time, circle_time}, before: [0.0], after: [255.0])
+		sprite.add_transform(typ: .fade, time: time.Time{circle_time, math.min(circle_time, appear_time + 150)}, before: [0.0], after: [255.0])
 		sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [255.0], after: [0.0])
 		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [size_ratio], after: [size_ratio * 1.2])
 		sprite.reset_size_based_on_texture()
 		sprite.reset_attributes_based_on_transforms()
+
+		for t := f64(slider.time.start); t < f64(slider.time.end); t += 300.0 {
+			length := math.min(300.0, slider.time.end - t)
+			sprite.add_transform(typ: .scale_factor, time: time.Time{t, t+length}, before: [size_ratio * 1.3], after: [size_ratio * 1.0])
+		}
 
 		slider.sprites << sprite
 	}
@@ -387,6 +406,19 @@ pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
 	}
 
 	return slider.points
+}
+
+pub fn (mut slider Slider) get_position_at_lazer(time f64) vector.Vector2 {
+	t1 := math.clamp(time, slider.time.start, slider.time.end)
+	mut progress := (t1 - slider.time.start) / slider.duration
+
+	progress = math.mod(progress, 2)
+
+	if progress >= 1 {
+		progress = 2 - progress
+	}
+
+	return slider.curve.point_at(progress)
 }
 
 pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
