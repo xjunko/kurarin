@@ -101,10 +101,18 @@ pub fn parse_beatmap(path string) &Beatmap {
 			}
 
 			"Events" {
+				// Normal BG
 				if (line.starts_with("0") || line.starts_with("Sprite")) && !background_done {
 					items := common_parse_with_key_value(line, ",")
 					beatmap.general.bg_filename = items[2].replace('"', "")
 					background_done = true
+					continue
+				}
+
+				// Background video
+				if line.starts_with('Video') {
+					items := common_parse_with_key_value(line, ',')
+					beatmap.general.video_filename = items[2].replace('"', '')
 					continue
 				}
 
