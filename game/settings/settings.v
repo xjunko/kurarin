@@ -53,8 +53,12 @@ fn init() {
 
 	// lmaooo
 	mut g_settings := global
-	g_settings.window = settings.window
-	g_settings.gameplay = settings.gameplay
-	g_settings.miscellaneous = settings.miscellaneous
-	g_settings.video = settings.video
+	replace_attribute_from<Settings>(mut g_settings, mut settings)
+}
+
+// Greatest hack of all time
+fn replace_attribute_from<T>(mut from T, mut with T) {
+	$for field in T.fields {
+		from.$(field.name) = with.$(field.name)
+	}
 }
