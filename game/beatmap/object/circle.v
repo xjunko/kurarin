@@ -142,11 +142,11 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 	
 	//
 	if circle.inherited {
-		circle.hitcircle.textures << skin.get_texture("sliderstartcircle")
-		circle.hitcircleoverlay.textures << skin.get_texture("sliderstartcircleoverlay")
+		circle.hitcircle.textures << skin.get_texture("sliderstartcircleoverlay")
+		circle.hitcircleoverlay.textures << skin.get_texture("sliderstartcircle")
 	} else {
-		circle.hitcircle.textures << skin.get_texture("hitcircle")
-		circle.hitcircleoverlay.textures << skin.get_texture("hitcircleoverlay")
+		circle.hitcircle.textures << skin.get_texture("hitcircleoverlay")
+		circle.hitcircleoverlay.textures << skin.get_texture("hitcircle")
 	}
 
 	circle.approachcircle.textures << skin.get_texture("approachcircle")
@@ -164,6 +164,7 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 
 	// Color
 	circle.hitcircle.add_transform(typ: .color, time: time.Time{start_time, start_time}, before: circle.color)
+	circle.hitcircleoverlay.add_transform(typ: .color, time: time.Time{start_time, start_time}, before: circle.color)
 	circle.approachcircle.add_transform(typ: .color, time: time.Time{start_time, start_time}, before: circle.color)
 
 	for mut s in circles {
