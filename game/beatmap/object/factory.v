@@ -11,14 +11,12 @@ pub fn make_object(items []string) IHitObject {
 	object_type := items[3].i8()
 
 	if (object_type & circle) > 0 {
-		// TODO
 		return make_circle(items)
 	} else if (object_type & slider) > 0 {
-		// TODO
 		return make_slider(items)
 	} else if (object_type & spinner) > 0 {
 		return make_spinner(items)
 	}
 
-	return Circle{id: -10}
+	panic("THE FUCK")
 }
