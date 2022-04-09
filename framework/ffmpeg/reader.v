@@ -45,6 +45,7 @@ pub fn (mut reader FFmpegReader) initialize_ffmpeg() {
 		"-i", reader.video_path,
 		"-f", "rawvideo",
 		"-pix_fmt", "rgba",
+		"-ss", "0:0:0",
 		"-vf", "scale=${reader.metadata.width}:${reader.metadata.height}"
 		"-"
 	]

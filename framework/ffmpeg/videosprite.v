@@ -1,4 +1,7 @@
+
 module ffmpeg
+
+import sync
 import library.gg
 
 import framework.math.time
@@ -15,15 +18,20 @@ pub struct VideoSprite {
 		last_time   f64
 		delta_count f64
 		frametime   f64
+		videotime   f64
+		start_at    f64 = -1889
 		ctx         &gg.Context = voidptr(0)
 		need_update bool
+		mutex       &sync.Mutex = sync.new_mutex()
 }
 
 pub fn (mut video VideoSprite) draw(arg sprite.CommonSpriteArgument) {
+	video.mutex.@lock()
 	if video.need_update {
 		video.update_texture()
 		video.need_update = false
 	}
+	video.mutex.unlock()
 
 
 	if video.is_drawable_at(arg.time) || video.always_visible {
@@ -39,6 +47,7 @@ pub fn (mut video VideoSprite) draw(arg sprite.CommonSpriteArgument) {
 			additive: video.additive
 		})
 	}
+
 }
 
 pub fn (mut video VideoSprite) update_video() {
@@ -52,17 +61,30 @@ pub fn (mut video VideoSprite) update_texture() {
 pub fn (mut video VideoSprite) update(time f64) {
 	video.Sprite.update(time)
 
-	// Update video frame when needed...
-	delta := time - video.last_time
-	video.last_time = time
-
-	video.delta_count += delta
-
-	if video.delta_count >= video.frametime {
-		video.delta_count -= video.frametime
-		video.need_update = true
-		video.update_video()
+	if time <= video.start_at {
+		return
 	}
+
+	// // Update video frame when needed...
+	// video.mutex.@lock()
+	// delta := time - video.last_time
+	// video.last_time = time
+
+	// video.delta_count += delta
+	// for video.delta_count >= video.frametime {
+	// 	video.delta_count -= video.frametime
+	// 	video.need_update = true
+	// 	video.update_video()
+	// }
+	// video.mutex.unlock()
+
+	video.mutex.@lock()
+	for video.videotime <= time {
+		video.videotime += video.frametime
+		video.update_video()
+		video.need_update = true
+	}
+	video.mutex.unlock()
 }
 
 pub fn (mut video VideoSprite) draw_and_update(arg sprite.CommonSpriteArgument) {
@@ -80,7 +102,7 @@ pub fn (mut video VideoSprite) start_video_thread() {
 	// }(mut video)
 }
 
-pub fn make_video_sprite(path string, mut ctx &gg.Context) &VideoSprite {
+pub fn make_video_sprite(path string, mut ctx &gg.Context, offset f64) &VideoSprite {
 	mut video := &VideoSprite{ctx: ctx, always_visible: true}
 
 	// Load video
@@ -95,10 +117,17 @@ pub fn make_video_sprite(path string, mut ctx &gg.Context) &VideoSprite {
 
 	// ehh
 	video.frametime = 1000.0 / video.source.metadata.fps
+	video.videotime += video.frametime
+	video.update_video() // Force first frame
 
 	// fade in
 	video.add_transform(typ: .fade, time: time.Time{0, 1000}, before: [0.0], after: [255.0])
 	video.reset_attributes_based_on_transforms()
+
+	// Seek to offset
+	for i := video.videotime; i < offset; i += video.frametime {
+		video.update_video()
+	}
 
 	return video
 }
