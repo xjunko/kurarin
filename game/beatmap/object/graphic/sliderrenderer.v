@@ -21,7 +21,7 @@ import math
 
 import sokol
 import sokol.gfx
-// import sokol.sgl // TODO: use sokol's wrapper structs instead of C's 
+import sokol.sgl // TODO: use sokol's wrapper structs instead of C's 
 
 import framework.logging
 import framework.math.vector
@@ -46,7 +46,7 @@ pub struct SliderRendererAttr {
 		length   f64
 		points   []vector.Vector2
 		vertices []f32
-		colors   []f32 // [3]Body [3]Border
+		colors   []f32 // [3]Body [3]Border [3]BorderWidth, Unused, Unused
 		uniform  C.sg_range
 		bindings C.sg_bindings
 		has_been_initialized bool
@@ -58,12 +58,16 @@ pub struct SliderRenderer {
 		has_been_initialized bool
 
 	pub mut:
-		shader   C.sg_shader
-		pip      C.sg_pipeline
-		pass     C.sg_pass_action
-		gradient C.sg_image
-		uniform  C.sg_range
-		uniform_values []f32
+		shader      C.sg_shader
+		pip         C.sg_pipeline
+		pass        gfx.Pass
+		pass_action C.sg_pass_action
+		pass_action2 C.sg_pass_action
+		gradient    C.sg_image
+		uniform     C.sg_range
+		color_img gfx.Image
+		depth_img gfx.Image
+		uniform_values []f32 // 
 }
 
 // Boost scaling thingy
@@ -101,8 +105,9 @@ pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f
 	// Color uniform
 	attr.colors = []f32{}
 	attr.colors << [
-		f32(0.0), f32(0.0), f32(0.0), 1.0,
-		f32(1.0), f32(1.0), f32(1.0), 1.0,
+		f32(0.0), f32(0.0), f32(0.0), 1.0, // Body
+		f32(1.0), f32(1.0), f32(1.0), 1.0, // Border
+		f32(0.5), f32(0.0), f32(0.0), 1.0 // Width
 	] // ghost numbers, dont ask my why its there
 
 	attr.uniform = C.sg_range{
@@ -234,7 +239,7 @@ pub fn (mut attr SliderRendererAttr) update_vertex_progress(start int, end int) 
 }
 
 // Draw
-pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64) {
+pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	if !global_renderer.has_been_initialized { panic("global_renderer.has_been_initialized == False; This should not happen.") }
 	if !attr.has_been_initialized { 
 		attr.make_vertices()
@@ -254,11 +259,44 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64) {
 		attr.colors[6] = f32(math.sin(0.3 * time * 1.5 + 4 + 10) * 127 + 128) / 255
 	}
 
-	gfx.apply_pipeline(global_renderer.pip)
-	gfx.apply_bindings(&attr.bindings)
-	gfx.apply_uniforms(.vs, C.SLOT_vs_uniform, global_renderer.uniform)
-	gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
-	gfx.draw(0, attr.vertices.len, 1)
+	// Set border color
+	attr.colors[0] = f32(colors[0] / 255.0 / 1.5)
+	attr.colors[1] = f32(colors[1] / 255.0 / 1.5)
+	attr.colors[2] = f32(colors[2] / 255.0 / 1.5)
+	
+	attr.colors[4] = f32(colors[0] / 255.0)
+	attr.colors[5] = f32(colors[1] / 255.0)
+	attr.colors[6] = f32(colors[2] / 255.0)
+
+	// gfx.apply_pipeline(global_renderer.pip)
+	// gfx.apply_bindings(&attr.bindings)
+	// gfx.apply_uniforms(.vs, C.SLOT_vs_uniform, global_renderer.uniform)
+	// gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
+	// gfx.draw(0, attr.vertices.len, 1)
+	gfx.begin_pass(global_renderer.pass, &global_renderer.pass_action2)
+		gfx.apply_pipeline(global_renderer.pip)
+			gfx.apply_bindings(&attr.bindings)
+			gfx.apply_uniforms(.vs, C.SLOT_vs_uniform, global_renderer.uniform)
+			gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
+				gfx.draw(0, attr.vertices.len, 1)
+		gfx.end_pass()
+	gfx.commit()
+
+
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
+		sgl.enable_texture()
+			sgl.texture(global_renderer.color_img)
+		sgl.c4b(255, 255, 255, byte(255 - ( 255 * alpha )))
+		sgl.begin_quads()
+			sgl.v3f_t2f(0,    0,   1, 0, 1)
+			sgl.v3f_t2f(1280, 0,   1, 1, 1)
+			sgl.v3f_t2f(1280, 720, 1, 1, 0)
+			sgl.v3f_t2f(0,    720, 1, 0, 0)
+		sgl.end()
+		sgl.disable_texture()
+			sgl.draw()
+		gfx.end_pass()
+	gfx.commit()
 }
 
 pub fn (mut attr SliderRendererAttr) free() {
@@ -294,12 +332,14 @@ pub fn init_slider_renderer() {
 	mut pipeline_desc := &C.sg_pipeline_desc{
 		shader: renderer.shader,
 		depth: C.sg_depth_state{
+			pixel_format: .depth
 			compare: .less,
 			write_enabled: true
 		}
 	}
 
 	// Pipeline blending (for slider to appear correctly, well almost.)
+	pipeline_desc.colors[0].pixel_format = .rgba8
 	pipeline_desc.colors[0].blend.enabled = false
 	pipeline_desc.colors[0].blend.op_rgb = .add
 	pipeline_desc.colors[0].blend.src_factor_rgb = .src_alpha
@@ -324,10 +364,35 @@ pub fn init_slider_renderer() {
 	// pipeline_desc.layout.attrs[C.ATTR_vs_test_color].format = .float3
 	// renderer.pip = C.sg_make_pipeline(pipeline_desc)
 
+	// Color and Depth buffer
+	mut img_desc := gfx.ImageDesc{
+		render_target: true,
+		width: 1280,
+		height: 720,
+		pixel_format: .rgba8,
+		label: "ColorBuffer".str
+	}
+	renderer.color_img = gfx.make_image(&img_desc)
+	img_desc.pixel_format = .depth
+	img_desc.label = "DepthBuffer".str
+	renderer.depth_img = gfx.make_image(&img_desc)
+
 	// Pass
-	renderer.pass.colors[0] = C.sg_color_attachment_action{
+	mut offscreen_pass_desc := gfx.PassDesc{label: "offscreen-pass".str}
+	offscreen_pass_desc.color_attachments[0].image = renderer.color_img
+	offscreen_pass_desc.depth_stencil_attachment.image = renderer.depth_img
+	renderer.pass = gfx.make_pass(&offscreen_pass_desc)
+	
+
+	// Pass action
+	renderer.pass_action.colors[0] = C.sg_color_attachment_action{
 		action: .dontcare,
-		value: C.sg_color{0.0, 0.0, 0.0, 0.0}
+		value: C.sg_color{1.0, 1.0, 1.0, 1.0}
+	}
+
+	renderer.pass_action2.colors[0] = C.sg_color_attachment_action{
+		action: .clear,
+		value: C.sg_color{1.0, 1.0, 1.0, 0.0}
 	}
 	
 
