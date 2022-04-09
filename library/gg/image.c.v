@@ -317,4 +317,12 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 	}
 
 	sgl.disable_texture()
+	
+	// println("========")
+	// println("${img_rect.width} ${img_rect.height} | ${img_rect.x} ${img_rect.y}")
+	// println("${x0} ${y0} ${u0f} ${v0f}")
+	// println("${x1} ${y0} ${u1f} ${v0f}")
+	// println("${x1} ${y1} ${u1f} ${v1f}")
+	// println("${x0} ${y1} ${u0f} ${v1f}")
+	// println("========")
 }
