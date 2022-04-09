@@ -106,11 +106,11 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 
 	// Draw slider body
 	// TODO: alpha
-	if slider.last_time >= slider.time.start - slider.diff.preempt && slider.last_time <= slider.time.end {
-		slider.slider_renderer_attr.update_vertex_progress(0, 0)
-		slider.slider_renderer_attr.draw_slider(slider.hitcircle.hitcircle.color.a)
-		return
-	}
+	// if slider.last_time >= slider.time.start - slider.diff.preempt && slider.last_time <= slider.time.end {
+	// 	slider.slider_renderer_attr.update_vertex_progress(0, 0)
+	// 	slider.slider_renderer_attr.draw_slider(slider.hitcircle.hitcircle.color.a)
+	// 	return
+	// }
 }
 
 pub fn (mut slider Slider) play_hitsound(index int) {
@@ -305,7 +305,7 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 				current_angle -= math.pi
 			}
 
-			sprite.add_transform(typ: .angle, time: time.Time{temp_time, temp_time + offset}, before: [current_angle])
+			sprite.add_transform(typ: .angle, time: time.Time{temp_time, temp_time + offset}, before: [last_angle], after: [current_angle])
 			last_angle = current_angle
 		}
 
@@ -377,7 +377,7 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 		sprite.reset_size_based_on_texture()
 		sprite.reset_attributes_based_on_transforms()
 
-		for t := f64(slider.time.start); t < circle_time - 300; t += 300.0 {
+		for t := f64(slider.time.start); t < circle_time; t += 300.0 {
 			length := math.min(300.0, circle_time - t)
 			sprite.add_transform(typ: .scale_factor, time: time.Time{t, t+length}, before: [size_ratio * 1.3], after: [size_ratio * 1.0])
 		}
@@ -422,6 +422,9 @@ pub fn (mut slider Slider) get_position_at_lazer(time f64) vector.Vector2 {
 }
 
 pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
+	// Set color to parent hitcircle also
+	slider.hitcircle.color = slider.color
+
 	slider.diff = diff
 	slider.hitcircle.set_difficulty(diff)
 
