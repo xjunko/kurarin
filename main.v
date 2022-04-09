@@ -109,7 +109,7 @@ pub fn (mut window Window) draw() {
 		window.ctx.draw_rect_filled(1200, 683, 100, 16, gx.Color{0, 0, 0, 100})
 		window.ctx.draw_text(1275, 683, "${time.global.fps:.0}fps [${time.global.delta:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
 	}
-	gfx.begin_default_pass(graphic.global_renderer.pass, 1280, 720)
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 	sgl.draw()
 	gfx.end_pass()
 
