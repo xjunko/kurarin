@@ -49,7 +49,7 @@ out vec4 color;
 uniform fs_uniform {
     vec3 colBody;
     vec3 colBorder;
-    // float borderMultiplier;
+    vec3 borderMultiplier;
 };
 
 const float defaultTransitionSize = 0.011;
@@ -76,7 +76,7 @@ vec4 getOuterBodyColor(in vec4 bodyColor)
 
 void main() {
     // here goes nothing
-    float borderSize = defaultBorderSize; //* borderMultiplier;
+    float borderSize = defaultBorderSize * borderMultiplier.r;
     const float transitionSize = defaultTransitionSize;
 
     // output
@@ -84,7 +84,7 @@ void main() {
 
     //
     // vec3 colBorder = vec3(1.0, 1.0, 1.0);
-    // vec3 colBody = vec3(0.0, 0.0, 0.0);
+    // vec3 colBody = vec3(0.0, 1.0, 0.0);
     float bodyAlphaMultiplier = 1.0;
     float bodyColorSaturation = 1.0;
 
@@ -99,10 +99,10 @@ void main() {
     outerBodyColor.rgb *= bodyColorSaturation;
 
     // osu!next (lazer) style
-    // outerBodyColor.rgb = bodyColor.rgb * bodyColorSaturation;
-    // outerBodyColor.a = 1.0*bodyAlphaMultiplier;
-    // innerBodyColor.rgb = bodyColor.rgb * 0.5 * bodyColorSaturation;
-    // innerBodyColor.a = 0.0;
+    outerBodyColor.rgb = bodyColor.rgb * bodyColorSaturation;
+    outerBodyColor.a = 1.0*bodyAlphaMultiplier;
+    innerBodyColor.rgb = bodyColor.rgb * 0.5 * bodyColorSaturation;
+    innerBodyColor.a = 0.0;
 
     // cond varianctt
     if (v_uv.x < outerShadowSize - transitionSize) // just shadow
