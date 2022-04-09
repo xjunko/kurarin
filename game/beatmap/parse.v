@@ -1,8 +1,10 @@
 module beatmap
 
 import os
+import gx
 import difficulty
 import object
+import math
 
 import framework.logging
 
@@ -113,6 +115,7 @@ pub fn parse_beatmap(path string) &Beatmap {
 				if line.starts_with('Video') {
 					items := common_parse_with_key_value(line, ',')
 					beatmap.general.video_filename = items[2].replace('"', '')
+					beatmap.general.video_offset = math.abs(items[1].f64())
 					continue
 				}
 
@@ -121,6 +124,13 @@ pub fn parse_beatmap(path string) &Beatmap {
 					beatmap.temp_beatmap_sb << "[Events]"
 				}
 				beatmap.temp_beatmap_sb << line
+			}
+
+			"Colours" {
+				items := common_parse_with_key_value(line, ":")
+				rgb := common_parse_with_key_value(items[1], ",")
+				color := gx.Color{byte(rgb[0].int()), byte(rgb[1].int()), byte(rgb[2].int()), byte(255)}
+				beatmap.combo_color << color
 			}
 
 			"HitObjects" {

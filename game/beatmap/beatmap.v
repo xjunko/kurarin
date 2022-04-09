@@ -22,6 +22,7 @@ import game.skin
 import game.audio
 import game.settings
 
+
 import storyboard
 import object.graphic
 
@@ -29,6 +30,7 @@ pub struct BeatmapGeneralInfo {
 	pub mut:
 		bg_filename    string [_SKIP]
 		video_filename string [_SKIP]
+		video_offset   f64    [_SKIP]
 		audio_filename string [AudioFilename]
 		stack_leniency f64    [StackLeniency]
 		widescreen 	   bool   [WidescreenStoryboard]
@@ -47,20 +49,21 @@ pub struct BeatmapDifficultyInfo {
 
 pub struct Beatmap {
 	pub mut:
-		root       string
-		filename   string
-		general    BeatmapGeneralInfo
-		metadata   BeatmapMetadataInfo
-		difficulty BeatmapDifficultyInfo
-		timing     timing.Timings
+		root        string
+		filename    string
+		general     BeatmapGeneralInfo
+		metadata    BeatmapMetadataInfo
+		difficulty  BeatmapDifficultyInfo
+		timing      timing.Timings
 
-		ctx        &gg.Context = voidptr(0)
-		storyboard &storyboard.Storyboard = &storyboard.Storyboard{}
-		background []sprite.ISprite
-		objects    []object.IHitObject
-		queue      []object.IHitObject
-		finished   []object.IHitObject
-		objects_i  int
+		ctx         &gg.Context = voidptr(0)
+		storyboard  &storyboard.Storyboard = &storyboard.Storyboard{}
+		background  []sprite.ISprite
+		objects     []object.IHitObject
+		queue       []object.IHitObject
+		finished    []object.IHitObject
+		combo_color []gx.Color
+		objects_i   int
 
 		// Temporary
 		playfield_size   vector.Vector2
@@ -80,7 +83,7 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 		mut has_video := false
 		if os.exists(beatmap.get_video_path()) && !settings.global.gameplay.disable_background_video {
 			has_video = true
-			mut video := ffmpeg.make_video_sprite(beatmap.get_video_path(), mut beatmap.ctx)
+			mut video := ffmpeg.make_video_sprite(beatmap.get_video_path(), mut beatmap.ctx, beatmap.general.video_offset)
 			beatmap.storyboard.video = video
 		}
 
@@ -135,6 +138,10 @@ pub fn (mut beatmap Beatmap) reset() {
 		if o.is_new_combo() {
 			combo_number = 1
 		}
+
+		// Set colors
+		color := beatmap.combo_color[o.color_offset % beatmap.combo_color.len]
+		o.color = [f64(color.r), f64(color.g), f64(color.g)]
 
 		o.set_id(i)
 		o.set_combo_number(combo_number)
@@ -222,7 +229,7 @@ pub fn (mut beatmap Beatmap) draw() {
 	beatmap.update_lock.@lock()
 
 	// Background/Storyboard draws
-	gfx.begin_default_pass(graphic.global_renderer.pass, 1280, 720)
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 
 	beatmap.storyboard.draw() // Includes background
 
@@ -246,7 +253,22 @@ pub fn (mut beatmap Beatmap) draw() {
 	// sokol.
 	if !settings.global.gameplay.disable_hitobject { // We might want hitcircle hitsounds but not the hitcircle itself, so on draw calls ignored it but not on update calls
 		for i := beatmap.queue.len - 1; i >= 0; i-- {
-			gfx.begin_default_pass(graphic.global_renderer.pass, 1280, 720)
+			mut hitobject := &beatmap.queue[i]
+			// Render slider
+			if mut hitobject is object.Slider {
+				if beatmap.last_update <= hitobject.get_start_time() && hitobject.hitcircle.hitcircle.is_drawable_at(beatmap.last_update) {
+					hitobject.slider_renderer_attr.update_vertex_progress(0, 0)
+					hitobject.slider_renderer_attr.draw_slider(hitobject.hitcircle.hitcircle.color.a, hitobject.color)
+				}
+
+				if beatmap.last_update >= hitobject.get_start_time() && hitobject.slider_overlay_sprite.is_drawable_at(beatmap.last_update) {
+					hitobject.slider_renderer_attr.update_vertex_progress(0, 0)
+					hitobject.slider_renderer_attr.draw_slider(hitobject.slider_overlay_sprite.color.a, hitobject.color)
+				}
+			}
+
+			// Render hitcircle
+			gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 			beatmap.queue[i].draw(ctx: beatmap.ctx, time: beatmap.last_update)
 			sgl.draw()
 			gfx.end_pass()
