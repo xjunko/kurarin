@@ -148,11 +148,8 @@ pub fn parse_beatmap(path string) &Beatmap {
 				}
 
 				mut object := object.make_object(common_parse_with_key_value(line, ","))
-				if object.id == -10 { continue }
 
 				beatmap.objects << &object
-
-
 			}
 
 			else {}
