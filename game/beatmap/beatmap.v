@@ -170,8 +170,8 @@ pub fn (mut beatmap Beatmap) reset() {
 	beatmap.ensure_background_loaded()
 	beatmap.ensure_hitsound_loaded()
 
-	// Only start thread whe needed
-	if beatmap.storyboard.sprites.len > 0 {
+	// Only start thread when needed and not recording
+	if beatmap.storyboard.sprites.len > 0 && !settings.global.video.record {
 		beatmap.storyboard.start_thread()
 	}
 
@@ -215,6 +215,11 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 
 	// Storyboard
 	beatmap.storyboard.update_time(time)
+
+	// Update storyboard in beatmap thread if recording instead
+	if settings.global.video.record {
+		beatmap.storyboard.update(time)
+	}
 
 	// Playfield size update
 	// TODO: make this customizeable or smth
