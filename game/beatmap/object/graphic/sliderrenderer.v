@@ -200,7 +200,7 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 	if attr.vertices.len == 0 {
 		return // Something went wrong or the slider is just straitght up retadred
 	}
-
+	
 	// Bind the shit
 	attr.bindings.vertex_buffers[0] = C.sg_make_buffer(&C.sg_buffer_desc{
 		size: usize(attr.vertices.len * int(sizeof(f32))),
@@ -213,6 +213,7 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 
 	// Failed to create vertex_buffers
 	// if attr.bindings.vertex_buffers[0].id == 0 {
+	// TODO: Fix this dumbass code
 	if false {
 		logging.error("Failed to bind vertex buffers")
 		return 
@@ -241,6 +242,7 @@ pub fn (mut attr SliderRendererAttr) update_vertex_progress(start int, end int) 
 // Draw
 pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	if !global_renderer.has_been_initialized { panic("global_renderer.has_been_initialized == False; This should not happen.") }
+
 	if !attr.has_been_initialized { 
 		attr.make_vertices()
 		return
