@@ -8,6 +8,7 @@ import flag
 import math
 import sokol.gfx
 import sokol.sgl
+import time as timelib
 import library.gg
 
 import game.skin
@@ -34,6 +35,7 @@ pub struct Window {
 
 		// TODO: move this to somewhere else
 		audio_been_played bool
+		limiter           &time.Limiter = &time.Limiter{int(settings.global.window.fps), 0, 0}
 
 
 		// Recording stuff
@@ -136,6 +138,7 @@ pub fn window_init(mut window &Window) {
 		mut current_cursor := cursor.make_cursor(mut window.ctx)
 		current_cursor.bind_beatmap(mut window.beatmap)
 		cursor.make_replay(mut window.beatmap, mut current_cursor, cursor_i + 1, max_cursor)
+
 		// idk colors
 		current_cursor.trail_color.r = byte((math.sin(cursor_i + 0) * 100) + 128 * 0.4)
 		current_cursor.trail_color.g = byte((math.sin(cursor_i + 2) * 75) + 128 * 0.2)
@@ -174,23 +177,92 @@ pub fn window_init(mut window &Window) {
 
 pub fn window_draw(mut window &Window) {
 	window.draw()
+	window.limiter.sync()
 }
 
 pub fn window_draw_recording(mut window &Window) {
-	mut g_time := time.get_time()
-	for _ in 0 .. int(time.global.custom_delta) * 2 { // Exploit to make the rendering faster >:)), this will kill the pc but hey atleast the render is fast ;)
-		// Update
-		window.update(g_time.time)
+	window_size := gg.window_size()
 
-		// Draw
-		window.draw()
-
-		// Pipe 
-		window.pipe_window() 
-		window.pipe_audio()
-
-		g_time.tick()
+	if window_size.width != 1280 || window_size.height != 720 {
+		window.ctx.begin()
+		window.ctx.resize(1280, 720)
+		window.ctx.draw_text(0, 0, "Please make sure the window resolution is [1280, 720].", gx.TextCfg{color: gx.white})
+		window.ctx.end()
+		return
 	}
+
+	logging.info("Video rendering started!")
+
+	// Continue rendering
+	mut g_time := time.get_time()
+	mut last_progress := int(0)
+	mut last_count := i64(0)
+	mut count := i64(0)
+	mut last_time := timelib.ticks()
+
+	// shrug
+	update_delta := 1000.0 / 1000.0
+	fps_delta := 1000.0 / settings.global.video.fps
+	audio_delta := update_delta
+
+	mut delta_sum_video := fps_delta
+	mut delta_sum_audio := 0.0
+
+
+	end_time := window.beatmap.time.end + 3000
+	for g_time.time < end_time {
+		delta_sum_audio += update_delta
+
+		for delta_sum_audio >= audio_delta {
+			window.pipe_audio()
+			delta_sum_audio -= audio_delta
+		}
+
+		delta_sum_video += update_delta
+		if delta_sum_video >= fps_delta {
+			// Update
+			window.update(g_time.time)
+
+			// Draw
+			window.draw()
+
+			// Pipe 
+			window.pipe_window() 
+
+			g_time.tick()
+
+			// Print progress
+			count++
+			progress := int((g_time.time / end_time) * 100.0)
+
+			if math.fmod(progress, 5) == 0 && progress != last_progress {
+				speed := f64(count - last_count) * (1000 / g_time.fps) / (timelib.ticks() - last_time) 
+				eta := int((end_time - g_time.time) / 1000.0 / speed)
+
+				mut eta_text := ""
+
+				hours := eta / 3600
+				minutes := eta / 60
+
+				if hours > 0 {
+					eta_text += "${hours}h "
+				}
+
+				if minutes > 0 {
+					eta_text += "${minutes%60:02d}m"
+				}
+
+				logging.info("Progress: ${progress}% | Speed: ${speed:.2f}x | ETA: ${eta_text}")
+
+				last_time = timelib.ticks()
+				last_count = count
+				last_progress = progress
+
+			delta_sum_video -= fps_delta
+		}
+		}
+	}
+	window.ctx.quit() // Ok we're done...
 }
 
 pub fn initiate_game_loop(argument GameArgument) {
@@ -209,8 +281,8 @@ pub fn initiate_game_loop(argument GameArgument) {
 
 		// Just a test, remove `cursor.make_replay` on line 54 to get this working
 		// move_fn: fn (x_ f32, y_ f32, mut window &Window) {
-		// 	window.cursor.position.x = (x_ - x.resolution.offset.x) / x.resolution.playfield_scale
-		// 	window.cursor.position.y = (y_ - x.resolution.offset.y) / x.resolution.playfield_scale
+		// 	window.cursors[0].position.x = (x_ - x.resolution.offset.x) / x.resolution.playfield_scale
+		// 	window.cursors[0].position.y = (y_ - x.resolution.offset.y) / x.resolution.playfield_scale
 		// }
 	)
 
