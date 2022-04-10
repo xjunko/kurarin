@@ -9,7 +9,6 @@ import math
 import sokol.gfx
 import sokol.sgl
 import library.gg
-import time as timelib
 
 import game.skin
 import game.cursor
@@ -161,12 +160,13 @@ pub fn window_init(mut window &Window) {
 	if !window.record {
 		go fn (mut window &Window) {
 			mut g_time := time.get_time()
+			mut limiter := time.Limiter{int(settings.global.window.fps), 0, 0}
 			g_time.reset()
 			g_time.set_speed(settings.global.window.speed)
 			
 			for {
 				window.update(g_time.time)
-				timelib.sleep(time.update_rate_ms)
+				limiter.sync()
 			}
 		}(mut window)
 	}
