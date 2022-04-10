@@ -157,7 +157,7 @@ pub fn (mut slider Slider) update(time f64) bool {
 	}
 
 	// Generate shader -1000ms before
-	if time >= (slider.time.start - 1000) && isnil(slider.slider_renderer_attr) {
+	if time >= (slider.time.start - 1000) && slider.slider_renderer_attr == voidptr(0) {
 		slider.generate_slider_renderer()
 	}
 
