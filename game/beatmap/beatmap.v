@@ -81,7 +81,7 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 	// TODO: use storyboard
 	if beatmap.storyboard.sprites.len == 0 {
 		mut has_video := false
-		if os.exists(beatmap.get_video_path()) && !settings.global.gameplay.disable_background_video {
+		if beatmap.general.video_filename.len != 0 && os.exists(beatmap.get_video_path()) && !settings.global.gameplay.disable_background_video {
 			has_video = true
 			mut video := ffmpeg.make_video_sprite(beatmap.get_video_path(), mut beatmap.ctx, beatmap.general.video_offset)
 			beatmap.storyboard.video = video
