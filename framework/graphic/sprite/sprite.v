@@ -141,6 +141,7 @@ pub fn (mut sprite Sprite) is_drawable_at(time f64) bool {
 	//               Was working fine the day before...
 	if isnil(sprite.time) {
 		logging.error("Time is nulled when checking sprite, returning false.")
+		// logging.error("Amount of transforms: ${sprite.transforms.len}")
 		return false // ?? huh
 	}
 
