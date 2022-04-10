@@ -268,11 +268,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	attr.colors[5] = f32(colors[1] / 255.0)
 	attr.colors[6] = f32(colors[2] / 255.0)
 
-	// gfx.apply_pipeline(global_renderer.pip)
-	// gfx.apply_bindings(&attr.bindings)
-	// gfx.apply_uniforms(.vs, C.SLOT_vs_uniform, global_renderer.uniform)
-	// gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
-	// gfx.draw(0, attr.vertices.len, 1)
+	// FIXME: This is janky asf lmao but it works
 	gfx.begin_pass(global_renderer.pass, &global_renderer.pass_action2)
 		gfx.apply_pipeline(global_renderer.pip)
 			gfx.apply_bindings(&attr.bindings)
