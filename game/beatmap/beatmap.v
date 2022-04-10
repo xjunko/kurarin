@@ -1,6 +1,7 @@
 module beatmap
 
 import os
+import math
 import difficulty
 import timing
 import object
@@ -51,6 +52,7 @@ pub struct Beatmap {
 	pub mut:
 		root        string
 		filename    string
+		time        time.Time
 		general     BeatmapGeneralInfo
 		metadata    BeatmapMetadataInfo
 		difficulty  BeatmapDifficultyInfo
@@ -133,14 +135,21 @@ pub fn (mut beatmap Beatmap) reset() {
 	// Normal shit
 	beatmap.process_stack_position()
 
+	// Check for combo colors
+	if beatmap.combo_color.len == 0 {
+		beatmap.combo_color << gx.Color{255, 255, 255, 255}
+	}
+
 	mut combo_number := 1
+	mut combo_color := 0
 	for i, mut o in beatmap.objects {
 		if o.is_new_combo() {
 			combo_number = 1
+			combo_color++
 		}
 
 		// Set colors
-		color := beatmap.combo_color[o.color_offset % beatmap.combo_color.len]
+		color := beatmap.combo_color[(combo_color + o.color_offset) % beatmap.combo_color.len]
 		o.color = [f64(color.r), f64(color.g), f64(color.g)]
 
 		o.set_id(i)
@@ -160,7 +169,17 @@ pub fn (mut beatmap Beatmap) reset() {
 
 	beatmap.ensure_background_loaded()
 	beatmap.ensure_hitsound_loaded()
-	beatmap.storyboard.start_thread()
+
+	// Only start thread whe needed
+	if beatmap.storyboard.sprites.len > 0 {
+		beatmap.storyboard.start_thread()
+	}
+
+	// Set beatmap time
+	for object in beatmap.objects {
+		beatmap.time.start = math.min<f64>(object.time.start, beatmap.time.start)
+		beatmap.time.end = math.max<f64>(object.time.end, beatmap.time.end)
+	}
 }
 
 pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
