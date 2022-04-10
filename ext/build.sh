@@ -2,6 +2,13 @@ build_shaders() {
     v shader assets/shaders/slider.glsl
 }
 
+build_debug() {
+    clear &&
+    echo "Build: Debug" &&
+    build_shaders &&
+    v -cc gcc -cg .
+}
+
 build_development() {
     clear &&
     echo "Build: Development" &&
@@ -19,6 +26,11 @@ build_production() {
 case $1 in 
     "--prod"|"--production"|"-prod")
         build_production
+        exit 0
+        ;;
+
+    "--debug"|"--debug"|"-debug")
+        build_debug
         exit 0
         ;;
     *)
