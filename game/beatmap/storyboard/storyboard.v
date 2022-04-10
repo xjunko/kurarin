@@ -24,6 +24,7 @@ pub struct Storyboard {
 		video   &ffmpeg.VideoSprite = voidptr(0)
 
 		last_time f64
+		thread_started bool
 
 		// Cache
 		cache   map[string]gg.Image
@@ -38,34 +39,11 @@ pub fn (mut storyboard Storyboard) get_image(path string) gg.Image {
 	return storyboard.cache[path]
 }
 
-pub fn (mut storyboard Storyboard) update(time f64) {
+pub fn (mut storyboard Storyboard) update_time(time f64) {
 	storyboard.last_time = time
+}
 
-	// // Add to queue)
-	// for i := storyboard.last_index; i < storyboard.sprites.len; i++ {
-	// 	if (time >= storyboard.sprites[i].time.start - 100) &&
-	// 	   (time <= storyboard.sprites[i].time.end + 100) && 
-	// 	   (storyboard.sprites[i] !in storyboard.sprites_queue) { // This should do it
-	// 	   	   storyboard.sprites[i].update(time)
-	// 		   storyboard.sprites_queue << storyboard.sprites[i]
-	// 		   storyboard.last_index++
-	// 		   continue
-	// 	   }
-	// }
-
-	// // Update queue
-	// for i := 0; i < storyboard.sprites_queue.len; i++ {
-	// 	if time >= (storyboard.sprites_queue[i].time.end + 100) {
-	// 		// Remove from queue
-	// 		storyboard.sprites_queue = storyboard.sprites_queue[1..]
-	// 		i--
-	// 		continue
-	// 	}
-
-	// 	storyboard.sprites_queue[i].update(time)
-	// }
-
-
+pub fn (mut storyboard Storyboard) update(time f64) {
 	// remove and update
 	for mut sprite in storyboard.sprites {
 		// Remove
@@ -83,6 +61,22 @@ pub fn (mut storyboard Storyboard) update(time f64) {
 	if storyboard.video != voidptr(0) {
 		storyboard.video.update(storyboard.last_time)	
 	}
+}
+
+pub fn (mut storyboard Storyboard) start_thread() {
+	if storyboard.thread_started {
+		return
+	}
+
+	storyboard.thread_started = true
+
+	go fn (mut storyboard Storyboard){
+		mut limiter := time2.Limiter{120, 0, 0}
+		for storyboard.thread_started {
+			storyboard.update(storyboard.last_time)
+			limiter.sync()
+		}
+	}(mut storyboard)
 }
 
 pub fn (mut storyboard Storyboard) draw() {

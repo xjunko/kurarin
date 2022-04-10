@@ -160,6 +160,7 @@ pub fn (mut beatmap Beatmap) reset() {
 
 	beatmap.ensure_background_loaded()
 	beatmap.ensure_hitsound_loaded()
+	beatmap.storyboard.start_thread()
 }
 
 pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
@@ -194,7 +195,7 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 	graphic.update_boost_level(boost)
 
 	// Storyboard
-	beatmap.storyboard.update(time)
+	beatmap.storyboard.update_time(time)
 
 	// Playfield size update
 	// TODO: make this customizeable or smth
@@ -254,7 +255,8 @@ pub fn (mut beatmap Beatmap) draw() {
 	if !settings.global.gameplay.disable_hitobject { // We might want hitcircle hitsounds but not the hitcircle itself, so on draw calls ignored it but not on update calls
 		for i := beatmap.queue.len - 1; i >= 0; i-- {
 			mut hitobject := &beatmap.queue[i]
-			// Render slider
+			// Render slider body
+			// TODO: Fix this maybe, it looks kinda ugly like this.
 			if mut hitobject is object.Slider {
 				if beatmap.last_update <= hitobject.get_start_time() && hitobject.hitcircle.hitcircle.is_drawable_at(beatmap.last_update) {
 					hitobject.slider_renderer_attr.update_vertex_progress(0, 0)
