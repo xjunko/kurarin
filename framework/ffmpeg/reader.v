@@ -5,6 +5,7 @@ import math
 
 import framework.logging
 
+
 pub struct FFmpegReader {
 	mut:
 		video_path         string
@@ -53,11 +54,15 @@ pub fn (mut reader FFmpegReader) initialize_ffmpeg() {
 	reader.process.set_args(ffmpeg_arg)
 	reader.process.set_redirect_stdio()
 	reader.process.run()
+	reader.ok = true
 }
 
 pub fn (mut reader FFmpegReader) update() {
+	if !reader.ok { return }
+
 	expected_data_length := int(reader.metadata.width * reader.metadata.height * 4)
 	mut remaining := expected_data_length
+	mut last_data_length := 0
 
 	unsafe {
 		reader.buffer.clear()
@@ -68,8 +73,31 @@ pub fn (mut reader FFmpegReader) update() {
 			remaining -= amount_of_bytes
 			reader.buffer << data.bytes()
 			data.free()
+
+			// Check if we dont have any new data received
+			if remaining == last_data_length {
+				// Ok shit, prolly something fucked up or video finished
+				logging.info("Video data fucked, stopping video.")
+				reader.ok = false // This video is invalid now, stop everything.
+				reader.stop()
+				break
+				
+			}
+			last_data_length =  remaining
 		}
 	}
+}
+
+pub fn (mut reader FFmpegReader) stop() {
+	// Dont block
+	go fn(mut reader FFmpegReader) {
+		reader.ok = false
+
+		reader.process.close()
+		for reader.process.status == .running {}
+		logging.info("Video stopped!")
+
+	}(mut reader)
 }
 
 pub fn load_video(path string) &FFmpegReader {
