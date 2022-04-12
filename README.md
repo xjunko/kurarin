@@ -1,6 +1,7 @@
-## Disclaimer
+## Info
 
-This is my personal side project so updates is very random.
+With the recent addition of proper slider rendering, the updates will be way way slower than it used to be (maybe) since the slider rendering is the thing that kept this project from
+finishing so yea....
 ## Preview
 
 (Latest Preview)
@@ -55,10 +56,3 @@ Some of the code is _derived_ or literally copy-pasted from these projects, so b
 * [danser-go](https://github.com/McKay42/McOsu) by [Wieku](https://github.com/Wieku)
 * [osr2mp4](https://github.com/uyitroa/osr2mp4-core) by [yuitora](https://github.com/uyitroa)
 * [opsu-dance](https://github.com/yugecin/opsu-dance) by [yugecin](https://github.com/yugecin)
-
-
-## TODOs
-
-* Implement proper timing instead of relying on time.sleep (Ref: [Larpon's timing control](https://ptb.discord.com/channels/592103645835821068/713953140952530965/938000930622828625))
-* Optimize Background Video
-* Optimize Slider Rendering
