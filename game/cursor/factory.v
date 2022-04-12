@@ -14,7 +14,7 @@ import game.settings
 
 const (
 	offset = settings.global.gameplay.auto_update_rate
-	tag_on_new_combo = false
+	tag_on_new_combo = true
 )
 
 // [deprecated: "TODO: remove this after we got realtime auto."]
