@@ -112,7 +112,7 @@ pub fn parse_beatmap(path string) &Beatmap {
 				}
 
 				// Background video
-				if line.starts_with('Video') {
+				if line.starts_with('Video') || line.starts_with("1") {
 					items := common_parse_with_key_value(line, ',')
 					beatmap.general.video_filename = items[2].replace('"', '')
 					beatmap.general.video_offset = math.abs(items[1].f64())
