@@ -3,7 +3,8 @@
 module gg
 
 import os
-import library.stbi
+import stbi
+
 import sokol.gfx
 import sokol.sgl
 
