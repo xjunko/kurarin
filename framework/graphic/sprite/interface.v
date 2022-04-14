@@ -4,15 +4,18 @@ import library.gg
 import gx
 
 import framework.math.time
+import framework.math.camera
 import framework.math.vector
 import framework.math.transform
 
 [params]
 pub struct CommonSpriteArgument {
 	pub mut:
-		ctx   &gg.Context = voidptr(0)
-		time  f64
-		delta f64
+		ctx    &gg.Context = voidptr(0)
+		time   f64
+		delta  f64
+		scale  f64 = f64(1.0) // Extra scale so we can use it with boost
+		camera camera.Camera
 }
 
 [params]
