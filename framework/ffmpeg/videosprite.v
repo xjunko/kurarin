@@ -38,10 +38,10 @@ pub fn (mut video VideoSprite) draw(arg sprite.CommonSpriteArgument) {
 		video.ctx.draw_image_with_config(gg.DrawImageConfig{
 			img_id: video.tex_id,
 			img_rect: gg.Rect{
-				x: f32((x.resolution.resolution.x - video.source.metadata.width) / 2.0),
-				y: f32((x.resolution.resolution.y - video.source.metadata.height) / 2.0),
-				width: f32(video.source.metadata.width),
-				height: f32(video.source.metadata.height)
+				x: f32((x.resolution.resolution.x - (video.source.metadata.width * arg.scale)) / 2.0),
+				y: f32((x.resolution.resolution.y - (video.source.metadata.height * arg.scale)) / 2.0),
+				width: f32(video.source.metadata.width * arg.scale),
+				height: f32(video.source.metadata.height * arg.scale)
 			},
 			color: video.color,
 			additive: video.additive
