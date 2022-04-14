@@ -4,6 +4,7 @@ module x
 
 import framework.logging
 import framework.math.vector
+import framework.math.camera
 
 pub const (
 	resolution = &Resolution{}
@@ -16,6 +17,7 @@ pub struct Resolution {
 		playfield_scale f64
 		offset          vector.Vector2
 		scale			f64
+		camera          camera.Camera
 }
 
 pub fn (mut res Resolution) calculate() {
@@ -41,6 +43,10 @@ pub fn (mut res Resolution) calculate() {
 	// res.playfield_scale = get_playfield_size_factor(res)
 	// res.offset = get_playfield_offset(res)
 	// res.scale = res.resolution.y / 768
+
+	// Camera
+	res.camera.offset = res.offset
+	res.camera.scale = res.playfield_scale
 
 	logging.info(res.str())
 	logging.debug("Resolution calculated!")
