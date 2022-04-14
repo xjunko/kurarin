@@ -1,6 +1,11 @@
 module time
 
-import time as timelib // To avoid confusion (or make more)
+/*
+	TODO: Redesign this
+*/
+
+import math
+import time as timelib 
 import game.settings
 
 pub const (
@@ -33,6 +38,11 @@ pub fn tick() f64 {
 	return time.tick()
 }
 
+pub fn tick_average() {
+	mut time := get_time()
+	time.tick_average_fps()
+}
+
 fn init() {
 	// Starts counting time on startup albeit with a countdown so it doesnt kill the cpu
 	go fn () {
@@ -58,6 +68,9 @@ pub struct TimeCounter {
 		stop  			 bool
 		use_custom_delta bool
 		custom_delta     f64
+		
+		//
+		average f64
 }
 
 pub fn (mut t TimeCounter) reset() {
@@ -87,4 +100,22 @@ pub fn (mut t TimeCounter) tick() f64 {
 
 pub fn (mut t TimeCounter) set_speed(s f64) {
 	t.speed = s
+}
+
+// New shit
+// TODO: Maybe split this into its own struct?
+pub fn (mut t TimeCounter) tick_average_fps() {
+	delta := t.tick()
+
+	if t.average == 0.0 {
+		t.average = delta
+	}
+
+	rate := f64(1.0 - math.pow(0.1, delta / 100.0))
+	t.average = t.average + (delta - t.average) * rate
+}
+
+
+pub fn (t &TimeCounter) get_average_fps() f64 {
+	return 1000.0 / t.average
 }

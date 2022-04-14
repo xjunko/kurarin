@@ -108,7 +108,7 @@ pub fn (mut window Window) draw() {
 	// Texts (only on windowed mode)
 	if !settings.global.video.record {
 		window.ctx.draw_rect_filled(1200, 683, 100, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(1275, 683, "${time.global.fps:.0}fps [${time.global.delta:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
+		window.ctx.draw_text(1275, 683, "${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
 	}
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 	sgl.draw()
@@ -163,7 +163,7 @@ pub fn window_init(mut window &Window) {
 	if !window.record {
 		go fn (mut window &Window) {
 			mut g_time := time.get_time()
-			mut limiter := time.Limiter{int(settings.global.window.fps), 0, 0}
+			mut limiter := time.Limiter{480, 0, 0}
 			g_time.reset()
 			g_time.set_speed(settings.global.window.speed)
 			
@@ -177,6 +177,7 @@ pub fn window_init(mut window &Window) {
 
 pub fn window_draw(mut window &Window) {
 	window.draw()
+	time.tick_average()
 	window.limiter.sync()
 }
 
