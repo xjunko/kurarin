@@ -1,6 +1,5 @@
 module object
 
-import library.gg
 import math
 
 import framework.graphic.sprite
@@ -13,7 +12,6 @@ import game.beatmap.difficulty
 import game.beatmap.timing
 import game.audio
 import game.skin
-import game.x
 
 import curves
 import graphic
@@ -46,6 +44,10 @@ pub struct Slider {
 		sample_sets     []int
 		addition_sets   []int // TODO
 
+		// angle
+		start_angle f64
+		end_angle f64
+
 		// temp
 		done             bool
 		last_slider_time int
@@ -58,25 +60,11 @@ pub fn (mut slider Slider) set_combo_number(combo int) {
 }
 
 pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
-	slider.hitcircle.draw(arg)
+	slider.hitcircle.draw(arg) // Draw hitcircle
+
 	// Draw the easy stuff first
 	for mut sprite in slider.sprites {
-		if sprite.is_drawable_at(slider.last_time) {
-			size := sprite.size.scale(slider.music_boost)
-			pos := sprite.position.sub(sprite.origin.multiply(size))
-			arg.ctx.draw_image_with_config(gg.DrawImageConfig{
-					img: sprite.get_texture(),
-					img_id: sprite.get_texture().id,
-					img_rect: gg.Rect{
-						x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
-						y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-						width: f32(size.x * x.resolution.playfield_scale),
-						height: f32(size.y * x.resolution.playfield_scale)
-					},
-					color: sprite.color
-					rotate: f32(sprite.angle)
-			})
-		}
+		sprite.draw(arg)
 	}
 
 	// // Slider Vertex shit
@@ -248,7 +236,15 @@ pub fn (mut slider Slider) generate_slider_points() {
 	
 	// oh god
 	slider.curve = curves.new_slider_curve(slider_type, slider_points)
-	slider.end_position = slider.curve.point_at(slider.repeated % 2)
+	slider.end_position = slider.get_position_at_lazer(slider.time.end)
+
+	slider.start_angle = slider.get_start_angle()
+
+	if slider.curve.curves.len > 0 {
+		slider.end_angle = slider.curve.curves[slider.curve.curves.len - 1].get_end_angle()
+	} else {
+		slider.end_angle = slider.start_angle + math.pi
+	}
 
 	// Done
 	logging.debug("Done generating slider path!")
@@ -355,14 +351,12 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 
 		// 
 		mut position := slider.position
-		mut look_at := slider.position
+		mut angle := slider.end_angle
 
 		// O----<O Start to Finish
 		if (i % 2) == 1 {
 			position = slider.points[slider.points.len - 1]
-			look_at = slider.points[slider.points.len - 2] // Look one point behind instead of looking at start circle position
-		} else { // O>---O Finish to Start
-			look_at = slider.points[1]
+			angle = slider.start_angle
 		}
 
 		mut sprite := &sprite.Sprite{}
@@ -370,7 +364,7 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 		sprite.add_transform(typ: .move, time: time.Time{appear_time, appear_time}, before: [position.x, position.y])
 		
 		sprite.add_transform(typ: .scale_factor, time: time.Time{appear_time, appear_time}, before: [size_ratio])
-		sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [look_at.angle_rv(position)])
+		sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [angle])
 		sprite.add_transform(typ: .fade, time: time.Time{appear_time, circle_time}, before: [0.0], after: [255.0])
 		sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [255.0], after: [0.0])
 		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [size_ratio], after: [size_ratio * 1.2])
@@ -432,6 +426,14 @@ pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
 	slider.generate_slider_points()
 	slider.generate_slider_repeat_circle()
 	slider.generate_slider_follow_circles()
+}
+
+pub fn (mut slider Slider) get_start_angle() f64 {
+	return slider.position.angle_rv(slider.get_position_at_lazer(slider.time.start + math.min<f64>(10, slider.duration)))
+}
+
+pub fn (mut slider Slider) get_end_angle() f64 {
+	return slider.end_position.angle_rv(slider.get_position_at_lazer(slider.time.end - math.min<f64>(10, slider.duration)))
 }
 
 
