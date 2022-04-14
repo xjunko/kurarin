@@ -71,6 +71,7 @@ pub struct Beatmap {
 		playfield_size   vector.Vector2
 		temp_beatmap_sb  []string
 		last_update  	 f64
+		last_boost       f64
 		update_lock  	 &sync.Mutex = sync.new_mutex() // To prevent race, note that this might block the entire thing if draw or update method got stuck
 }
 
@@ -235,6 +236,7 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 
 	// Done
 	beatmap.last_update = time
+	beatmap.last_boost = boost
 	beatmap.update_lock.unlock()
 }
 
@@ -295,7 +297,7 @@ pub fn (mut beatmap Beatmap) draw() {
 
 			// Render hitcircle
 			gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
-			beatmap.queue[i].draw(ctx: beatmap.ctx, time: beatmap.last_update)
+			beatmap.queue[i].draw(ctx: beatmap.ctx, time: beatmap.last_update, scale: beatmap.last_boost, camera: x.resolution.camera)
 			sgl.draw()
 			gfx.end_pass()
 			gfx.commit()
