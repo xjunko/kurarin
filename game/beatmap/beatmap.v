@@ -185,6 +185,10 @@ pub fn (mut beatmap Beatmap) reset() {
 
 pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 	beatmap.update_lock.@lock()
+	
+	// Update shit
+	beatmap.last_update = time
+	beatmap.last_boost = boost
 
 	for i := beatmap.objects_i; i < beatmap.objects.len; i++ {
 		if (time >= (beatmap.objects[i].get_start_time() - beatmap.difficulty.preempt)) &&
@@ -208,14 +212,15 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 		}
 
 		beatmap.queue[i].update(time)
-		beatmap.queue[i].set_boost_level(boost)
+		beatmap.queue[i].set_boost_level(f32(beatmap.last_boost))
 	}
 
 	// Slider renderer scale
-	graphic.update_boost_level(boost)
+	graphic.update_boost_level(f32(beatmap.last_boost))
 
 	// Storyboard
 	beatmap.storyboard.update_time(time)
+	beatmap.storyboard.update_boost(beatmap.last_boost)
 
 	// Update storyboard in beatmap thread if recording instead
 	if settings.global.video.record {
@@ -233,10 +238,8 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 		beatmap.playfield_size.x = x.resolution.playfield.x
 		beatmap.playfield_size.y = x.resolution.playfield.y
 	}
-
+	
 	// Done
-	beatmap.last_update = time
-	beatmap.last_boost = boost
 	beatmap.update_lock.unlock()
 }
 
