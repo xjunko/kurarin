@@ -23,6 +23,7 @@ pub struct Storyboard {
 		sprites []&sprite.Sprite
 		video   &ffmpeg.VideoSprite = voidptr(0)
 
+		last_boost f64
 		last_time f64
 		thread_started bool
 
@@ -41,6 +42,10 @@ pub fn (mut storyboard Storyboard) get_image(path string) gg.Image {
 
 pub fn (mut storyboard Storyboard) update_time(time f64) {
 	storyboard.last_time = time
+}
+
+pub fn (mut storyboard Storyboard) update_boost(boost f64) {
+	storyboard.last_boost = boost
 }
 
 pub fn (mut storyboard Storyboard) update(time f64) {
@@ -84,7 +89,7 @@ pub fn (mut storyboard Storyboard) draw() {
 		if sprite.is_drawable_at(storyboard.last_time) || sprite.always_visible {
 			pos := sprite.position
 					.scale(storyboard_scale)
-					.sub(sprite.origin.multiply(sprite.size.scale(storyboard_scale)))
+					.sub(sprite.origin.multiply(sprite.size.scale(storyboard.last_boost * storyboard_scale)))
 					.add(x: 105 * storyboard_scale, y: 0)
 			
 			storyboard.ctx.draw_image_with_config(gg.DrawImageConfig{
@@ -93,8 +98,8 @@ pub fn (mut storyboard Storyboard) draw() {
 					img_rect: gg.Rect{
 						x: f32(pos.x),
 						y: f32(pos.y),
-						width: f32(sprite.size.x * storyboard_scale),
-						height: f32(sprite.size.y * storyboard_scale)
+						width: f32(sprite.size.x * (storyboard.last_boost * storyboard_scale)),
+						height: f32(sprite.size.y * (storyboard.last_boost * storyboard_scale))
 					},
 					color: sprite.color,
 					rotate: f32(sprite.angle)
@@ -104,7 +109,7 @@ pub fn (mut storyboard Storyboard) draw() {
 	}
 
 	if storyboard.video != voidptr(0) {
-		storyboard.video.draw(ctx: storyboard.ctx)	
+		storyboard.video.draw(ctx: storyboard.ctx, scale: storyboard.last_boost)
 	}
 }
 
