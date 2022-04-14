@@ -57,23 +57,9 @@ pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
 		                                                       //       is v and its kinda buggy, might as well put up a notice here
 	}
 
+	// Draw
 	for mut sprite in circle.sprites {
-		if sprite.is_drawable_at(circle.last_time) {
-			size := sprite.size.scale(circle.music_boost)
-			pos := sprite.position.sub(sprite.origin.multiply(size))
-			arg.ctx.draw_image_with_config(gg.DrawImageConfig{
-					img: sprite.get_texture(),
-					img_id: sprite.get_texture().id,
-					img_rect: gg.Rect{
-						x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x) ,
-						y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-						width: f32(size.x * x.resolution.playfield_scale),
-						height: f32(size.y * x.resolution.playfield_scale)
-					},
-					color: sprite.color,
-					additive: sprite.additive
-			})
-		}
+		sprite.draw(arg)
 	}
 
 	// Combo

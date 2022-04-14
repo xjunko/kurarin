@@ -176,5 +176,25 @@ pub fn (mut sprite Sprite) update(time f64) {
 	// 	}
 	// }
 }
-pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {}
+pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
+	if sprite.is_drawable_at(arg.time) {
+		size := sprite.size.scale(arg.camera.scale * arg.scale)
+		pos := sprite.position.scale(arg.camera.scale).sub(sprite.origin.multiply(size)).add(arg.camera.offset)
+
+		arg.ctx.draw_image_with_config(gg.DrawImageConfig{
+			img: sprite.get_texture(),
+			img_id: sprite.get_texture().id,
+			img_rect: gg.Rect{
+				x: f32(pos.x)
+				y: f32(pos.y),
+				width: f32(size.x),
+				height: f32(size.y)
+			},
+			rotate: f32(sprite.angle)
+			color: sprite.color,
+			additive: sprite.additive,
+		})
+	}
+}
+
 pub fn (mut sprite Sprite) draw_and_update(arg CommonSpriteArgument) {}

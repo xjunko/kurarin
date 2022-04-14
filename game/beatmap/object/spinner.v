@@ -1,11 +1,8 @@
 module object
 
-import library.gg
-
 import framework.graphic.sprite
 import framework.math.time
 
-import game.x
 import game.skin
 import game.audio
 import game.beatmap.difficulty
@@ -26,20 +23,7 @@ pub struct Spinner {
 
 pub fn (mut spinner Spinner) draw(arg sprite.CommonSpriteArgument) {
 	for mut sprite in spinner.sprites {
-		if sprite.is_drawable_at(spinner.last_time) {
-			pos := sprite.position.sub(sprite.origin.multiply(x: sprite.size.x, y: sprite.size.y))
-			arg.ctx.draw_image_with_config(gg.DrawImageConfig{
-					img: sprite.get_texture(),
-					img_id: sprite.get_texture().id,
-					img_rect: gg.Rect{
-						x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x),
-						y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-						width: f32(sprite.size.x * x.resolution.playfield_scale),
-						height: f32(sprite.size.y * x.resolution.playfield_scale)
-					},
-					color: sprite.color
-			})
-		}
+		sprite.draw(arg)
 	}
 }
 
