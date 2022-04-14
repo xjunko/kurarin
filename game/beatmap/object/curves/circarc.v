@@ -53,8 +53,7 @@ pub fn make_circ_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.Vector2) &C
 		total_angle = 2.0 * math.pi - total_angle
 	}
 
-	// HOLY FUCKING SHIT I HATE MATH SO MUCh
-	// IM NOT EVEN DOING THE MATH BUT HOLY
+	// so bad lmao
 	arc.total_angle = total_angle
 	arc.dir = dir
 	arc.start_angle = start
@@ -66,6 +65,14 @@ pub fn make_circ_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.Vector2) &C
 
 pub fn (circ CircArc) point_at(time f64) vector.Vector2 {
 	return vector.new_vec_rad(circ.start_angle + circ.dir * time * circ.total_angle, circ.r).add(circ.centre)
+}
+
+pub fn (circ CircArc) get_start_angle() f64 {
+	return circ.p1.angle_rv(circ.point_at(1.0 / circ.get_length()))
+}
+
+pub fn (circ CircArc) get_end_angle() f64 {
+	return circ.p3.angle_rv(circ.point_at((circ.get_length() - 1.0) / circ.get_length()))
 }
 
 pub fn (circ CircArc) get_length() f64 {

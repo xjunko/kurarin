@@ -62,6 +62,14 @@ pub fn (bezier Bezier) get_length() f64 {
 	return bezier.approx_length
 }
 
+pub fn (bezier Bezier) get_start_angle() f64 {
+	return bezier.points[0].angle_rv(bezier.point_at(1.0 / bezier.control_length))
+}
+
+pub fn (bezier Bezier) get_end_angle() f64 {
+	return bezier.points[bezier.points.len - 1].angle_rv(bezier.point_at(1.0 - 1.0 / bezier.control_length))
+}
+
 // Utils ?
 pub fn binomial_coeff(n i64, k i64) i64 {
 	if k < 0 || k > n {
