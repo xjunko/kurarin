@@ -52,13 +52,13 @@ pub fn (mut sprite Sprite) apply_event(t transform.Transform, time f64) {
 
 		.color {
 			pos := t.as_three(time)
-			sprite.color.r = byte(pos[0])
-			sprite.color.g = byte(pos[1])
-			sprite.color.b = byte(pos[2])
+			sprite.color.r = u8(pos[0])
+			sprite.color.g = u8(pos[1])
+			sprite.color.b = u8(pos[2])
 		}
 		
 		.fade {
-			sprite.color.a = byte(t.as_one(time))
+			sprite.color.a = u8(t.as_one(time))
 		}
 
 		.scale {

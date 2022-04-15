@@ -47,9 +47,9 @@ pub struct Circle {
 pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
 	if settings.global.miscellaneous.rainbow_hitcircle {
 		time := circle.last_time / 100.0
-		circle.hitcircle.color.r = byte(f32(math.sin(0.3*time + 0 + 1 * 1) * 127.0 + 128.0))
-		circle.hitcircle.color.g = byte(f32(math.sin(0.3*time + 2 + 1 * 1) * 127.0 + 128.0))
-		circle.hitcircle.color.b = byte(f32(math.sin(0.3*time + 4 + 1 * 1) * 127.0 + 128.0))
+		circle.hitcircle.color.r = u8(f32(math.sin(0.3*time + 0 + 1 * 1) * 127.0 + 128.0))
+		circle.hitcircle.color.g = u8(f32(math.sin(0.3*time + 2 + 1 * 1) * 127.0 + 128.0))
+		circle.hitcircle.color.b = u8(f32(math.sin(0.3*time + 4 + 1 * 1) * 127.0 + 128.0))
 
 		circle.combotext.color = circle.hitcircle.color
 		circle.approachcircle.color = circle.hitcircle.color

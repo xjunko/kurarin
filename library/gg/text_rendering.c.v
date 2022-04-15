@@ -63,7 +63,7 @@ fn new_ft(c FTConfig) ?&FT {
 	}
 
 	mut normal_path := c.font_path
-	mut bytes := []byte{}
+	mut bytes := []u8{}
 	$if android {
 		// First try any filesystem paths
 		bytes = os.read_bytes(c.font_path) or { []byte{} }

@@ -190,6 +190,16 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 	beatmap.last_update = time
 	beatmap.last_boost = boost
 
+	// Storyboard
+	beatmap.storyboard.update_time(time)
+	beatmap.storyboard.update_boost(beatmap.last_boost)
+
+	// Update storyboard in beatmap thread if recording instead
+	if settings.global.video.record {
+		beatmap.storyboard.update(time)
+	}
+
+	// Update hitobjects
 	for i := beatmap.objects_i; i < beatmap.objects.len; i++ {
 		if (time >= (beatmap.objects[i].get_start_time() - beatmap.difficulty.preempt)) &&
 		   (time <= (beatmap.objects[i].get_end_time() + difficulty.hit_fade_out + beatmap.difficulty.hit50)) {
@@ -217,15 +227,6 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 
 	// Slider renderer scale
 	graphic.update_boost_level(f32(beatmap.last_boost))
-
-	// Storyboard
-	beatmap.storyboard.update_time(time)
-	beatmap.storyboard.update_boost(beatmap.last_boost)
-
-	// Update storyboard in beatmap thread if recording instead
-	if settings.global.video.record {
-		beatmap.storyboard.update(time)
-	}
 
 	// Playfield size update
 	// TODO: make this customizeable or smth
@@ -264,7 +265,7 @@ pub fn (mut beatmap Beatmap) draw() {
 	beatmap.storyboard.draw() // Includes background
 
 	// Shitty background dim
-	beatmap.ctx.draw_rect_filled(0, 0, 1280, 720, gx.Color{0,0,0, byte(settings.global.gameplay.background_dim)})
+	beatmap.ctx.draw_rect_filled(0, 0, 1280, 720, gx.Color{0,0,0, u8(settings.global.gameplay.background_dim)})
 
 	// Playfield
 	// Insides
@@ -284,6 +285,7 @@ pub fn (mut beatmap Beatmap) draw() {
 	if !settings.global.gameplay.disable_hitobject { // We might want hitcircle hitsounds but not the hitcircle itself, so on draw calls ignored it but not on update calls
 		for i := beatmap.queue.len - 1; i >= 0; i-- {
 			mut hitobject := &beatmap.queue[i]
+			
 			// Render slider body
 			// TODO: Fix this maybe, it looks kinda ugly like this.
 			if mut hitobject is object.Slider {

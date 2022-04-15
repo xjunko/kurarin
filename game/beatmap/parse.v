@@ -129,7 +129,7 @@ pub fn parse_beatmap(path string) &Beatmap {
 			"Colours" {
 				items := common_parse_with_key_value(line, ":")
 				rgb := common_parse_with_key_value(items[1], ",")
-				color := gx.Color{byte(rgb[0].int()), byte(rgb[1].int()), byte(rgb[2].int()), byte(255)}
+				color := gx.Color{u8(rgb[0].int()), u8(rgb[1].int()), u8(rgb[2].int()), u8(255)}
 				beatmap.combo_color << color
 			}
 

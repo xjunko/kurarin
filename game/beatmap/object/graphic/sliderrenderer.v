@@ -208,7 +208,7 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 			ptr: attr.vertices.data,
 			size: usize(attr.vertices.len * int(sizeof(f32)))
 		}
-		label: &byte(0),
+		label: "SliderBinding".str,
 	})
 
 	// Failed to create vertex_buffers
@@ -284,7 +284,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 		sgl.enable_texture()
 			sgl.texture(global_renderer.color_img)
-		sgl.c4b(255, 255, 255, byte(255 - ( 255 * alpha )))
+		sgl.c4b(255, 255, 255, u8(255 - ( 255 * alpha )))
 		sgl.begin_quads()
 			sgl.v3f_t2f(0,    0,   1, 0, 1)
 			sgl.v3f_t2f(1280, 0,   1, 1, 1)

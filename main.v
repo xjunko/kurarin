@@ -41,9 +41,9 @@ pub struct Window {
 		// Recording stuff
 		record 		bool
 		video_proc  &os.Process = voidptr(0)
-		record_data &byte = voidptr(0)
+		record_data &u8 = voidptr(0)
 		audio_proc  &os.Process = voidptr(0)
-		audio_data  []byte
+		audio_data  []u8
 
 		// HACK: move this to somewhere else
 		beatmap_song &audio.Track = voidptr(0)
@@ -68,9 +68,9 @@ pub fn (mut window Window) update_cursor(time f64) {
 	// Rainbow mode if theres only one cursor
 	if window.cursors.len == 1 {
 		color_index := (f32(math.fmod(time / 100.0, 10000)) / 10000.0) + 0.1
-		window.cursors[0].trail_color.r = byte(f32(math.sin(0.3*(time / 1000.0) + 0 + 1 * color_index) * 127.0 + 128.0))
-		window.cursors[0].trail_color.g = byte(f32(math.sin(0.3*(time / 1000.0) + 2 + 1 * color_index) * 127.0 + 128.0))
-		window.cursors[0].trail_color.b = byte(f32(math.sin(0.3*(time / 1000.0) + 4 + 1 * color_index) * 127.0 + 128.0))
+		window.cursors[0].trail_color.r = u8(f32(math.sin(0.3*(time / 1000.0) + 0 + 1 * color_index) * 127.0 + 128.0))
+		window.cursors[0].trail_color.g = u8(f32(math.sin(0.3*(time / 1000.0) + 2 + 1 * color_index) * 127.0 + 128.0))
+		window.cursors[0].trail_color.b = u8(f32(math.sin(0.3*(time / 1000.0) + 4 + 1 * color_index) * 127.0 + 128.0))
 	}
 }
 
@@ -140,9 +140,9 @@ pub fn window_init(mut window &Window) {
 		cursor.make_replay(mut window.beatmap, mut current_cursor, cursor_i + 1, max_cursor)
 
 		// idk colors
-		current_cursor.trail_color.r = byte((math.sin(cursor_i + 0) * 100) + 128 * 0.4)
-		current_cursor.trail_color.g = byte((math.sin(cursor_i + 2) * 75) + 128 * 0.2)
-		current_cursor.trail_color.b = byte((math.sin(cursor_i + 4) * 50) + 128 * 0.5)
+		current_cursor.trail_color.r = u8((math.sin(cursor_i + 0) * 100) + 128 * 0.4)
+		current_cursor.trail_color.g = u8((math.sin(cursor_i + 2) * 75) + 128 * 0.2)
+		current_cursor.trail_color.b = u8((math.sin(cursor_i + 4) * 50) + 128 * 0.5)
 		window.cursors << current_cursor
 	}
 

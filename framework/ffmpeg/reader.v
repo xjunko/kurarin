@@ -15,7 +15,7 @@ pub struct FFmpegReader {
 		ok                bool
 
 	pub mut:
-		buffer 	  []byte
+		buffer 	  []u8
 
 		// Info
 		metadata  &Metadata = voidptr(0)

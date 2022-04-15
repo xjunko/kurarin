@@ -211,7 +211,7 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 			y: items[5].f64()
 		}
 		origin := vector.parse_origin(items[2])
-
+	
 		mut sprite := &sprite.Sprite{
 			origin: origin,
 			textures: [storyboard.get_image(img_path)] // ez

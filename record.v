@@ -61,14 +61,14 @@ pub fn (mut window Window) init_video_pipe_process() {
 
 	// Init record buffer
 	img_size := 1280 * 720 * 4
-	window.record_data = unsafe { &byte(malloc(img_size)) }
+	window.record_data = unsafe { &u8(malloc(img_size)) }
 
 	logging.info("VideoPipe Process started!")
 }
 
 pub fn (mut window Window) init_audio_pipe_process() {
 	audio_buffer_size := audio.get_required_buffer_size_for_mixer(1.0 / settings.global.video.fps)
-	window.audio_data = []byte{len: audio_buffer_size}
+	window.audio_data = []u8{len: audio_buffer_size}
 
 	// Create the process
 	window.audio_proc = os.new_process(
@@ -116,7 +116,8 @@ pub fn (mut window Window) pipe_window() {
 
 	// hacky but works
 	unsafe {
-		temp := window.record_data.vbytes(1280 * 720 * 4).bytestr()
+		// temp := window.record_data.vbytes(1280 * 720 * 4).bytestr()
+		temp := window.record_data.vstring_with_len(1280 * 720 * 4)
 		window.video_proc.stdin_write(temp)	
 		temp.free()
 	}
