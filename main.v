@@ -6,14 +6,17 @@ import os
 import gx
 import flag
 import math
+import sync
 import sokol.gfx
 import sokol.sgl
 import time as timelib
 import library.gg
 
+import game.x
 import game.skin
 import game.cursor
 import game.beatmap
+import game.ruleset
 import game.beatmap.object.graphic
 
 import framework.audio
@@ -36,6 +39,10 @@ pub struct Window {
 		// TODO: move this to somewhere else
 		audio_been_played bool
 		limiter           &time.Limiter = &time.Limiter{int(settings.global.window.fps), 0, 0}
+
+		// Ruleset
+		ruleset &ruleset.Ruleset = voidptr(0)
+		ruleset_mutex &sync.Mutex = sync.new_mutex()
 
 
 		// Recording stuff
@@ -82,6 +89,14 @@ pub fn (mut window Window) update(time f64) {
 		window.beatmap_song.play()
 	}
 
+	// Ruleset
+	window.ruleset_mutex.@lock()
+	window.ruleset.update_click_for(window.cursors[0], time - settings.global.gameplay.lead_in_time)
+	window.ruleset.update_normal_for(window.cursors[0], time - settings.global.gameplay.lead_in_time, false)
+	window.ruleset.update_post_for(window.cursors[0], time - settings.global.gameplay.lead_in_time, false)
+	window.ruleset.update(time - settings.global.gameplay.lead_in_time)
+	window.ruleset_mutex.unlock()
+
 	window.beatmap.update(time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
 	window.beatmap_song.update(time - settings.global.gameplay.lead_in_time)
 	window.update_cursor(time - settings.global.gameplay.lead_in_time)
@@ -103,13 +118,26 @@ pub fn (mut window Window) draw() {
 		}
 	}
 
-
 	window.ctx.begin()
 	// Texts (only on windowed mode)
 	if !settings.global.video.record {
 		window.ctx.draw_rect_filled(1200, 683, 100, 16, gx.Color{0, 0, 0, 100})
 		window.ctx.draw_text(1275, 683, "${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
 	}
+
+	// Draw keys
+	if window.cursors[0].left_button {
+		window.ctx.draw_rect_filled(32, 32, 32, 32, gx.blue)
+	} else {
+		window.ctx.draw_rect_filled(32, 32, 32, 32, gx.red)
+	}
+
+	if window.cursors[0].right_button {
+		window.ctx.draw_rect_filled(64, 32, 32, 32, gx.blue)
+	} else {
+		window.ctx.draw_rect_filled(64, 32, 32, 32, gx.red)
+	}
+
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 	sgl.draw()
 	gfx.end_pass()
@@ -136,8 +164,8 @@ pub fn window_init(mut window &Window) {
 	max_cursor := settings.global.gameplay.auto_tag_cursors
 	for cursor_i in 0 .. max_cursor {
 		mut current_cursor := cursor.make_cursor(mut window.ctx)
-		current_cursor.bind_beatmap(mut window.beatmap)
-		cursor.make_replay(mut window.beatmap, mut current_cursor, cursor_i + 1, max_cursor)
+		// current_cursor.bind_beatmap(mut window.beatmap)
+		// cursor.make_replay(mut window.beatmap, mut current_cursor, cursor_i + 1, max_cursor)
 
 		// idk colors
 		current_cursor.trail_color.r = u8((math.sin(cursor_i + 0) * 100) + 128 * 0.4)
@@ -145,6 +173,10 @@ pub fn window_init(mut window &Window) {
 		current_cursor.trail_color.b = u8((math.sin(cursor_i + 4) * 50) + 128 * 0.5)
 		window.cursors << current_cursor
 	}
+
+	// Make ruleset
+	window.ruleset = ruleset.new_ruleset(mut window.beatmap, mut window.cursors)
+
 
 	// If recording
 	if window.record {
@@ -177,6 +209,7 @@ pub fn window_init(mut window &Window) {
 
 pub fn window_draw(mut window &Window) {
 	window.draw()
+	
 	time.tick_average()
 	window.limiter.sync()
 }
@@ -281,10 +314,35 @@ pub fn initiate_game_loop(argument GameArgument) {
 		frame_fn: [window_draw, window_draw_recording][int(settings.global.video.record)] // yea...
 
 		// Just a test, remove `cursor.make_replay` on line 54 to get this working
-		// move_fn: fn (x_ f32, y_ f32, mut window &Window) {
-		// 	window.cursors[0].position.x = (x_ - x.resolution.offset.x) / x.resolution.playfield_scale
-		// 	window.cursors[0].position.y = (y_ - x.resolution.offset.y) / x.resolution.playfield_scale
-		// }
+		move_fn: fn (x_ f32, y_ f32, mut window &Window) {
+			window.cursors[0].position.x = (x_ - x.resolution.offset.x) / x.resolution.playfield_scale
+			window.cursors[0].position.y = (y_ - x.resolution.offset.y) / x.resolution.playfield_scale
+			
+		}
+
+		keydown_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window &Window) {
+			window.ruleset_mutex.@lock()
+			if keycode == .z {
+				window.cursors[0].left_button = true
+			}
+
+			if keycode == .x {
+				window.cursors[0].right_button = true
+			}
+			window.ruleset_mutex.unlock()
+		}
+		keyup_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window &Window) {
+			window.ruleset_mutex.@lock()
+			if keycode == .z {
+				window.cursors[0].left_button = false
+			}
+
+			if keycode == .x {
+				window.cursors[0].right_button = false
+			}
+
+			window.ruleset_mutex.unlock()
+		}
 	)
 
 	// Record or na
