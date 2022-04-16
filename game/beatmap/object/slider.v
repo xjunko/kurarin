@@ -59,6 +59,10 @@ pub fn (mut slider Slider) set_combo_number(combo int) {
 	slider.hitcircle.set_combo_number(combo)
 }
 
+pub fn (mut slider Slider) set_id(id int) {
+	slider.hitcircle.set_id(id)
+}
+
 pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 	slider.hitcircle.draw(arg) // Draw hitcircle
 
@@ -150,25 +154,25 @@ pub fn (mut slider Slider) update(time f64) bool {
 	}
 
 	// Hitsounds
-	if time >= slider.time.start && time <= slider.time.end {
-		times := int(((time - slider.time.start) / slider.duration) + 1)
+	// if time >= slider.time.start && time <= slider.time.end {
+	// 	times := int(((time - slider.time.start) / slider.duration) + 1)
 		
-		if slider.last_slider_time != times {
-			slider.play_hitsound(times - 1)
-			slider.last_slider_time = times
-		}
+	// 	if slider.last_slider_time != times {
+	// 		slider.play_hitsound(times - 1)
+	// 		slider.last_slider_time = times
+	// 	}
 
-		return false
-	}
+	// 	return false
+	// }
 
 
-	// Last hit
-	if time >= slider.time.end && !slider.done {
-		slider.play_hitsound(int(slider.repeated))
-		slider.done = true
+	// // Last hit
+	// if time >= slider.time.end && !slider.done {
+	// 	slider.play_hitsound(int(slider.repeated))
+	// 	slider.done = true
 
-		return true
-	}
+	// 	return true
+	// }
 
 
 	return false

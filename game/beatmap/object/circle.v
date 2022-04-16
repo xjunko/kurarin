@@ -96,18 +96,18 @@ pub fn (mut circle Circle) update(time f64) bool {
 	circle.combotext.update(time)
 
 	// Hitanimation, we're done
-	if time >= circle.get_start_time() && !circle.done {
-		circle.arm(true, time)
+	// if time >= circle.get_start_time() && !circle.done {
+	// 	// circle.arm(true, time)
 
-		// Dont play if this is inherited from a slider
-		if !circle.inherited {
-			circle.play_hitsound()
-		}
+	// 	// Dont play if this is inherited from a slider
+	// 	// if !circle.inherited {
+	// 	// 	circle.play_hitsound()
+	// 	// }
 		
-		circle.done = true
+	// 	circle.done = true
 
-		return true
-	}
+	// 	return true
+	// }
 
 	return false
 }
@@ -222,6 +222,17 @@ pub fn (mut circle Circle) arm(clicked bool, _time f64) {
 	circle.hitcircleoverlay.reset_attributes_based_on_transforms()
 	circle.approachcircle.reset_attributes_based_on_transforms()
 
+}
+
+pub fn (mut circle Circle) shake(_time f64) {
+	for mut sprite in circle.sprites {
+		sprite.add_transform(typ: .move_x, time: time.Time{_time, _time + 20}, before: [circle.position.x + 0], after: [circle.position.x + 8])
+		sprite.add_transform(typ: .move_x, time: time.Time{_time + 20, _time + 40}, before: [circle.position.x + 8], after: [circle.position.x - 8])
+		sprite.add_transform(typ: .move_x, time: time.Time{_time + 40, _time + 60}, before: [circle.position.x - 8], after: [circle.position.x + 8])
+		sprite.add_transform(typ: .move_x, time: time.Time{_time + 60, _time + 80}, before: [circle.position.x + 8], after: [circle.position.x - 8])
+		sprite.add_transform(typ: .move_x, time: time.Time{_time + 80, _time + 100}, before: [circle.position.x - 8], after: [circle.position.x + 8])
+		sprite.add_transform(typ: .move_x, time: time.Time{_time + 100, _time + 120}, before: [circle.position.x + 8], after: [circle.position.x + 0])
+	}
 }
 
 pub fn (mut circle Circle) play_hitsound() {

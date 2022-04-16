@@ -43,6 +43,10 @@ pub struct Cursor {
 		delta_pos   []vector.Vector2
 		delta_pos_i int
 
+		// Game shit
+		left_button	bool
+		right_button bool
+
 	mut:
 		sixty_delta   f64
 		last_time     f64
