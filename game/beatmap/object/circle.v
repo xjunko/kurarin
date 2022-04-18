@@ -218,14 +218,15 @@ pub fn (mut circle Circle) arm(clicked bool, _time f64) {
 	}
 
 	//  resets
-	circle.hitcircle.reset_attributes_based_on_transforms()
-	circle.hitcircleoverlay.reset_attributes_based_on_transforms()
-	circle.approachcircle.reset_attributes_based_on_transforms()
+	circle.hitcircle.reset_time_based_on_transforms()
+	circle.hitcircleoverlay.reset_time_based_on_transforms()
+	circle.approachcircle.reset_time_based_on_transforms()
 
 }
 
 pub fn (mut circle Circle) shake(_time f64) {
 	for mut sprite in circle.sprites {
+		sprite.remove_transform_by_type(.move_x)
 		sprite.add_transform(typ: .move_x, time: time.Time{_time, _time + 20}, before: [circle.position.x + 0], after: [circle.position.x + 8])
 		sprite.add_transform(typ: .move_x, time: time.Time{_time + 20, _time + 40}, before: [circle.position.x + 8], after: [circle.position.x - 8])
 		sprite.add_transform(typ: .move_x, time: time.Time{_time + 40, _time + 60}, before: [circle.position.x - 8], after: [circle.position.x + 8])
