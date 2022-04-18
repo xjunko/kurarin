@@ -12,7 +12,7 @@ pub struct ObjectState {
 pub struct Circle {
 	pub mut:
 		ruleset &Ruleset = voidptr(0)
-		hitcircle object.Circle
+		hitcircle &object.Circle = voidptr(0)
 		players []&DifficultyPlayer
 		state []ObjectState
 		fade_start_relative f64
@@ -106,7 +106,6 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 					player.right_cond_e = false
 
 					if action == .shake && circle.players.len == 1 {
-						println("SHAKE THAT SHIT")
 						circle.hitcircle.shake(time)
 						// panic("CIRCLE SHAKE")
 					}
@@ -122,7 +121,7 @@ pub fn (mut circle Circle) update_post_for(player &DifficultyPlayer, time f64, _
 	mut state := &circle.state[0]
 
 	if time > circle.hitcircle.get_end_time() + player.diff.hit50 && !state.is_hit {
-		position := circle.hitcircle.position
+		// position := circle.hitcircle.position
 
 		if circle.players.len == 1 {
 			circle.hitcircle.arm(false, time)
@@ -137,7 +136,7 @@ pub fn (mut circle Circle) update_post_for(player &DifficultyPlayer, time f64, _
 pub fn (mut circle Circle) update_post(_ f64) bool {
 	mut unfinished := 0
 
-	for i, player in circle.players {
+	for i, _ in circle.players {
 		state := &circle.state[i]
 
 		if !state.is_hit {
