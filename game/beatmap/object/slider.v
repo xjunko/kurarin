@@ -16,6 +16,12 @@ import game.skin
 import curves
 import graphic
 
+pub struct TickPoint {
+	pub mut:
+		time f64
+		pos vector.Vector2	
+		is_reverse bool
+}
 
 pub struct Slider {
 	HitObject
@@ -30,6 +36,11 @@ pub struct Slider {
 		duration        f64		
 		points          []vector.Vector2
 		curve           curves.SliderCurve
+
+		//
+		tick_points []TickPoint
+		tick_reverse []TickPoint
+		score_points []TickPoint
 
 		// 
 		slider_overlay_sprite &sprite.Sprite = &sprite.Sprite{}
@@ -49,6 +60,7 @@ pub struct Slider {
 		end_angle f64
 
 		// temp
+		is_sliding bool
 		done             bool
 		last_slider_time int
 		last_time        f64
@@ -60,7 +72,12 @@ pub fn (mut slider Slider) set_combo_number(combo int) {
 }
 
 pub fn (mut slider Slider) set_id(id int) {
+	slider.HitObject.set_id(id)
 	slider.hitcircle.set_id(id)
+}
+
+pub fn (mut slider Slider) get_number() i64 {
+	return slider.HitObject.get_id()
 }
 
 pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
@@ -103,6 +120,18 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 	// 	slider.slider_renderer_attr.draw_slider(slider.hitcircle.hitcircle.color.a)
 	// 	return
 	// }
+}
+
+pub fn (mut slider Slider) hit_edge(index int, time f64, is_hit bool) {
+	if index == 0 {
+		slider.arm_start(is_hit, time)
+	} else {
+		println("TODO: Slider HITEDGE | ARM EDGES")
+	}
+
+	if is_hit {
+		slider.play_hitsound(index)
+	}
 }
 
 pub fn (mut slider Slider) play_hitsound(index int) {
@@ -148,6 +177,13 @@ pub fn (mut slider Slider) update(time f64) bool {
 		sprite.update(time)
 	}
 
+	// HACK: MOVe this to somwhre else
+	slider_current_position := slider.get_position_at_lazer(time)
+	slider.slider_overlay_sprite.position.x = slider_current_position.x
+	slider.slider_overlay_sprite.position.y = slider_current_position.y
+	slider.slider_b_sprite.position.x = slider_current_position.x
+	slider.slider_b_sprite.position.y = slider_current_position.y
+
 	// Generate shader -1000ms before
 	if time >= (slider.time.start - 1000) && slider.slider_renderer_attr == voidptr(0) {
 		slider.generate_slider_renderer()
@@ -181,6 +217,64 @@ pub fn (mut slider Slider) update(time f64) bool {
 pub fn (mut slider Slider) post_update(time f64) {
 	logging.debug("Freeing slider.")
 	slider.slider_renderer_attr.free()
+}
+
+pub fn (mut slider Slider) arm_start(clicked bool, time f64) {
+	slider.hitcircle.arm(clicked, time)
+}
+
+pub fn (mut slider Slider) init_slide(_time f64) {
+	if _time < slider.time.start || _time > slider.time.end {
+		return
+	}
+
+	size_ratio := f64((slider.diff.circle_radius * 1.05 * 2) / 128)
+
+	slider.slider_overlay_sprite.reset_transform()
+	start_time := _time
+	fade_in_end := math.min<f64>(start_time + 180, slider.time.end)
+
+	slider.slider_overlay_sprite.add_transform(typ: .fade, time: time.Time{start_time, math.min<f64>(start_time + 60, slider.time.end)}, before: [0.0], after: [255.0])
+	slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{start_time, fade_in_end}, before: [size_ratio * 0.5], after: [size_ratio * 1.0])
+
+	slider.slider_overlay_sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + 200}, before: [255.0], after: [0.0])
+	slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + 200}, before: [size_ratio * 1.0], after: [size_ratio * 0.8])
+
+	slider.slider_overlay_sprite.reset_attributes_based_on_transforms()
+
+	// TODO: Follower thud-thud thingy
+	// https://github.com/Wieku/danser-go/blob/2b0ec47f1b93a338df37ece927743d3b92288cc0/app/beatmap/objects/slider.go#L755
+	// fade_base := 200.0
+	// mut fade_time := fade_base
+
+	// if slider.score_points.len >= 2 {
+	// 	fade_time = math.min<f64>(fade_time, slider.score_points[1].time - slider.score_points[0].time)
+	// }
+
+	// end_value := 1.1 - (fade_time / fade_base) * 0.1
+
+	// for i := 0; i < slider.score_points.len-1; i++ {
+	// 	mut p := &slider.score_points[i]
+	// 	end_time := p.time + fade_time
+
+	// 	if end_time < fade_in_end {
+	// 		continue
+	// 	}
+
+	// 	start_time := p.time
+	// 	start_value :=
+	// }
+
+	slider.is_sliding = true
+}
+
+pub fn (mut slider Slider) kill_slide(time f64) {
+	slider.slider_overlay_sprite.reset_transform()
+	
+	// TODO:
+	// https://github.com/Wieku/danser-go/blob/2b0ec47f1b93a338df37ece927743d3b92288cc0/app/beatmap/objects/slider.go#L780
+	slider.is_sliding = false
+
 }
 
 pub fn (mut slider Slider) set_boost_level(boost f32) {
@@ -222,6 +316,50 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 			slider.addition_sets[i] = items[1].int()
 		}
 	}
+
+	// Lazer-like score point calc, clean but unreliable
+	start_point := slider.timing.get_point_at(slider.time.start)
+	tick_distance := slider.timing.get_tick_distance(start_point)
+	slider_length := slider.curve.length
+	nan_timing_point := math.is_nan(start_point.beatlength)
+	velocity := slider.timing.get_velocity(start_point)
+	min_distance_from_end := velocity * 0.01
+	span_duration := slider_length * 1000.0 / velocity
+	end_time_lazer := slider.time.start + slider_length * 1000.0 * slider.repeated / velocity
+
+	for span := 0; span < slider.repeated; span++ {
+		span_start_time := slider.time.start + (f64(span) * slider.duration)
+		reversed := (span % 2) == 1
+
+		for d := tick_distance; d <= slider_length && !nan_timing_point; d += tick_distance {
+			if d >= slider_length - min_distance_from_end {
+				break
+			}
+
+			mut time_progress := d / slider_length
+
+			if reversed {
+				time_progress = 1 - time_progress
+			}
+
+			slider.score_points << TickPoint{
+				time: span_start_time + time_progress * span_duration
+			}
+		}
+
+		if span < int(slider.repeated) - 1 {
+			slider.score_points << TickPoint{
+				time: span_start_time + span_duration,
+				is_reverse: true
+			}
+		} else {
+			slider.score_points << TickPoint{
+				time: math.max<f64>(slider.time.start + (end_time_lazer - slider.time.start) / 2.0, end_time_lazer - 36.0),
+			}
+		}
+	}
+
+	
 }
 
 pub fn (mut slider Slider) generate_slider_points() {
@@ -255,8 +393,6 @@ pub fn (mut slider Slider) generate_slider_points() {
 }
 
 pub fn (mut slider Slider) generate_slider_follow_circles() {
-	size_ratio := f64((slider.diff.circle_radius * 1.05 * 2) / 128)
-
 	// not poggers
 	slider.slider_overlay_sprite.textures << skin.get_texture("sliderfollowcircle")
 	slider.slider_b_sprite.textures << skin.get_texture("sliderb")
@@ -269,63 +405,62 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 	slider.slider_b_sprite.add_transform(typ: .color, time: time.Time{slider.time.start, slider.time.start}, before: slider.color)
 
 	// The thing taht slider circle does
-	slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start + 160.0}, before: [size_ratio * 0.75], after: [size_ratio])
-	slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + 160.0}, before: [size_ratio], after: [size_ratio * 0.75])
+	// slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start + 160.0}, before: [size_ratio * 0.75], after: [size_ratio])
+	// slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.end, slider.time.end + 160.0}, before: [size_ratio], after: [size_ratio * 0.75])
 
 	// Movement
-	mut last_position := slider.position
-	mut last_angle := 0.0
+	// mut last_position := slider.position
+	// mut last_angle := 0.0
+	size_ratio := f64((slider.diff.circle_radius * 1.05 * 2) / 128)
 
 	for i, mut sprite in slider_sprites {
-		// Movement
-		offset := 16
+	// 	// Movement
+	// 	offset := 16
 
-		for temp_time := int(slider.time.start); temp_time <= int(slider.time.end); temp_time += offset {
-			times := int(((temp_time - slider.time.start) / slider.duration) + 1)
-			t_time := (f64(temp_time) - slider.time.start - (times - 1) * slider.duration)
-			rt := slider.pixel_length / slider.curve.length
+	// 	for temp_time := int(slider.time.start); temp_time <= int(slider.time.end); temp_time += offset {
+	// 		times := int(((temp_time - slider.time.start) / slider.duration) + 1)
+	// 		t_time := (f64(temp_time) - slider.time.start - (times - 1) * slider.duration)
+	// 		rt := slider.pixel_length / slider.curve.length
 
-			mut is_reversing := false
-			mut pos := vector.Vector2{}
+	// 		mut is_reversing := false
+	// 		mut pos := vector.Vector2{}
 
-			if (times % 2) == 1 {
-				pos = slider.curve.point_at(rt * t_time / slider.duration)
-				last_position = slider.curve.point_at(rt * (t_time - offset) / slider.duration)
-			} else {
-				pos = slider.curve.point_at((1.0 - t_time / slider.duration) * rt)
-				last_position = slider.curve.point_at((1.0 - (t_time - offset) / slider.duration) * rt)
-				is_reversing = true
-			}
-			sprite.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [last_position.x, last_position.y], after: [pos.x, pos.y])
+	// 		if (times % 2) == 1 {
+	// 			pos = slider.curve.point_at(rt * t_time / slider.duration)
+	// 			last_position = slider.curve.point_at(rt * (t_time - offset) / slider.duration)
+	// 		} else {
+	// 			pos = slider.curve.point_at((1.0 - t_time / slider.duration) * rt)
+	// 			last_position = slider.curve.point_at((1.0 - (t_time - offset) / slider.duration) * rt)
+	// 			is_reversing = true
+	// 		}
+	// 		sprite.add_transform(typ: .move, time: time.Time{temp_time, temp_time + offset}, before: [last_position.x, last_position.y], after: [pos.x, pos.y])
 
-			// SliderB angle
-			mut current_angle := pos.angle_rv(slider.position)
+	// 		// SliderB angle
+	// 		mut current_angle := pos.angle_rv(slider.position)
 
-			if is_reversing {
-				current_angle -= math.pi
-			}
+	// 		if is_reversing {
+	// 			current_angle -= math.pi
+	// 		}
 
-			sprite.add_transform(typ: .angle, time: time.Time{temp_time, temp_time + offset}, before: [last_angle], after: [current_angle])
-			last_angle = current_angle
-		}
+	// 		sprite.add_transform(typ: .angle, time: time.Time{temp_time, temp_time + offset}, before: [last_angle], after: [current_angle])
+	// 		last_angle = current_angle
+	// 	}
 
-		// Just incase
-		// sprite.add_transform(typ: .move, time: time.Time{slider.time.end - offset, slider.time.end}, before: [last_position.x, last_position.y], after: [slider.end_position.x, slider.end_position.y])
-
-		// Fadeout
-		sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [size_ratio])
+	// 	// Just incase
+	// 	// sprite.add_transform(typ: .move, time: time.Time{slider.time.end - offset, slider.time.end}, before: [last_position.x, last_position.y], after: [slider.end_position.x, slider.end_position.y])
 
 		// This is utterly retarded
 		// 0 is slider_overlay
 		// 1 is slider_b
 		if i == 0 {
-			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + 160.0}, before: [255.0], after: [0.0])
+			// sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + 160.0}, before: [255.0], after: [0.0])
 		} else {
-			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + 16.0}, before: [255.0], after: [0.0])
+			sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, slider.time.start}, before: [size_ratio])
+			sprite.add_transform(typ: .fade, time: time.Time{slider.time.end, slider.time.end + 120.0}, before: [255.0], after: [0.0])
 		}
 		
 	
-		// Done
+	// 	// Done
 		sprite.reset_size_based_on_texture()
 		sprite.reset_attributes_based_on_transforms()
 	}
@@ -391,17 +526,30 @@ pub fn (mut slider Slider) generate_slider_renderer() {
 }
 
 pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
-	if slider.points.len == 0 {
-		t0 := f64(2 / slider.pixel_length)
-		rt := f64(slider.pixel_length) / slider.curve.length
-		slider.points = []vector.Vector2{len: int(slider.pixel_length / 2)}
-		mut t := 0.0
+	// if slider.points.len == 0 {
+	// 	t0 := f64(2 / slider.pixel_length)
+	// 	rt := f64(slider.pixel_length) / slider.curve.length
+	// 	slider.points = []vector.Vector2{len: int(slider.pixel_length / 2)}
+	// 	mut t := 0.0
 
-		for i := 0; i < int(slider.pixel_length / 2); i++ {
-			slider.points[i] = slider.curve.point_at(f64(t) * f64(rt))
-			t += t0
+	// 	for i := 0; i < int(slider.pixel_length / 2); i++ {
+	// 		slider.points[i] = slider.curve.point_at(f64(t) * f64(rt))
+	// 		t += t0
+	// 	}
+	// }
+
+	if slider.points.len == 0 {
+		slider_quality := 100.0 // TODO: Move to settings
+		length := slider.curve.length
+		num_points := math.min<f64>(math.ceil(length * slider_quality / 100.0), 10000)
+
+		if num_points > 0 {
+			for i := 0; i < num_points; i++ {
+				slider.points << slider.curve.point_at(f64(i) / f64(num_points))
+			}
 		}
 	}
+
 
 	return slider.points
 }

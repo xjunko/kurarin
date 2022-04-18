@@ -226,16 +226,15 @@ pub fn (mut ruleset Ruleset) update_normal_for(cursor &cursor.Cursor, time f64, 
 		for i := 0; i < ruleset.processed.len; i++ {
 			mut g := &ruleset.processed[i]
 
-			// TODO: Slider ruleset
-			// if mut g is Slider {
-			// 	if was_slider_already {
-			// 		continue
-			// 	}
+			if mut g is Slider {
+				if was_slider_already {
+					continue
+				}
 
-			// 	if !g.is_hit(player) {
-			// 		was_slider_already = true
-			// 	}
-			// }
+				if !g.is_hit(player) {
+					was_slider_already = true
+				}
+			}
 
 			g.update_for(*player, time, process_slider_ends_ahead)
 		}
@@ -285,9 +284,9 @@ pub fn new_ruleset(mut beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &
 		}
 
 		if mut hitobject is object.Slider {
-			mut r_circle := &Circle{}
-			r_circle.init(ruleset, hitobject.hitcircle, diff_players)
-			ruleset.queue << r_circle
+			mut r_slider := &Slider{}
+			r_slider.init(ruleset, hitobject, diff_players)
+			ruleset.queue << r_slider
 		}
 	}
 
