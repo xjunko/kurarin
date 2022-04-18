@@ -112,3 +112,23 @@ pub fn (timing &Timings) get_point_at(time f64) TimingPoint {
 pub fn (timing &Timings) get_slider_time_part(point TimingPoint, pixel_length f64) f64 {
 	return f64(f32(1000.0*pixel_length) / f32(100.0*timing.slider_multiplier*(1000.0/point.get_beat_length())))
 }
+
+pub fn (timing &Timings) get_scoring_distance() f64 {
+	return (100.0 * timing.slider_multiplier) / timing.slider_tick_rate
+}
+
+pub fn (timing &Timings) get_tick_distance(point TimingPoint) f64 {
+	return timing.get_scoring_distance() / point.get_ratio()
+}
+
+pub fn (timing &Timings) get_velocity(point TimingPoint) f64 {
+	mut velocity := timing.get_scoring_distance() * timing.slider_tick_rate
+
+	beat_length := point.get_beat_length()
+
+	if beat_length >= 0 {
+		velocity *= 1000.0 / beat_length
+	}
+
+	return velocity
+}
