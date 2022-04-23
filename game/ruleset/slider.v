@@ -69,10 +69,21 @@ pub fn (mut slider Slider) init(ruleset &Ruleset, hitobject object.IHitObject, p
 		slider.state << &SliderState{}
 		slider.state[0].start_result = HitResult.miss
 
-		// mut edge_number := 1
+		mut edge_number := 1
 
-		// TODO: Points
-		// https://github.com/Wieku/danser-go/blob/master/app/rulesets/osu/slider.go#L79
+		for point in slider.hitslider.score_points {
+			if point.is_reverse {
+				slider.state[0].points << TickPoint{point.time, HitResult.slider_repeat, edge_number}
+				edge_number++
+			} else {
+				slider.state[0].points << TickPoint{point.time, HitResult.slider_point, -1}
+			}
+		}
+
+		if slider.state[0].points.len > 0 {
+			slider.state[0].points[slider.state[0].points.len - 1].time =  math.max<f64>((slider.hitslider.time.start)+(slider.hitslider.time.end-slider.hitslider.time.start)/2, (slider.hitslider.time.end)-36) //slider ends 36ms before the real end for scoring
+			slider.state[0].points[slider.state[0].points.len - 1].score_given = HitResult.slider_end
+		}
 	}
 }
 
