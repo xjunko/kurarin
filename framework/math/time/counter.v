@@ -40,6 +40,11 @@ pub fn tick() f64 {
 
 pub fn tick_average() {
 	mut time := get_time()
+
+	if time.time == 0.0 {
+		time.reset()
+	}
+
 	time.tick_average_fps()
 }
 
