@@ -86,7 +86,7 @@ pub fn (mut sprite Sprite) remove_transform_by_type(t transform.TransformType) {
 }
 
 pub fn (mut sprite Sprite) reset_transform() {
-	sprite.transforms = []transform.Transform{} // TODO: better way to clear transforms 
+	sprite.transforms = []transform.Transform{}
 }
 
 pub fn (mut sprite Sprite) add_transform(_t transform.Transform) {
@@ -135,6 +135,13 @@ pub fn (mut sprite Sprite) reset_attributes_based_on_transforms() {
 	}
 }
 
+pub fn (mut sprite Sprite) reset_time_based_on_transforms() {
+    for t in sprite.transforms {
+        sprite.time.start = math.min(sprite.time.start, t.time.start)
+		sprite.time.end = math.max(sprite.time.end, t.time.end)
+    }
+}
+
 // 
 pub fn (mut sprite Sprite) is_drawable_at(time f64) bool {
 	// HACKHACKHACK: New bug appeared out of nowhere, broken as of 10/4/22
@@ -177,7 +184,7 @@ pub fn (mut sprite Sprite) update(time f64) {
 	// }
 }
 pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
-	if sprite.is_drawable_at(arg.time) {
+	if sprite.is_drawable_at(arg.time) || sprite.always_visible {
 		size := sprite.size.scale(arg.camera.scale * arg.scale)
 		pos := sprite.position.scale(arg.camera.scale).sub(sprite.origin.multiply(size)).add(arg.camera.offset)
 
