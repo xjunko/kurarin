@@ -289,14 +289,20 @@ pub fn (mut beatmap Beatmap) draw() {
 			// Render slider body
 			// TODO: Fix this maybe, it looks kinda ugly like this.
 			if mut hitobject is object.Slider {
-				if beatmap.last_update <= hitobject.get_start_time() && hitobject.hitcircle.hitcircle.is_drawable_at(beatmap.last_update) && hitobject.slider_renderer_attr != voidptr(0){
-					hitobject.slider_renderer_attr.update_vertex_progress(0, 0)
-					hitobject.slider_renderer_attr.draw_slider(hitobject.hitcircle.hitcircle.color.a, hitobject.color)
-				}
+				// if beatmap.last_update <= hitobject.get_start_time() && hitobject.hitcircle.hitcircle.is_drawable_at(beatmap.last_update) && hitobject.slider_renderer_attr != voidptr(0){
+				// 	hitobject.slider_renderer_attr.update_vertex_progress(0, 0)
+				// 	hitobject.slider_renderer_attr.draw_slider(255, hitobject.color)
+				// 	// hitobject.slider_renderer_attr.draw_slider(hitobject.hitcircle.hitcircle.color.a, hitobject.color)
+				// }
 
-				if beatmap.last_update >= hitobject.get_start_time() && hitobject.slider_overlay_sprite.is_drawable_at(beatmap.last_update) && hitobject.slider_renderer_attr != voidptr(0){
-					hitobject.slider_renderer_attr.update_vertex_progress(0, 0)
-					hitobject.slider_renderer_attr.draw_slider(hitobject.slider_overlay_sprite.color.a, hitobject.color)					
+				// if beatmap.last_update >= hitobject.get_start_time() && hitobject.slider_overlay_sprite.is_drawable_at(beatmap.last_update) && hitobject.slider_renderer_attr != voidptr(0){
+				// 	hitobject.slider_renderer_attr.update_vertex_progress(0, 0)
+				// 	hitobject.slider_renderer_attr.draw_slider(255, hitobject.color)
+				// 	// hitobject.slider_renderer_attr.draw_slider(hitobject.slider_overlay_sprite.color.a, hitobject.color)					
+				// }
+
+				if beatmap.last_update <= hitobject.get_start_time() - beatmap.difficulty.preempt || beatmap.last_update <= hitobject.get_end_time() + difficulty.hit_fade_out {
+					hitobject.slider_renderer_attr.draw_slider(1.0 - hitobject.slider_renderer_fade.value, hitobject.color)
 				}
 			}
 
