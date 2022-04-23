@@ -17,6 +17,7 @@ import game.skin
 import game.cursor
 import game.beatmap
 import game.ruleset
+import game.overlays
 import game.beatmap.object.graphic
 
 import framework.audio
@@ -43,6 +44,9 @@ pub struct Window {
 		// Ruleset
 		ruleset &ruleset.Ruleset = voidptr(0)
 		ruleset_mutex &sync.Mutex = sync.new_mutex()
+
+		// Overlay
+		overlay &overlays.GameplayOverlay = voidptr(0)
 
 
 		// Recording stuff
@@ -89,6 +93,9 @@ pub fn (mut window Window) update(time f64) {
 		window.beatmap_song.play()
 	}
 
+	// Overlay
+	window.overlay.update(time - settings.global.gameplay.lead_in_time)
+
 	// Ruleset
 	window.ruleset_mutex.@lock()
 	window.ruleset.update_click_for(window.cursors[0], time - settings.global.gameplay.lead_in_time)
@@ -125,18 +132,7 @@ pub fn (mut window Window) draw() {
 		window.ctx.draw_text(1275, 683, "${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
 	}
 
-	// Draw keys
-	if window.cursors[0].left_button {
-		window.ctx.draw_rect_filled(32, 32, 32, 32, gx.blue)
-	} else {
-		window.ctx.draw_rect_filled(32, 32, 32, 32, gx.red)
-	}
-
-	if window.cursors[0].right_button {
-		window.ctx.draw_rect_filled(64, 32, 32, 32, gx.blue)
-	} else {
-		window.ctx.draw_rect_filled(64, 32, 32, 32, gx.red)
-	}
+	window.overlay.draw()
 
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 	sgl.draw()
@@ -177,6 +173,8 @@ pub fn window_init(mut window &Window) {
 	// Make ruleset
 	window.ruleset = ruleset.new_ruleset(mut window.beatmap, mut window.cursors)
 
+	// Overlay
+	window.overlay = overlays.new_gameplay_overlay(window.ruleset, window.cursors[0], window.ctx)
 
 	// If recording
 	if window.record {
