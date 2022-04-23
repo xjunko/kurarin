@@ -41,7 +41,9 @@ pub interface ISprite {
 		draw_and_update(CommonSpriteArgument)
 
 		add_transform(transform.Transform)
-
+		reset_transform()
+		remove_transform_by_type(transform.TransformType)
+		
 		reset_size_based_on_texture(CommonSpriteSizeResetArgument)
 		reset_attributes_based_on_transforms()
 
