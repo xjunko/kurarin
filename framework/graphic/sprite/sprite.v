@@ -19,7 +19,7 @@ pub struct Sprite {
 		// Attrs
 		additive       bool
 		always_visible bool
-		origin    vector.Vector2 = vector.centre
+		origin    vector.Origin = vector.centre
 		position  vector.Vector2
 		size      vector.Vector2
 		raw_size  vector.Vector2
@@ -200,6 +200,7 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 			rotate: f32(sprite.angle)
 			color: sprite.color,
 			additive: sprite.additive,
+			origin: sprite.origin
 		})
 	}
 }
