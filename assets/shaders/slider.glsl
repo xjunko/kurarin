@@ -10,23 +10,14 @@ uniform vs_uniform {
 out vec2 v_uv;
 
 void main() {
-    /*
-    cam = mgl32.Mat4FromRows(
-        mgl32.Vec4{0.001628, 0.000000, 0.000000, -0.416667},
-        mgl32.Vec4{0.000000, -0.002894, 0.000000, 0.555556},
-        mgl32.Vec4{0.000000, 0.000000, 1.000000, 0.000000},
-        mgl32.Vec4{0.000000, 0.000000, 0.000000, 1.000000},
-    )
-    */
-    // TODO: unhardcode this or maybe dont idk 
-    float playfield_scale = 1.453857; // HACK: not dynamic (1280x720)
+    // TODO: Unhardcode this
+    // HARDCODE: 1280x720 resolution
     mat4 proj = mat4(
-        0.001628 * playfield_scale, 0.0, 0.0, 0.0,
-        0.0, -0.002894 * playfield_scale, 0.0, 0.0,
+        0.002344 * playfield_scale, 0.0, 0.0, 0.0,
+        0.0, -0.004167 * playfield_scale, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
-        -0.416667 * playfield_scale, 0.555556 * playfield_scale, 0.000000, 1.0
+        -0.600000 * playfield_scale, 0.800000 * playfield_scale, 0.000000, 1.0
     );
-    
 
     mat4 trans = mat4(
         slider_beat_scale.x, 0.0, 0.0, 0.0,
@@ -35,7 +26,11 @@ void main() {
         0.0, 0.0, 0.0, 1.0
     );
 
-    gl_Position = proj * ((trans * vec4(in_position-centre, 1))+vec4(centre, 0));
+    gl_Position = proj * (
+            (
+                (trans * vec4(in_position, 1)) - (trans * vec4(centre, 1)) + (trans * vec4(0, 0, 0, 1))
+        ) + vec4(centre, 0)
+    );
     v_uv = texture_coord;
 }
 @end
@@ -85,7 +80,7 @@ void main() {
     float bodyAlphaMultiplier = 1.0;
     float bodyColorSaturation = 1.0;
 
-    // dunamic bullsh titerary
+    // Colors
     vec4 borderColor = vec4(colBorder.x, colBorder.y, colBorder.z, 1.0);
     vec4 bodyColor = vec4(colBody.x, colBody.y, colBody.z, 0.7*bodyAlphaMultiplier);
     vec4 outerShadowColor = vec4(0, 0, 0, 0.25);
@@ -101,7 +96,7 @@ void main() {
     innerBodyColor.rgb = bodyColor.rgb * 0.5 * bodyColorSaturation;
     innerBodyColor.a = 0.0;
 
-    // cond varianctt
+    // Conditional Variant
     if (v_uv.x < outerShadowSize - transitionSize) // just shadow
 	{
 		float delta = v_uv.x / (outerShadowSize - transitionSize);
