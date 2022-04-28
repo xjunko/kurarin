@@ -1,8 +1,15 @@
 ## Info
 
-With the recent addition of proper slider rendering, the updates will be way way slower than it used to be (maybe) since the slider rendering is the thing that kept this project from
-finishing so yea....
+Repo might be dead for awhile, blame school and vacations.
+
 ## Preview
+
+(Gameplay branch preview (Not public, yet)) </br>
+Awful gameplay I know
+
+https://user-images.githubusercontent.com/44401509/165777649-ca6827de-0126-4ffe-9672-bc461c912ecc.mp4
+
+
 
 (Latest Preview)
 
@@ -53,6 +60,6 @@ Then after that use the [`ext/build.sh`](https://github.com/FireRedz/kurarin/blo
 Some of the code is _derived_ or literally copy-pasted from these projects, so big credits to them.
 
 * [McOsu](https://github.com/McKay42/McOsu) by [McKay](https://github.com/McKay42)
-* [danser-go](https://github.com/McKay42/McOsu) by [Wieku](https://github.com/Wieku)
+* [danser-go](https://github.com/Wieku/danser-go) by [Wieku](https://github.com/Wieku)
 * [osr2mp4](https://github.com/uyitroa/osr2mp4-core) by [yuitora](https://github.com/uyitroa)
 * [opsu-dance](https://github.com/yugecin/opsu-dance) by [yugecin](https://github.com/yugecin)
