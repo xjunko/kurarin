@@ -14,6 +14,8 @@ module graphic
 	* figure out how the fuck to create a rendertarget (with depth test and blending)
 	* render slider on the rendertarget (with depth test and without blending) (pass 1)
 	* draw the rendertarget on the screen with (without depth test and with blending) (pass 2)
+
+	// OK DONE :DDDD
 */
 
 import game.settings
@@ -149,42 +151,6 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 					f32(p3.x), f32(p3.y), 0.0, 
 					1.0, 0.0
 				]
-
-				// 1
-				// attr.vertices[(24 * i) + 0] = f32(p1.x)
-				// attr.vertices[(24 * i) + 1] = f32(p1.y)
-				// attr.vertices[(24 * i) + 2] = 1.0
-
-				// attr.vertices[(24 * i) + 3] = f32(p3.x)
-				// attr.vertices[(24 * i) + 4] = f32(p3.y)
-				// attr.vertices[(24 * i) + 5] = 0.0
-
-				// attr.vertices[(24 * i) + 6] = 0.0
-				// attr.vertices[(24 * i) + 7] = 0.0
-
-				// // 2
-				// attr.vertices[(24 * i) + 8] = f32(p2.x)
-				// attr.vertices[(24 * i) + 9] = f32(p2.y)
-				// attr.vertices[(24 * i) + 10] = 1.0
-
-				// attr.vertices[(24 * i) + 11] = f32(p3.x)
-				// attr.vertices[(24 * i) + 12] = f32(p3.y)
-				// attr.vertices[(24 * i) + 13] = 0.0
-
-				// attr.vertices[(24 * i) + 14] = 0.0
-				// attr.vertices[(24 * i) + 15] = 0.0
-
-				// // 3
-				// attr.vertices[(24 * i) + 16] = f32(p3.x)
-				// attr.vertices[(24 * i) + 17] = f32(p3.y)
-				// attr.vertices[(24 * i) + 18] = 0.0
-
-				// attr.vertices[(24 * i) + 19] = f32(p3.x)
-				// attr.vertices[(24 * i) + 20] = f32(p3.y)
-				// attr.vertices[(24 * i) + 21] = 0.0
-
-				// attr.vertices[(24 * i) + 22] = 1.0
-				// attr.vertices[(24 * i) + 23] = 0.0
 			}
 		}
 	}
