@@ -13,10 +13,10 @@ void main() {
     // TODO: Unhardcode this
     // HARDCODE: 1280x720 resolution
     mat4 proj = mat4(
-        0.002344 * playfield_scale, 0.0, 0.0, 0.0,
-        0.0, -0.004167 * playfield_scale, 0.0, 0.0,
+        0.002344, 0.0, 0.0, 0.0,
+        0.0, -0.004167, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
-        -0.600000 * playfield_scale, 0.800000 * playfield_scale, 0.000000, 1.0
+        -0.600000, 0.800000, 0.000000, 1.0
     );
 
     mat4 trans = mat4(
