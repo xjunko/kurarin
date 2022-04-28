@@ -2,7 +2,7 @@ module ruleset
 
 import math
 import game.beatmap.object
-import game.beatmap.difficulty
+// import game.beatmap.difficulty
 
 pub struct ObjectState {
 	pub mut:
@@ -99,6 +99,8 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 							circle.hitcircle.arm(hit != .miss, time)
 						}
 
+						circle.ruleset.send_result(time, mut player.cursor, mut circle, position, hit)
+
 						state.is_hit = true
 					}
 				} else {
@@ -110,6 +112,8 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 						// panic("CIRCLE SHAKE")
 					}
 				}
+			} else if action == .click {
+				// circle.ruleset.send_result(time, mut player.cursor, mut circle, position, .miss)
 			}
 		}
 	}
@@ -117,11 +121,13 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 	return !state.is_hit
 }
 
-pub fn (mut circle Circle) update_post_for(player &DifficultyPlayer, time f64, _ bool) bool {
+pub fn (mut circle Circle) update_post_for(_player &DifficultyPlayer, time f64, _ bool) bool {
 	mut state := &circle.state[0]
+	mut player := unsafe { &_player }
 
 	if time > circle.hitcircle.get_end_time() + player.diff.hit50 && !state.is_hit {
-		// position := circle.hitcircle.position
+		position := circle.hitcircle.position
+		circle.ruleset.send_result(time, mut player.cursor, mut circle, position, .miss)
 
 		if circle.players.len == 1 {
 			circle.hitcircle.arm(false, time)

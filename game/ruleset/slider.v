@@ -4,7 +4,7 @@ import math
 
 import framework.math.vector
 
-import game.beatmap.difficulty
+// import game.beatmap.difficulty
 import game.beatmap.object
 
 const (
@@ -64,7 +64,7 @@ pub fn (mut slider Slider) init(ruleset &Ruleset, hitobject object.IHitObject, p
 
 	slider.fade_start_relative = 100000.0
 
-	for player in slider.players {
+	for mut player in slider.players {
 		slider.fade_start_relative = math.min<f64>(slider.fade_start_relative, player.diff.preempt)
 		slider.state << &SliderState{}
 		slider.state[0].start_result = HitResult.miss
@@ -143,6 +143,8 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 						slider.hitslider.hit_edge(0, time, hit != .slider_miss)
 					}
 
+					slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit)
+
 					state.is_start_hit = true
 				}
 			} else {
@@ -157,8 +159,9 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 	return state.is_start_hit
 }
 
-pub fn (mut slider Slider) update_for(player &DifficultyPlayer, time f64, process_slider_ends_ahead bool) bool {
+pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, process_slider_ends_ahead bool) bool {
 	mut state := &slider.state[0]
+	mut player := unsafe { &_player }
 
 	mut slider_position := vector.Vector2{}
 
@@ -230,8 +233,10 @@ pub fn (mut slider Slider) update_for(player &DifficultyPlayer, time f64, proces
 
 			if allowable && state.slide_start <= point.time {
 				state.scored++
+				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_point)
 			} else {
 				state.missed++
+				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_miss)
 			}
 		}
 
@@ -248,13 +253,18 @@ pub fn (mut slider Slider) update_for(player &DifficultyPlayer, time f64, proces
 	return true
 }
 
-pub fn (mut slider Slider) update_post_for(player &DifficultyPlayer, time f64, process_slider_ends_ahead bool) bool {
+pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, process_slider_ends_ahead bool) bool {
 	mut state := &slider.state[0]
+	mut player := unsafe { &_player }
 
 	if time > slider.hitslider.time.start + player.diff.hit50 && !state.is_start_hit {
 		if slider.players.len == 1 {
 			slider.hitslider.arm_start(false, time)
 		}
+
+		position := slider.hitslider.get_start_position()
+
+		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, .miss)
 
 		if player.left_cond {
 			state.down_button = left_button
@@ -275,11 +285,9 @@ pub fn (mut slider Slider) update_post_for(player &DifficultyPlayer, time f64, p
 
 		mut hit := HitResult.miss
 		rate := f64(state.scored) / f64(state.points.len + 1)
-
+	
 		if rate > 0 && slider.players.len == 1 {
-			println("TODO: Slider update_post_for HIT EDGE")
-			// slider.hitslider.hit_edge(slider.hitslider.tick_reverse, time, true)
-			slider.hitslider.hit_edge(1, time, true)
+			slider.hitslider.hit_edge(slider.hitslider.tick_reverse.len, time, true)
 		}
 
 		if rate == 1.0 {
@@ -292,6 +300,13 @@ pub fn (mut slider Slider) update_post_for(player &DifficultyPlayer, time f64, p
 
 		if hit != .miss {
 			// TODO: COMBO HOLD
+		}
+
+
+		// FIXME: Slider Repeat acc might be fucked rn, it keeps giving 100s
+		if hit == .miss || hit == .hit50 {
+			position := slider.hitslider.get_end_position()
+			slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit)
 		}
 
 		state.is_hit = true

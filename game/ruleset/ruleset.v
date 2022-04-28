@@ -8,6 +8,7 @@ import game.beatmap.difficulty
 import game.cursor
 
 import framework.logging
+import framework.math.vector
 
 const (
 	tolerance_2b = int(3)
@@ -99,9 +100,19 @@ pub struct Ruleset {
 
 		queue []IHitObject
 		processed []IHitObject
+
+		hit_listener HitListener
 }
 
-pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut object IHitObject, player &DifficultyPlayer) Action {
+type HitListener = fn (f64, i64, vector.Vector2, HitResult)
+
+pub fn (mut ruleset Ruleset) set_listener(func HitListener) {
+	ruleset.hit_listener = func
+}
+
+pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut object IHitObject, _player &DifficultyPlayer) Action {
+	mut player := &ruleset.subset[0].player
+
 	if mut object is Circle {
 		mut index := -1
 
@@ -253,6 +264,17 @@ pub fn (mut ruleset Ruleset) update_post_for(cursor &cursor.Cursor, time f64, pr
 	}
 }
 
+pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult) {
+	mut number := src.get_number()
+	// mut subset := &ruleset.subset[0]
+
+	// if result == .ignore || result == .miss {
+	// 	if result == .miss && isnil(ruleset.hit_listener) {
+	// 		// ruleset.hit_listener(time, number, position, mut ruleset)
+	// 	}
+	// }
+	ruleset.hit_listener(time, number, position, result)
+}
 
 // Factory
 pub fn new_ruleset(mut beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &Ruleset {
