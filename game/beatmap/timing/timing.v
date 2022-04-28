@@ -65,7 +65,7 @@ pub struct Timings {
 		original_points []TimingPoint
 
 		base_set int =  1
-		last_set int = 1
+		last_set int
 }
 
 pub fn (mut timing Timings) add_point(time f64, beatlength f64, sample_set int, sample_index int, sample_volume f64, signature int, inherited bool, kiai bool) {
