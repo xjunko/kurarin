@@ -290,6 +290,12 @@ pub fn parse_sprite_commands(mut spr &sprite.Sprite, commands []string) {
 				"A" { 
 					spr.additive = true
 				}
+				"V" {
+					logging.error("DUMBASS VFLIP FLAG")
+				}
+				"H" {
+					logging.error("DUMBASS HFLIP FLAG")
+				}
 				else {}
 			}
 			continue
