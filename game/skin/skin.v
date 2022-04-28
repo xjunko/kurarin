@@ -8,6 +8,7 @@ import framework.logging
 
 const (
 	global = &Skin{}
+	required_files = ["hit0", "hit50", "hit100", "hit300"]
 )
 
 //
@@ -22,6 +23,10 @@ pub fn bind_context(mut ctx &gg.Context) {
 	g.bind = true
 
 	logging.info("Skin's context is binded!")
+
+	for file in required_files {
+		get_texture(file)
+	}
 }
 //
 
@@ -72,9 +77,10 @@ pub fn get_texture_with_fallback(name string, fallback string) gg.Image {
 
 		// Check if failed
 		if skin.cache[name].id == 0 {
-			logging.error("Failed getting ${name} from skin, trying ${fallback}!")
+			logging.debug("Failed getting ${name} from skin, trying ${fallback}!")
 			
 			// Get from fallback
+			println(os.join_path(skin.fallback, fallback + '.png'))
 			skin.cache[fallback] = skin.ctx.create_image(os.join_path(skin.fallback, fallback + '.png'))
 			skin.cache[name] = skin.cache[fallback]
 		}
