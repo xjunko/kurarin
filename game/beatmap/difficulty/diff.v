@@ -4,6 +4,9 @@ pub const (
 	hit_fade_in = 400.0
 	hit_fade_out = 240.0
 	hit_range = 400.0
+	result_fade_in = 120.0
+	result_fade_out = 600.0
+	post_empt = 500.0
 )
 
 pub struct Difficulty {
