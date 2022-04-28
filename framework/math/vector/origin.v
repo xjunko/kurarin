@@ -1,22 +1,43 @@
 module vector
 
 pub const (
-	top_left = Vector2{0, 0}
-	top_centre = Vector2{0.5, -1}
-	top_right = Vector2{1, -1}
+	top_left = Origin{x: 0, y: 0, typ: OriginType.top_left}
+	top_centre = Origin{x: 0.5, y: -1, typ: OriginType.top_centre}
+	top_right = Origin{x: 1, y: -1, typ: OriginType.top_right}
 
 	
-	centre_left = Vector2{0, 0.5}
-	centre = Vector2{0.5, 0.5}
-	centre_right = Vector2{1, 0.5}
+	centre_left = Origin{x: 0, y: 0.5, typ: OriginType.centre_left}
+	centre = Origin{x: 0.5, y: 0.5, typ: OriginType.centre}
+	centre_right = Origin{x: 1, y: 0.5, typ: OriginType.centre_right}
 	
 
-	bottom_left = Vector2{0, 1}
-	bottom_centre = Vector2{0.5, 1}
-	bottom_right = Vector2{1, 1}
+	bottom_left = Origin{x: 0, y: 1, typ: OriginType.bottom_left}
+	bottom_centre = Origin{x: 0.5, y: 1, typ: OriginType.bottom_centre}
+	bottom_right = Origin{x: 1, y: 1, typ: OriginType.bottom_right}
 )
 
-pub fn parse_origin(s string) Vector2 {
+pub enum OriginType {
+	top_left
+	top_centre
+	top_right
+
+	centre_left
+	centre
+	centre_right
+
+	bottom_left
+	bottom_centre
+	bottom_right
+}
+
+pub struct Origin {
+	Vector2 
+
+	pub mut:
+		typ OriginType = OriginType.centre
+}
+
+pub fn parse_origin(s string) Origin {
 	return match s {
 		'TopLeft' { top_left }
 		'TopCentre' { top_centre }

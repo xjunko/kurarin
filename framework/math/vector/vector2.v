@@ -95,6 +95,10 @@ pub fn (v Vector2) length() f64 {
 	return math.sqrt(v.x*v.x + v.y*v.y)
 }
 
+pub fn (v Vector2) length_squared() f64 {
+	return v.x * v.x + v.y * v.y
+}
+
 pub fn (v Vector2) nor() Vector2 {
 	len := v.length()
 	return Vector2{
@@ -135,4 +139,13 @@ pub fn (v Vector2) scale_normal(x f64, y f64) Vector2 {
 
 pub fn (v Vector2) clone() Vector2 {
 	return Vector2{v.x, v.y}
+}
+
+pub fn (v Vector2) equal(t Vector2) bool {
+	return (v.x == t.x) && (v.y == t.y)
+}
+
+
+pub fn is_straight_line(a Vector2, b Vector2, c Vector2) bool {
+	return math.abs((b.y-a.y)*(c.x-a.x)-(b.x-a.x)*(c.y-a.y)) < 0.001
 }
