@@ -300,9 +300,59 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 		height := (if img_rect.height > 0 { img_rect.height } else { img.height }) * ctx.scale
 
 		sgl.push_matrix()
-		sgl.translate(x0 + (width / 2), y0 + (height / 2), 0)
-		sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
-		sgl.translate(-x0 - (width / 2), -y0 - (height / 2), 0)
+
+		// TODO: THIS SHIT IS DOG AWFUL, PLEASE USE MATH WHEN BRAIN AVAILABLE
+		match config.origin.typ {
+			.top_left {
+				sgl.translate(x0, y0, 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0, -y0, 0)
+			}
+			.top_centre {
+				sgl.translate(x0 + (width / 2), y0 - height, 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0 - (width / 2), -y0, 0)
+			}
+			.top_right {
+				sgl.translate(x0 + width, y0 - height, 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0 - width, -y0, 0)
+			}
+
+			.centre_left {
+				sgl.translate(x0, y0 + (height / 2), 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0, -y0 - (height / 2), 0)
+			}
+			.centre {
+				sgl.translate(x0 + (width / 2), y0 + (height / 2), 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0 - (width / 2), -y0 - (height / 2), 0)
+			}
+			.centre_right {
+				sgl.translate(x0 + width, y0 + (height / 2), 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0 - width, -y0 - (height / 2), 0)
+			}
+
+
+			.bottom_left {
+				sgl.translate(x0, y0 + height, 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0, -y0 - height, 0)
+			}
+			.bottom_centre {
+				sgl.translate(x0 + (width / 2), y0 + height, 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0 - (width / 2), -y0 - height, 0)
+			}
+			.bottom_right {
+				sgl.translate(x0 + width, y0 + height, 0)
+				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
+				sgl.translate(-x0 - width, -y0 - height, 0)
+			}
+		}
+
 	}
 
 	sgl.begin_quads()
