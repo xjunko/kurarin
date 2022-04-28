@@ -1,5 +1,7 @@
 module object
 
+import math
+
 import framework.graphic.sprite
 import framework.math.time
 
@@ -72,6 +74,7 @@ pub fn (mut spinner Spinner) set_difficulty(diff difficulty.Difficulty) {
 		t.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [0.0], after: [255.5])
 		t.add_transform(typ: .fade, time: time.Time{spinner.time.end, spinner.time.end + difficulty.hit_fade_out}, before: [255.0], after: [0.0])
 		t.add_transform(typ: .scale_factor, time: time.Time{start_time, start_time}, before: [0.75])
+		t.add_transform(typ: .angle, time: time.Time{start_time, spinner.time.end}, before: [0.0], after: [math.pi * 2.0])
 		
 
 		t.reset_size_based_on_texture()
