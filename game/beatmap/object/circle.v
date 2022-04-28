@@ -128,8 +128,8 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 	
 	//
 	if circle.inherited {
-		circle.hitcircle.textures << skin.get_texture("sliderstartcircleoverlay")
-		circle.hitcircleoverlay.textures << skin.get_texture("sliderstartcircle")
+		circle.hitcircle.textures << skin.get_texture_with_fallback("sliderstartcircleoverlay", "hitcircleoverlay")
+		circle.hitcircleoverlay.textures << skin.get_texture_with_fallback("sliderstartcircle", "hitcircle")
 	} else {
 		circle.hitcircle.textures << skin.get_texture("hitcircle")
 		circle.hitcircleoverlay.textures << skin.get_texture("hitcircleoverlay")
@@ -165,7 +165,7 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 			s.add_transform(typ: .fade, time: time.Time{start_time + diff.preempt * 0.4, start_time + diff.preempt * 0.7}, before: [255.0], after: [0.0])
 		} else {
 			s.add_transform(typ: .fade, time: time.Time{start_time, start_time + diff.fade_in}, before: [0.0], after: [255.0])
-			s.add_transform(typ: .fade, time: time.Time{end_time, end_time}, before: [0.0], after: [255.0])
+			s.add_transform(typ: .fade, time: time.Time{end_time, end_time + diff.hit50}, before: [255.0])
 		}
 
 		// Done
@@ -208,7 +208,7 @@ pub fn (mut circle Circle) arm(clicked bool, _time f64) {
 		// fade
 		circle.hitcircle.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
 		circle.hitcircleoverlay.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
-		circle.combotext.add_transform(typ: .fade, time: time.Time{start_time, end_time}, before: [255.0], after: [0.0])
+		circle.combotext.add_transform(typ: .fade, time: time.Time{start_time, start_time + 60}, before: [255.0], after: [0.0])
 	} else {
 		// Hidden or missed, same shit
 		end_time := start_time + 60.0
@@ -221,6 +221,7 @@ pub fn (mut circle Circle) arm(clicked bool, _time f64) {
 	circle.hitcircle.reset_time_based_on_transforms()
 	circle.hitcircleoverlay.reset_time_based_on_transforms()
 	circle.approachcircle.reset_time_based_on_transforms()
+	circle.combotext.reset_time_based_on_transforms()
 
 }
 
