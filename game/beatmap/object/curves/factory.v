@@ -79,3 +79,7 @@ pub fn (slider SliderCurve) point_at(time f64) vector.Vector2 {
 
 	return vector.Vector2{512/2, 384/2}
 }
+
+pub fn (slider SliderCurve) get_length() f64 {
+	return slider.length
+}
