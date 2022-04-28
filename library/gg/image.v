@@ -4,6 +4,8 @@ module gg
 
 import gx
 
+import framework.math.vector
+
 // DrawImageConfig struct defines the various options
 // that can be used to draw an image onto the screen
 pub struct DrawImageConfig {
@@ -20,6 +22,7 @@ pub:
 	
 	// Effects 
 	additive  bool
+	origin    vector.Origin
 }
 
 pub struct Rect {
