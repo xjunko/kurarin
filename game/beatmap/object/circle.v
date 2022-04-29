@@ -1,7 +1,7 @@
 module object
 
 import math
-import library.gg
+// import library.gg
 
 // import framework.logging
 import framework.math.time
@@ -14,7 +14,7 @@ import game.beatmap.difficulty
 import game.beatmap.timing
 import game.audio
 import game.skin
-import game.x
+// import game.x
 
 const (
 	default_hitcircle_size = 128.0
