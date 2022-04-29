@@ -25,6 +25,9 @@ pub struct Sprite {
 		raw_size  vector.Vector2
 		color     gx.Color = gx.white
 		angle     f64
+
+		flip_x    bool
+		flip_y    bool
 }
 
 
@@ -73,7 +76,18 @@ pub fn (mut sprite Sprite) apply_event(t transform.Transform, time f64) {
 			sprite.size.y = sprite.raw_size.y * factor
 		}
 
-		// else {}
+		// Special
+		.additive {
+			sprite.additive = true
+		}
+
+		.flip_vertically {
+			sprite.flip_x = true
+		}
+
+		.flip_horizontally {
+			sprite.flip_y = true
+		}
 	}
 }
 
@@ -200,7 +214,9 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 			rotate: f32(sprite.angle)
 			color: sprite.color,
 			additive: sprite.additive,
-			origin: sprite.origin
+			origin: sprite.origin,
+			flip_x: sprite.flip_x,
+			flip_y: sprite.flip_x
 		})
 	}
 }
