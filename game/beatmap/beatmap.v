@@ -269,10 +269,10 @@ pub fn (mut beatmap Beatmap) draw() {
 
 	// Playfield
 	// Insides
-	beatmap.ctx.draw_rect_filled(f32((1280 - beatmap.playfield_size.x) / 2), f32((720 - beatmap.playfield_size.y) / 2), f32(beatmap.playfield_size.x), f32(beatmap.playfield_size.y), gx.Color{0,0,0, 150})
+	beatmap.ctx.draw_rect_filled(f32((1280 - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((720 - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), gx.Color{0,0,0, 150})
 
 	// Outline
-	beatmap.ctx.draw_rect_empty(f32((1280 - beatmap.playfield_size.x) / 2), f32((720 - beatmap.playfield_size.y) / 2), f32(beatmap.playfield_size.x), f32(beatmap.playfield_size.y), gx.white)
+	beatmap.ctx.draw_rect_empty(f32((1280 - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((720 - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), gx.white)
 
 	// Done
 	sgl.draw()
