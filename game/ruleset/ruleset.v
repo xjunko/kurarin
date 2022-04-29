@@ -32,6 +32,12 @@ pub enum Action {
 	click
 }
 
+pub enum ComboResult  {
+	reset
+	hold
+	increase
+}
+
 pub struct ButtonState {
 	pub mut:
 		left bool
@@ -104,7 +110,7 @@ pub struct Ruleset {
 		hit_listener HitListener
 }
 
-type HitListener = fn (f64, i64, vector.Vector2, HitResult)
+type HitListener = fn (f64, i64, vector.Vector2, HitResult, ComboResult)
 
 pub fn (mut ruleset Ruleset) set_listener(func HitListener) {
 	ruleset.hit_listener = func
@@ -264,7 +270,7 @@ pub fn (mut ruleset Ruleset) update_post_for(cursor &cursor.Cursor, time f64, pr
 	}
 }
 
-pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult) {
+pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult, combo ComboResult) {
 	mut number := src.get_number()
 	// mut subset := &ruleset.subset[0]
 
@@ -273,7 +279,7 @@ pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mu
 	// 		// ruleset.hit_listener(time, number, position, mut ruleset)
 	// 	}
 	// }
-	ruleset.hit_listener(time, number, position, result)
+	ruleset.hit_listener(time, number, position, result, combo)
 }
 
 // Factory

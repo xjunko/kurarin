@@ -121,6 +121,7 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 				}
 
 				mut hit := HitResult.slider_miss
+				mut combo := ComboResult.reset
 				relative := math.abs<f64>(time - slider.hitslider.time.start)
 
 				if relative < player.diff.hit300 {
@@ -135,6 +136,7 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 
 				if state.start_result != .miss {
 					hit = .slider_start
+					combo = .increase
 				}
 
 				if hit != .ignore {
@@ -143,7 +145,7 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 						slider.hitslider.hit_edge(0, time, hit != .slider_miss)
 					}
 
-					slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit)
+					slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
 
 					state.is_start_hit = true
 				}
@@ -233,10 +235,17 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 
 			if allowable && state.slide_start <= point.time {
 				state.scored++
-				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_point)
+				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_point, .increase)
 			} else {
 				state.missed++
-				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_miss)
+
+				mut combo := ComboResult.reset 
+
+				if (state.scored + state.missed) == state.points.len {
+					combo = .hold
+				}
+
+				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_miss, combo)
 			}
 		}
 
@@ -264,7 +273,7 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 
 		position := slider.hitslider.get_start_position()
 
-		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, .miss)
+		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, .miss, .reset)
 
 		if player.left_cond {
 			state.down_button = left_button
@@ -284,6 +293,7 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 		}
 
 		mut hit := HitResult.miss
+		mut combo := ComboResult.reset
 		rate := f64(state.scored) / f64(state.points.len + 1)
 	
 		if rate > 0 && slider.players.len == 1 {
@@ -299,14 +309,14 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 		}
 
 		if hit != .miss {
-			// TODO: COMBO HOLD
+			combo = .hold
 		}
 
 
 		// FIXME: Slider Repeat acc might be fucked rn, it keeps giving 100s
 		if hit == .miss || hit == .hit50 {
 			position := slider.hitslider.get_end_position()
-			slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit)
+			slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
 		}
 
 		state.is_hit = true
