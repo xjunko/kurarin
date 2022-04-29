@@ -29,17 +29,7 @@ pub fn (mut ctx Context) create_image(file string) Image {
 	if !os.exists(file) {
 		return Image{}
 	}
-	$if macos {
-		if ctx.native_rendering {
-			// return C.darwin_create_image(file)
-			mut img := C.darwin_create_image(file)
-			// println('created macos image: $img.path w=$img.width')
-			// C.printf('p = %p\n', img.data)
-			img.id = ctx.image_cache.len
-			ctx.image_cache << img
-			return img
-		}
-	}
+
 	if !gfx.is_valid() {
 		// Sokol is not initialized yet, add stbi object to a queue/cache
 		// ctx.image_queue << file
@@ -197,10 +187,11 @@ fn create_image(file string) Image {
 		return Image{} // none
 	}
 	stb_img := stbi.load(file) or { return Image{} }
+
 	mut img := Image{
 		width: stb_img.width
 		height: stb_img.height
-		nr_channels: stb_img.nr_channels
+		nr_channels: 4 // FIXME: some voodoo hacks, this fixes fucked up image channels.
 		ok: stb_img.ok
 		data: stb_img.data
 		ext: stb_img.ext
