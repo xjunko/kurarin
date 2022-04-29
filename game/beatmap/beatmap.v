@@ -171,7 +171,7 @@ pub fn (mut beatmap Beatmap) reset() {
 	beatmap.ensure_background_loaded()
 	beatmap.ensure_hitsound_loaded()
 
-	// Only start thread when needed and not recording
+	// // Only start thread when needed and not recording
 	if beatmap.storyboard.sprites.len > 0 && !settings.global.video.record {
 		beatmap.storyboard.start_thread()
 	}
@@ -257,6 +257,9 @@ pub fn (mut beatmap Beatmap) post_update(time f64) {
 }
 
 pub fn (mut beatmap Beatmap) draw() {
+	// FIXME: This is kinda fucked ngl
+	// FIXME: data race or smth idk what its called
+	beatmap.storyboard.mutex.@lock()
 	beatmap.update_lock.@lock()
 
 	// Background/Storyboard draws
@@ -313,6 +316,7 @@ pub fn (mut beatmap Beatmap) draw() {
 	
 	//
 	beatmap.update_lock.unlock()
+	beatmap.storyboard.mutex.unlock()
 }
 
 // Property
