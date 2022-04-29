@@ -520,7 +520,7 @@ pub fn (mut slider Slider) generate_slider_path() {
 pub fn (mut slider Slider) generate_slider_follow_circles() {
 	// not poggers
 	slider.slider_overlay_sprite.textures << skin.get_texture("sliderfollowcircle")
-	slider.slider_b_sprite.textures << skin.get_texture("sliderb")
+	slider.slider_b_sprite.textures << skin.get_frames("sliderb")
 
 	mut slider_sprites := []&sprite.Sprite{}
 	slider_sprites << slider.slider_overlay_sprite
