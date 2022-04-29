@@ -22,6 +22,8 @@ pub struct TickPoint {
 		time f64
 		pos vector.Vector2	
 		is_reverse bool
+		// fade &glider.Glider = &glider.Glider{}
+		// scale &glider.Glider = &glider.Glider{}
 }
 
 pub struct Pathline {
@@ -36,6 +38,7 @@ pub struct Slider {
 
 	pub mut:
 		timing          timing.Timings
+		timing_point    timing.TimingPoint
 		hitcircle 		&Circle
 
 		// Slider shit
@@ -198,6 +201,10 @@ pub fn (mut slider Slider) post_update(time f64) {
 	slider.slider_renderer_attr.free()
 }
 
+pub fn (mut slider Slider) is_retarded() bool {
+	return slider.score_path.len == 0 || slider.time.start == slider.time.end
+}
+
 pub fn (mut slider Slider) arm_start(clicked bool, time f64) {
 	slider.hitcircle.arm(clicked, time)
 }
@@ -223,30 +230,30 @@ pub fn (mut slider Slider) init_slide(_time f64) {
 
 	// TODO: Follower thud-thud thingy
 	// https://github.com/Wieku/danser-go/blob/2b0ec47f1b93a338df37ece927743d3b92288cc0/app/beatmap/objects/slider.go#L755
-	fade_base := 200.0
-	mut fade_time := fade_base
+	// fade_base := 200.0
+	// mut fade_time := fade_base
 
-	if slider.score_points.len >= 2 {
-		fade_time = math.min<f64>(fade_time, slider.score_points[1].time - slider.score_points[0].time)
-	}
+	// if slider.score_points.len >= 2 {
+	// 	fade_time = math.min<f64>(fade_time, slider.score_points[1].time - slider.score_points[0].time)
+	// }
 
-	end_value := 1.1 - (fade_time / fade_base) * 0.1
+	// end_value := 1.1 - (fade_time / fade_base) * 0.1
 
-	for i := 0; i < slider.score_points.len-1; i++ {
-		mut p := &slider.score_points[i]
-		end_time := p.time + fade_time
+	// for i := 0; i < slider.score_points.len-1; i++ {
+	// 	mut p := &slider.score_points[i]
+	// 	end_time := p.time + fade_time
 
-		if end_time < fade_in_end {
-			continue
-		}
+	// 	if end_time < fade_in_end {
+	// 		continue
+	// 	}
 
-		start_time = p.time
-		mut start_value := 1.1
+	// 	start_time = p.time
+	// 	mut start_value := 1.1
 
-		if start_time < fade_in_end {
-			slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, math.min<f64>(slider.time.end, end_time)}, before: [start_value], after: [end_value])
-		}
-	}
+	// 	if start_time < fade_in_end {
+	// 		slider.slider_overlay_sprite.add_transform(typ: .scale_factor, time: time.Time{slider.time.start, math.min<f64>(slider.time.end, end_time)}, before: [size_ratio * start_value], after: [size_ratio * end_value])
+	// 	}
+	// }
 
 	slider.is_sliding = true
 }
@@ -283,6 +290,7 @@ pub fn (mut slider Slider) set_boost_level(boost f32) {
 
 pub fn (mut slider Slider) set_timing(t timing.Timings) {
 	slider.timing = t
+	slider.timing_point = t.get_point_at(slider.time.start)
 	slider.hitcircle.set_timing(t)
 
 	// Slider data
@@ -316,26 +324,46 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 		}
 	}
 
-	// Lazer-like score point calc, clean but unreliable
-	start_point := slider.timing.get_point_at(slider.time.start)
-	tick_distance := slider.timing.get_tick_distance(start_point)
-	slider_length := slider.curve.length
-	nan_timing_point := math.is_nan(start_point.beatlength)
-	velocity := slider.timing.get_velocity(start_point)
-	min_distance_from_end := velocity * 0.01
-	span_duration := slider_length * 1000.0 / velocity
-	end_time_lazer := slider.time.start + slider_length * 1000.0 * slider.repeated / velocity
+	// Initialize slider curve
+	slider.generate_slider_path()
 
-	for span := 0; span < slider.repeated; span++ {
-		span_start_time := slider.time.start + (f64(span) * slider.duration)
+	// WARNING: God awful calculation starts here
+	nan_timing_point := math.is_nan(slider.timing_point.beatlength)
+
+	lines := slider.curve.get_lines()
+
+	mut start_time := slider.time.start
+
+	velocity := slider.timing.get_velocity(slider.timing_point)
+
+	c_length := slider.curve.get_length()
+
+	span_duration := c_length * 1000.0 / velocity
+
+	end_time_lazer := slider.time.start + c_length * 1000.0 * f64(slider.repeated) / velocity
+
+	min_distance_from_end := velocity * 0.01
+	mut tick_distance := slider.timing.get_tick_distance(slider.timing_point)
+
+	if slider.curve.get_length() > 0.0 && tick_distance > slider.pixel_length {
+		tick_distance = slider.pixel_length
+	}
+
+	// Lazer-like score point calculation, clean but not reliable
+	for span := 0; span < int(slider.repeated); span++ {
+		span_start_time := slider.time.start + f64(span) * span_duration
 		reversed := (span % 2) == 1
 
-		for d := tick_distance; d <= slider_length && !nan_timing_point; d += tick_distance {
-			if d >= slider_length - min_distance_from_end {
+		// Skip ticks if timingpoint has nan beatlength
+		for d := tick_distance; d <= c_length && !nan_timing_point; d += tick_distance {
+			if d >= c_length - min_distance_from_end {
 				break
 			}
 
-			mut time_progress := d / slider_length
+			// Always generate ticks from the start of the path rather than the span
+			// To ensure that ticks in repeat spans are positioned identically 
+			// to those in non-repeat spans
+			mut time_progress := d / c_length
 
 			if reversed {
 				time_progress = 1 - time_progress
@@ -346,30 +374,31 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 			}
 		}
 
-		if span < int(slider.repeated) - 1 {
+		if span < int(slider.repeated) - 1{
 			slider.score_points_lazer << TickPoint{
 				time: span_start_time + span_duration,
 				is_reverse: true
 			}
 		} else {
 			slider.score_points_lazer << TickPoint{
-				time: math.max<f64>(slider.time.start + (end_time_lazer - slider.time.start) / 2.0, end_time_lazer - 36.0),
+				time: math.max<f64>(
+					slider.time.start + (end_time_lazer - slider.time.start) / 2.0,
+					end_time_lazer - 36.0
+				)
 			}
 		}
 	}
 
-	// Stable
-	mut start_time := slider.time.start
-	lines := slider.curve.get_lines()
 	mut scoring_length_total := 0.0
 	mut scoring_distance := 0.0
 
-	for i := 0; i < slider.repeated; i++ {
-		mut distance_to_end := slider.curve.get_length()
-		mut skip_tick := false
+	// Stable-like score point processing, god awful
+	for i := i64(0); i < slider.repeated; i++ {
+		mut distance_to_end := f64(slider.curve.get_length())
+		mut skip_tick := nan_timing_point
 
 		reverse := (i % 2) == 1
-		
+
 		mut start := 0
 		mut end := lines.len
 		mut direction := 1
@@ -380,8 +409,8 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 			direction = -1
 		}
 
-		for j := start; j != end; j += direction {
-			mut line := &lines[j]
+		for j := start; j != end; j+= direction {
+			line := &lines[j]
 
 			mut p1, mut p2 := line.p1, line.p2
 
@@ -390,7 +419,9 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 			}
 
 			distance := line.get_length()
-			progress := 1000.0 * distance / velocity
+
+			progress := 1000.0 * f64(distance) / velocity
+
 			slider.score_path << Pathline{
 				time1: i64(start_time),
 				time2: i64(start_time + progress),
@@ -399,9 +430,8 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 
 			start_time += progress
 			slider.time.end = math.floor(start_time)
-
-			scoring_distance += distance
-
+			
+			scoring_distance += f64(distance)
 
 			for scoring_distance >= tick_distance && !skip_tick {
 				scoring_length_total += tick_distance
@@ -414,21 +444,29 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 					break
 				}
 
-				score_time := slider.time.start + math.floor(f64(f32(scoring_length_total) * 1000)/velocity)
+				score_time := slider.time.start + math.floor(
+					f64(f32(scoring_length_total) * 1000.0) / velocity
+				)
+
 				point := TickPoint{
 					score_time,
 					slider.get_position_at_lazer(score_time),
 					false
 				}
+
 				slider.tick_points << point
 				slider.score_points << point
 			}
 		}
 
 		scoring_length_total += scoring_distance
-		score_time := slider.time.start + math.floor((f64(f32(scoring_length_total))/velocity)*1000.0)
 
-		point := TickPoint{score_time, slider.get_position_at_lazer(score_time), true}
+		score_time := slider.time.start + math.floor((f64(f32(scoring_length_total)) / velocity) * 1000.0)
+		point := TickPoint{
+			score_time,
+			slider.get_position_at_lazer(score_time),
+			true
+		}
 
 		slider.tick_reverse << point
 		slider.score_points << point
@@ -439,14 +477,16 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 			scoring_length_total -= tick_distance - scoring_distance
 			scoring_distance = tick_distance - scoring_distance
 		}
+
 	}
 
+	
 	println("TickPoint: ${slider.tick_points.len} | ScorePoint: ${slider.score_points.len} - Lazer: ${slider.score_points_lazer.len} | TickReverse: ${slider.tick_reverse.len} | ScorePath: ${slider.score_path.len}")
 
 	slider.duration = (slider.time.end - slider.time.start) / f64(slider.repeated)
 }
 
-pub fn (mut slider Slider) generate_slider_points() {
+pub fn (mut slider Slider) generate_slider_path() {
 	logging.debug("Generating slider path!")
 
 	slider_points_raw := slider.data[5].split("|")
@@ -503,6 +543,41 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 
 	slider.sprites << slider.slider_overlay_sprite
 	slider.sprites << slider.slider_b_sprite
+}
+
+pub fn (mut slider Slider) generate_slider_tickpoints() {
+	texture := skin.get_texture("sliderscorepoint")
+	size_ratio := f64((slider.diff.circle_radius * 1.05 * 2) / 128)
+
+	// Nice variable name, weiku.
+	// https://github.com/Wieku/danser-go/blob/10faa98060a2dca369ff2aaf49e18496c8f4a008/app/beatmap/objects/slider.go#L440
+	sl_sn_in_s := slider.time.start - slider.diff.preempt
+	sl_sn_in_e := slider.time.start - slider.diff.preempt * 2.0/3.0 * 1.0 + slider.duration * 0.0
+
+	for mut p in slider.tick_points {
+		mut a := (p.time - slider.time.start) / 2.0 + slider.time.start - slider.diff.preempt * 2.0/3.0
+		mut fs := (p.time - slider.time.start) / slider.duration
+
+		if fs < 1.0 {
+			a = math.max<f64>(fs * (sl_sn_in_e - sl_sn_in_s) + sl_sn_in_s, a)
+		}
+
+		end_time := math.min<f64>(a + 150.0, p.time - 36.0)
+
+		// TODO: bruh
+		mut sprite := &sprite.Sprite{}
+		sprite.textures << texture
+
+		sprite.add_transform(typ: .move, time: time.Time{slider.time.start, slider.time.end}, before: [p.pos.x, p.pos.y])
+		sprite.add_transform(typ: .scale_factor, time: time.Time{a, end_time}, before: [size_ratio * 0.5], after: [size_ratio * 1.2])
+		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{end_time, end_time + 150.0}, before: [size_ratio * 1.2], after: [size_ratio * 1.0])
+		sprite.add_transform(typ: .fade, time: time.Time{a, end_time}, before: [0.0], after: [255.0])
+		sprite.add_transform(typ: .fade, time: time.Time{p.time, p.time + 16.0}, before: [255.0], after: [0.0])
+		sprite.reset_size_based_on_texture()
+		sprite.reset_attributes_based_on_transforms()
+
+		slider.sprites << sprite
+	}
 }
 
 pub fn (mut slider Slider) generate_slider_repeat_circle() {
@@ -577,6 +652,37 @@ pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
 	return slider.points
 }
 
+pub fn (mut slider Slider) get_position_at_stable(time f64) vector.Vector2 {
+	if slider.is_retarded() {
+		return slider.position
+	}
+
+	mut index := 0
+
+	for i := 0; i < slider.score_path.len; i++ {
+		if f64(slider.score_path[i].time2) >= time {
+			index = i
+			break
+		}
+	}
+
+	p_line := slider.score_path[int(math.clamp(index, 0, slider.score_path.len - 1))]
+	clamped := math.clamp(time, f64(p_line.time1), f64(p_line.time2))
+
+	mut pos := vector.Vector2{}
+
+	if p_line.time2 == p_line.time1 {
+		pos = p_line.line.p2
+	} else {
+		pos = p_line.line.point_at(
+			f32(clamped - f64(p_line.time1)) / 
+			f32(p_line.time2 - p_line.time1)
+		)
+	}
+
+	return pos
+}
+
 pub fn (mut slider Slider) get_position_at_lazer(time f64) vector.Vector2 {
 	t1 := math.clamp(time, slider.time.start, slider.time.end)
 	mut progress := (t1 - slider.time.start) / slider.duration
@@ -603,7 +709,7 @@ pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
 	slider.slider_renderer_fade.add_event_start(slider.time.end, slider.time.end + difficulty.hit_fade_out, 1.0, 0.0)
 
 	// Make points n shit
-	slider.generate_slider_points()
+	slider.generate_slider_tickpoints()
 	slider.generate_slider_repeat_circle()
 	slider.generate_slider_follow_circles()
 }
@@ -613,7 +719,7 @@ pub fn (mut slider Slider) get_start_angle() f64 {
 	return slider.position.angle_rv(slider.get_position_at_lazer(slider.time.start + math.min<f64>(10, slider.duration)))
 }
 
-pub fn (mut slider Slider) get_end_angle() f64 {
+pub fn (mut slider Slider) get_end_angle() f64 {	
 	// TODO: Fix this
 	return slider.end_position.angle_rv(slider.get_position_at_lazer(slider.time.end - math.min<f64>(10, slider.duration)))
 }
