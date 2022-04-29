@@ -1,6 +1,7 @@
 module storyboard
 
 import os
+import sync
 import math
 import library.gg
 
@@ -10,6 +11,7 @@ import framework.logging
 import framework.math.time as time2
 import framework.math.vector
 import framework.math.easing
+import framework.math.transform
 import framework.graphic.sprite
 
 pub const (
@@ -26,6 +28,7 @@ pub struct Storyboard {
 		last_boost f64
 		last_time f64
 		thread_started bool
+		mutex &sync.Mutex = sync.new_mutex()
 
 		// Cache
 		cache   map[string]gg.Image
@@ -78,7 +81,9 @@ pub fn (mut storyboard Storyboard) start_thread() {
 	go fn (mut storyboard Storyboard){
 		mut limiter := time2.Limiter{120, 0, 0}
 		for storyboard.thread_started {
+			storyboard.mutex.@lock()
 			storyboard.update(storyboard.last_time)
+			storyboard.mutex.unlock()
 			limiter.sync()
 		}
 	}(mut storyboard)
@@ -130,6 +135,16 @@ pub fn parse_comma(s string) []string {
 	return s.trim_space().split(',')
 }
 
+pub fn cut_whites(s string) (string, int) {
+	for i, c in s {
+		if c.is_letter() || c.is_digit() {
+			return s[i..], i
+		}
+	}
+
+	return s, 0
+}
+
 //
 pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 	mut current_section := ''
@@ -163,11 +178,6 @@ pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 							line = line.replace(key, value)
 						}
 					}
-				}
-
-				// Two spaces is usually loops and idw to deal with that for now
-				if line.starts_with('  ') {
-					continue
 				}
 				
 				if line.starts_with("Sprite") || line.starts_with("Animation") {
@@ -219,7 +229,13 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 
 		sprite.position.x = position.x
 		sprite.position.y = position.y
-		parse_sprite_commands(mut sprite, commands)
+		transforms := parse_sprite_commands(commands)
+
+		// FIXME: This is a hack
+		// println(transforms.len)
+		for transform in transforms {
+			sprite.add_transform(transform)
+		}
 
 		if sprite.transforms.len > 0 {
 			sprite.reset_size_based_on_texture()
@@ -227,7 +243,7 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 			storyboard.sprites << sprite 
 		}	
 
-		// check for stuff that doesnt have scale tranforms
+		// check for stuff that doesnt have scale transforms
 		mut has_been_scaled := false
 		for transform in sprite.transforms {
 			if transform.typ == .scale || transform.typ == .scale_factor {
@@ -243,167 +259,213 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 	}
 }
 
-pub fn parse_sprite_commands(mut spr &sprite.Sprite, commands []string) {
-	for command in commands {
-		mut items := parse_comma(command)
+pub fn parse_sprite_commands(commands []string) []&transform.Transform {
+	mut transforms := []&transform.Transform{}
+	mut current_loop := &LoopProcessor{}
+	mut loop_depth := -1
+	current_loop = voidptr(0) // HACK: epic trol
 
-		if items[0] == 'T' || items[0] == 'L' {
-			continue // aint fuckin with you
+	for subcommand in commands {
+		mut command := subcommand.split(",")
+		mut removed := 0
+
+		command[0], removed = cut_whites(command[0])
+
+		if command[0] == "T" {
+			continue // LOL NO
 		}
 
-		command_type := items[0]
-		easing := easing.get_easing_from_enum(easing.Easing(items[1].i8())) // looks fucked
+		if removed == 1 {
+			if current_loop != voidptr(0) {
+				transforms << current_loop.finalize()
 
-		mut start_time := items[2].f64()
+				current_loop = voidptr(0)
+				loop_depth = -1
+			}
 
-		if items[3] == '' {
-			items[3] = items[2]
+			if command[0] != "L" {
+				transforms << parse_command(mut command)
+			}
 		}
 
-		mut end_time := items[3].f64()
-		mut arguments := 0
-
-		// Make sure end_time is greater than start
-		end_time = math.max(start_time, end_time)
-
-		if end_time == start_time {
-			end_time = start_time + 1
+		if command[0] == "L" {
+			current_loop = make_loop_processor(command)
+			loop_depth = removed + 1
+		} else if removed == loop_depth && current_loop != voidptr(0) {
+			current_loop.add(mut command)
 		}
 		
+	}
 
-		match command_type {
-			'F', 'R', 'S', 'MX', 'MY' {
-				arguments = 1
+	if current_loop != voidptr(0) {
+		transforms << current_loop.finalize()
+	}
+
+	return transforms
+}
+
+pub fn parse_command(mut items []string) []&transform.Transform {
+	mut transforms := []&transform.Transform{}
+
+	if items[0] == 'T' || items[0] == 'L' {
+		panic("T or L command called in generic parser.")
+	}
+
+	command_type := items[0]
+	easing := easing.get_easing_from_enum(easing.Easing(items[1].i8())) // looks fucked
+
+	mut start_time := items[2].f64()
+
+	if items[3] == '' {
+		items[3] = items[2]
+	}
+
+	mut end_time := items[3].f64()
+	mut arguments := 0
+
+	// Make sure end_time is greater than start
+	end_time = math.max(start_time, end_time)
+
+	if end_time == start_time {
+		end_time = start_time + 1
+	}
+	
+
+	match command_type {
+		'F', 'R', 'S', 'MX', 'MY' {
+			arguments = 1
+		}
+		'M', 'V' {
+			arguments = 2
+		}
+		'C' {
+			arguments = 3
+		}
+		else {}
+	}
+
+	mut parameters := items[4..]
+	if arguments == 0 {
+		match parameters[0] {
+			"A" { 
+				transforms << &transform.Transform{typ: .additive, time: time2.Time{start_time, end_time}, before: [1.0]}
 			}
-			'M', 'V' {
-				arguments = 2
+			"V" {
+				transforms << &transform.Transform{typ: .flip_vertically, time: time2.Time{start_time, end_time}, before: [1.0]}
 			}
-			'C' {
-				arguments = 3
+			"H" {
+				transforms << &transform.Transform{typ: .flip_horizontally, time: time2.Time{start_time, end_time}, before: [1.0]}
 			}
 			else {}
 		}
 
-		mut parameters := items[4..]
-		if arguments == 0 {
-			match parameters[0] {
-				"A" { 
-					spr.additive = true
-				}
-				"V" {
-					logging.error("DUMBASS VFLIP FLAG")
-				}
-				"H" {
-					logging.error("DUMBASS HFLIP FLAG")
-				}
-				else {}
+		return transforms
+	}
+	
+	mut sections := [][]f64{}
+	sections_length := parameters.len / arguments
+
+	for i in 0 .. sections_length {
+		sections << []f64{}
+
+		for j in 0 .. arguments {
+			sections[i] << parameters[arguments * i + j].f64()
+
+			if command_type == 'F' {
+			sections[i][j] *= 255
 			}
-			continue
-		}
-		
-		mut sections := [][]f64{}
-		sections_length := parameters.len / arguments
-
-		for i in 0 .. sections_length {
-			sections << []f64{}
-
-			for j in 0 .. arguments {
-				sections[i] << parameters[arguments * i + j].f64()
-
-				if command_type == 'F' {
-				sections[i][j] *= 255
-				}
-			}
-		}
-
-		if sections_length == 1 {
-			sections << sections[0].clone()
-		}
-
-		match command_type {
-			'F' {
-				spr.add_transform(
-					typ: .fade, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			'R' {
-				spr.add_transform(
-					typ: .angle, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			'S' {
-				spr.add_transform(
-					typ: .scale_factor, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			'MX' {
-				spr.add_transform(
-					typ: .move_x, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			'MY' {
-				spr.add_transform(
-					typ: .move_y, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			'M' {
-				spr.add_transform(
-					typ: .move, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			'V' {
-				spr.add_transform(
-					typ: .scale, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			'C' {
-				spr.add_transform(
-					typ: .color, 
-					easing: easing, 
-					time: time2.Time{start_time, end_time},
-					before: sections[0],
-					after: sections[1]
-				)
-			}
-
-			else { logging.debug('> Storyboard: Invalid command => ${command_type}') }
 		}
 	}
+
+	if sections_length == 1 {
+		sections << sections[0].clone()
+	}
+
+	match command_type {
+		'F' {
+			transforms << &transform.Transform{
+				typ: .fade, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		'R' {
+			transforms << &transform.Transform{
+				typ: .angle, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		'S' {
+			transforms << &transform.Transform{
+				typ: .scale_factor, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		'MX' {
+			transforms << &transform.Transform{
+				typ: .move_x, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		'MY' {
+			transforms << &transform.Transform{
+				typ: .move_y, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		'M' {
+			transforms << &transform.Transform{
+				typ: .move, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		'V' {
+			transforms << &transform.Transform{
+				typ: .scale, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		'C' {
+			transforms << &transform.Transform{
+				typ: .color, 
+				easing: easing, 
+				time: time2.Time{start_time, end_time},
+				before: sections[0],
+				after: sections[1]
+			}
+		}
+
+		else { logging.debug('> Storyboard: Invalid command => ${command_type}') }
+	}
+
+	return transforms
 }
 
 //
