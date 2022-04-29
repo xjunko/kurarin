@@ -22,7 +22,7 @@ pub:
 	
 	// Effects 
 	additive  bool
-	origin    vector.Origin
+	origin    vector.Origin = vector.centre
 }
 
 pub struct Rect {
