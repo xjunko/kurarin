@@ -14,6 +14,9 @@ pub enum TransformType {
 	fade
 	scale
 	scale_factor
+	additive
+	flip_vertically
+	flip_horizontally
 }
 
 pub struct Transform {
@@ -62,4 +65,14 @@ pub fn (t Transform) as_three(time f64) []f64 {
 		t.easing(time - t.time.start, t.before[1], t.after[1] - t.before[1], t.time.duration()),
 		t.easing(time - t.time.start, t.before[2], t.after[2] - t.before[2], t.time.duration()),	
 	]
+}
+
+pub fn (t Transform) clone(time time.Time) &Transform {
+	return &Transform{
+		typ: t.typ,
+		easing: t.easing,
+		time: time
+		before: t.before,
+		after: t.after,
+	}
 }
