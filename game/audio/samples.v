@@ -28,6 +28,7 @@ pub struct GameSamples {
 	pub mut:
 		base     	 [3][7]audio.Sample
 		beatmap 	 [3][7]map[int]audio.Sample
+		cache        map[string]audio.Sample
 		skin_path    string
 		beatmap_path string
 }
@@ -200,4 +201,21 @@ pub fn init_samples(skin_path string, beatmap_path string) {
 	sample.beatmap_path = beatmap_path
 	sample.load_base_sample()
 	sample.load_beatmap_sample()
+}
+
+pub fn get_sample(name string) audio.Sample {
+	mut sample := get_global_sample()
+
+	if name.to_lower() !in sample.cache {
+		for format in ["mp3", "wav", "ogg"] {
+			path := os.join_path(sample.skin_path, name) + ".${format}"
+
+			if os.exists(path) {
+				sample.cache[name.to_lower()] = audio.new_sample(path)
+			}
+		}
+	}
+
+	// FIXME: im not sure how to handle this exactly
+	return sample.cache[name.to_lower()] or { audio.Sample{} }
 }
