@@ -63,28 +63,7 @@ pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
 	}
 
 	// Combo
-	if circle.combotext.is_drawable_at(circle.last_time) {
-		// God awful
-		pos := circle.combotext.position.sub(
-				circle.combotext.origin
-					.multiply(x: circle.combotext.size.x * circle.combotext.number_len, y: circle.combotext.size.y)
-			)
-
-		for n, img in circle.combotext.number_img {
-			arg.ctx.draw_image_with_config(
-				img: img,
-				img_id: img.id,
-				img_rect: gg.Rect{
-					x: f32((pos.x + (circle.combotext.size.x * n)) * x.resolution.playfield_scale + x.resolution.offset.x),
-					y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y),
-					width: f32(circle.combotext.size.x * x.resolution.playfield_scale),
-					height: f32(circle.combotext.size.y * x.resolution.playfield_scale)
-				},
-				color: circle.combotext.color,
-				additive: circle.combotext.additive
-			)
-		}
-	}
+	circle.combotext.draw(arg)
 }
 
 pub fn (mut circle Circle) update(time f64) bool {
