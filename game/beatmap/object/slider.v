@@ -177,8 +177,8 @@ pub fn (mut slider Slider) update(time f64) bool {
 	slider.slider_b_sprite.position.x = slider_current_position.x
 	slider.slider_b_sprite.position.y = slider_current_position.y
 
-	// Generate shader -1000ms before
-	if time >= (slider.time.start - 1000) && slider.slider_renderer_attr == voidptr(0) {
+	// Generate renderer way before the slider appears
+	if time >= (slider.time.start - slider.diff.preempt - 50.0) && slider.slider_renderer_attr == voidptr(0) {
 		slider.generate_slider_renderer()
 	}
 
