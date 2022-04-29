@@ -54,14 +54,30 @@ pub fn get_texture(name string) gg.Image {
 
 pub fn get_frames(name string) []gg.Image {
 	mut skin := get_skin()
+	mut frames := []gg.Image{}
+
+	// Check for static version, if found use that one instead.
+	if os.exists(os.join_path(skin.fallback, "${name}.png")) {
+		frames << get_texture(name)
+	}
 
 	// Check for first frame
-	mut frames := []gg.Image{}
 	mut frame_n := 0
 
-	for os.exists(os.join_path(skin.fallback, '${name}-${frame_n}.png')) {
-		frames << get_texture('${name}-${frame_n}')
-		frame_n++
+	// The "normal" animations
+	if frames.len == 0 {
+		for os.exists(os.join_path(skin.fallback, '${name}-${frame_n}.png')) {
+			frames << get_texture('${name}-${frame_n}')
+			frame_n++
+		}
+	}
+
+	// Some legacy shit still use this naming 
+	if frames.len == 0 {
+		for os.exists(os.join_path(skin.fallback, '${name}${frame_n}.png')) {
+			frames << get_texture('${name}${frame_n}')
+			frame_n++
+		}
 	}
 
 	return frames
