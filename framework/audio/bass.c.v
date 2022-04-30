@@ -1,10 +1,10 @@
 module audio
 
-#flag -I @VMODROOT/audio/bass
+#flag -I @VMODROOT/framework/audio/header
 #include "bass.h"
 #include "bass_fx.h"
 #include "bassmix.h"
-#flag -Wl,-L/usr/lib -lbass -lbass_fx -lbassmix
+#flag -Wl,-rpath=assets/dll,-L@VMODROOT/assets/dll -lbass -lbass_fx -lbassmix
 
 // Important bits
 fn C.BASS_Init(int, int, int, int, int) int
