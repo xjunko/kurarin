@@ -25,6 +25,7 @@ pub fn (mut loop LoopProcessor) finalize() []&transform.Transform {
 		if !indexed {
 			start_time = t.time.start
 			end_time = t.time.end
+			indexed = true
 			continue
 		}
 
