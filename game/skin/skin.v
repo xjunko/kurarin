@@ -26,6 +26,7 @@ pub fn bind_context(mut ctx &gg.Context) {
 
 	for file in required_files {
 		get_texture(file)
+		get_frames(file)
 	}
 }
 //
@@ -65,11 +66,9 @@ pub fn get_frames(name string) []gg.Image {
 	mut frame_n := 0
 
 	// The "normal" animations
-	if frames.len == 0 {
-		for os.exists(os.join_path(skin.fallback, '${name}-${frame_n}.png')) {
-			frames << get_texture('${name}-${frame_n}')
-			frame_n++
-		}
+	for os.exists(os.join_path(skin.fallback, '${name}-${frame_n}.png')) {
+		frames << get_texture('${name}-${frame_n}')
+		frame_n++
 	}
 
 	// Some legacy shit still use this naming 

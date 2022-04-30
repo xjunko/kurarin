@@ -11,7 +11,7 @@ import framework.graphic.sprite
 import game.x
 import game.skin
 import game.ruleset
-import game.beatmap.object
+// import game.beatmap.object
 import game.beatmap.difficulty
 
 pub struct HitResults {
@@ -48,7 +48,8 @@ pub fn (mut result HitResults) add_result(_time f64, _result ruleset.HitResult, 
 
 	// Animation
 	mut hit := &sprite.Sprite{}
-	hit.textures << skin.get_texture(tex_name)
+	hit.textures << skin.get_frames(tex_name)
+	hit.texture_fps = 60
 
 	// Animation
 	fade_in := _time + difficulty.result_fade_in
