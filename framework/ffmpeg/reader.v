@@ -77,7 +77,7 @@ pub fn (mut reader FFmpegReader) update() {
 			// Check if we dont have any new data received
 			if remaining == last_data_length {
 				// Ok shit, prolly something fucked up or video finished
-				logging.error("Video data fucked, stopping video.")
+				logging.error("Invalid video data, stopping video.")
 				reader.ok = false // This video is invalid now, stop everything.
 				reader.stop()
 				break
