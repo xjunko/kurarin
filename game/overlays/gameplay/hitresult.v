@@ -49,7 +49,11 @@ pub fn (mut result HitResults) add_result(_time f64, _result ruleset.HitResult, 
 	// Animation
 	mut hit := &sprite.Sprite{}
 	hit.textures << skin.get_frames(tex_name)
-	hit.texture_fps = 60
+
+	if hit.textures.len > 1 {
+		// TODO: read skin.ini file for animation fps
+		hit.texture_fps = 60
+	}
 
 	// Animation
 	fade_in := _time + difficulty.result_fade_in
