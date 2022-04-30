@@ -116,7 +116,7 @@ pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx
 	overlay.keys_background = &sprite.Sprite{origin: vector.top_left, always_visible: true}
 	overlay.keys_background.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [1280.0, 720.0 / 2.0 - 64.0])
 	overlay.keys_background.add_transform(typ: .angle, time: time.Time{0.0, 0.0}, before: [math.pi / 2.0])
-	overlay.keys_background.add_transform(typ: .scale, time: time.Time{0.0, 0.0}, before: [1.05, 1.5])
+	overlay.keys_background.add_transform(typ: .scale, time: time.Time{0.0, 0.0}, before: [1.05, 1.0])
 	overlay.keys_background.textures << skin.get_texture("inputoverlay-background")
 	overlay.keys_background.reset_size_based_on_texture()
 	overlay.keys_background.reset_attributes_based_on_transforms()
