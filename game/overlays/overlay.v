@@ -97,6 +97,7 @@ pub fn (mut overlay GameplayOverlay) draw() {
 		overlay.ctx.draw_text(int(pos_x), int(pos_y), overlay.key_counters[i].str(), gx.TextCfg{color: gx.white, align: .center, size: int(relative_size)})
 	}
 
+	overlay.ctx.draw_rect_filled(0, 720 - 16, 120, 16, gx.Color{0, 0, 0, 100})
 	overlay.ctx.draw_text(0, 720 - 16, "Combo: ${overlay.combo_counter.combo}", gx.TextCfg{color: gx.white})
 }
 
