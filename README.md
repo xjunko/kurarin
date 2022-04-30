@@ -4,15 +4,14 @@ Repo might be dead for awhile, blame school and vacations.
 
 ## Preview
 
-(Gameplay branch preview (Not public, yet)) </br>
-Awful gameplay I know
+
+## Gameplay branch preview
+https://user-images.githubusercontent.com/44401509/166099339-9d356ef9-3096-407f-b72e-aca91f82a3e2.mp4
 
 https://user-images.githubusercontent.com/44401509/165777649-ca6827de-0126-4ffe-9672-bc461c912ecc.mp4
 
 
-
-(Latest Preview)
-
+## Old preview
 
 https://user-images.githubusercontent.com/44401509/162553604-c6ac7c7b-246d-4344-bad5-b616bd7421ed.mp4
 
