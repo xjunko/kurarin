@@ -37,5 +37,6 @@ case $1 in
     
     # devel build?
     build_development
+    exit 0
 
 esac
