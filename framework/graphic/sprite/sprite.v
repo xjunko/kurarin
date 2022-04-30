@@ -11,10 +11,13 @@ import framework.math.vector
 
 pub struct Sprite {
 	pub mut:
-		time       time.Time
-		transforms []transform.Transform
-		textures   []gg.Image
-		texture_i  int
+		time              time.Time
+		transforms        []transform.Transform
+		textures          []gg.Image
+		texture_i         int
+		texture_fps       int
+		texture_last_t    f64
+		texture_delta     f64
 
 		// Attrs
 		additive       bool
@@ -117,7 +120,12 @@ pub fn (mut sprite Sprite) reset_size_based_on_texture(arg CommonSpriteSizeReset
 		sprite.size.x = arg.size.x
 		sprite.size.y = arg.size.y
 	} else {
-		texture := sprite.get_texture()
+		mut texture := sprite.get_texture()
+
+		// Get last texture if this is animation
+		if sprite.texture_fps != 0 {
+			texture = &sprite.textures[sprite.textures.len - 1]
+		}
 
 		sprite.raw_size.x = texture.width * arg.factor
 		sprite.raw_size.y = texture.height * arg.factor
@@ -184,6 +192,32 @@ pub fn (mut sprite Sprite) update(time f64) {
 			sprite.apply_event(t, math.min(time, t.time.end)) // HACKHACHKHACK: extra 100ms to make sure the transform doesnt get skipped
 		}
 	}
+
+
+	// TODO: Put this somewhere else
+	if sprite.textures.len > 1 && sprite.texture_fps > 0 && sprite.texture_i < sprite.textures.len {
+		if sprite.texture_last_t == 0.0 {
+			sprite.texture_last_t = time
+		}
+
+		texture_frametime := 1000.0 / f64(sprite.texture_fps) 
+
+		delta := time - sprite.texture_last_t
+		sprite.texture_delta += delta
+		sprite.texture_last_t = time
+
+		if sprite.texture_delta >= texture_frametime {
+			sprite.texture_i++
+			sprite.texture_delta -= texture_frametime
+
+			sprite.texture_i = sprite.texture_i
+		}
+	}
+
+	if sprite.texture_fps > 0 && sprite.texture_i >= sprite.textures.len {
+		sprite.texture_i = sprite.textures.len - 1
+	}
+
 
 	//for mut t in sprite.transforms {
 	// 	if time >= t.time.start {
