@@ -9,6 +9,7 @@ import math
 import sync
 import sokol.gfx
 import sokol.sgl
+import sokol.sapp
 import time as timelib
 import library.gg
 
@@ -23,6 +24,11 @@ import game.beatmap.object.graphic
 import framework.audio
 import framework.logging
 import framework.math.time
+
+const (
+	game_name = "Kurarin"
+	game_version = "rewrite-0.0.2a-preview1"
+)
 
 // TODO: lol
 pub struct GameArgument {
@@ -40,6 +46,7 @@ pub struct Window {
 		// TODO: move this to somewhere else
 		audio_been_played bool
 		limiter           &time.Limiter = &time.Limiter{int(settings.global.window.fps), 0, 0}
+		draw_counter      &time.TimeCounter = &time.TimeCounter{}
 
 		// Ruleset
 		ruleset &ruleset.Ruleset = voidptr(0)
@@ -47,7 +54,6 @@ pub struct Window {
 
 		// Overlay
 		overlay &overlays.GameplayOverlay = voidptr(0)
-
 
 		// Recording stuff
 		record 		bool
@@ -117,6 +123,7 @@ pub fn (mut window Window) draw() {
 
 	// Game
 	window.beatmap.draw()
+	window.overlay.draw()
 	
 	// TODO: maybe move cursor to beatmap struct
 	if !settings.global.gameplay.disable_cursor {
@@ -126,20 +133,27 @@ pub fn (mut window Window) draw() {
 	}
 
 	window.ctx.begin()
+
 	// Texts (only on windowed mode)
 	if !settings.global.video.record {
-		window.ctx.draw_rect_filled(1200, 683, 100, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(1275, 683, "${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
-	}
+		// Game info
+		window.ctx.draw_rect_filled(0, 50, 60, 16, gx.Color{0, 0, 0, 100})
+		window.ctx.draw_text(5, 50, game_name, gx.TextCfg{color: gx.white})
+		window.ctx.draw_rect_filled(0, 50 + 16, 145, 16, gx.Color{0, 0, 0, 100})
+		window.ctx.draw_text(5, 50 + 16, game_version, gx.TextCfg{color: gx.white})
 
-	window.overlay.draw()
+		// FPS info
+		window.ctx.draw_rect_filled(1145, 683, 155, 16, gx.Color{0, 0, 0, 100})
+		window.ctx.draw_text(1275, 683, "Update: ${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
+		window.ctx.draw_rect_filled(1160, 683 + 16, 150, 16, gx.Color{0, 0, 0, 100})
+		window.ctx.draw_text(1275, 683+16, "Draw: ${window.draw_counter.get_average_fps():.0}fps [${window.draw_counter.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
+	}
 
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
 	sgl.draw()
 	gfx.end_pass()
 
 	gfx.commit()
-
 }
 
 pub fn window_init(mut window &Window) {
@@ -196,9 +210,14 @@ pub fn window_init(mut window &Window) {
 			mut limiter := time.Limiter{480, 0, 0}
 			g_time.reset()
 			g_time.set_speed(settings.global.window.speed)
+			window.draw_counter.reset()
+
+			// Disable mouse
+			sapp.show_mouse(false)
 			
 			for {
 				window.update(g_time.time)
+				g_time.tick_average_fps()
 				limiter.sync()
 			}
 		}(mut window)
@@ -207,8 +226,7 @@ pub fn window_init(mut window &Window) {
 
 pub fn window_draw(mut window &Window) {
 	window.draw()
-	
-	time.tick_average()
+	window.draw_counter.tick_average_fps()
 	window.limiter.sync()
 }
 
@@ -346,6 +364,12 @@ pub fn initiate_game_loop(argument GameArgument) {
 	// Record or na
 	window.record = settings.global.video.record
 
+	// FIXME: Release this limit once we got auto going
+	if window.record {
+		logging.error("Recording is unavailable rn due to gameplay refactor, try again later.")
+		exit(1)
+	}
+
 	skin.bind_context(mut window.ctx)
 
 	if window.record {
@@ -363,9 +387,9 @@ pub fn initiate_game_loop(argument GameArgument) {
 [console]
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)
-	fp.application("Kurarin")
-	fp.version("0.2.2-dementia")
-	fp.description("Kurarin rewrite Codename Dementia")
+	fp.application(game_name)
+	fp.version(game_version)
+	fp.description("Everything WIP, be careful when running ;).")
 
 	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file")
 
