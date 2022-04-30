@@ -313,11 +313,14 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 		}
 
 
-		// FIXME: Slider Repeat acc might be fucked rn, it keeps giving 100s
-		if hit == .miss || hit == .hit50 {
-			position := slider.hitslider.get_end_position()
-			slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
-		}
+		// // FIXME: Slider Repeat acc might be fucked rn, it keeps giving 100s
+		// if hit == .miss || hit == .hit50 {
+			// position := slider.hitslider.get_end_position()
+			// slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
+		// }
+
+		position := slider.hitslider.get_end_position()
+		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
 
 		state.is_hit = true
 	}
