@@ -25,6 +25,8 @@ pub struct GameplayOverlay {
 		combo     i64
 		new_combo i64
 
+		score     i64
+
 		ruleset &ruleset.Ruleset
 		cursor  &cursor.Cursor
 
@@ -42,6 +44,7 @@ pub struct GameplayOverlay {
 }
 
 pub fn (mut overlay GameplayOverlay) update(_time f64) {
+	overlay.combo_counter.update(_time)
 	overlay.hitresult.update(_time)
 
 	for mut sprite in overlay.keys {
@@ -97,8 +100,10 @@ pub fn (mut overlay GameplayOverlay) draw() {
 		overlay.ctx.draw_text(int(pos_x), int(pos_y), overlay.key_counters[i].str(), gx.TextCfg{color: gx.white, align: .center, size: int(relative_size)})
 	}
 
-	overlay.ctx.draw_rect_filled(0, 720 - 16, 120, 16, gx.Color{0, 0, 0, 100})
-	overlay.ctx.draw_text(0, 720 - 16, "Combo: ${overlay.combo_counter.combo}", gx.TextCfg{color: gx.white})
+	overlay.combo_counter.draw(ctx: overlay.ctx)
+
+	// Score
+	overlay.ctx.draw_text(1280, 0, "${overlay.score:08d}", gx.TextCfg{color: gx.white, align: .right, size: 45})
 }
 
 pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
@@ -144,8 +149,9 @@ pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx
 
 
 // Some hack
-pub fn hit_received(time f64, number i64, position vector.Vector2, result ruleset.HitResult, combo ruleset.ComboResult) {
+pub fn hit_received(time f64, number i64, position vector.Vector2, result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
 	mut g_overlay := g_overlay_hack
+	g_overlay.score = score
 	g_overlay.hitresult.add_result(time, result, position)
 
 	if combo == .increase {
