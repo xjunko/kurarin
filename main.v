@@ -34,6 +34,7 @@ const (
 pub struct GameArgument {
 	pub mut:
 		beatmap_path string
+		playing      bool
 }
 
 pub struct Window {
@@ -41,6 +42,7 @@ pub struct Window {
 		ctx 		&gg.Context = voidptr(0)
 		beatmap 	&beatmap.Beatmap = voidptr(0)
 		cursors     []&cursor.Cursor
+		auto        &cursor.AutoCursor = voidptr(0)
 		argument    &GameArgument = voidptr(0)
 
 		// TODO: move this to somewhere else
@@ -68,7 +70,7 @@ pub struct Window {
 }
 
 pub fn (mut window Window) update_boost() {
-	if settings.global.miscellaneous.scale_to_beat {
+	if settings.global.gameplay.hitobjects.scale_to_beat {
 		target := math.clamp(1.0 + (0.5 * window.beatmap_song.boost), 1.0, 2.0) // 2.0 is the max
 		window.beatmap_song_boost = f32(target * 0.1 + window.beatmap_song_boost - window.beatmap_song_boost * 0.1)
 
@@ -78,6 +80,10 @@ pub fn (mut window Window) update_boost() {
 }
 
 pub fn (mut window Window) update_cursor(time f64) {
+	if !window.argument.playing {
+		window.auto.update(time)
+	}
+
 	for mut cursor in window.cursors {
 		cursor.update(time)
 	}
@@ -92,28 +98,28 @@ pub fn (mut window Window) update_cursor(time f64) {
 }
 
 pub fn (mut window Window) update(time f64) {
-	if time >= settings.global.gameplay.lead_in_time && !window.audio_been_played {
+	if time >= settings.global.gameplay.playfield.lead_in_time && !window.audio_been_played {
 		window.audio_been_played = true
 		window.beatmap_song.set_speed(settings.global.window.speed)
-		window.beatmap_song.set_pitch(settings.global.window.pitch)
-		window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
+		window.beatmap_song.set_pitch(settings.global.audio.pitch)
+		window.beatmap_song.set_volume(f32((settings.global.audio.music / 100.0) * (settings.global.audio.global / 100.0)))
 		window.beatmap_song.play()
 	}
 
 	// Overlay
-	window.overlay.update(time - settings.global.gameplay.lead_in_time)
+	window.overlay.update(time - settings.global.gameplay.playfield.lead_in_time)
 
 	// Ruleset
 	window.ruleset_mutex.@lock()
-	window.ruleset.update_click_for(window.cursors[0], time - settings.global.gameplay.lead_in_time)
-	window.ruleset.update_normal_for(window.cursors[0], time - settings.global.gameplay.lead_in_time, false)
-	window.ruleset.update_post_for(window.cursors[0], time - settings.global.gameplay.lead_in_time, false)
-	window.ruleset.update(time - settings.global.gameplay.lead_in_time)
+	window.ruleset.update_click_for(window.cursors[0], time - settings.global.gameplay.playfield.lead_in_time)
+	window.ruleset.update_normal_for(window.cursors[0], time - settings.global.gameplay.playfield.lead_in_time, false)
+	window.ruleset.update_post_for(window.cursors[0], time - settings.global.gameplay.playfield.lead_in_time, false)
+	window.ruleset.update(time - settings.global.gameplay.playfield.lead_in_time)
 	window.ruleset_mutex.unlock()
 
-	window.beatmap.update(time - settings.global.gameplay.lead_in_time, window.beatmap_song_boost)
-	window.beatmap_song.update(time - settings.global.gameplay.lead_in_time)
-	window.update_cursor(time - settings.global.gameplay.lead_in_time)
+	window.beatmap.update(time - settings.global.gameplay.playfield.lead_in_time, window.beatmap_song_boost)
+	window.beatmap_song.update(time - settings.global.gameplay.playfield.lead_in_time)
+	window.update_cursor(time - settings.global.gameplay.playfield.lead_in_time)
 	window.update_boost()
 }
 
@@ -127,7 +133,7 @@ pub fn (mut window Window) draw() {
 	window.overlay.draw()
 	
 	// TODO: maybe move cursor to beatmap struct
-	if !settings.global.gameplay.disable_cursor {
+	if settings.global.gameplay.cursor.visible {
 		for mut cursor in window.cursors {
 			cursor.draw()
 		}
@@ -171,18 +177,12 @@ pub fn window_init(mut window &Window) {
 	// Init beatmap bg song
 	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
 
-	// Make cursor
-	max_cursor := settings.global.gameplay.auto_tag_cursors
-	for cursor_i in 0 .. max_cursor {
-		mut current_cursor := cursor.make_cursor(mut window.ctx)
-		// current_cursor.bind_beatmap(mut window.beatmap)
-		// cursor.make_replay(mut window.beatmap, mut current_cursor, cursor_i + 1, max_cursor)
-
-		// idk colors
-		current_cursor.trail_color.r = u8((math.sin(cursor_i + 0) * 100) + 128 * 0.4)
-		current_cursor.trail_color.g = u8((math.sin(cursor_i + 2) * 75) + 128 * 0.2)
-		current_cursor.trail_color.b = u8((math.sin(cursor_i + 4) * 50) + 128 * 0.5)
-		window.cursors << current_cursor
+	// Make cursor based on argument
+	if window.argument.playing {
+		window.cursors << cursor.make_cursor(mut window.ctx)
+	} else {
+		window.auto = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)
+		window.cursors << unsafe{ window.auto.cursor }
 	}
 
 	// Make ruleset
@@ -332,12 +332,20 @@ pub fn initiate_game_loop(argument GameArgument) {
 
 		// Just a test, remove `cursor.make_replay` on line 54 to get this working
 		move_fn: fn (x_ f32, y_ f32, mut window &Window) {
+			if !window.argument.playing {
+				return
+			}
+
 			window.cursors[0].position.x = (x_ - x.resolution.offset.x) / x.resolution.playfield_scale
 			window.cursors[0].position.y = (y_ - x.resolution.offset.y) / x.resolution.playfield_scale
 			
 		}
 
 		keydown_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window &Window) {
+			if !window.argument.playing {
+				return
+			}
+
 			window.ruleset_mutex.@lock()
 			if keycode == .z {
 				window.cursors[0].left_button = true
@@ -349,6 +357,10 @@ pub fn initiate_game_loop(argument GameArgument) {
 			window.ruleset_mutex.unlock()
 		}
 		keyup_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window &Window) {
+			if !window.argument.playing {
+				return
+			}
+			
 			window.ruleset_mutex.@lock()
 			if keycode == .z {
 				window.cursors[0].left_button = false
@@ -392,7 +404,8 @@ fn main() {
 	fp.version(game_version)
 	fp.description("Everything WIP, be careful when running ;).")
 
-	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file")
+	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file.")
+	is_playing := fp.bool("play", `p`, false, "Flag for playing in the client.")
 
 	fp.finalize() or {
 		println(fp.usage())
@@ -413,7 +426,8 @@ fn main() {
 
 	// Create GameArgument
 	argument := &GameArgument{
-		beatmap_path: beatmap_path
+		beatmap_path: beatmap_path,
+		playing: is_playing
 	}
 
 	logging.info("Beatmap: ${beatmap_path}")
