@@ -16,7 +16,6 @@ import framework.math.time as time2
 import game.settings
 import game.beatmap
 import game.beatmap.object as gameobject
-import game.movers
 import game.skin
 import game.x
 
@@ -35,18 +34,16 @@ pub struct Cursor {
 	pub mut:
 		mutex       &sync.Mutex = sync.new_mutex()
 		ctx 	    &gg.Context = voidptr(0)
-		beatmap     &beatmap.Beatmap = voidptr(0)
-		beatmap_i   int
-		mover       &movers.HalfCircleMover = &movers.HalfCircleMover{}
 		trails      []&sprite.Sprite
 		trail_color gx.Color = gx.Color{0, 25, 100, u8(255 * 0.5)}
 		delta_pos   []vector.Vector2
 		delta_pos_i int
 
-		// Game shit
+		// Game control
 		left_button	bool
 		right_button bool
-
+		left_mouse bool
+		right_mouse bool
 	mut:
 		sixty_delta   f64
 		last_time     f64
@@ -57,7 +54,7 @@ pub struct Cursor {
 pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	cursor.mutex.@lock()
 
-	if settings.global.gameplay.cursor_style == 2 {
+	if settings.global.gameplay.cursor.style == 2 {
 		for i, trail in cursor.delta_pos {
 			size := cursor.size.scale(
 				0.9 * (0.5 + f64(i) / f64(cursor.delta_pos.len) * 0.4)
@@ -94,7 +91,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 					height: f32(trail.size.y * x.resolution.playfield_scale)
 				},
 				color: trail.color,
-				additive: [true, false][int(settings.global.gameplay.cursor_style == 0)]
+				additive: [true, false][int(settings.global.gameplay.cursor.style == 0)]
 			})
 		}
 	}
@@ -102,7 +99,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	// Cursor
 	pos := cursor.position.sub(cursor.origin.multiply(x: cursor.size.x, y: cursor.size.y))
 	
-	if settings.global.gameplay.cursor_style == 2 {
+	if settings.global.gameplay.cursor.style == 2 {
 		// Fancy cursor
 		cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
 			img: &cursor.textures[2],
@@ -130,7 +127,6 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 		})
 	}
 	
-
 	cursor.mutex.unlock()
 }
 
@@ -141,22 +137,21 @@ pub fn (mut cursor Cursor) update(time f64) {
 	delta := time - cursor.last_time
 
 	// Time
-	cursor.last_time = time
 	cursor.Sprite.update(time) // Update the main cursor itself
 
 	cursor.sixty_delta += delta
 	// Normal trails
-	if settings.global.gameplay.cursor_style == 0 && cursor.sixty_delta >= settings.global.gameplay.cursor_trail_update_rate {
+	if settings.global.gameplay.cursor.style == 0 && cursor.sixty_delta >= settings.global.gameplay.cursor.trail_update_rate {
 		mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
 		trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [255.0], after: [0.0])
 		trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [cursor.position.x, cursor.position.y])
-		trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [settings.global.gameplay.cursor_size])
+		trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [settings.global.gameplay.cursor.size])
 		trail.reset_size_based_on_texture()
 		trail.reset_attributes_based_on_transforms()
 		cursor.trails << trail
 
-		cursor.sixty_delta -= settings.global.gameplay.cursor_trail_update_rate
-	} else if settings.global.gameplay.cursor_style == 1 {
+		cursor.sixty_delta -= settings.global.gameplay.cursor.trail_update_rate
+	} else if settings.global.gameplay.cursor.style == 1 {
 		// God awful particle trail (Old)
 		distance := cursor.position.distance(cursor.last_position)
 		distance_real := cursor.position.sub(cursor.last_position)
@@ -166,7 +161,7 @@ pub fn (mut cursor Cursor) update(time f64) {
 				mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
 				trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 25.0, 150))}, before: [255.0], after: [0.0])
 				trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 32.0, 150))}, before: [cursor.position.x, cursor.position.y], after: [cursor.position.x - distance_real.x + random_f64_in_range(-distance, distance), cursor.position.y - distance_real.y + random_f64_in_range(-distance, distance)])
-				trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [random_f64_in_range(0.05, settings.global.gameplay.cursor_size)])
+				trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [random_f64_in_range(0.05, settings.global.gameplay.cursor.size)])
 				trail.add_transform(typ: .color, time: time2.Time{time, time}, before: [random_f64_in_range(0, 255), random_f64_in_range(0, 255), random_f64_in_range(0, 255)])
 				trail.reset_size_based_on_texture()
 				trail.reset_attributes_based_on_transforms()
@@ -176,7 +171,7 @@ pub fn (mut cursor Cursor) update(time f64) {
 	}
 
 	// Smoother cursor trail (wip)
-	if settings.global.gameplay.cursor_style == 2 && delta > 0.0 {
+	if settings.global.gameplay.cursor.style == 2 && delta > 0.0 {
 		points := int(cursor.position.distance(cursor.last_position)) * 2
 		cursor.delta_pos << cursor.last_position
 
@@ -209,52 +204,10 @@ pub fn (mut cursor Cursor) update(time f64) {
 	// Done
 	cursor.last_position.x = cursor.position.x
 	cursor.last_position.y = cursor.position.y
+	cursor.last_time = time
 
 	cursor.mutex.unlock()
 }
-
-pub fn (mut cursor Cursor) update_auto(time f64) {
-	// // Realtime "AUTO" cursor movement
-	// // Looks abit janky compared to the pregenerated one.
-	// if cursor.beatmap_i < cursor.beatmap.objects.len {
-	// 	if cursor.beatmap.objects[cursor.beatmap_i].time.start <= time {
-	// 		if cursor.beatmap.objects[cursor.beatmap_i].done {
-	// 			cursor.beatmap_i++
-	// 			if cursor.beatmap_i + 1 < cursor.beatmap.objects.len {
-	// 				cursor.mover.init(
-	// 					mut &cursor.beatmap.objects[cursor.beatmap_i - 1], 
-	// 					mut &cursor.beatmap.objects[cursor.beatmap_i],
-	// 					1
-	// 				)
-	// 			}
-	// 		}
-	// 	}
-
-	// 	// Apply the position
-	// 	if (time - cursor.mover.time.start) >= 0.0 {
-	// 		// HitCircle mover
-	// 		if time <= cursor.mover.time.end {
-	// 			pos := cursor.mover.get_point_at(time)
-	// 			cursor.position.x = pos.x
-	// 			cursor.position.y = pos.y
-	// 		}
-
-	// 		// Bit of an hack cuz we dont want to calculate slider path on update (we can but i dont want to so...)
-	// 		// Slider mover
-	// 		mut cur_hitobject := &cursor.beatmap.objects[cursor.beatmap_i]
-	// 		if (time >= cursor.mover.time.end && time <= cur_hitobject.time.end) && mut cur_hitobject is gameobject.Slider {
-	// 			cursor.position.x = cur_hitobject.slider_b_sprite.position.x	
-	// 			cursor.position.y = cur_hitobject.slider_b_sprite.position.y
-	// 		}
-	// 	}
-	// }
-}
-
-// AUTO stuff
-pub fn (mut cursor Cursor) bind_beatmap(mut beatmap &beatmap.Beatmap) {
-	cursor.beatmap = unsafe { beatmap } 
-}
-
 
 // Factory
 pub fn make_cursor(mut ctx &gg.Context) &Cursor {
@@ -263,7 +216,7 @@ pub fn make_cursor(mut ctx &gg.Context) &Cursor {
 	cursor.textures << skin.get_texture("cursortrail")
 	cursor.textures << skin.get_texture("cursor-top")
 	cursor.textures << skin.get_texture("cursortrailfx")
-	cursor.add_transform(typ: .scale_factor, time: time2.Time{0, 0}, before: [settings.global.gameplay.cursor_size])
+	cursor.add_transform(typ: .scale_factor, time: time2.Time{0, 0}, before: [settings.global.gameplay.cursor.size])
 
 	//
 	cursor.reset_size_based_on_texture()
