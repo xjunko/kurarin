@@ -67,7 +67,7 @@ pub fn (mut window Window) init_video_pipe_process() {
 }
 
 pub fn (mut window Window) init_audio_pipe_process() {
-	audio_buffer_size := audio.get_required_buffer_size_for_mixer(1.0 / settings.global.video.fps)
+	audio_buffer_size := audio.get_required_buffer_size_for_mixer(1.0 / 480.0) // Render Update FPS (Refer to window_draw_recording in main)
 	window.audio_data = []u8{len: audio_buffer_size}
 
 	// Create the process
