@@ -4,6 +4,7 @@ module settings
 pub struct Window {
 	pub mut:
 		speed  f64
+		pitch  f64
 		fps    f64 // Update tick
 
 		// Volumes
@@ -16,6 +17,7 @@ pub struct Window {
 pub fn make_window_settings() Window {
 	mut window_ := Window{
 		speed: 1.0,
+		pitch: 1.0,
 		fps: 480,
 		audio_volume: 50,
 		effect_volume: 100,
