@@ -1,8 +1,5 @@
 module sprite
 
-import library.gg
-// import math
-
 pub struct Manager {
 	pub mut:
 		queue []&Sprite
