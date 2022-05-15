@@ -16,7 +16,7 @@ pub struct Window {
 pub fn make_window_settings() Window {
 	mut window_ := Window{
 		speed: 1.0,
-		fps: 60,
+		fps: 480,
 		audio_volume: 50,
 		effect_volume: 100,
 		overall_volume: 50,
