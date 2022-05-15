@@ -95,6 +95,7 @@ pub fn (mut window Window) update(time f64) {
 	if time >= settings.global.gameplay.lead_in_time && !window.audio_been_played {
 		window.audio_been_played = true
 		window.beatmap_song.set_speed(settings.global.window.speed)
+		window.beatmap_song.set_pitch(settings.global.window.pitch)
 		window.beatmap_song.set_volume(f32((settings.global.window.audio_volume / 100.0) * (settings.global.window.overall_volume / 100.0)))
 		window.beatmap_song.play()
 	}
