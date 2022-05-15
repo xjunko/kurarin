@@ -110,7 +110,7 @@ pub struct Ruleset {
 		hit_listener HitListener
 }
 
-type HitListener = fn (f64, i64, vector.Vector2, HitResult, ComboResult)
+type HitListener = fn (f64, i64, vector.Vector2, HitResult, ComboResult, i64)
 
 pub fn (mut ruleset Ruleset) set_listener(func HitListener) {
 	ruleset.hit_listener = func
@@ -272,14 +272,16 @@ pub fn (mut ruleset Ruleset) update_post_for(cursor &cursor.Cursor, time f64, pr
 
 pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult, combo ComboResult) {
 	mut number := src.get_number()
-	// mut subset := &ruleset.subset[0]
+	mut subset := &ruleset.subset[0]
 
 	// if result == .ignore || result == .miss {
 	// 	if result == .miss && isnil(ruleset.hit_listener) {
 	// 		// ruleset.hit_listener(time, number, position, mut ruleset)
 	// 	}
 	// }
-	ruleset.hit_listener(time, number, position, result, combo)
+	subset.raw_score += result.get_value()
+
+	ruleset.hit_listener(time, number, position, result, combo, subset.raw_score)
 }
 
 // Factory
