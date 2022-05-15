@@ -233,8 +233,13 @@ pub fn (mut sprite Sprite) update(time f64) {
 }
 pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 	if sprite.is_drawable_at(arg.time) || sprite.always_visible {
-		size := sprite.size.scale(arg.camera.scale * arg.scale)
-		pos := sprite.position.scale(arg.camera.scale).sub(sprite.origin.multiply(size)).add(arg.camera.offset)
+		size := sprite.size
+					.scale(arg.camera.scale * arg.scale)
+					
+		pos := sprite.position
+					.scale(arg.camera.scale)
+					.sub(sprite.origin.multiply(size))
+					.add(arg.camera.offset)
 
 		arg.ctx.draw_image_with_config(gg.DrawImageConfig{
 			img: sprite.get_texture(),
