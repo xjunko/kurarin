@@ -216,7 +216,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 
 	// Fuck around with the colors
 	// Literally copy-pasted from mcosu lmaooo credit to mckay
-	if settings.global.miscellaneous.rainbow_slider && !settings.global.miscellaneous.default_slider {
+	if settings.global.gameplay.hitobjects.rainbow_slider && !settings.global.gameplay.hitobjects.old_slider {
 		time := time.global.time / 100.0
 		attr.colors[0] = f32(math.sin(0.3 * time + 0 + 10) * 127 + 128) / 255
 		attr.colors[1] = f32(math.sin(0.3 * time + 2 + 10) * 127 + 128) / 255
@@ -228,7 +228,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	}
 
 	// Set border color
-	if !settings.global.miscellaneous.default_slider {
+	if !settings.global.gameplay.hitobjects.old_slider {
 		attr.colors[0] = f32(colors[0] / 255.0 / 1.5)
 		attr.colors[1] = f32(colors[1] / 255.0 / 1.5)
 		attr.colors[2] = f32(colors[2] / 255.0 / 1.5)

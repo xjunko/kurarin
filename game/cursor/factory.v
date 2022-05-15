@@ -13,7 +13,7 @@ import framework.math.easing
 import game.settings
 
 const (
-	offset = settings.global.gameplay.auto_update_rate
+	offset = settings.global.gameplay.cursor.trail_update_rate // Maybe change thsi?
 	tag_on_new_combo = true
 )
 

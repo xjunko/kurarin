@@ -2,49 +2,79 @@ module settings
 
 pub struct Gameplay {
 	pub mut:
-		global_offset  f64
-		lead_in_time   f64
-		background_dim int
+		playfield Playfield
+		cursor Cursor
+		hitobjects HitObjects
+}
 
-		disable_hitsound   bool
-		disable_hitobject  bool
-		disable_storyboard bool
-		disable_background_video bool
+pub struct Playfield {
+	pub mut:
+		objects_visible bool
+		lead_in_time f64
 
-		use_beatmap_hitsound bool
+		background Background
+}
 
-		disable_cursor     		 bool
-		cursor_size        	     f64
-		cursor_trail_update_rate f64
-		cursor_trail_length      int
-		cursor_style             f64
+pub struct Background {
+	pub mut:
+		enable_storyboard bool
+		enable_video      bool
+		background_dim    int
+}
 
-		auto_update_rate         f64
-		auto_tag_cursors         int
+pub struct Cursor {
+	pub mut:
+		visible bool
+		size f64
+		style f64
+		trail_update_rate f64
+		trail_length int
+}
+
+pub struct HitObjects {
+	pub mut:
+		disable_hitobjects bool
+
+		scale_to_beat bool
+
+		// dumbass shit
+		rainbow_hitcircle bool
+		rainbow_slider    bool
+
+		// fallback
+		old_slider bool
 }
 
 // Factory 
 pub fn make_gameplay_settings() Gameplay {
 	mut gameplay_ := Gameplay{
-		global_offset: 0,
-		lead_in_time: 3.0, // n Seconds
-		background_dim: 100,
+		playfield: Playfield{
+			objects_visible: true,
+			lead_in_time: 3.0,
 
-		disable_hitsound: false,
-		disable_hitobject: false,
-		disable_storyboard: false,
-		disable_background_video: true, // BG Video is pretty heavy rn
+			background: Background{
+				enable_storyboard: true,
+				enable_video: true,
+				background_dim: 100
+			}
+		}
 
-		use_beatmap_hitsound: false,
+		cursor: Cursor{
+			visible: true,
+			size: 0.75,
+			style: 0,
+			trail_update_rate: 16.6667,
+			trail_length: 1000
+		}
 
-		disable_cursor: false,
-		cursor_size: 0.75,
-		cursor_trail_update_rate: 16.6667, // 60FPS delta
-		cursor_trail_length: 1000, // Maximum length
-		cursor_style: 2, // 0: Normal, 1: Particle (terrible), 2: Long (Like style 0 but the trail is smoother)
+		hitobjects: HitObjects{
+			disable_hitobjects: false,
+			scale_to_beat: false,
+			rainbow_hitcircle: false,
+			rainbow_slider: false,
+			old_slider: false,
+		}
 
-		auto_update_rate: 16.6667,
-		auto_tag_cursors: 1
 	}
 
 	return gameplay_

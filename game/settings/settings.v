@@ -12,9 +12,9 @@ pub const (
 
 pub struct Settings {
 	pub mut:
+		audio        Audio = make_audio_settings()
 		window   	 Window = make_window_settings()
 		gameplay 	 Gameplay = make_gameplay_settings()
-		miscellaneous Miscellaneous = make_miscellaneous_settings()
 		video        Video = make_video_settings()
 }
 
@@ -40,15 +40,12 @@ fn init() {
 		settings = json.decode(Settings, crap) or { panic(err) }
 	}
 
-	// Fix some weird stuff just incase
-	settings.gameplay.auto_tag_cursors = math.max(1, settings.gameplay.auto_tag_cursors)
-
 	// Also save again, this way new shit can just get append into the json
 	settings.save()
 
 	// Post-Fix
-	settings.gameplay.lead_in_time = math.max(1.0, settings.gameplay.lead_in_time)
-	settings.gameplay.lead_in_time *= 1000.0
+	settings.gameplay.playfield.lead_in_time = math.max(1.0, settings.gameplay.playfield.lead_in_time)
+	settings.gameplay.playfield.lead_in_time *= 1000.0
 
 	// unepic global hack
 	mut g_settings := global

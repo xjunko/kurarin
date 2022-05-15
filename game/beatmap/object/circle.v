@@ -45,7 +45,7 @@ pub struct Circle {
 }
 
 pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
-	if settings.global.miscellaneous.rainbow_hitcircle {
+	if settings.global.gameplay.hitobjects.rainbow_hitcircle {
 		time := circle.last_time / 100.0
 		circle.hitcircle.color.r = u8(f32(math.sin(0.3*time + 0 + 1 * 1) * 127.0 + 128.0))
 		circle.hitcircle.color.g = u8(f32(math.sin(0.3*time + 2 + 1 * 1) * 127.0 + 128.0))

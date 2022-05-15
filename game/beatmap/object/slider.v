@@ -518,7 +518,7 @@ pub fn (mut slider Slider) generate_slider_path() {
 	// oh god
 	slider.curve = curves.new_multi_curve_t(slider_points_raw[0], slider_points, slider.pixel_length)
 	slider.get_slider_points() // Generate points
-	slider.end_position = slider.curve.point_at(1.0)
+	slider.end_position = slider.get_position_at_lazer(slider.time.end)
 
 	slider.start_angle = slider.get_start_angle()
 

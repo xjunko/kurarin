@@ -287,7 +287,7 @@ pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mu
 // Factory
 pub fn new_ruleset(mut beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &Ruleset {
 	logging.info("Creating osu! ruleset.")	
-
+	
 	mut ruleset := &Ruleset{beatmap: unsafe { beatmap }}
 	ruleset.cursors = []&cursor.Cursor{}
 	ruleset.subset = []&SubSet{}
