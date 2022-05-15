@@ -203,7 +203,6 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 		transforms := parse_sprite_commands(commands)
 
 		// FIXME: This is a hack
-		// println(transforms.len)
 		for transform in transforms {
 			sprite.add_transform(transform)
 		}
