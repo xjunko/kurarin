@@ -48,7 +48,7 @@ pub fn (mut res Resolution) calculate() {
 	res.camera.offset = res.offset
 	res.camera.scale = res.playfield_scale
 
-	logging.info(res.str())
+	logging.debug(res.str())
 	logging.debug("Resolution calculated!")
 }
 
