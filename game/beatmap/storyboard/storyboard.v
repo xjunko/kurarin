@@ -11,6 +11,7 @@ import framework.logging
 import framework.math.time as time2
 import framework.math.vector
 import framework.math.easing
+import framework.math.camera
 import framework.math.transform
 import framework.graphic.sprite
 
@@ -20,9 +21,8 @@ pub const (
 
 pub struct Storyboard {
 	pub mut:
-		ctx  	&gg.Context = voidptr(0)
 		root 	string
-		sprites []&sprite.Sprite
+		ctx  	&gg.Context = voidptr(0)
 		video   &ffmpeg.VideoSprite = voidptr(0)
 
 		last_boost f64
@@ -30,9 +30,12 @@ pub struct Storyboard {
 		thread_started bool
 		mutex &sync.Mutex = sync.new_mutex()
 
+		// Sprite
+		camera  camera.Camera = camera.Camera{offset: vector.Vector2{x: 105.0 * storyboard_scale, y: 0}, scale: storyboard_scale}
+		manager &sprite.Manager = sprite.make_manager()
+
 		// Cache
 		cache   map[string]gg.Image
-		// TODO: layering
 }
 
 pub fn (mut storyboard Storyboard) get_image(path string) gg.Image {
@@ -52,18 +55,7 @@ pub fn (mut storyboard Storyboard) update_boost(boost f64) {
 }
 
 pub fn (mut storyboard Storyboard) update(time f64) {
-	// remove and update
-	for mut sprite in storyboard.sprites {
-		// Remove
-		if time >= sprite.time.end && !sprite.always_visible {
-			storyboard.sprites.delete(storyboard.sprites.index(sprite))
-			continue
-		}
-
-		if sprite.is_drawable_at(time) {
-			sprite.update(time)
-		}
-	}
+	storyboard.manager.update(time)
 
 	// Background video
 	if storyboard.video != voidptr(0) {
@@ -90,28 +82,7 @@ pub fn (mut storyboard Storyboard) start_thread() {
 }
 
 pub fn (mut storyboard Storyboard) draw() {
-	for mut sprite in storyboard.sprites {
-		if sprite.is_drawable_at(storyboard.last_time) || sprite.always_visible {
-			pos := sprite.position
-					.scale(storyboard_scale)
-					.sub(sprite.origin.multiply(sprite.size.scale(storyboard.last_boost * storyboard_scale)))
-					.add(x: 105 * storyboard_scale, y: 0)
-			
-			storyboard.ctx.draw_image_with_config(gg.DrawImageConfig{
-					img: sprite.get_texture(),
-					img_id: sprite.get_texture().id,
-					img_rect: gg.Rect{
-						x: f32(pos.x),
-						y: f32(pos.y),
-						width: f32(sprite.size.x * (storyboard.last_boost * storyboard_scale)),
-						height: f32(sprite.size.y * (storyboard.last_boost * storyboard_scale))
-					},
-					color: sprite.color,
-					rotate: f32(sprite.angle)
-					additive: sprite.additive
-			})
-		}
-	}
+	storyboard.manager.draw(ctx: storyboard.ctx, camera: storyboard.camera, time: storyboard.last_time)
 
 	if storyboard.video != voidptr(0) {
 		storyboard.video.draw(ctx: storyboard.ctx, scale: storyboard.last_boost)
@@ -240,7 +211,7 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 		if sprite.transforms.len > 0 {
 			sprite.reset_size_based_on_texture()
 			sprite.reset_attributes_based_on_transforms()
-			storyboard.sprites << sprite 
+			storyboard.manager.add(mut sprite)
 		}	
 
 		// check for stuff that doesnt have scale transforms
