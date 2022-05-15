@@ -80,8 +80,8 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 		split_before_digit := fn (text string) []string {
 			// TODO: 3am code; this is retarded, find a better way
 			numbers := ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
-			for i, char in text {
-				if char.str_escaped() in numbers {
+			for i, charac in text {
+				if charac.str_escaped() in numbers {
 					return [text[..i], text[i..]]
 				}
 			}
