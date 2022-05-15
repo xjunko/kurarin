@@ -96,13 +96,20 @@ pub fn (mut slider Slider) get_number() i64 {
 }
 
 pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
+	// // DEBUG: some angle lines, uncomment to see.
+	// local := arg.camera.translate(slider.slider_b_sprite.position)
+	// distance := local.distance(arg.camera.translate(slider.position))
+	// angle := slider.slider_b_sprite.position.angle_rv(slider.position) + math.pi
+	// angled := local.add(x: math.cos(angle) * distance, y: math.sin(angle) * distance)
+	// arg.ctx.draw_line_with_config(f32(local.x), f32(local.y), f32(angled.x), f32(angled.y), gg.PenConfig{color: gx.white, thickness: 16})
+
+	// Normal shit
 	slider.hitcircle.draw(arg) // Draw hitcircle
 
 	// Draw the easy stuff first
 	for mut sprite in slider.sprites {
 		sprite.draw(arg)
 	}
-
 }
 
 pub fn (mut slider Slider) hit_edge(index int, time f64, is_hit bool) {
@@ -176,6 +183,13 @@ pub fn (mut slider Slider) update(time f64) bool {
 	slider.slider_overlay_sprite.position.y = slider_current_position.y
 	slider.slider_b_sprite.position.x = slider_current_position.x
 	slider.slider_b_sprite.position.y = slider_current_position.y
+
+	// SliderBall angle
+	if time >= slider.time.start && time <= slider.time.end - 5.0 {
+		slider_future_infront_position := slider.get_position_at_lazer(math.min<f64>(time + 1.0, slider.time.end))
+		slider.slider_b_sprite.angle = (slider_current_position.angle_rv(slider_future_infront_position) * 180 / math.pi) * -1.0 + 180.0
+		// ^^^^ FIXME: what the fuck huh
+	}
 
 	// Generate renderer way before the slider appears
 	if time >= (slider.time.start - slider.diff.preempt - 50.0) && slider.slider_renderer_attr == voidptr(0) {
@@ -616,13 +630,14 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 		
 		sprite.add_transform(typ: .scale_factor, time: time.Time{appear_time, appear_time}, before: [size_ratio])
 		sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [angle])
-		sprite.add_transform(typ: .fade, time: time.Time{appear_time, circle_time}, before: [0.0], after: [255.0])
-		sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [255.0], after: [0.0])
-		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + slider.diff.preempt / 2.0}, before: [size_ratio], after: [size_ratio * 1.2])
+		sprite.add_transform(typ: .fade, time: time.Time{appear_time, math.min<f64>(circle_time, appear_time + 150.0)}, before: [0.0], after: [255.0])
+		sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}, before: [255.0], after: [0.0])
+		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}, before: [size_ratio], after: [size_ratio * 1.4])
 		sprite.reset_size_based_on_texture()
 		sprite.reset_attributes_based_on_transforms()
 
-		for t := f64(slider.time.start); t < circle_time; t += 300.0 {
+		bounce_start_time := math.min<f64>(slider.diff.preempt, 15000)
+		for t := f64(slider.time.start) - bounce_start_time; t < circle_time; t += 300.0 {
 			length := math.min(300.0, circle_time - t)
 			sprite.add_transform(typ: .scale_factor, time: time.Time{t, t+length}, before: [size_ratio * 1.3], after: [size_ratio * 1.0])
 		}
