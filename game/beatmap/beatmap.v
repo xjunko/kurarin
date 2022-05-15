@@ -82,7 +82,7 @@ pub fn (mut beatmap Beatmap) bind_context(mut ctx &gg.Context) {
 
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 	// TODO: use storyboard
-	if beatmap.storyboard.sprites.len == 0 {
+	if beatmap.storyboard.manager.queue.len == 0 {
 		mut has_video := false
 		if beatmap.general.video_filename.len != 0 && os.exists(beatmap.get_video_path()) && !settings.global.gameplay.disable_background_video {
 			has_video = true
@@ -121,7 +121,7 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 		beatmap_bg.reset_size_based_on_texture(size: end_size)
 		beatmap_bg.reset_attributes_based_on_transforms()
 
-		beatmap.storyboard.sprites << beatmap_bg
+		beatmap.storyboard.manager.add(mut beatmap_bg)
 		logging.info("No background, making one!")
 	}
 }
@@ -172,7 +172,7 @@ pub fn (mut beatmap Beatmap) reset() {
 	beatmap.ensure_hitsound_loaded()
 
 	// // Only start thread when needed and not recording
-	if beatmap.storyboard.sprites.len > 0 && !settings.global.video.record {
+	if beatmap.storyboard.manager.queue.len > 0 && !settings.global.video.record {
 		beatmap.storyboard.start_thread()
 	}
 
