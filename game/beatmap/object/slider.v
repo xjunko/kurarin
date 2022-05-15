@@ -480,8 +480,9 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 
 	}
 
-	
-	println("TickPoint: ${slider.tick_points.len} | ScorePoint: ${slider.score_points.len} - Lazer: ${slider.score_points_lazer.len} | TickReverse: ${slider.tick_reverse.len} | ScorePath: ${slider.score_path.len}")
+	$if debug {
+		logging.debug("TickPoint: ${slider.tick_points.len} | ScorePoint: ${slider.score_points.len} - Lazer: ${slider.score_points_lazer.len} | TickReverse: ${slider.tick_reverse.len} | ScorePath: ${slider.score_path.len}")
+	}
 
 	slider.duration = (slider.time.end - slider.time.start) / f64(slider.repeated)
 }
