@@ -62,6 +62,11 @@ pub fn (mut auto AutoCursor) update(time f64) {
 						mut &auto.queue[auto.queue_i],
 						1
 					)
+				} else {
+					auto.queue_i = auto.queue.len - 1
+					auto.cursor.left_button = false
+					auto.cursor.right_button = false
+					return // We're done here.
 				}
 			}
 		}
