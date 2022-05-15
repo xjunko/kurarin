@@ -252,7 +252,7 @@ pub fn window_draw_recording(mut window &Window) {
 
 	// shrug
 	update_delta := 1000.0 / 1000.0
-	game_update_delta := 1000.0 / 480.0 // Render Update FPS
+	game_update_delta := 1000.0 / settings.global.video.update_fps // Render Update FPS
 	fps_delta := 1000.0 / settings.global.video.fps
 
 	mut delta_sum_video := fps_delta
@@ -260,12 +260,12 @@ pub fn window_draw_recording(mut window &Window) {
 
 	mut video_time := 0.0
 
-	end_time := 5000 + 3000
+	end_time := (window.beatmap.time.end + 3000.0) * settings.global.window.speed
 	for video_time < end_time {
 		// Update and Audio
 		delta_sum_update += update_delta
 		if delta_sum_update >= game_update_delta {
-			video_time += game_update_delta
+			video_time += game_update_delta * settings.global.window.speed
 			// Update
 			window.update(video_time)
 
