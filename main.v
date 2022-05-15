@@ -245,7 +245,6 @@ pub fn window_draw_recording(mut window &Window) {
 	logging.info("Video rendering started!")
 
 	// Continue rendering
-	mut g_time := time.get_time()
 	mut last_progress := int(0)
 	mut last_count := i64(0)
 	mut count := i64(0)
@@ -253,42 +252,44 @@ pub fn window_draw_recording(mut window &Window) {
 
 	// shrug
 	update_delta := 1000.0 / 1000.0
+	game_update_delta := 1000.0 / 480.0 // Render Update FPS
 	fps_delta := 1000.0 / settings.global.video.fps
-	audio_delta := update_delta
 
 	mut delta_sum_video := fps_delta
-	mut delta_sum_audio := 0.0
+	mut delta_sum_update := 0.0
 
+	mut video_time := 0.0
 
-	end_time := window.beatmap.time.end + 3000
-	for g_time.time < end_time {
-		delta_sum_audio += update_delta
+	end_time := 5000 + 3000
+	for video_time < end_time {
+		// Update and Audio
+		delta_sum_update += update_delta
+		if delta_sum_update >= game_update_delta {
+			video_time += game_update_delta
+			// Update
+			window.update(video_time)
 
-		for delta_sum_audio >= audio_delta {
+			// Submit audio
 			window.pipe_audio()
-			delta_sum_audio -= audio_delta
+			delta_sum_update -= game_update_delta
 		}
 
+		// Video
 		delta_sum_video += update_delta
 		if delta_sum_video >= fps_delta {
-			// Update
-			window.update(g_time.time)
-
 			// Draw
 			window.draw()
 
 			// Pipe 
 			window.pipe_window() 
 
-			g_time.tick()
-
 			// Print progress
 			count++
-			progress := int((g_time.time / end_time) * 100.0)
+			progress := int((video_time / end_time) * 100.0)
 
 			if math.fmod(progress, 5) == 0 && progress != last_progress {
-				speed := f64(count - last_count) * (1000 / g_time.fps) / (timelib.ticks() - last_time) 
-				eta := int((end_time - g_time.time) / 1000.0 / speed)
+				speed := f64(count - last_count) * (1000 / settings.global.video.fps) / (timelib.ticks() - last_time) 
+				eta := int((end_time - video_time) / 1000.0 / speed)
 
 				mut eta_text := ""
 
@@ -308,9 +309,8 @@ pub fn window_draw_recording(mut window &Window) {
 				last_time = timelib.ticks()
 				last_count = count
 				last_progress = progress
-
+			}
 			delta_sum_video -= fps_delta
-		}
 		}
 	}
 	window.ctx.quit() // Ok we're done...
@@ -377,8 +377,8 @@ pub fn initiate_game_loop(argument GameArgument) {
 	// Record or na
 	window.record = settings.global.video.record
 
-	// FIXME: Release this limit once we got auto going
-	if window.record {
+	// Don't record if we're playing the game, only record for auto (and replays soon).
+	if window.record && argument.playing {
 		logging.error("Recording is unavailable rn due to gameplay refactor, try again later.")
 		exit(1)
 	}
