@@ -6,6 +6,8 @@ import library.gg
 import game.beatmap.object
 import game.movers
 
+import framework.math.vector
+
 pub struct AutoCursor {
 	pub mut:
 		cursor  &Cursor
@@ -19,12 +21,12 @@ pub struct AutoCursor {
 		release_left_at f64 = -123456
 		release_right_at f64 = -123456
 		was_right_before bool
+
+		// Spinner
+		rotation f64
 }
 
 pub fn (mut auto AutoCursor) update(time f64) {
-	// Normal cursor shit
-	auto.cursor.update(time)
-
 	// Auto
 	// Looks abit janky compared to the pregenerated one.
 	if auto.queue_i < auto.queue.len {
@@ -62,11 +64,13 @@ pub fn (mut auto AutoCursor) update(time f64) {
 						mut &auto.queue[auto.queue_i],
 						1
 					)
+
+					// Reset spinner rotation
+					auto.rotation = 0.0
 				} else {
+					// End of the map
+					// Just move to the last object no matter what
 					auto.queue_i = auto.queue.len - 1
-					auto.cursor.left_button = false
-					auto.cursor.right_button = false
-					return // We're done here.
 				}
 			}
 		}
@@ -81,12 +85,25 @@ pub fn (mut auto AutoCursor) update(time f64) {
 				auto.cursor.position.y = pos.y
 			}
 
-			// Bit of an hack cuz we dont want to calculate slider path on update (we can but i dont want to so...)
-			// Slider mover
+			// Some object specific movement
 			mut cur_hitobject := &auto.queue[auto.queue_i]
+
+			// Slider
 			if (time >= auto.mover.time.end && time <= cur_hitobject.time.end) && mut cur_hitobject is object.Slider {
 				auto.cursor.position.x = cur_hitobject.slider_b_sprite.position.x	
 				auto.cursor.position.y = cur_hitobject.slider_b_sprite.position.y
+			}
+
+			// Spinner
+			if (time >= auto.mover.time.end + 10.0 && time >= cur_hitobject.time.start && time <= cur_hitobject.time.end) && mut cur_hitobject is object.Spinner {
+				radius := 100.0
+				position := vector.Vector2{
+					math.cos(auto.rotation) * radius + 512.0 / 2.0,
+					math.sin(auto.rotation) * radius + 384.0 / 2.0,
+				}
+				auto.cursor.position.x = position.x
+				auto.cursor.position.y = position.y
+				auto.rotation += 0.85
 			}
 		}
 	}
@@ -101,6 +118,9 @@ pub fn make_auto_cursor(mut ctx &gg.Context, hitobjects []object.IHitObject) &Au
 		cursor: make_cursor(mut ctx),
 		queue: hitobjects
 	}
+
+	auto.cursor.position.x = 512.0 / 2.0
+	auto.cursor.position.y = 384.0 / 2.0
 
 	return auto
 }
