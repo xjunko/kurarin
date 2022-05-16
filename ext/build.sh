@@ -9,6 +9,13 @@ build_debug() {
     v -cc gcc -cg .
 }
 
+build_debug_gc() {
+    clear &&
+    echo "Build: Debug" &&
+    build_shaders &&
+    v -cc gcc -gc boehm -cg .
+}
+
 build_development() {
     clear &&
     echo "Build: Development" &&
@@ -25,12 +32,17 @@ build_production() {
 
 case $1 in 
     "--prod"|"--production"|"-prod")
-        build_production
+        build_production && 
         exit 0
         ;;
 
     "--debug"|"--debug"|"-debug")
-        build_debug
+        build_debug_gc && 
+        exit 0
+        ;;
+
+    "--debug_raw")
+        build_debug &&
         exit 0
         ;;
     *)
