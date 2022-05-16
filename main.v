@@ -260,7 +260,7 @@ pub fn window_draw_recording(mut window &Window) {
 
 	mut video_time := 0.0
 
-	end_time := (window.beatmap.time.end + 3000.0) * settings.global.window.speed
+	end_time := (window.beatmap.time.end + 7000.0) * settings.global.window.speed
 	for video_time < end_time {
 		// Update and Audio
 		delta_sum_update += update_delta
