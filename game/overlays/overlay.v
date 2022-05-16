@@ -26,6 +26,7 @@ pub struct GameplayOverlay {
 		new_combo i64
 
 		score     i64
+		score_smooth i64
 
 		ruleset &ruleset.Ruleset
 		cursor  &cursor.Cursor
@@ -103,7 +104,8 @@ pub fn (mut overlay GameplayOverlay) draw() {
 	overlay.combo_counter.draw(ctx: overlay.ctx)
 
 	// Score
-	overlay.ctx.draw_text(1280-5, 0, "${overlay.score:08d}", gx.TextCfg{color: gx.white, align: .right, size: 45})
+	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) - f64(overlay.score_smooth) * 0.5)
+	overlay.ctx.draw_text(1280-5, 0, "${overlay.score_smooth:08d}", gx.TextCfg{color: gx.white, align: .right, size: 45})
 }
 
 pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
