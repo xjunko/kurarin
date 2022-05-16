@@ -279,6 +279,8 @@ pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mu
 	// 		// ruleset.hit_listener(time, number, position, mut ruleset)
 	// 	}
 	// }
+
+	// FIXME: This is not accurate but i dont care
 	subset.raw_score += result.get_value()
 
 	ruleset.hit_listener(time, number, position, result, combo, subset.raw_score)
