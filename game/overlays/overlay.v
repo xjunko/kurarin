@@ -107,7 +107,7 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 	// Score
 	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) - f64(overlay.score_smooth) * 0.5)
-	overlay.score_font.draw_number("${overlay.score_smooth:08d}", vector.Vector2{1280 - (8 * overlay.score_font.size.x), 0}, vector.top_left, ctx: overlay.ctx, time: overlay.last_time)
+	overlay.score_font.draw_number("${overlay.score_smooth:08d}", vector.Vector2{1275 - (8 * overlay.score_font.size.x), 0}, vector.top_left, ctx: overlay.ctx, time: overlay.last_time)
 }
 
 pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
