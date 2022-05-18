@@ -177,9 +177,9 @@ pub fn (mut beatmap Beatmap) reset() {
 	}
 
 	// Set beatmap time
-	for object in beatmap.objects {
-		beatmap.time.start = math.min<f64>(object.time.start, beatmap.time.start)
-		beatmap.time.end = math.max<f64>(object.time.end, beatmap.time.end)
+	for mut object in beatmap.objects {
+		beatmap.time.start = math.min<f64>(object.get_start_time(), beatmap.time.start)
+		beatmap.time.end = math.max<f64>(object.get_end_time(), beatmap.time.end)
 	}
 }
 
