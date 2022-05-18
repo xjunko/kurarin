@@ -1,6 +1,5 @@
 module gameplay
 
-import gx
 import math
 
 import framework.audio as f_audio
@@ -8,12 +7,14 @@ import game.audio as g_audio
 
 import framework.math.easing
 import framework.math.glider
+import framework.math.vector
 import framework.graphic.sprite
 
 pub struct ComboCounter {
 	pub mut:
 		combo int
 		combo_display int
+		combo_font &sprite.NumberSprite = voidptr(0)
 
 		combo_break f_audio.Sample
 
@@ -41,12 +42,14 @@ pub fn (mut counter ComboCounter) update(time f64) {
 }
 
 pub fn (mut counter ComboCounter) draw(arg sprite.CommonSpriteArgument) {
-	arg.ctx.draw_text(0, int(720.0 - 16.0 - (32.0 * math.max<f64>(counter.combo_glider.value, 1.0))), "x${counter.combo}", gx.TextCfg{color: gx.white, size: int(16.0 + (32.0 * math.max<f64>(counter.combo_glider.value, 1.0)))})
+	scale := math.max<f64>(counter.combo_glider.value, 1.0)
+	counter.combo_font.draw_number(counter.combo.str(), vector.Vector2{0, 720 - counter.combo_font.size.y * scale}, vector.top_left, sprite.CommonSpriteArgument{...arg, scale: scale})
 }
 
 pub fn make_combo_counter() &ComboCounter {
 	mut counter := &ComboCounter{
-		combo_break: g_audio.get_sample("combobreak")
+		combo_break: g_audio.get_sample("combobreak"),
+		combo_font: sprite.make_number_font("combo")
 	}
 	counter.combo_glider.easing = easing.quad_out
 
