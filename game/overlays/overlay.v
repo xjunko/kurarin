@@ -25,8 +25,9 @@ pub struct GameplayOverlay {
 		combo     i64
 		new_combo i64
 
-		score     i64
+		score        i64
 		score_smooth i64
+		score_font   &sprite.NumberSprite = voidptr(0)
 
 		ruleset &ruleset.Ruleset
 		cursor  &cursor.Cursor
@@ -84,6 +85,7 @@ pub fn (mut overlay GameplayOverlay) update(_time f64) {
 		overlay.key_states[i] = state
 	}
 
+	overlay.score_font.update(_time)
 	overlay.last_time = _time
 }
 
@@ -105,19 +107,21 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 	// Score
 	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) - f64(overlay.score_smooth) * 0.5)
-	overlay.ctx.draw_text(1280-5, 0, "${overlay.score_smooth:08d}", gx.TextCfg{color: gx.white, align: .right, size: 45})
+	overlay.score_font.draw_number("${overlay.score_smooth:08d}", vector.Vector2{1280 - (8 * overlay.score_font.size.x), 0}, vector.top_left, ctx: overlay.ctx, time: overlay.last_time)
 }
 
 pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
 	mut hitresult := gameplay.make_hit_result(ctx, ruleset.beatmap.difficulty.Difficulty)
 	mut counter := gameplay.make_combo_counter()
+	mut score_font := sprite.make_number_font("score")
 
 	mut overlay := &GameplayOverlay{
 		ruleset: unsafe { ruleset },
 		cursor: unsafe { cursor },
 		ctx: unsafe { ctx },
 		hitresult: hitresult,
-		combo_counter: counter
+		combo_counter: counter,
+		score_font: score_font
 	}
 
 	overlay.keys_background = &sprite.Sprite{origin: vector.top_left, always_visible: true}
