@@ -24,9 +24,9 @@ pub fn (mut number NumberSprite) draw_number(text string, position vector.Vector
 			origin.multiply(
 				x: number.size.x * number.text.len,
 				y: number.size.y
-			)
+			).scale(arg.scale)
 		)
-
+		
 		size := number.size.scale(arg.camera.scale * arg.scale)
 
 		for character in text {
@@ -46,7 +46,7 @@ pub fn (mut number NumberSprite) draw_number(text string, position vector.Vector
 				additive: number.additive
 			)
 
-			base_position.x += number.size.x
+			base_position.x += number.size.x * (arg.scale)
 		}
 	}
 }
