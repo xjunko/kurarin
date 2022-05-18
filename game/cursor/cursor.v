@@ -2,6 +2,7 @@
 
 module cursor
 
+import time
 import library.gg
 import gx
 import math
@@ -91,7 +92,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 					height: f32(trail.size.y * x.resolution.playfield_scale)
 				},
 				color: trail.color,
-				additive: [true, false][int(settings.global.gameplay.cursor.style == 0)]
+				additive: settings.global.gameplay.cursor.style != 0
 			})
 		}
 	}
@@ -130,11 +131,11 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	cursor.mutex.unlock()
 }
 
-pub fn (mut cursor Cursor) update(time f64) {
+pub fn (mut cursor Cursor) update(time f64, delta f64) {
 	cursor.mutex.@lock()
 
 	// Delta
-	delta := time - cursor.last_time
+	// delta := time - cursor.last_time
 
 	// Time
 	cursor.Sprite.update(time) // Update the main cursor itself

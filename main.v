@@ -79,13 +79,13 @@ pub fn (mut window Window) update_boost() {
 	}
 }
 
-pub fn (mut window Window) update_cursor(time f64) {
+pub fn (mut window Window) update_cursor(time f64, delta f64) {
 	if !window.argument.playing {
 		window.auto.update(time)
 	}
 
 	for mut cursor in window.cursors {
-		cursor.update(time)
+		cursor.update(time, delta)
 	}
 
 	// Rainbow mode if theres only one cursor
@@ -97,7 +97,7 @@ pub fn (mut window Window) update_cursor(time f64) {
 	}
 }
 
-pub fn (mut window Window) update(time f64) {
+pub fn (mut window Window) update(time f64, delta f64) {
 	if time >= settings.global.gameplay.playfield.lead_in_time && !window.audio_been_played {
 		window.audio_been_played = true
 		window.beatmap_song.set_speed(settings.global.window.speed)
@@ -119,7 +119,7 @@ pub fn (mut window Window) update(time f64) {
 
 	window.beatmap.update(time - settings.global.gameplay.playfield.lead_in_time, window.beatmap_song_boost)
 	window.beatmap_song.update(time - settings.global.gameplay.playfield.lead_in_time)
-	window.update_cursor(time - settings.global.gameplay.playfield.lead_in_time)
+	window.update_cursor(time - settings.global.gameplay.playfield.lead_in_time, delta)
 	window.update_boost()
 }
 
@@ -217,7 +217,7 @@ pub fn window_init(mut window &Window) {
 			sapp.show_mouse(false)
 			
 			for {
-				window.update(g_time.time)
+				window.update(g_time.time, g_time.delta)
 				g_time.tick_average_fps()
 				limiter.sync()
 			}
@@ -267,7 +267,7 @@ pub fn window_draw_recording(mut window &Window) {
 		if delta_sum_update >= game_update_delta {
 			video_time += game_update_delta * settings.global.window.speed
 			// Update
-			window.update(video_time)
+			window.update(video_time, fps_delta)
 
 			// Submit audio
 			window.pipe_audio()
