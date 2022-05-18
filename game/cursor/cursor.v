@@ -158,7 +158,7 @@ pub fn (mut cursor Cursor) update(time f64, delta f64) {
 		distance_real := cursor.position.sub(cursor.last_position)
 
 		if distance != 0.0 {
-			for _ in 0 .. rand.int_in_range(10, 100) or { 0 } {
+			for _ in 0 .. rand.int_in_range(10, math.max<int>(math.min<int>(int(distance), 40), 20)) or { 0 } {
 				mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
 				trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 25.0, 150))}, before: [255.0], after: [0.0])
 				trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + random_f64_in_range(100, math.max(distance * 32.0, 150))}, before: [cursor.position.x, cursor.position.y], after: [cursor.position.x - distance_real.x + random_f64_in_range(-distance, distance), cursor.position.y - distance_real.y + random_f64_in_range(-distance, distance)])
