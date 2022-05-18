@@ -267,7 +267,7 @@ pub fn window_draw_recording(mut window &Window) {
 		if delta_sum_update >= game_update_delta {
 			video_time += game_update_delta * settings.global.window.speed
 			// Update
-			window.update(video_time, fps_delta)
+			window.update(video_time, update_delta)
 
 			// Submit audio
 			window.pipe_audio()
