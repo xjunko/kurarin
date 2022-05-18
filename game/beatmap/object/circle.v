@@ -103,7 +103,7 @@ pub fn (mut circle Circle) set_difficulty(diff difficulty.Difficulty) {
 	end_time := circle.time.start
 
 	// init combo sprite
-	circle.combotext = sprite.make_number_sprite(circle.combo_number)
+	circle.combotext = sprite.make_number_sprite(circle.combo_number, "default")
 	
 	//
 	if circle.inherited {
