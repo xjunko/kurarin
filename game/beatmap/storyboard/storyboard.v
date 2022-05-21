@@ -15,9 +15,7 @@ import framework.math.camera
 import framework.math.transform
 import framework.graphic.sprite
 
-pub const (
-	storyboard_scale = f64(1.5) // TODO: put this into game.x or smth
-)
+import game.x
 
 pub struct Storyboard {
 	pub mut:
@@ -31,7 +29,8 @@ pub struct Storyboard {
 		mutex &sync.Mutex = sync.new_mutex()
 
 		// Sprite
-		camera  camera.Camera = camera.Camera{offset: vector.Vector2{x: 105.0 * storyboard_scale, y: 0}, scale: storyboard_scale}
+		scale   f64
+		camera  camera.Camera
 		manager &sprite.Manager = sprite.make_manager()
 
 		// Cache
@@ -223,8 +222,6 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 
 		if !has_been_scaled {
 			sprite.reset_size_based_on_texture()
-			sprite.raw_size = sprite.raw_size.scale(1 / storyboard_scale)
-			sprite.size = sprite.size.scale(1 / storyboard_scale)
 		}
 	}
 }
@@ -442,6 +439,25 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 pub fn parse_storyboard(path string, mut ctx &gg.Context) &Storyboard {
 	mut sb := &Storyboard{ctx: ctx}
 	sb.root = os.dir(path)
+
+	// Camera
+	sb.camera = camera.Camera{offset: vector.Vector2{x: 0, y: 0}, scale: sb.scale}
+
+	// Scale and Center the storyboard somehow
+	mut scale := 0.0
+	mut storyboard_canvas := vector.Vector2{480 * (16/9), 480}
+
+	// Make sure storyboard width hit the window
+	for storyboard_canvas.y * scale < x.resolution.resolution.y {
+		scale += 0.01
+	}
+	
+	// Ok now somehow scale and center it
+	storyboard_canvas = storyboard_canvas.scale(scale)
+
+	sb.camera.offset = sb.camera.offset.add(x.resolution.resolution.sub(storyboard_canvas).scale(0.5).sub(x: 120 * x.resolution.ui_camera.scale, y: 0))
+	sb.camera.scale = scale
+	
 
 	if os.exists(path) {
 		mut lines := os.read_lines(path) or { panic("uwu i fucked up: ${err}") }
