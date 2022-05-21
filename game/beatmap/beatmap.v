@@ -93,11 +93,11 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 
 		// Nothing on the storyboard, make our own background
 		image := beatmap.ctx.create_image(beatmap.get_bg_path())
-		mut ratio := ((480 * (16/9)) / f64(image.width)) / beatmap.storyboard.scale
+		mut ratio := (settings.global.window.width / f64(image.width)) / beatmap.storyboard.scale
 
-		// Make sure the height is >= 480
-		for ((f64(image.height) * ratio) * beatmap.storyboard.scale ) < 480.0 {
-			ratio += 0.01
+		// Make sure the height is >= Window height
+		for ((f64(image.height) * ratio) * beatmap.storyboard.scale) < settings.global.window.height {
+			ratio += 0.05
 		}
 
 		end_size := vector.Vector2{f64(image.width * ratio), f64(image.height * ratio)}
@@ -106,7 +106,7 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 			origin: vector.centre,
 			textures: [image],
 			always_visible: true,
-			position: vector.Vector2{(480 * (16/9)) / 2.0, 240.0}
+			position: vector.Vector2{320.0, 240.0}
 		}
 
 		// fade
