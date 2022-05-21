@@ -4,21 +4,13 @@ in vec3 centre;
 in vec2 texture_coord;
 
 uniform vs_uniform {
+    mat4 proj;
     vec4 slider_beat_scale; // it was a float but idk sokol is being retarded so had to do this to workaround that
 };
 
 out vec2 v_uv;
 
 void main() {
-    // TODO: Unhardcode this
-    // HARDCODE: 1280x720 resolution
-    mat4 proj = mat4(
-        0.002344, 0.0, 0.0, 0.0,
-        0.0, -0.004167, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        -0.600000, 0.800000, 0.000000, 1.0
-    );
-
     mat4 trans = mat4(
         slider_beat_scale.x, 0.0, 0.0, 0.0,
         0.0, slider_beat_scale.x, 0.0, 0.0,

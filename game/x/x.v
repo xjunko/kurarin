@@ -1,10 +1,13 @@
 module x
 
 /* "x" module is for shit that im not sure where to put so itll be here for now */
+import gg.m4
 
 import framework.logging
 import framework.math.vector
 import framework.math.camera
+
+import game.settings
 
 pub const (
 	resolution = &Resolution{}
@@ -12,15 +15,20 @@ pub const (
 
 pub struct Resolution {
 	pub mut:
-		resolution 		vector.Vector2 = vector.Vector2{1280, 720}
+		resolution 		vector.Vector2
 		playfield  		vector.Vector2
 		playfield_scale f64
 		offset          vector.Vector2
 		scale			f64
 		camera          camera.Camera
+		projection      m4.Mat4
 }
 
 pub fn (mut res Resolution) calculate() {
+	// Use settings resolution
+	res.resolution.x = settings.global.window.width
+	res.resolution.y = settings.global.window.height
+
 	// The "old" one
 	// res.playfield_scale = 595.5 / 768
 	// res.playfield.y = res.resolution.y * res.playfield_scale
@@ -48,7 +56,10 @@ pub fn (mut res Resolution) calculate() {
 	res.camera.offset = res.offset
 	res.camera.scale = res.playfield_scale
 
-	logging.debug(res.str())
+	// Projection (for slider rendering)
+	res.projection = get_matrix_projection(res)
+
+	logging.info(res.str())
 	logging.debug("Resolution calculated!")
 }
 
@@ -80,7 +91,26 @@ pub fn get_playfield_offset(res Resolution) vector.Vector2 {
 	
 }
 
+pub fn get_matrix_projection(res Resolution) m4.Mat4 {
+	mult := f32(res.playfield_scale)
+	mut matrix := m4.ortho(-f32(res.resolution.x) / 2.0, f32(res.resolution.x) / 2.0, f32(res.resolution.y) / 2, -f32(res.resolution.y )/ 2.0, 1.0, -1.0)
 
+	mut playfield := m4.unit_m4()
+	playfield.set_e(3, -512.0 * mult / 2)
+	playfield.set_e(7, -384.0 * mult / 2)
+
+	mut scale := m4.unit_m4()
+	scale.set_e(0, mult)
+	scale.set_e(5, mult)
+
+	matrix *= playfield
+	matrix *= scale
+
+	// HACK: ????
+	matrix.set_e(10, 1.0)
+
+	return matrix
+}
 
 //
 fn init() {
