@@ -4,12 +4,13 @@ import os
 import math
 
 import framework.logging
+import game.settings
 
 
 pub struct FFmpegReader {
 	mut:
 		video_path         string
-		target_resolution  [2]f64 = [1280.0, 720.0]!
+		target_resolution  [2]f64
 
 		process 		  &os.Process = voidptr(0)
 		ok                bool
@@ -25,6 +26,9 @@ pub fn (mut reader FFmpegReader) initialize_video_data() {
 	if !os.exists(reader.video_path) {
 		logging.error("Tried to read unexisting video file.")
 	}
+
+	// Resolution
+	reader.target_resolution = [settings.global.window.width, settings.global.window.height]!
 
 	// Resize video to fit target_resolution
 	mut ratio := reader.target_resolution[0] / reader.metadata.width

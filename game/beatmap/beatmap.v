@@ -93,10 +93,10 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 
 		// Nothing on the storyboard, make our own background
 		image := beatmap.ctx.create_image(beatmap.get_bg_path())
-		mut ratio := (1280.0 / f64(image.width)) / storyboard.storyboard_scale
+		mut ratio := (settings.global.window.width / f64(image.width)) / storyboard.storyboard_scale
 
-		// Make sure the height is >= 720
-		for ((f64(image.height) * ratio) * storyboard.storyboard_scale ) < 720 {
+		// Make sure the height is >= Window height
+		for ((f64(image.height) * ratio) * storyboard.storyboard_scale ) < settings.global.window.height {
 			ratio += 0.05
 		}
 
@@ -263,19 +263,19 @@ pub fn (mut beatmap Beatmap) draw() {
 	beatmap.update_lock.@lock()
 
 	// Background/Storyboard draws
-	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 
 	beatmap.storyboard.draw() // Includes background
 
 	// Shitty background dim
-	beatmap.ctx.draw_rect_filled(0, 0, 1280, 720, gx.Color{0,0,0, u8(settings.global.gameplay.playfield.background.background_dim)})
+	beatmap.ctx.draw_rect_filled(0, 0, int(settings.global.window.width), int(settings.global.window.height), gx.Color{0,0,0, u8(settings.global.gameplay.playfield.background.background_dim)})
 
 	// Playfield
 	// Insides
-	beatmap.ctx.draw_rect_filled(f32((1280 - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((720 - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), gx.Color{0,0,0, 150})
+	beatmap.ctx.draw_rect_filled(f32((int(settings.global.window.width) - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((int(settings.global.window.height) - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), gx.Color{0,0,0, 150})
 
 	// Outline
-	beatmap.ctx.draw_rect_empty(f32((1280 - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((720 - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), gx.white)
+	beatmap.ctx.draw_rect_empty(f32((int(settings.global.window.width) - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((int(settings.global.window.height) - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), gx.white)
 
 	// Done
 	sgl.draw()
@@ -301,7 +301,7 @@ pub fn (mut beatmap Beatmap) draw() {
 			}
 
 			// Render hitcircle
-			gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
+			gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 			beatmap.queue[i].draw(ctx: beatmap.ctx, time: beatmap.last_update, scale: beatmap.last_boost, camera: x.resolution.camera)
 			sgl.draw()
 			gfx.end_pass()

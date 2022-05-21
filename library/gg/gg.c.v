@@ -11,6 +11,8 @@ import sokol.sgl
 import sokol.gfx
 import math
 
+import game.settings
+
 pub type TouchPoint = C.sapp_touchpoint
 
 pub struct Event {
@@ -534,12 +536,12 @@ pub fn (gg &Context) begin() {
 	}
 	sgl.defaults()
 	sgl.matrix_mode_projection()
-	sgl.ortho(0.0, 1280, 720, 0.0, -1.0, 1.0)
+	sgl.ortho(0.0, int(settings.global.window.width), int(settings.global.window.height), 0.0, -1.0, 1.0)
 }
 
 // Finishes drawing for the context
 pub fn (gg &Context) end() {
-	gfx.begin_default_pass(gg.clear_pass, 1280, 720)
+	gfx.begin_default_pass(gg.clear_pass, int(settings.global.window.width), int(settings.global.window.height))
 	sgl.draw()
 	gfx.end_pass()
 	gfx.commit()

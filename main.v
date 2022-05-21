@@ -150,13 +150,13 @@ pub fn (mut window Window) draw() {
 		window.ctx.draw_text(5, 50 + 16, game_version, gx.TextCfg{color: gx.white})
 
 		// FPS info
-		window.ctx.draw_rect_filled(1145, 683, 155, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(1275, 683, "Update: ${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
-		window.ctx.draw_rect_filled(1160, 683 + 16, 150, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(1275, 683+16, "Draw: ${window.draw_counter.get_average_fps():.0}fps [${window.draw_counter.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
+		window.ctx.draw_rect_filled(int(settings.global.window.width - 135), int(settings.global.window.height - 37), 155, 16, gx.Color{0, 0, 0, 100})
+		window.ctx.draw_text(int(settings.global.window.width - 5), int(settings.global.window.height - 37), "Update: ${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
+		window.ctx.draw_rect_filled(int(settings.global.window.width - 120), int(settings.global.window.height - 37 + 16), 150, 16, gx.Color{0, 0, 0, 100})
+		window.ctx.draw_text(int(settings.global.window.width - 5), int(settings.global.window.height - 37 + 16), "Draw: ${window.draw_counter.get_average_fps():.0}fps [${window.draw_counter.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
 	}
 
-	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 	sgl.draw()
 	gfx.end_pass()
 
@@ -234,10 +234,10 @@ pub fn window_draw(mut window &Window) {
 pub fn window_draw_recording(mut window &Window) {
 	window_size := gg.window_size()
 
-	if window_size.width != 1280 || window_size.height != 720 {
+	if window_size.width != int(settings.global.window.width) || window_size.height != int(settings.global.window.height) {
 		window.ctx.begin()
-		window.ctx.resize(1280, 720)
-		window.ctx.draw_text(0, 0, "Please make sure the window resolution is [1280, 720].", gx.TextCfg{color: gx.white})
+		window.ctx.resize(int(settings.global.window.width), int(settings.global.window.height))
+		window.ctx.draw_text(0, 0, "Please make sure the window resolution is [${int(settings.global.window.width)}, ${int(settings.global.window.height)}].", gx.TextCfg{color: gx.white})
 		window.ctx.end()
 		return
 	}
@@ -321,8 +321,8 @@ pub fn initiate_game_loop(argument GameArgument) {
 	window.argument = &argument
 
 	window.ctx = gg.new_context(
-		width: 1280,
-		height: 720,
+		width: int(settings.global.window.width),
+		height: int(settings.global.window.height),
 		user_data: window,
 		bg_color: gx.black,
 

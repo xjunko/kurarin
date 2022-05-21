@@ -19,6 +19,8 @@ module graphic
 */
 
 import game.settings
+import game.x
+
 import math
 
 import sokol
@@ -75,7 +77,7 @@ pub struct SliderRenderer {
 // Boost scaling thingy
 pub fn update_boost_level(boost f32) {
 	mut g_render := global_renderer
-	g_render.uniform_values[0] = boost
+	g_render.uniform_values[16] = boost
 }
 
 
@@ -249,15 +251,15 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	gfx.commit()
 
 
-	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 		sgl.enable_texture()
 			sgl.texture(global_renderer.color_img)
 		sgl.c4b(255, 255, 255, u8(255 - ( 255 * alpha )))
 		sgl.begin_quads()
 			sgl.v3f_t2f(0,    0,   1, 0, 1)
-			sgl.v3f_t2f(1280, 0,   1, 1, 1)
-			sgl.v3f_t2f(1280, 720, 1, 1, 0)
-			sgl.v3f_t2f(0,    720, 1, 0, 0)
+			sgl.v3f_t2f(int(settings.global.window.width), 0,   							   1, 1, 1)
+			sgl.v3f_t2f(int(settings.global.window.width), int(settings.global.window.height), 1, 1, 0)
+			sgl.v3f_t2f(0,    							   int(settings.global.window.height), 1, 0, 0)
 		sgl.end()
 		sgl.disable_texture()
 			sgl.draw()
@@ -333,8 +335,8 @@ pub fn init_slider_renderer() {
 	// Color and Depth buffer
 	mut img_desc := gfx.ImageDesc{
 		render_target: true,
-		width: 1280,
-		height: 720,
+		width: int(settings.global.window.width),
+		height: int(settings.global.window.height),
 		pixel_format: .rgba8,
 		label: "ColorBuffer".str
 	}
@@ -362,8 +364,14 @@ pub fn init_slider_renderer() {
 	}
 	
 
-	// Uniform (for slider scale)
-	renderer.uniform_values = [
+	// Uniform (projection and slider scale)
+	for col in 0 .. 4 {
+		for row in 0 .. 4 {
+			renderer.uniform_values << x.resolution.projection.get_f(col, row)
+		}	
+	}
+
+	renderer.uniform_values << [
 		f32(1.0), 0.0, 0.0, 0.0,
 	]
 	

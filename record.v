@@ -36,7 +36,7 @@ pub fn (mut window Window) init_video_pipe_process() {
 
 		"-f", "rawvideo",
 		"-vcodec", "rawvideo",
-		"-s", "1280x720",
+		"-s", "${int(settings.global.window.width)}x${int(settings.global.window.height)}",
 		"-pix_fmt", "rgba",
 		"-r", fps.str(),
 		"-i", "-",
@@ -60,7 +60,7 @@ pub fn (mut window Window) init_video_pipe_process() {
 	window.video_proc.run()
 
 	// Init record buffer
-	img_size := 1280 * 720 * 4
+	img_size := int(settings.global.window.width) * int(settings.global.window.height) * 4
 	window.record_data = unsafe { &u8(malloc(img_size)) }
 
 	logging.info("VideoPipe Process started!")
@@ -112,12 +112,12 @@ pub fn (mut window Window) close_pipe_process() {
 
 pub fn (mut window Window) pipe_window() {
 	// read gl buffer
-	C.v_sapp_gl_read_rgba_pixels(0, 0, 1280, 720, window.record_data)
+	C.v_sapp_gl_read_rgba_pixels(0, 0, int(settings.global.window.width), int(settings.global.window.height), window.record_data)
 
 	// hacky but works
 	unsafe {
 		// temp := window.record_data.vbytes(1280 * 720 * 4).bytestr()
-		temp := window.record_data.vstring_with_len(1280 * 720 * 4)
+		temp := window.record_data.vstring_with_len(int(settings.global.window.width) * int(settings.global.window.height) * 4)
 		window.video_proc.stdin_write(temp)	
 		temp.free()
 	}
