@@ -2,6 +2,8 @@ module gameplay
 
 import math
 
+import game.settings
+
 import framework.audio as f_audio
 import game.audio as g_audio
 
@@ -51,10 +53,10 @@ pub fn (mut counter ComboCounter) update(time f64) {
 }
 
 pub fn (mut counter ComboCounter) draw(arg sprite.CommonSpriteArgument) {
-	main_scale := math.max<f64>(counter.main_glider.value, 1.0)
-	pop_scale := math.max<f64>(counter.pop_glider.value, 1.0)
-	counter.main_font.draw_number(counter.combo.str(), vector.Vector2{5, 715 - counter.main_font.size.y * main_scale}, vector.top_left, sprite.CommonSpriteArgument{...arg, scale: main_scale})
-	counter.pop_font.draw_number(counter.combo.str(), vector.Vector2{5, 715 - counter.pop_font.size.y * pop_scale}, vector.top_left, sprite.CommonSpriteArgument{...arg, scale: pop_scale})
+	main_scale := math.max<f64>(counter.main_glider.value, 1.0) * arg.scale
+	pop_scale := math.max<f64>(counter.pop_glider.value, 1.0) * arg.scale
+	counter.main_font.draw_number(counter.combo.str(), vector.Vector2{5, (settings.global.window.height - 5) - counter.main_font.size.y * main_scale}, vector.top_left, sprite.CommonSpriteArgument{...arg, scale: main_scale})
+	counter.pop_font.draw_number(counter.combo.str(), vector.Vector2{5, (settings.global.window.height - 5) - counter.pop_font.size.y * pop_scale}, vector.top_left, sprite.CommonSpriteArgument{...arg, scale: pop_scale})
 }
 
 pub fn make_combo_counter() &ComboCounter {
