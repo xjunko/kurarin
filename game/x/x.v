@@ -21,6 +21,7 @@ pub struct Resolution {
 		offset          vector.Vector2
 		scale			f64
 		camera          camera.Camera
+		ui_camera       camera.Camera
 		projection      m4.Mat4
 }
 
@@ -53,8 +54,13 @@ pub fn (mut res Resolution) calculate() {
 	// res.scale = res.resolution.y / 768
 
 	// Camera
+	// Playfield camera
 	res.camera.offset = res.offset
 	res.camera.scale = res.playfield_scale
+
+	// UI camera
+	res.ui_camera.offset.x = res.resolution.x / 2.0
+	res.ui_camera.scale = res.resolution.y / 720.0
 
 	// Projection (for slider rendering)
 	res.projection = get_matrix_projection(res)
