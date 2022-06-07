@@ -22,7 +22,7 @@ pub fn (mut manager Manager) update(time f64) {
 			continue
 		}
 
-		if sprite.is_drawable_at(time) {
+		if sprite.is_drawable_at(time) && !sprite.always_visible {
 			sprite.update(time)
 		}
 	}
