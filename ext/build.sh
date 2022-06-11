@@ -4,14 +4,14 @@ build_shaders() {
 
 build_debug() {
     clear &&
-    echo "Build: Debug" &&
+    echo "Build: Debug w/o GC" &&
     build_shaders &&
     v -cc gcc -cg .
 }
 
 build_debug_gc() {
     clear &&
-    echo "Build: Debug" &&
+    echo "Build: Debug w/ GC" &&
     build_shaders &&
     v -cc gcc -gc boehm -cg .
 }
@@ -30,25 +30,43 @@ build_production() {
     v -cc gcc -gc boehm -prod .
 }
 
+run_program() {
+    echo "Running Program!" &&
+    ./dementia
+}
+
+# Build type
 case $1 in 
     "--prod"|"--production"|"-prod")
-        build_production && 
-        exit 0
+        build_production
         ;;
 
     "--debug"|"--debug"|"-debug")
-        build_debug_gc && 
-        exit 0
+        build_debug_gc
         ;;
 
-    "--debug_raw")
-        build_debug &&
-        exit 0
+    "--debug_raw"|"-debug_raw")
+        build_debug
         ;;
     *)
     
-    # devel build?
+    # Nothing passed, devel build
     build_development
-    exit 0
+esac
 
+# TODO: not familiar with bash, make this better.
+case $1 in 
+    "--run"|"-run")
+        run_program
+        ;;
+
+    *)
+esac
+
+case $2 in 
+    "--run"|"-run")
+        run_program
+        ;;
+
+    *)
 esac
