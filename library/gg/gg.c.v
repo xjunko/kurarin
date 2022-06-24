@@ -102,6 +102,8 @@ mut:
 	// a cache with all images created by the user. used for sokol image init and to save space
 	// (so that the user can store image ids, not entire Image objects)
 	image_cache   []Image
+	image_queue   []&Image
+	image_default Image // Texture to fallback to incase the image cant be loaded.
 	needs_refresh bool = true
 	ticks         int // for ui mode only
 pub:
@@ -232,13 +234,17 @@ fn gg_init_sokol_window(user_data voidptr) {
 
 	g.additive_pip = sgl.make_pipeline(&additive_pipdesc)
 
+	// Load default texture
+	g.image_default = g.create_image("assets/textures/default.png")
+
+	// Call init fn
 	if g.config.init_fn != voidptr(0) {
 		g.config.init_fn(g.user_data)
 	}
 	// Create images now that we can do that after sg is inited
 	if g.native_rendering {
 		return
-	}
+	}	
 
 	for i in 0 .. g.image_cache.len {
 		if g.image_cache[i].simg.id == 0 {
@@ -353,15 +359,22 @@ pub fn (ctx &Context) draw_rect(x f32, y f32, w f32, h f32, c gx.Color) {
 }
 
 pub fn (ctx &Context) draw_rect_filled(x f32, y f32, w f32, h f32, c gx.Color) {
-	$if macos {
-		if ctx.native_rendering {
-			C.darwin_draw_rect(x, ctx.height - (y + h), w, h, c)
-			return
-		}
+	ctx.internal_draw_rect_filled(x, y, w, h, c, false)
+}
+
+pub fn (ctx &Context) draw_rect_filled_add(x f32, y f32, w f32, h f32, c gx.Color) {
+	ctx.internal_draw_rect_filled(x, y, w, h, c, true)
+}
+
+fn (ctx &Context) internal_draw_rect_filled(x f32, y f32, w f32, h f32, c gx.Color, additive bool) {
+	if additive {
+		sgl.load_pipeline(ctx.additive_pip)
 	}
-	if c.a != 255 {
+
+	if c.a != 255 && !additive {
 		sgl.load_pipeline(ctx.timage_pip)
 	}
+
 	sgl.c4b(c.r, c.g, c.b, c.a)
 	sgl.begin_quads()
 	sgl.v2f(x * ctx.scale, y * ctx.scale)

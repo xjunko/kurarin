@@ -23,11 +23,17 @@ pub mut:
 	path        string
 }
 
-// TODO return ?Image
+pub fn (mut ctx Context) load_image_queue() {
+	for i := 0; i < ctx.image_queue.len; i++ {
+		ctx.image_cache[ctx.image_queue[i].id].init_sokol_image()
+		ctx.image_queue = ctx.image_queue[1 ..]
+		i--
+	}
+}
+
 pub fn (mut ctx Context) create_image(file string) Image {
-	// println('\ncreate_image("$file")')
 	if !os.exists(file) {
-		return Image{}
+		return ctx.image_default
 	}
 
 	if !gfx.is_valid() {
@@ -47,9 +53,17 @@ pub fn (mut ctx Context) create_image(file string) Image {
 		ctx.image_cache << img
 		return img
 	}
+
 	mut img := create_image(file)
+
+	// Check if the image is fucked up
+	if img.width == 0 && img.height == 0 {
+		return ctx.image_default
+	}
+
 	img.id = ctx.image_cache.len
 	ctx.image_cache << img
+	ctx.image_queue << &img
 	return img
 }
 
@@ -197,7 +211,7 @@ fn create_image(file string) Image {
 		ext: stb_img.ext
 		path: file
 	}
-	img.init_sokol_image()
+
 	return img
 }
 
