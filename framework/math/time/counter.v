@@ -64,8 +64,11 @@ fn init() {
 
 
 pub struct TimeCounter {
+	mut:
+		start_time f64
+		last_time f64
+
 	pub mut:
-		last  f64
 		delta f64
 		time  f64
 		fps   f64
@@ -81,7 +84,8 @@ pub struct TimeCounter {
 }
 
 pub fn (mut t TimeCounter) reset() {
-	t.last = timelib.ticks()
+	t.last_time = timelib.ticks()
+	t.start_time = t.last_time
 	t.time = 0
 	t.delta = 0
 	t.fps = 0
@@ -89,18 +93,21 @@ pub fn (mut t TimeCounter) reset() {
 
 pub fn (mut t TimeCounter) tick() f64 {
 	now := timelib.ticks()
-	last_ticked := t.last
-
-	t.last = now
-
+	
+	// Most likely a recording timer, dont use system time.
 	if t.use_custom_delta {
 		t.delta = t.custom_delta
+		t.time += t.custom_delta * t.speed
+
+		return t.custom_delta
 	} else {
-		t.delta =  now - last_ticked
+		// Normal timer, use system timer.
+		t.delta = now - t.last_time
+		t.time = (now - t.start_time) * t.speed
+		t.last_time = now
 	}
-	
-	t.time += t.delta * t.speed
-	t.fps = 1000 / t.delta
+
+	t.fps = 1000.0 / t.delta
 
 	return t.delta
 }
