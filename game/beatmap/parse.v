@@ -8,7 +8,7 @@ import math
 
 import framework.logging
 
-pub fn parse_beatmap(path string) &Beatmap {
+pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 	if !os.exists(path) {
 		logging.fatal("Beatmap file: ${path} doesnt exists.")
 		exit(1)
@@ -19,7 +19,11 @@ pub fn parse_beatmap(path string) &Beatmap {
 		exit(1)
 	}
 
-	logging.info("Parsing beatmap!")
+	if !lazy {
+		// Only print this when actually loading the map.
+		logging.info("Parsing beatmap!")
+	}
+	
 
 	mut beatmap := &Beatmap{}
 	beatmap.root = os.dir(path)
@@ -39,17 +43,17 @@ pub fn parse_beatmap(path string) &Beatmap {
 
 		match category {
 			"General" {
-				items := common_parse_with_key_value(line, ":")
+				items := common_parse_with_key_value_and_limit(line, ":", 2)
 				general_beatmap_parser<BeatmapGeneralInfo>(mut beatmap.general, items[0], items[1])
 			}
 
 			"Metadata" {
-				items := common_parse_with_key_value(line, ":")
+				items := common_parse_with_key_value_and_limit(line, ":", 2)
 				general_beatmap_parser<BeatmapMetadataInfo>(mut beatmap.metadata, items[0], items[1])
 			}
 
 			"Difficulty" {
-				items := common_parse_with_key_value(line, ":")
+				items := common_parse_with_key_value_and_limit(line, ":", 2)
 				general_beatmap_parser<difficulty.Difficulty>(mut beatmap.difficulty.Difficulty, items[0], items[1])
 			}
 
@@ -127,6 +131,8 @@ pub fn parse_beatmap(path string) &Beatmap {
 			}
 
 			"Colours" {
+				if lazy { continue }
+
 				items := common_parse_with_key_value(line, ":")
 				rgb := common_parse_with_key_value(items[1], ",")
 				color := gx.Color{u8(rgb[0].int()), u8(rgb[1].int()), u8(rgb[2].int()), u8(255)}
@@ -134,6 +140,8 @@ pub fn parse_beatmap(path string) &Beatmap {
 			}
 
 			"HitObjects" {
+				if lazy { continue }
+
 				// Calculate difficulty and timing if havent
 				if !beatmap.difficulty.calculated {
 					beatmap.difficulty.calculate()
@@ -156,14 +164,20 @@ pub fn parse_beatmap(path string) &Beatmap {
 		}
 	}
 
-	logging.info("Done parsing beatmap!")
+	if !lazy {
+		logging.info("Done parsing beatmap!")
+	}
 
 	return beatmap
 }
 
 // Utils
 pub fn common_parse_with_key_value(line string, split string) []string {
-	return line.split(split).map(it.trim_space())
+	return common_parse_with_key_value_and_limit(line, split, -1)
+}
+
+pub fn common_parse_with_key_value_and_limit(line string, split string, limit int) []string {
+	return line.split_nth(split, limit).map(it.trim_space())
 }
 
 pub fn parse_category(line string) ?string {
