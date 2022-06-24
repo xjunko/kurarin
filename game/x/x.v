@@ -65,7 +65,7 @@ pub fn (mut res Resolution) calculate() {
 	// Projection (for slider rendering)
 	res.projection = get_matrix_projection(res)
 
-	logging.info(res.str())
+	logging.debug(res.str())
 	logging.debug("Resolution calculated!")
 }
 
@@ -120,6 +120,8 @@ pub fn get_matrix_projection(res Resolution) m4.Mat4 {
 
 //
 fn init() {
-	mut r := resolution
-	r.calculate()
+	unsafe {
+		mut r := resolution
+		r.calculate()
+	}
 }
