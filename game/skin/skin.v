@@ -13,8 +13,10 @@ const (
 
 //
 pub fn get_skin() &Skin {
-	mut skin := global
-	return skin
+	unsafe {
+		mut skin := global
+		return skin
+	}
 }
 
 pub fn bind_context(mut ctx &gg.Context) {
