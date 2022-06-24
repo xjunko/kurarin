@@ -30,12 +30,12 @@ fn init() {
 	mut settings := Settings{}
 
 	if !os.exists("settings.json") {
-		logging.info("No settings.json file found, creating one.")
-		logging.info("Please change your settings.json file (if you wanted to), then run the program again.")
+		logging.error("No settings.json file found, creating one.")
+		logging.error("Please change your settings.json file (if you wanted to), then run the program again.")
 		settings.save()
 		exit(1)
 	} else {
-		logging.info("settings.json found, loading.")
+		logging.debug("settings.json found, loading.")
 		crap := os.read_file('settings.json') or { panic(err) }
 		settings = json.decode(Settings, crap) or { panic(err) }
 	}
@@ -48,8 +48,10 @@ fn init() {
 	settings.gameplay.playfield.lead_in_time *= 1000.0
 
 	// unepic global hack
-	mut g_settings := global
-	replace_attribute_from<Settings>(mut g_settings, mut settings)
+	unsafe {
+		mut g_settings := global
+		replace_attribute_from<Settings>(mut g_settings, mut settings)
+	}
 }
 
 // Greatest hack of all time
