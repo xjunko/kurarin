@@ -178,7 +178,8 @@ pub fn play_sample_internal(_sample_set int, hitsound_index int, index int, volu
 		sample_set = 1
 	}
 
-	mut g_sample := global_sample
+	mut g_sample := unsafe { global_sample }
+
 	if global_sample.beatmap[sample_set - 1][hitsound_index].len > 0 && index in global_sample.beatmap[sample_set -1][hitsound_index] && !settings.global.audio.ignore_beatmap_samples {
 		g_sample.beatmap[sample_set - 1][hitsound_index][index].play_volume(f32(volume))
 	} else {
@@ -190,8 +191,10 @@ pub fn play_sample_internal(_sample_set int, hitsound_index int, index int, volu
 
 // Internal
 fn get_global_sample() &GameSamples {
-	mut sample := global_sample
-	return sample
+	unsafe {
+		mut sample := global_sample
+		return sample
+	}
 }
 
 
