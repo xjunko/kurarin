@@ -35,6 +35,7 @@ pub struct BeatmapGeneralInfo {
 		audio_filename string [AudioFilename]
 		stack_leniency f64    [StackLeniency]
 		widescreen 	   bool   [WidescreenStoryboard]
+		preview_time   f64    [PreviewTime]
 }
 
 pub struct BeatmapMetadataInfo {
@@ -75,6 +76,12 @@ pub struct Beatmap {
 		update_lock  	 &sync.Mutex = sync.new_mutex() // To prevent race, note that this might block the entire thing if draw or update method got stuck
 }
 
+// General Helper
+pub fn (mut beatmap Beatmap) load_full_beatmap() &Beatmap{
+	// We load a new beatmap with everything loaded (most likely for playing the beatmap)
+	return parse_beatmap(os.join_path(beatmap.root, beatmap.filename), false)
+}
+
 // Method
 pub fn (mut beatmap Beatmap) bind_context(mut ctx &gg.Context) {
 	beatmap.ctx = ctx
@@ -83,6 +90,7 @@ pub fn (mut beatmap Beatmap) bind_context(mut ctx &gg.Context) {
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 	// TODO: use storyboard
 	if beatmap.storyboard.manager.queue.len == 0 {
+		// Video
 		mut has_video := false
 		if beatmap.general.video_filename.len != 0 && os.exists(beatmap.get_video_path()) && settings.global.gameplay.playfield.background.enable_video {
 			has_video = true
@@ -90,13 +98,12 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 			beatmap.storyboard.video = video
 		}
 
-
 		// Nothing on the storyboard, make our own background
 		image := beatmap.ctx.create_image(beatmap.get_bg_path())
-		mut ratio := (settings.global.window.width / f64(image.width)) / beatmap.storyboard.scale
+		mut ratio := ((480.0 * (16.0/9.0)) / f64(image.width))
 
-		// Make sure the height is >= Window height
-		for ((f64(image.height) * ratio) * beatmap.storyboard.scale) < settings.global.window.height {
+		// Fit the image height also
+		for (f64(image.height) * ratio) < 480 {
 			ratio += 0.05
 		}
 
@@ -168,6 +175,7 @@ pub fn (mut beatmap Beatmap) reset() {
 	}
 	logging.info("Storyboard loaded!")
 
+	beatmap.storyboard.initialize_camera()
 	beatmap.ensure_background_loaded()
 	beatmap.ensure_hitsound_loaded()
 
