@@ -9,8 +9,7 @@ const (
 interface Any { str() string }
 
 pub fn get_logger() &log.Log {
-	mut l := global
-	return l
+	return global
 }
 
 pub fn fatal(s Any) {
