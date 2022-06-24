@@ -435,13 +435,9 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 	return transforms
 }
 
-//
-pub fn parse_storyboard(path string, mut ctx &gg.Context) &Storyboard {
-	mut sb := &Storyboard{ctx: ctx}
-	sb.root = os.dir(path)
-
+pub fn (mut storyboard Storyboard) initialize_camera() {
 	// Camera
-	sb.camera = camera.Camera{offset: vector.Vector2{x: 0, y: 0}, scale: sb.scale}
+	storyboard.camera = camera.Camera{offset: vector.Vector2{x: 0, y: 0}, scale: storyboard.scale}
 
 	// Scale and Center the storyboard somehow
 	mut scale := 0.0
@@ -455,9 +451,14 @@ pub fn parse_storyboard(path string, mut ctx &gg.Context) &Storyboard {
 	// Ok now somehow scale and center it
 	storyboard_canvas = storyboard_canvas.scale(scale)
 
-	sb.camera.offset = sb.camera.offset.add(x.resolution.resolution.sub(storyboard_canvas).scale(0.5).sub(x: 120 * x.resolution.ui_camera.scale, y: 0))
-	sb.camera.scale = scale
-	
+	storyboard.camera.offset = storyboard.camera.offset.add(x.resolution.resolution.sub(storyboard_canvas).scale(0.5).sub(x: 120 * x.resolution.ui_camera.scale, y: 0))
+	storyboard.camera.scale = scale
+}
+
+//
+pub fn parse_storyboard(path string, mut ctx &gg.Context) &Storyboard {
+	mut sb := &Storyboard{ctx: ctx}
+	sb.root = os.dir(path)
 
 	if os.exists(path) {
 		mut lines := os.read_lines(path) or { panic("uwu i fucked up: ${err}") }
