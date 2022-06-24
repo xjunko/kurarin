@@ -35,8 +35,8 @@ import framework.math.time
 #include "assets/shaders/slider.h"
 // #include "assets/shaders/test.h"
 
-fn C.fuck_shader_desc(gfx.Backend) &C.sg_shader_desc
-// fn C.test_shader_desc(gfx.Backend) &C.sg_shader_desc
+fn C.fuck_shader_desc(gfx.Backend) &gfx.ShaderDesc
+// fn C.test_shader_desc(gfx.Backend) &gfx.ShaderDesc
 
 pub const (
 	used_import = gfx.used_import + sokol.used_import
@@ -51,8 +51,8 @@ pub struct SliderRendererAttr {
 		points   []vector.Vector2
 		vertices []f32
 		colors   []f32 // [3]Body [3]Border [3]BorderWidth, Unused, Unused
-		uniform  C.sg_range
-		bindings C.sg_bindings
+		uniform  gfx.Range
+		bindings gfx.Bindings
 		has_been_initialized bool
 }
 
@@ -62,13 +62,13 @@ pub struct SliderRenderer {
 		has_been_initialized bool
 
 	pub mut:
-		shader      C.sg_shader
-		pip         C.sg_pipeline
+		shader      gfx.Shader
+		pip         gfx.Pipeline
 		pass        gfx.Pass
-		pass_action C.sg_pass_action
-		pass_action2 C.sg_pass_action
-		gradient    C.sg_image
-		uniform     C.sg_range
+		pass_action gfx.PassAction
+		pass_action2 gfx.PassAction
+		gradient    gfx.Image
+		uniform     gfx.Range
 		color_img gfx.Image
 		depth_img gfx.Image
 		uniform_values []f32 // 
@@ -76,8 +76,10 @@ pub struct SliderRenderer {
 
 // Boost scaling thingy
 pub fn update_boost_level(boost f32) {
-	mut g_render := global_renderer
-	g_render.uniform_values[16] = boost
+	unsafe {
+		mut g_render := global_renderer
+		g_render.uniform_values[16] = boost
+	}
 }
 
 
@@ -170,7 +172,7 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 	}
 	
 	// Bind the shit
-	attr.bindings.vertex_buffers[0] = C.sg_make_buffer(&C.sg_buffer_desc{
+	attr.bindings.vertex_buffers[0] = C.sg_make_buffer(&gfx.BufferDesc{
 		size: usize(attr.vertices.len * int(sizeof(f32))),
 		data: C.sg_range{
 			ptr: attr.vertices.data,
@@ -287,7 +289,7 @@ pub fn init_slider_renderer() {
 	// Start
 	logging.info("Initializing slider renderer!")
 
-	mut renderer := global_renderer
+	mut renderer := unsafe { global_renderer }
 
 	// Normal slider shader
 	renderer.shader = C.sg_make_shader(
@@ -297,9 +299,9 @@ pub fn init_slider_renderer() {
 	)
 
 	// Make pipeline
-	mut pipeline_desc := &C.sg_pipeline_desc{
+	mut pipeline_desc := &gfx.PipelineDesc{
 		shader: renderer.shader,
-		depth: C.sg_depth_state{
+		depth: gfx.DepthState{
 			pixel_format: .depth
 			compare: .less,
 			write_enabled: true
@@ -353,14 +355,14 @@ pub fn init_slider_renderer() {
 	
 
 	// Pass action
-	renderer.pass_action.colors[0] = C.sg_color_attachment_action{
+	renderer.pass_action.colors[0] = gfx.ColorAttachmentAction{
 		action: .dontcare,
-		value: C.sg_color{1.0, 1.0, 1.0, 1.0}
+		value: gfx.Color{1.0, 1.0, 1.0, 1.0}
 	}
 
-	renderer.pass_action2.colors[0] = C.sg_color_attachment_action{
+	renderer.pass_action2.colors[0] = gfx.ColorAttachmentAction{
 		action: .clear,
-		value: C.sg_color{1.0, 1.0, 1.0, 0.0}
+		value: gfx.Color{1.0, 1.0, 1.0, 0.0}
 	}
 	
 
