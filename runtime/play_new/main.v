@@ -32,6 +32,7 @@ import framework.graphic.visualizer
 */
 
 const (
+	shut_the_fuck_up_v = settings.ok_sure
 	logo_hearbeat_rate = f64(1000.0) // ms
 )
 

@@ -7,6 +7,7 @@ import json
 import framework.logging
 
 pub const (
+	ok_sure = 0 // It's here so the retarded warning is gone
 	global = &Settings{} // disgusting global hack
 )
 
