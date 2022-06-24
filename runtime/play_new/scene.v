@@ -3,7 +3,6 @@ module play_new
 import os
 import gx
 import math
-import rand
 import time as i_time
 
 import framework.audio
