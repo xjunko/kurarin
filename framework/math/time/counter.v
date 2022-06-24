@@ -18,8 +18,10 @@ pub const (
 
 //
 pub fn get_time() &TimeCounter {
-	mut time := global
-	return time
+	unsafe {
+		mut time := global
+		return time
+	}
 }
 
 pub fn reset() {
