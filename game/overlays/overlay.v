@@ -158,7 +158,7 @@ pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx
 
 // Some hack
 pub fn hit_received(time f64, number i64, position vector.Vector2, result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
-	mut g_overlay := g_overlay_hack
+	mut g_overlay := unsafe { g_overlay_hack }
 	g_overlay.score = score
 	g_overlay.hitresult.add_result(time, result, position)
 
