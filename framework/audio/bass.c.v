@@ -23,6 +23,7 @@ fn C.BASS_ChannelSetPosition(C.HSTREAM, C.QWORD, int)
 fn C.BASS_SampleGetChannel(C.HSAMPLE, int) C.HSTREAM
 fn C.BASS_SampleLoad(int, &char, int, int, int, int) C.HSTREAM
 fn C.BASS_ChannelSeconds2Bytes(C.HSTREAM, f64) C.QWORD
+fn C.BASS_ChannelBytes2Seconds(C.HSTREAM, f64) C.QWORD
 
 // FFT
 fn C.BASS_ChannelGetData(C.HSTREAM, &voidptr, int)
@@ -36,3 +37,6 @@ fn C.BASS_FX_TempoCreate(C.HSTREAM, int) C.HSTREAM
 fn C.BASS_Mixer_StreamCreate(int, int, int) C.HSTREAM
 fn C.BASS_Mixer_StreamAddChannel(C.HSTREAM, C.HSTREAM, int) bool
 fn C.BASS_Mixer_ChannelGetData(C.HSTREAM, &voidptr, int)
+fn C.BASS_Mixer_ChannelSetPosition(C.HSTREAM, C.QWORD)
+fn C.BASS_Mixer_ChannelGetPosition(C.HSTREAM, int) f64
+fn C.BASS_Mixer_ChannelFlags(C.HSTREAM, int, int)

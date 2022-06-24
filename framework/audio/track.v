@@ -38,8 +38,20 @@ pub fn (mut track Track) play() {
 	track.playing = true
 }
 
+pub fn (mut track Track) pause() {
+	C.BASS_Mixer_ChannelFlags(track.channel, C.BASS_MIXER_CHAN_PAUSE, C.BASS_MIXER_CHAN_PAUSE)
+}
+
+pub fn (mut track Track) resume() {
+	C.BASS_Mixer_ChannelFlags(track.channel, 0, C.BASS_MIXER_CHAN_PAUSE)
+}
+
 pub fn (mut track Track) set_volume(vol f32) {
 	C.BASS_ChannelSetAttribute(track.channel, C.BASS_ATTRIB_VOL, vol)
+}
+
+pub fn (mut track Track) set_position(millisecond f64) {
+	C.BASS_ChannelSetPosition(track.channel, C.BASS_ChannelSeconds2Bytes(track.channel, millisecond / 1000.0), C.BASS_POS_BYTE)
 }
 
 pub fn (mut track Track) set_speed(speed f64) {
@@ -47,7 +59,7 @@ pub fn (mut track Track) set_speed(speed f64) {
 		track.speed = speed
 	}
 
-	C.BASS_ChannelSetAttribute(track.channel, C.BASS_ATTRIB_TEMPO, (speed-1.0)*100)
+	C.BASS_ChannelSetAttribute(track.channel, C.BASS_ATTRIB_TEMPO, (speed-1.0)*100.0)
 }
 
 pub fn (mut track Track) set_pitch(pitch f64) {
@@ -69,4 +81,8 @@ pub fn (mut track Track) update(time f64) {
 	}
 
 	track.boost = boost
+}
+
+pub fn (mut track Track) get_position() f64 {
+	return f64(C.BASS_ChannelBytes2Seconds(track.channel, C.BASS_Mixer_ChannelGetPosition(track.channel, C.BASS_POS_BYTE))) * 1000.0
 }
