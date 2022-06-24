@@ -48,8 +48,10 @@ fn init() {
 		C.BASS_ChannelPlay(master_mixer, 0)
 
 		// Point global to that mixer
-		mut g_mixer := global
-		g_mixer.master = master_mixer
+		unsafe {
+			mut g_mixer := global
+			g_mixer.master = master_mixer
+		}
 	} else {
 		logging.error("Failed to start BASS!")
 	}
