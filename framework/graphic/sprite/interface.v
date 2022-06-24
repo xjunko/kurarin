@@ -21,8 +21,10 @@ pub struct CommonSpriteArgument {
 [params]
 pub struct CommonSpriteSizeResetArgument {
 	pub:
-		factor f64 = 1.0
-		size   vector.Vector2
+		factor   f64 = 1.0
+		size     vector.Vector2
+		source   vector.Vector2
+		fit_size bool // If false, just overide, if true factor it based on source
 }
 
 pub interface ISprite {

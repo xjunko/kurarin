@@ -113,12 +113,31 @@ pub fn (mut sprite Sprite) add_transform(_t transform.Transform) {
 }
 
 pub fn (mut sprite Sprite) reset_size_based_on_texture(arg CommonSpriteSizeResetArgument) {
-	if arg.size.x != 0 || arg.size.y != 0 {
-		sprite.raw_size.x = arg.size.x
-		sprite.raw_size.y = arg.size.y
+	if (arg.size.x != 0 || arg.size.y != 0) && !arg.fit_size {
+		sprite.raw_size = arg.size
+		sprite.size = arg.size
 
-		sprite.size.x = arg.size.x
-		sprite.size.y = arg.size.y
+	} else if (arg.source.x != 0 || arg.source.y != 0) && arg.fit_size {
+		// Fit image within a given size and keep ratio.
+
+		mut size := vector.Vector2{}
+
+		// Use arg size if given
+		if arg.size.x != 0 || arg.size.y != 0 {
+			size.x = arg.size.x
+			size.y = arg.size.y
+		} else {
+			texture := sprite.get_texture()
+			size.x = f64(texture.width)
+			size.y = f64(texture.height)
+		}
+
+		// Ratio
+		mut ratio := (arg.source.x / size.x)
+
+		sprite.raw_size = size.scale(ratio)
+		sprite.size = size.scale(ratio)
+
 	} else {
 		mut texture := sprite.get_texture()
 
