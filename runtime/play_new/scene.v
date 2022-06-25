@@ -51,7 +51,12 @@ pub fn (mut window Window) update_current_song() bool {
 		window.menu_title_x = 0.0
 
 		// Kill old shit
-		// TODO: Free background somehow
+		// Free old background
+		if !isnil(window.background) && !isnil(window.background.data) {
+			println("FREeing image")
+			C.stbi_image_free(window.background.data) // Call stbi directly
+		}
+		
 		if window.audio != voidptr(0) {
 			window.audio.pause()
 		}
