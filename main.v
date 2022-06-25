@@ -38,6 +38,6 @@ fn main() {
 	if gui_mode {
 		play_new.main()
 	} else {
-		play_old.main(beatmap_path, is_playing)
+		play_old.main(beatmap_path.replace("\\", ""), is_playing)
 	}
 }
