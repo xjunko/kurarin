@@ -53,7 +53,6 @@ pub fn (mut window Window) update_current_song() bool {
 		// Kill old shit
 		// Free old background
 		if !isnil(window.background) && !isnil(window.background.data) {
-			println("FREeing image")
 			C.stbi_image_free(window.background.data) // Call stbi directly
 		}
 		
