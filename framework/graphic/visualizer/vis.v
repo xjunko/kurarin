@@ -17,12 +17,13 @@ pub struct Visualizer {
 		start_distance f64 = 1.0
 		last_time f64
 		counter f64
-		fft []f64 = []f64{len: 200}
+		fft []f64 = []f64{len: 200} // TODO: fix this, make a visualizer factor yor smth
 		music &audio.Track
+		multiplier f64 = 0.5 // Change this to increase the "oopmh"
 
 		// logo stuff
-		logo_position vector.Vector2
-		logo_size     vector.Vector2
+		logo_position vector.Vector2 = vector.Vector2{640, 480}
+		logo_size     vector.Vector2 = vector.Vector2{100, 100}
 }
 
 pub fn (mut vis Visualizer) update_logo(position vector.Vector2, size vector.Vector2) {
@@ -36,13 +37,11 @@ pub fn (mut vis Visualizer) update(time f64) {
 	vis.counter += delta
 	mut decay := delta * vis.decay_value
 
-	mult := 0.5 // Change this to increase the "oopmh"
-
 	if vis.counter >= vis.update_delay {
 		fft := &vis.music.fft
 
 		for i := 0; i < vis.bars; i++ {
-			value := unsafe { fft[(i + vis.jump_counter) % vis.bars] * mult }
+			value := unsafe { fft[(i + vis.jump_counter) % vis.bars] * vis.multiplier }
 
 			if value > vis.fft[i] {
 				vis.fft[i] = value
