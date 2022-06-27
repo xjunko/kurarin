@@ -12,6 +12,7 @@ fn C.BASS_SetConfig(int, int)
 fn C.BASS_GetDevice() int
 fn C.BASS_ChannelSetDevice(C.HSTREAM, int) bool
 fn C.BASS_ChannelSeconds2Bytes(C.HSTREAM, f64) u64
+fn C.BASS_ChannelFree(C.HSTREAM)
 
 // Track
 fn C.BASS_StreamCreateFile(int, &char, int, int, int) C.HSTREAM
@@ -40,3 +41,4 @@ fn C.BASS_Mixer_ChannelGetData(C.HSTREAM, &voidptr, int)
 fn C.BASS_Mixer_ChannelSetPosition(C.HSTREAM, C.QWORD)
 fn C.BASS_Mixer_ChannelGetPosition(C.HSTREAM, int) f64
 fn C.BASS_Mixer_ChannelFlags(C.HSTREAM, int, int)
+fn C.BASS_Mixer_ChannelRemove(C.HSTREAM)
