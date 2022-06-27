@@ -274,7 +274,7 @@ pub fn (mut attr SliderRendererAttr) free() {
 	if !attr.has_been_initialized { return }
 
 	for mut buffer in attr.bindings.vertex_buffers {
-		buffer.free()
+		C.sg_destroy_buffer(&buffer)
 	}
 
 	unsafe {
@@ -308,7 +308,7 @@ pub fn init_slider_renderer() {
 		}
 	}
 
-	// Pipeline blending (for slider to appear correctly, well almost.)
+	// Pipeline blending (for slider to appear correctly)
 	pipeline_desc.colors[0].pixel_format = .rgba8
 	pipeline_desc.colors[0].blend.enabled = false
 	pipeline_desc.colors[0].blend.op_rgb = .add
