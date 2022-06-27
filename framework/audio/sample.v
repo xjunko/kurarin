@@ -26,7 +26,6 @@ pub fn (mut sample Sample) play_volume(vol f32) {
 	channel.channel = C.BASS_SampleGetChannel(channel.source, C.BASS_SAMCHAN_STREAM|C.BASS_STREAM_DECODE)
 
 	C.BASS_ChannelSetAttribute(channel.channel, C.BASS_ATTRIB_VOL, f32((settings.global.audio.sample / 100.0) * (settings.global.audio.global / 100.0)) * vol)
-	// C.BASS_ChannelPlay(channel.channel, 1)
 	C.BASS_Mixer_StreamAddChannel(global.master, channel.channel, C.BASS_MIXER_CHAN_NORAMPIN|C.BASS_STREAM_AUTOFREE)
 }
 
