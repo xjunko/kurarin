@@ -5,9 +5,11 @@ import sync
 import library.gg
 
 import framework.math.time
+import framework.math.vector
 import framework.graphic.sprite
 
 import game.x
+import game.settings
 
 pub struct VideoSprite {
 	sprite.Sprite
@@ -38,10 +40,10 @@ pub fn (mut video VideoSprite) draw(arg sprite.CommonSpriteArgument) {
 		video.ctx.draw_image_with_config(gg.DrawImageConfig{
 			img_id: video.tex_id,
 			img_rect: gg.Rect{
-				x: f32((x.resolution.resolution.x - (video.source.metadata.width * arg.scale)) / 2.0),
-				y: f32((x.resolution.resolution.y - (video.source.metadata.height * arg.scale)) / 2.0),
-				width: f32(video.source.metadata.width * arg.scale),
-				height: f32(video.source.metadata.height * arg.scale)
+				x: f32((x.resolution.resolution.x - (video.size.x * arg.scale)) / 2.0),
+				y: f32((x.resolution.resolution.y - (video.size.y * arg.scale)) / 2.0),
+				width: f32(video.size.x * arg.scale),
+				height: f32(video.size.y * arg.scale)
 			},
 			color: video.color,
 			additive: video.additive
@@ -122,6 +124,13 @@ pub fn make_video_sprite(path string, mut ctx &gg.Context, offset f64) &VideoSpr
 
 	// fade in
 	video.add_transform(typ: .fade, time: time.Time{0, 1000}, before: [0.0], after: [255.0])
+
+	// Resize the video with gpu (or cpu idk)
+	ratio := settings.global.window.width / video.source.metadata.width
+
+	video.reset_size_based_on_texture(
+		size: vector.Vector2{x: video.source.metadata.width * ratio, y: video.source.metadata.height * ratio}
+	)
 	video.reset_attributes_based_on_transforms()
 
 	// Seek to offset
