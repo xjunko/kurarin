@@ -83,6 +83,8 @@ pub struct Window {
 		last_time f64
 
 		// Beatmap list
+		list_manager   &sprite.Manager = voidptr(0)
+
 		list_beatmap_s []&sprite.Sprite
 		list_offset_y f64
 		list_offset_y_sm f64 // Smoothen
@@ -120,9 +122,9 @@ pub fn (mut window Window) initialize_variables() {
 	window.visualizer = &visualizer.Visualizer{music: 0}
 
 	// Images
-	window.background_s = &sprite.Sprite{textures: [gg.Image{}], position: vector.Vector2{1280.0 / 2.0, 720.0 / 2.0}, always_visible: true}
-	window.last_background_s = &sprite.Sprite{textures: [gg.Image{}], position: vector.Vector2{1280.0 / 2.0, 720.0 / 2.0}, always_visible: true}
-	window.logo_s = &sprite.Sprite{position: vector.Vector2{1280.0 / 2.0, 720.0 / 2.0}, always_visible: true}
+	window.background_s = &sprite.Sprite{textures: [gg.Image{}], position: vector.Vector2{settings.global.window.width / 2.0, settings.global.window.height / 2.0}, always_visible: true}
+	window.last_background_s = &sprite.Sprite{textures: [gg.Image{}], position: vector.Vector2{settings.global.window.width / 2.0, settings.global.window.height / 2.0}, always_visible: true}
+	window.logo_s = &sprite.Sprite{position: vector.Vector2{settings.global.window.width / 2.0, settings.global.window.height / 2.0}, always_visible: true}
 
 	// Load required images
 	window.logo_s.textures << window.ctx.create_image("assets/textures/logo.png")
@@ -137,7 +139,7 @@ pub fn (mut window Window) initialize_variables() {
 	button_texture := window.ctx.create_image("assets/textures/menu_button.png")
 	for i in 0 .. 3 {
 		mut button := &sprite.Sprite{textures: [button_texture], always_visible: true, origin: vector.top_left}
-		button.add_transform(typ: .move_y, time: time.Time{0.0, 0.0}, before: [((720.0 / 2.0)-175) + ((114 + 5) * i)])
+		button.add_transform(typ: .move_y, time: time.Time{0.0, 0.0}, before: [((settings.global.window.height / 2.0)-175) + ((114 + 5) * i)])
 		button.color.r = i * 255
 		button.color.g = 100 + i * 100
 		button.color.b = 50 + i * 200
@@ -148,28 +150,7 @@ pub fn (mut window Window) initialize_variables() {
 		button.reset_size_based_on_texture()
 		button.reset_attributes_based_on_transforms()
 	}
-
-	// jk, initialize beatmap list stuff
-	how_many_on_screen := 14
-	size_per_map := 720.0 / f64(how_many_on_screen)
-	list_texture := window.ctx.create_image("assets/textures/menu-button-background.png")
-
-	for i in 0 .. how_many_on_screen + 2 { // 2 for offscreen
-		mut beatmap_s := &sprite.Sprite{textures: [list_texture], always_visible: true, origin: vector.top_left}
-		beatmap_s.add_transform(typ: .move, time: time.Time{0, 0}, before: [f64(i) * 10, f64(i) * size_per_map])
-		beatmap_s.add_transform(typ: .fade, time: time.Time{0, 0}, before: [0.0])
-		beatmap_s.reset_size_based_on_texture(size: vector.Vector2{x: 300.0, y: size_per_map})
-		beatmap_s.reset_attributes_based_on_transforms()
-
-		// Debug
-		beatmap_s.color.r = i * 255
-		beatmap_s.color.g = 100 + i * 100
-		beatmap_s.color.b = 50 + i * 200
-
-		window.list_beatmap_s << beatmap_s
-		window.manager.add(mut beatmap_s)
-	}
-
+	
 	window.manager.add(mut window.logo_s)
 }
 
@@ -255,19 +236,29 @@ pub fn (mut window Window) draw() {
 	window.ctx.draw_rect_filled(0, 0, 100, 20, gx.Color{0, 0, 0, 100})
 	window.ctx.draw_text(5, 0, "Scene: ${window.task}", gx.TextCfg{color: gx.white, size: 20})
 
-	// window.ctx.end()
-	gfx.begin_default_pass(graphic.global_renderer.pass_action, 1280, 720)
+	// window.ctx.endheight
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 	sgl.draw()
 	gfx.end_pass()
 
 	gfx.commit()
 }
 
+pub fn (mut window Window) scroll(event &gg.Event, _ voidptr) {
+	if window.task == .list {
+		window.list_offset_y += event.scroll_y * 50
+
+		// Dont overscroll
+		window.list_offset_y = math.min<f64>(window.list_offset_y, 0.0)
+		
+	}
+}
+
 pub fn main() {
 	mut window := &Window{}
 	window.ctx = gg.new_context(
-		width: 1280,
-		height: 720,
+		width: int(settings.global.window.width),
+		height: int(settings.global.window.height),
 		user_data: window,
 
 		// FNs
@@ -275,6 +266,7 @@ pub fn main() {
 		frame_fn: window.draw,
 
 		keydown_fn: window.key_down
+		scroll_fn: window.scroll
 	)
 
 	window.ctx.run()

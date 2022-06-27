@@ -31,7 +31,7 @@ pub fn (mut window Window) key_down(key gg.KeyCode, _ gg.Modifier, _ voidptr) {
 			}
 			
 			// Move visualizer
-			window.visualizer.update_logo(vector.Vector2{1280, 0}, vector.Vector2{720,720})
+			window.visualizer.update_logo(vector.Vector2{-720.0, 0}, vector.Vector2{720,720})
 
 			// Unhide menu element
 			for mut elem in window.list_beatmap_s {
