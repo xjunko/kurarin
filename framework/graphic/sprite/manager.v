@@ -1,8 +1,11 @@
 module sprite
 
+import framework.math.camera
+
 pub struct Manager {
 	pub mut:
 		queue []&Sprite
+		camera camera.Camera
 		dirty bool
 
 		last_time f64
@@ -32,6 +35,10 @@ pub fn (mut manager Manager) draw(arg CommonSpriteArgument) {
 	for mut sprite in manager.queue {
 		sprite.draw(arg)
 	}
+}
+
+pub fn (mut manager Manager) draw_internal_camera(arg CommonSpriteArgument) {
+	manager.draw(CommonSpriteArgument{...arg, camera: manager.camera})
 }
 
 
