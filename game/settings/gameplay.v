@@ -27,7 +27,6 @@ pub struct Cursor {
 		visible bool
 		size f64
 		style f64
-		trail_update_rate f64
 		trail_length int
 }
 
@@ -63,7 +62,6 @@ pub fn make_gameplay_settings() Gameplay {
 			visible: true,
 			size: 0.75,
 			style: 0,
-			trail_update_rate: 16.6667,
 			trail_length: 1000
 		}
 
