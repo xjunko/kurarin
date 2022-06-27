@@ -709,7 +709,8 @@ pub fn (mut slider Slider) get_position_at_lazer(time f64) vector.Vector2 {
 		progress = 2 - progress
 	}
 
-	return slider.curve.point_at(progress)
+	// gaslight the time to be f32 then f64 
+	return slider.curve.point_at(f64(f32(progress)))
 }
 
 pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {

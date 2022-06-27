@@ -20,7 +20,7 @@ pub fn (mut m_curve MultiCurve) point_at(time f64) vector.Vector2 {
 		return m_curve.first_point
 	}
 
-	desired_width := f64(m_curve.length * math.clamp(time), 0.0, 1.0)
+	desired_width := f64(m_curve.length * math.clamp(time, 0.0, 1.0))
 
 	without_first := m_curve.sections[1 ..]
 	mut index := m_curve.lines.len
