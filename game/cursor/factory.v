@@ -10,10 +10,8 @@ import framework.math.time
 import framework.math.vector
 import framework.math.easing
 
-import game.settings
-
 const (
-	offset = settings.global.gameplay.cursor.trail_update_rate // Maybe change thsi?
+	offset = osu_cursor_trail_delta // 120fps
 	tag_on_new_combo = true
 )
 

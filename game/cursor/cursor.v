@@ -22,6 +22,8 @@ import game.x
 
 const (
 	used_imports = gameobject.used_imports
+
+	osu_cursor_trail_delta = f64(1000.0 / 120.0) // 120FPS
 )
 
 // V updated its rand library and now its returning optionals (?)
@@ -131,18 +133,18 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	cursor.mutex.unlock()
 }
 
-pub fn (mut cursor Cursor) update(time f64, delta f64) {
+pub fn (mut cursor Cursor) update(time f64, _delta f64) {
 	cursor.mutex.@lock()
 
 	// Delta
-	// delta := time - cursor.last_time
+	delta := time - cursor.last_time
 
 	// Time
 	cursor.Sprite.update(time) // Update the main cursor itself
 
 	cursor.sixty_delta += delta
 	// Normal trails
-	if settings.global.gameplay.cursor.style == 0 && cursor.sixty_delta >= settings.global.gameplay.cursor.trail_update_rate {
+	if settings.global.gameplay.cursor.style == 0 && cursor.sixty_delta >= osu_cursor_trail_delta {
 		mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
 		trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [255.0], after: [0.0])
 		trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [cursor.position.x, cursor.position.y])
@@ -151,7 +153,7 @@ pub fn (mut cursor Cursor) update(time f64, delta f64) {
 		trail.reset_attributes_based_on_transforms()
 		cursor.trails << trail
 
-		cursor.sixty_delta -= settings.global.gameplay.cursor.trail_update_rate
+		cursor.sixty_delta -= osu_cursor_trail_delta
 	} else if settings.global.gameplay.cursor.style == 1 {
 		// God awful particle trail (Old)
 		distance := cursor.position.distance(cursor.last_position)
