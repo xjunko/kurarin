@@ -20,18 +20,17 @@ pub fn (mut m_curve MultiCurve) point_at(time f64) vector.Vector2 {
 		return m_curve.first_point
 	}
 
-	desired_width := f64(m_curve.length * math.clamp(time, 0.0, 1.0))
+	desired_width := f64(m_curve.length * math.clamp(time), 0.0, 1.0)
 
 	without_first := m_curve.sections[1 ..]
-	mut index := 0
+	mut index := m_curve.lines.len
 
 	for i, value in without_first {
-		if value >= desired_width {
+		if value > desired_width {
 			index = i
 			break
 		}
 	}
-	index++ // Offset
 
 	// panic("Lines: ${m_curve.lines.len} | Length: ${m_curve.length} | Index: ${index}")
 
@@ -153,7 +152,7 @@ pub fn process_linear(points []vector.Vector2) []Linear {
 	mut lines := []Linear{}
 
 	for i := 0; i < points.len - 1; i++ {
-		if points[i] == points[i + 1] { // Skip red anchors, legacy shit.
+		if points[i].equal(points[i + 1]) { // Skip red anchors, legacy shit.
 			continue
 		}
 
@@ -169,7 +168,7 @@ pub fn process_bezier(points []vector.Vector2) []Linear {
 
 	for i := 0; i < points.len; i++ {
 		// FIXME: THis shits fucked
-		multi := false //i < points.len - 2 && points[i].equal(points[i + 1])
+		multi := i < points.len - 2 && points[i].equal(points[i + 1])
 
 		if multi || i == points.len - 1 {
 			sub_points := points[int(last_index) .. int(i + 1)]
