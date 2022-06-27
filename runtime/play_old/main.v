@@ -24,6 +24,8 @@ import framework.audio
 import framework.logging
 import framework.math.time
 import framework.math.glider
+import framework.math.vector
+import framework.graphic.visualizer
 
 import runtime.constants
 
@@ -64,6 +66,7 @@ pub struct Window {
 		ruleset_mutex &sync.Mutex = sync.new_mutex()
 
 		// Overlay
+		visualizer &visualizer.Visualizer = voidptr(0)
 		overlay &overlays.GameplayOverlay = voidptr(0)
 
 		// Recording stuff
@@ -133,6 +136,7 @@ pub fn (mut window Window) update(time f64, delta f64) {
 	window.ruleset_mutex.unlock()
 
 	window.beatmap.update(time - settings.global.gameplay.playfield.lead_in_time, window.beatmap_song_boost)
+	window.visualizer.update(time - settings.global.gameplay.playfield.lead_in_time)
 	window.beatmap_song.update(time - settings.global.gameplay.playfield.lead_in_time)
 	window.update_cursor(time - settings.global.gameplay.playfield.lead_in_time, delta)
 	window.update_boost()
@@ -145,6 +149,7 @@ pub fn (mut window Window) draw() {
 
 	// Game
 	window.beatmap.draw()
+	window.visualizer.draw(mut window.ctx)
 	window.overlay.draw()
 	
 	// TODO: maybe move cursor to beatmap struct
@@ -193,6 +198,15 @@ pub fn window_init(mut window &Window) {
 
 	// Init beatmap bg song
 	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
+	window.visualizer = &visualizer.Visualizer{music: window.beatmap_song}
+
+	// visualizer shiit
+	window.visualizer.bars = 300
+	window.visualizer.fft = []f64{len: window.visualizer.bars}
+	window.visualizer.jump_size = 1
+	window.visualizer.multiplier = 2.5
+	window.visualizer.bar_length = 1000.0
+	window.visualizer.update_logo(vector.Vector2{0, settings.global.window.height}, vector.Vector2{settings.global.window.width, 100})
 
 	// Make cursor based on argument
 	if window.argument.playing {
@@ -243,6 +257,7 @@ pub fn window_init(mut window &Window) {
 }
 
 pub fn window_draw(mut window &Window) {
+	window.ctx.load_image_queue()
 	window.draw()
 	window.draw_counter.tick_average_fps()
 	window.limiter.sync()
