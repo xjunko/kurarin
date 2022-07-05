@@ -1,6 +1,6 @@
 <div style="float: right; text-align: center;">
     <div>
-        <img src="assets/textures/kurarin.png" style="width: 200px; height: auto;">
+        <img width="200" align="left" style="float: left; margin: 0 10px 0 0;" alt="Kurarin" src="assets/textures/kurarin.png">
     </div>
     <a style="text-decoration: none; font-size: 10px;" href="https://youtu.be/2b1IexhKPz4"> Image is courtesy of Iyowa </a>
 </div>
