@@ -1,8 +1,9 @@
 <div style="float: right; text-align: center;">
     <div>
-        <img width="200" align="right" style="float: right; margin: 0 10px 0 0;" alt="Kurarin" src="assets/textures/kurarin.png">
+        <a href="https://youtu.be/2b1IexhKPz4" title="Image is courtesy of Iyowa.">
+            <img width="200" align="right" style="float: right; margin: 0 10px 0 0;" alt="Kurarin" src="assets/textures/kurarin.png">
+        </a>
     </div>
-    <a align="right" style="text-decoration: none; font-size: 10px; float: right; margin: 0 10px 0 0;" href="https://youtu.be/2b1IexhKPz4"> Image is courtesy of Iyowa </a>
 </div>
 
 ## Disclaimer
