@@ -287,9 +287,6 @@ pub fn (mut beatmap Beatmap) draw() {
 	beatmap.storyboard.mutex.@lock()
 	beatmap.update_lock.@lock()
 
-	// Free slider
-	beatmap.free_slider_attr()
-
 	// Background/Storyboard draws
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 
@@ -337,10 +334,8 @@ pub fn (mut beatmap Beatmap) draw() {
 		}
 	}
 
-	// POST update, only used for freeing slider
-	// Note that in linux: this doesnt matter, it can be placed in draw or update loop
-	// But on windows: This NEED to be in here or everything shits itself and crash.
-	beatmap.post_update(beatmap.last_update)
+	// Free slider
+	beatmap.free_slider_attr()
 	
 	//
 	beatmap.update_lock.unlock()
