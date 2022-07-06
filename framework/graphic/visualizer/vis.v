@@ -20,6 +20,7 @@ pub struct Visualizer {
 		fft []f64 = []f64{len: 200} // TODO: fix this, make a visualizer factor yor smth
 		music &audio.Track
 		multiplier f64 = 0.5 // Change this to increase the "oopmh"
+		inverted bool // Invert the visualizer
 
 		// logo stuff
 		logo_position vector.Vector2 = vector.Vector2{640, 480}
@@ -67,6 +68,8 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 
 	position := vis.logo_position
 	size := vis.logo_size
+	inverted := [1, -1][int(vis.inverted)]
+	length := 400.0 // TODO: move thsi somwhre else
 
 	// Top
 	for i := 0; i < 4; i++ {
@@ -82,14 +85,14 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 			mut x := f32(position.x) + f32((f64(j) / vis.bars) * size.x)
 			mut y := f32(position.y)
 			mut width := thickness
-			mut height := -f32(v * size.y)
+			mut height := -f32(v * length * inverted)
 
 			
 			if i == 1 { // Right
 				x = f32(position.x + size.x)
 				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
 				height = thickness
-				width = f32(v * size.x)
+				width = f32(v * length * inverted)
 
 			} else if i == 2 { // Down
 				y += f32(size.y)
@@ -99,7 +102,7 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 				x = f32(position.x)
 				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
 				height = thickness
-				width = -f32(v * size.x)
+				width = -f32(v * length * inverted)
 			}
 
 			ctx.draw_rect_filled(x, y, width, height, gx.white)
@@ -120,14 +123,14 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 			mut x := f32(position.x) + f32((f64(j) / vis.bars) * size.x)
 			mut y := f32(position.y)
 			mut width := thickness
-			mut height := -f32(v * size.y)
+			mut height := -f32(v * length * inverted)
 
 			
 			if i == 1 { // Right
 				x = f32(position.x + size.x)
 				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
 				height = thickness
-				width = f32(v * size.x)
+				width = f32(v * length * inverted)
 
 			} else if i == 2 { // Down
 				y += f32(size.y)
@@ -137,7 +140,7 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 				x = f32(position.x)
 				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
 				height = thickness
-				width = -f32(v * size.x)
+				width = -f32(v * length * inverted)
 			}
 
 			ctx.draw_rect_filled_add(x, y, width, height, gx.purple)
