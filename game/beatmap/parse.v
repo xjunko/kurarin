@@ -64,7 +64,7 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 				bpm := items[1].f64()
 
 				mut signature := 4
-				mut sample_set := beatmap.timing.last_set
+				mut sample_set := beatmap.timing.base_set
 				mut sample_index := 1
 				mut sample_volume := 1.0
 				mut inherited := false
@@ -87,7 +87,7 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 				}
 
 				if items.len > 5 {
-					sample_volume = items[5].f64() / 100
+					sample_volume = items[5].f64() / 100.0
 				}
 
 				if items.len > 6 {
