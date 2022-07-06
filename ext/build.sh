@@ -1,35 +1,71 @@
+# Variables
+with_gc=true # True by default
+gc_type="boehm_incr_opt"
+
+make_shaders=true
+shaders_dir="assets/shaders/slider.glsl"
+
+is_debug=false
+is_prod=false
+
+compiler="gcc"
+
+build_command="v"
+
+where="." # This directory
+
+# Misc Variables
+what_mode="Development"
+
+
+# Functions
 build_shaders() {
-    v shader assets/shaders/slider.glsl
+    v shader $shaders_dir
 }
 
-build_debug() {
-    clear &&
-    echo "Build: Debug w/o GC" &&
-    build_shaders &&
-    v -cc gcc -cg .
+build() {
+    # Garbage collector
+    if [ "$with_gc" = "true" ]; then
+        build_command+=" -gc $gc_type"
+    fi
+
+    # Debug
+    if [ "$is_debug" = "true" ]; then
+        build_command+=" -cg"
+        what_mode="Debug"
+    fi
+
+    # Prod build
+    if [ "$is_prod" = "true" ]; then
+        build_command+=" -prod"
+        what_mode="Production"
+    fi
+
+    # Compiler
+    # TODO: use cc or smth
+    build_command+=" -cc $compiler"
+
+    # What to compile
+    build_command+=" $where"
+
+    # Clear shit
+    clear
+
+    # Print some stuff
+    echo "Mode: $what_mode"
+    echo "Compiler: $compiler"
+    echo "GC: $gc_type"
+    echo "Rebuild Shaders: $make_shaders"
+    
+    # TODO: scuffed
+    if [ "$make_shaders" = "true" ]; then
+        build_shaders && eval "$build_command"
+    else 
+        eval "$build_command"
+    fi
 }
 
-build_debug_gc() {
-    clear &&
-    echo "Build: Debug w/ GC" &&
-    build_shaders &&
-    v -cc gcc -gc boehm -cg .
-}
-
-build_development() {
-    clear &&
-    echo "Build: Development" &&
-    build_shaders &&
-    v -cc gcc -gc boehm .
-}
-
-build_production() {
-    clear &&
-    echo "Build: Production" &&
-    build_shaders &&
-    v -cc gcc -gc boehm -prod .
-}
-
+# Utils
 run_program() {
     echo "Running Program!" &&
     ./dementia
@@ -38,21 +74,21 @@ run_program() {
 # Build type
 case $1 in 
     "--prod"|"--production"|"-prod")
-        build_production
+        is_prod=true
         ;;
 
     "--debug"|"--debug"|"-debug")
-        build_debug_gc
+        is_debug=true
         ;;
 
     "--debug_raw"|"-debug_raw")
-        build_debug
+        with_gc=false
         ;;
     *)
-    
-    # Nothing passed, devel build
-    build_development
 esac
+
+# Nothing passed, build with devel settings
+build
 
 # TODO: not familiar with bash, make this better.
 case $1 in 
