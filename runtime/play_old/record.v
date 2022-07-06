@@ -85,6 +85,7 @@ pub fn (mut window Window) init_audio_pipe_process() {
 
 		"-nostats",
 		"-vn",
+		"-nostdin", // shut the fuck upp ffmpeg
 		"temp.mp3"
 	]
 
