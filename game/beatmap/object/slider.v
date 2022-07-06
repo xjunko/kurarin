@@ -211,8 +211,8 @@ pub fn (mut slider Slider) update(time f64) bool {
 }
 
 pub fn (mut slider Slider) post_update(time f64) {
-	logging.debug("Freeing slider.")
-	slider.slider_renderer_attr.free()
+	// logging.debug("Freeing slider.")
+	// slider.slider_renderer_attr.free()
 }
 
 pub fn (mut slider Slider) is_retarded() bool {

@@ -65,6 +65,7 @@ pub struct Beatmap {
 		objects     []object.IHitObject
 		queue       []object.IHitObject
 		finished    []object.IHitObject
+		to_be_freed []&graphic.SliderRendererAttr
 		combo_color []gx.Color
 		objects_i   int
 
@@ -224,6 +225,13 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 		if time >= (beatmap.queue[i].get_end_time() + difficulty.hit_fade_out + beatmap.difficulty.hit50) {
 			logging.debug("Removed hitobject ${i} from queue.")
 			beatmap.finished << &beatmap.queue[i]
+
+			// Special case
+			mut obj := &beatmap.queue[i]
+			if mut obj is object.Slider {
+				beatmap.to_be_freed << obj.slider_renderer_attr
+			}
+			
 			beatmap.queue = beatmap.queue[1..]
 			i--
 			continue
@@ -264,11 +272,23 @@ pub fn (mut beatmap Beatmap) post_update(time f64) {
 	}
 }
 
+pub fn (mut beatmap Beatmap) free_slider_attr() {
+	// Special
+	for i := 0; i < beatmap.to_be_freed.len; i++ {
+		beatmap.to_be_freed[i].free()
+		beatmap.to_be_freed = beatmap.to_be_freed[1 .. ]
+		i--
+	}
+}
+
 pub fn (mut beatmap Beatmap) draw() {
 	// FIXME: This is kinda fucked ngl
 	// FIXME: data race or smth idk what its called
 	beatmap.storyboard.mutex.@lock()
 	beatmap.update_lock.@lock()
+
+	// Free slider
+	beatmap.free_slider_attr()
 
 	// Background/Storyboard draws
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
