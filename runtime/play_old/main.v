@@ -8,9 +8,11 @@ import math
 import sync
 import sokol.gfx
 import sokol.sgl
-import sokol.sapp
+// import sokol.sapp
 import time as timelib
+
 import library.gg
+// import library.miru
 
 import game.x
 import game.skin
@@ -176,6 +178,13 @@ pub fn (mut window Window) draw() {
 		window.ctx.draw_text(int(settings.global.window.width - 5), int(settings.global.window.height - 37 + 16), "Draw: ${window.draw_counter.get_average_fps():.0}fps [${window.draw_counter.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
 	}
 
+	// // MicroUI
+	// C.mu_begin(&window.microui.ctx)
+	// window.microui.execute_ui()
+	// window.microui.execute_ui_log()
+	// C.mu_end(&window.microui.ctx)
+	// window.microui.draw()
+
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 	sgl.draw()
 	gfx.end_pass()
@@ -183,8 +192,13 @@ pub fn (mut window Window) draw() {
 	gfx.commit()
 }
 
+
+// VSync
+fn C._sapp_glx_swapinterval(int)
+
 pub fn window_init(mut window &Window) {
-	// sapp.toggle_fullscreen()
+	// Turn that shit off
+    C._sapp_glx_swapinterval(0)
 
 	mut beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)
 
@@ -201,12 +215,14 @@ pub fn window_init(mut window &Window) {
 	window.visualizer = &visualizer.Visualizer{music: window.beatmap_song}
 
 	// visualizer shiit
+	window.visualizer.inverted = true
 	window.visualizer.bars = 300
 	window.visualizer.fft = []f64{len: window.visualizer.bars}
 	window.visualizer.jump_size = 1
-	window.visualizer.multiplier = 2.5
+	window.visualizer.multiplier = 1.0
 	window.visualizer.bar_length = 1000.0
-	window.visualizer.update_logo(vector.Vector2{0, settings.global.window.height}, vector.Vector2{settings.global.window.width, 100})
+	window.visualizer.start_distance = 0.0
+	window.visualizer.update_logo(vector.Vector2{0, 0}, vector.Vector2{settings.global.window.width, settings.global.window.height})
 
 	// Make cursor based on argument
 	if window.argument.playing {
@@ -363,6 +379,8 @@ pub fn initiate_game_loop(argument GameArgument) {
 		frame_fn: [window_draw, window_draw_recording][int(settings.global.video.record)] // yea...
 
 		move_fn: fn (x_ f32, y_ f32, mut window &Window) {
+			// C.mu_input_mousemove(&window.microui.ctx, int(x_), int(y_))
+
 			if !window.argument.playing {
 				return
 			}
@@ -370,6 +388,18 @@ pub fn initiate_game_loop(argument GameArgument) {
 			window.cursors[0].position.x = (x_ - x.resolution.offset.x) / x.resolution.playfield_scale
 			window.cursors[0].position.y = (y_ - x.resolution.offset.y) / x.resolution.playfield_scale
 			
+		}
+
+		scroll_fn: fn (ev &gg.Event, mut window &Window) {
+			// C.mu_input_scroll(&window.microui.ctx, -ev.scroll_x, -ev.scroll_y * 6)
+		}
+
+		click_fn: fn (x f32, y f32, button gg.MouseButton, mut window &Window) {
+			// C.mu_input_mousedown(&window.microui.ctx, int(x), int(y), int(button) + 1)
+		}
+
+		unclick_fn: fn (x f32, y f32, button gg.MouseButton, mut window &Window) {
+			// C.mu_input_mouseup(&window.microui.ctx, int(x), int(y), int(button) + 1)
 		}
 
 		keydown_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window &Window) {
