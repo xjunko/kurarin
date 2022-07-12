@@ -79,7 +79,7 @@ pub struct Beatmap {
 
 // General Helper
 pub fn (mut beatmap Beatmap) load_full_beatmap() &Beatmap{
-	// We load a new beatmap with everything loaded (most likely for playing the beatmap)
+	// We load a new beatmap with everything loaded, to be use with lazy beatmap loading.
 	return parse_beatmap(os.join_path(beatmap.root, beatmap.filename), false)
 }
 
@@ -217,19 +217,19 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 	// Update hitobjects
 	for i := beatmap.objects_i; i < beatmap.objects.len; i++ {
 		if (time >= (beatmap.objects[i].get_start_time() - beatmap.difficulty.preempt)) &&
-		   (time <= (beatmap.objects[i].get_end_time() + difficulty.hit_fade_out + beatmap.difficulty.hit50)) {
-			   logging.debug("Added hitobject ${i} into queue")
-			   beatmap.queue << &beatmap.objects[i]
-			   beatmap.objects_i++
-			   continue
-		   }
+			(time <= (beatmap.objects[i].get_end_time() + difficulty.hit_fade_out + beatmap.difficulty.hit50)) {
+				// logging.debug("Added hitobject ${i} into queue")
+				beatmap.queue << &beatmap.objects[i]
+				beatmap.objects_i++
+				continue
+			}
 	}
 
 	// Queue
 	for i := 0; i < beatmap.queue.len; i++ {
 		// Remove if ended
 		if time >= (beatmap.queue[i].get_end_time() + difficulty.hit_fade_out + beatmap.difficulty.hit50) {
-			logging.debug("Removed hitobject ${i} from queue.")
+			// logging.debug("Removed hitobject ${i} from queue.")
 			beatmap.finished << &beatmap.queue[i]
 
 			// Special case

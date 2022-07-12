@@ -502,7 +502,7 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 }
 
 pub fn (mut slider Slider) generate_slider_path() {
-	logging.debug("Generating slider path!")
+	// logging.debug("Generating slider path!")
 
 	slider_points_raw := slider.data[5].split("|")
 	slider.typ = slider_points_raw[0]
@@ -529,7 +529,7 @@ pub fn (mut slider Slider) generate_slider_path() {
 	}
 
 	// Done
-	logging.debug("Done generating slider path!")
+	// logging.debug("Done generating slider path!")
 }
 
 pub fn (mut slider Slider) generate_slider_follow_circles() {
