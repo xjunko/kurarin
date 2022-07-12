@@ -37,12 +37,14 @@ pub struct HitObjects {
 
 		scale_to_beat bool
 
+		// Slider customization stuff
+		slider_width       f64
+		slider_lazer_style bool
+		slider_body_use_border_color bool // im so fucking bad at naming shit
+
 		// dumbass shit
 		rainbow_hitcircle bool
 		rainbow_slider    bool
-
-		// fallback
-		old_slider bool
 }
 
 pub struct Overlay {
@@ -68,7 +70,7 @@ pub fn make_gameplay_settings() Gameplay {
 		cursor: Cursor{
 			visible: true,
 			size: 0.75,
-			style: 0,
+			style: 2,
 			trail_length: 1000
 		}
 
@@ -77,7 +79,9 @@ pub fn make_gameplay_settings() Gameplay {
 			scale_to_beat: false,
 			rainbow_hitcircle: false,
 			rainbow_slider: false,
-			old_slider: false,
+			slider_width: 1.0,
+			slider_lazer_style: false,
+			slider_body_use_border_color: false,
 		},
 
 		overlay: Overlay{

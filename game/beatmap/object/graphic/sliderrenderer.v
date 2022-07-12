@@ -50,7 +50,7 @@ pub struct SliderRendererAttr {
 		length   f64
 		points   []vector.Vector2
 		vertices []f32
-		colors   []f32 // [3]Body [3]Border [3]BorderWidth, Unused, Unused
+		colors   []f32 // [3]Body [3]Border [3]BorderWidth, Style, Unused
 		uniform  gfx.Range
 		bindings gfx.Bindings
 		has_been_initialized bool
@@ -113,8 +113,12 @@ pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f
 	attr.colors << [
 		f32(0.0), f32(0.0), f32(0.0), 1.0, // Body
 		f32(1.0), f32(1.0), f32(1.0), 1.0, // Border
-		f32(0.5), f32(0.0), f32(0.0), 1.0 // Width
-	] // ghost numbers, dont ask my why its there
+		f32(1.0), f32(1.0), f32(0.0), 1.0 // Width, Style, Unused
+	] // ignore the 4th 1.0's , some fucked up shit with sokol or v idek
+
+	// Settings: Width, Style
+	attr.colors[8] = f32(settings.global.gameplay.hitobjects.slider_width)
+	attr.colors[9] = f32(settings.global.gameplay.hitobjects.slider_lazer_style)
 
 	attr.uniform = C.sg_range{
 		ptr: attr.colors.data,
@@ -220,7 +224,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 
 	// Fuck around with the colors
 	// Literally copy-pasted from mcosu lmaooo credit to mckay
-	if settings.global.gameplay.hitobjects.rainbow_slider && !settings.global.gameplay.hitobjects.old_slider {
+	if settings.global.gameplay.hitobjects.rainbow_slider {
 		time := time.global.time / 100.0
 		attr.colors[0] = f32(math.sin(0.3 * time + 0 + 10) * 127 + 128) / 255
 		attr.colors[1] = f32(math.sin(0.3 * time + 2 + 10) * 127 + 128) / 255
@@ -231,16 +235,19 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 		attr.colors[6] = f32(math.sin(0.3 * time * 1.5 + 4 + 10) * 127 + 128) / 255
 	}
 
-	// Set border color
-	if !settings.global.gameplay.hitobjects.old_slider {
+	// Body color
+	if settings.global.gameplay.hitobjects.slider_body_use_border_color {
 		attr.colors[0] = f32(colors[0] / 255.0 / 1.5)
 		attr.colors[1] = f32(colors[1] / 255.0 / 1.5)
 		attr.colors[2] = f32(colors[2] / 255.0 / 1.5)
-		
-		attr.colors[4] = f32(colors[0] / 255.0)
-		attr.colors[5] = f32(colors[1] / 255.0)
-		attr.colors[6] = f32(colors[2] / 255.0)
 	}
+	
+	// Border Color
+	attr.colors[4] = f32(colors[0] / 255.0)
+	attr.colors[5] = f32(colors[1] / 255.0)
+	attr.colors[6] = f32(colors[2] / 255.0)
+
+	
 
 	// FIXME: This is janky asf lmao but it works
 	gfx.begin_pass(global_renderer.pass, &global_renderer.pass_action2)

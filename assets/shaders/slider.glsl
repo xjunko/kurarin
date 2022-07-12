@@ -42,20 +42,20 @@ const float outerShadowSize = 0.08;
 
 vec4 getInnerBodyColor(in vec4 bodyColor)
 {
-    float brightnessMultiplier = 0.25;
-    bodyColor.r = min(1.0, bodyColor.r * (1.0 + 0.5 * brightnessMultiplier) + brightnessMultiplier);
-    bodyColor.g = min(1.0, bodyColor.g * (1.0 + 0.5 * brightnessMultiplier) + brightnessMultiplier);
-    bodyColor.b = min(1.0, bodyColor.b * (1.0 + 0.5 * brightnessMultiplier) + brightnessMultiplier);
-    return vec4(bodyColor);
+	float brightnessMultiplier = 0.25;
+	bodyColor.r = min(1.0, bodyColor.r * (1.0 + 0.5 * brightnessMultiplier) + brightnessMultiplier);
+	bodyColor.g = min(1.0, bodyColor.g * (1.0 + 0.5 * brightnessMultiplier) + brightnessMultiplier);
+	bodyColor.b = min(1.0, bodyColor.b * (1.0 + 0.5 * brightnessMultiplier) + brightnessMultiplier);
+	return vec4(bodyColor);
 }
 
 vec4 getOuterBodyColor(in vec4 bodyColor)
 {
-    float darknessMultiplier = 0.1;
-    bodyColor.r = min(1.0, bodyColor.r / (1.0 + darknessMultiplier));
-    bodyColor.g = min(1.0, bodyColor.g / (1.0 + darknessMultiplier));
-    bodyColor.b = min(1.0, bodyColor.b / (1.0 + darknessMultiplier));
-    return vec4(bodyColor);
+	float darknessMultiplier = 0.1;
+	bodyColor.r = min(1.0, bodyColor.r / (1.0 + darknessMultiplier));
+	bodyColor.g = min(1.0, bodyColor.g / (1.0 + darknessMultiplier));
+	bodyColor.b = min(1.0, bodyColor.b / (1.0 + darknessMultiplier));
+	return vec4(bodyColor);
 }
 
 void main() {
@@ -68,7 +68,7 @@ void main() {
 
     //
     // vec3 colBorder = vec3(1.0, 1.0, 1.0);
-    // vec3 colBody = vec3(0.0, 1.0, 0.0);
+    // vec3 colBody = vec3(0.0, 0.0, 0.0);
     float bodyAlphaMultiplier = 1.0;
     float bodyColorSaturation = 1.0;
 
@@ -83,10 +83,16 @@ void main() {
     outerBodyColor.rgb *= bodyColorSaturation;
 
     // osu!next (lazer) style
-    outerBodyColor.rgb = bodyColor.rgb * bodyColorSaturation;
-    outerBodyColor.a = 1.0*bodyAlphaMultiplier;
-    innerBodyColor.rgb = bodyColor.rgb * 0.5 * bodyColorSaturation;
-    innerBodyColor.a = 0.0;
+    if (borderMultiplier.g == 1.0f) {
+        outerBodyColor.rgb = bodyColor.rgb * bodyColorSaturation;
+        outerBodyColor.a = 1.0*bodyAlphaMultiplier;
+        innerBodyColor.rgb = bodyColor.rgb * 0.5 * bodyColorSaturation;
+        innerBodyColor.a = 0.0;
+    }
+
+    // HACK: this fixes rough edges
+    if (borderMultiplier.r < 0.01)
+		borderColor = outerShadowColor;
 
     // Conditional Variant
     if (v_uv.x < outerShadowSize - transitionSize) // just shadow
