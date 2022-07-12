@@ -126,9 +126,6 @@ pub fn (mut window Window) update(time f64, delta f64) {
 		window.beatmap_song.play()
 	}
 
-	// Overlay
-	window.overlay.update(time - settings.global.gameplay.playfield.lead_in_time)
-
 	// Ruleset
 	window.ruleset_mutex.@lock()
 	window.ruleset.update_click_for(window.cursors[0], time - settings.global.gameplay.playfield.lead_in_time)
@@ -138,7 +135,16 @@ pub fn (mut window Window) update(time f64, delta f64) {
 	window.ruleset_mutex.unlock()
 
 	window.beatmap.update(time - settings.global.gameplay.playfield.lead_in_time, window.beatmap_song_boost)
-	window.visualizer.update(time - settings.global.gameplay.playfield.lead_in_time)
+
+	// Overlay
+	if settings.global.gameplay.overlay.info {
+		window.overlay.update(time - settings.global.gameplay.playfield.lead_in_time)
+	}
+	
+	if settings.global.gameplay.overlay.visualizer {
+		window.visualizer.update(time - settings.global.gameplay.playfield.lead_in_time)
+	}
+	
 	window.beatmap_song.update(time - settings.global.gameplay.playfield.lead_in_time)
 	window.update_cursor(time - settings.global.gameplay.playfield.lead_in_time, delta)
 	window.update_boost()
@@ -151,8 +157,15 @@ pub fn (mut window Window) draw() {
 
 	// Game
 	window.beatmap.draw()
-	window.visualizer.draw(mut window.ctx)
-	window.overlay.draw()
+
+	if settings.global.gameplay.overlay.visualizer {	
+		window.visualizer.draw(mut window.ctx)
+	}
+
+	if settings.global.gameplay.overlay.info {
+		window.overlay.draw()
+	}
+	
 	
 	// TODO: maybe move cursor to beatmap struct
 	if settings.global.gameplay.cursor.visible {
@@ -212,17 +225,20 @@ pub fn window_init(mut window &Window) {
 
 	// Init beatmap bg song
 	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
-	window.visualizer = &visualizer.Visualizer{music: window.beatmap_song}
 
-	// visualizer shiit
-	window.visualizer.inverted = true
-	window.visualizer.bars = 300
-	window.visualizer.fft = []f64{len: window.visualizer.bars}
-	window.visualizer.jump_size = 1
-	window.visualizer.multiplier = 1.0
-	window.visualizer.bar_length = 1000.0
-	window.visualizer.start_distance = 0.0
-	window.visualizer.update_logo(vector.Vector2{0, 0}, vector.Vector2{settings.global.window.width, settings.global.window.height})
+	// Visualizer stuff
+	if settings.global.gameplay.overlay.visualizer {	
+		window.visualizer = &visualizer.Visualizer{music: window.beatmap_song}
+		
+		window.visualizer.inverted = true
+		window.visualizer.bars = 300
+		window.visualizer.fft = []f64{len: window.visualizer.bars}
+		window.visualizer.jump_size = 1
+		window.visualizer.multiplier = 1.0
+		window.visualizer.bar_length = 1000.0
+		window.visualizer.start_distance = 0.0
+		window.visualizer.update_logo(vector.Vector2{0, 0}, vector.Vector2{settings.global.window.width, settings.global.window.height})
+	}
 
 	// Make cursor based on argument
 	if window.argument.playing {
@@ -236,7 +252,9 @@ pub fn window_init(mut window &Window) {
 	window.ruleset = ruleset.new_ruleset(mut window.beatmap, mut window.cursors)
 
 	// Overlay
-	window.overlay = overlays.new_gameplay_overlay(window.ruleset, window.cursors[0], window.ctx)
+	if settings.global.gameplay.overlay.info {	
+		window.overlay = overlays.new_gameplay_overlay(window.ruleset, window.cursors[0], window.ctx)
+	}
 
 	// If recording
 	if window.record {

@@ -5,6 +5,7 @@ pub struct Gameplay {
 		playfield Playfield
 		cursor Cursor
 		hitobjects HitObjects
+		overlay Overlay
 }
 
 pub struct Playfield {
@@ -44,6 +45,12 @@ pub struct HitObjects {
 		old_slider bool
 }
 
+pub struct Overlay {
+	pub mut:
+		info bool // Score, Combo
+		visualizer bool
+}
+
 // Factory 
 pub fn make_gameplay_settings() Gameplay {
 	mut gameplay_ := Gameplay{
@@ -71,6 +78,11 @@ pub fn make_gameplay_settings() Gameplay {
 			rainbow_hitcircle: false,
 			rainbow_slider: false,
 			old_slider: false,
+		},
+
+		overlay: Overlay{
+			visualizer: true,
+			info: true
 		}
 
 	}
