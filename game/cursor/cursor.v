@@ -56,7 +56,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	if settings.global.gameplay.cursor.style == 2 {
 		for i, trail in cursor.delta_pos {
 			size := cursor.size.scale(
-				0.9 * (0.5 + f64(i) / f64(cursor.delta_pos.len) * 0.4)
+				0.9 * (0.1 + f64(i) / f64(cursor.delta_pos.len) * 0.9)
 			)
 
 			pos := trail.sub(cursor.origin.multiply(x: size.x, y: size.y))
@@ -149,7 +149,7 @@ pub fn (mut cursor Cursor) update(time f64, _delta f64) {
 		cursor.sixty_delta -= osu_cursor_trail_delta
 	}
 
-	// Smoother cursor trail (wip)
+	// Long cursor Trail
 	if settings.global.gameplay.cursor.style == 2 && delta > 0.0 {
 		points := int(cursor.position.distance(cursor.last_position)) * 2
 		cursor.delta_pos << cursor.last_position
@@ -158,7 +158,7 @@ pub fn (mut cursor Cursor) update(time f64, _delta f64) {
 			cursor.delta_pos << cursor.position.sub(cursor.last_position).scale(f64(i)/f64(points)).add(cursor.last_position)
 		}
 
-		times := cursor.delta_pos.len / (2.0 * (60.0 / delta)) + 1
+		times := cursor.delta_pos.len / (6.0 * (60.0 / delta)) + 1
 
 		if cursor.delta_pos.len > 0 {
 			if int(times) < cursor.delta_pos.len {
