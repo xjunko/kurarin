@@ -8,7 +8,26 @@ import framework.logging
 
 const (
 	global = &Skin{}
-	required_files = ["hit0", "hit50", "hit100", "hit300"]
+	required_files = [
+		// Cursor
+		"cursor", "cursortrail", "cursor-top", "cursortrailfx",
+
+		// HitCircle
+		"hitcircle", "hitcircleoverlay", "approachcircle",
+
+		// Slider: These files might not exists
+		"sliderstartcircleoverlay", "sliderstartcircle", "hitcircleoverlay",
+		"sliderfollowcircle", "sliderb",
+
+		// Spinner
+		"spinner-circle", "spinner-approachcircle",
+
+		// Hit Accuracy
+		"hit0", "hit50", "hit100", "hit300",
+
+		// UI shit
+		"inputoverlay-background", "inputoverlay-key"
+	]
 )
 
 //
@@ -26,10 +45,13 @@ pub fn bind_context(mut ctx &gg.Context) {
 
 	logging.info("Skin's context is binded!")
 
+	logging.info("Loading skin assets!")
 	for file in required_files {
+		logging.debug("Loading: ${file} from skin")
 		get_texture(file)
 		get_frames(file)
 	}
+	logging.info("Done!")
 }
 //
 
@@ -97,7 +119,7 @@ pub fn get_texture_with_fallback(name string, fallback string) gg.Image {
 			logging.debug("Failed getting ${name} from skin, trying ${fallback}!")
 			
 			// Get from fallback
-			println(os.join_path(skin.fallback, fallback + '.png'))
+			// println(os.join_path(skin.fallback, fallback + '.png'))
 			skin.cache[fallback] = skin.ctx.create_image(os.join_path(skin.fallback, fallback + '.png'))
 			skin.cache[name] = skin.cache[fallback]
 		}
