@@ -11,7 +11,7 @@ import framework.math.vector
 pub struct AutoCursor {
 	pub mut:
 		cursor  &Cursor
-		mover   &movers.LinearMover = &movers.LinearMover{}
+		mover   &movers.AggressiveMover = &movers.AggressiveMover{}
 		queue   []object.IHitObject
 		queue_i int
 
@@ -24,6 +24,9 @@ pub struct AutoCursor {
 
 		// Spinner
 		rotation f64
+
+		// Cursor-dance crap
+		mover_path int = 1
 }
 
 pub fn (mut auto AutoCursor) update(time f64) {
@@ -62,8 +65,11 @@ pub fn (mut auto AutoCursor) update(time f64) {
 					auto.mover.init(
 						mut &auto.queue[auto.queue_i - 1], 
 						mut &auto.queue[auto.queue_i],
-						1
+						auto.mover_path
 					)
+
+					// Negate, so it goes left right left right ....
+					auto.mover_path = auto.mover_path * -1
 
 					// Reset spinner rotation
 					auto.rotation = 0.0
@@ -87,6 +93,12 @@ pub fn (mut auto AutoCursor) update(time f64) {
 
 			// Some object specific movement
 			mut cur_hitobject := &auto.queue[auto.queue_i]
+
+			// Set cursor to object start position if first object.
+			if auto.queue_i == 0 {
+				auto.cursor.position.x = cur_hitobject.position.x
+				auto.cursor.position.y = cur_hitobject.position.y
+			}
 
 			// Slider
 			if (time >= auto.mover.time.end && time <= cur_hitobject.time.end) && mut cur_hitobject is object.Slider {
