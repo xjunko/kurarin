@@ -97,7 +97,12 @@ pub fn (mut sprite Sprite) apply_event(t transform.Transform, time f64) {
 pub fn (mut sprite Sprite) remove_transform_by_type(t transform.TransformType) {
 	for mut transform in sprite.transforms {
 		if transform.typ == t {
-			sprite.transforms.delete(sprite.transforms.index(transform))
+			index := sprite.transforms.index(transform)
+			
+			if index != -1 {
+				sprite.transforms.delete(index)
+			}
+			
 		}
 	}
 }
@@ -198,6 +203,10 @@ pub fn (mut sprite Sprite) is_drawable_at(time f64) bool {
 
 // Texture
 pub fn (mut sprite Sprite) get_texture() &gg.Image {
+	if sprite.textures.len == 0 {
+		return &gg.Image{}
+	}
+
 	return &sprite.textures[sprite.texture_i]
 }
 
