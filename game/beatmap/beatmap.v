@@ -151,15 +151,21 @@ pub fn (mut beatmap Beatmap) reset() {
 
 	mut combo_number := 1
 	mut combo_color := 0
+	mut combo_color_hax := 0
 	for i, mut o in beatmap.objects {
 		if o.is_new_combo() {
 			combo_number = 1
 			combo_color++
+			combo_color_hax += o.color_offset + 1
 		}
 
+		// NOTE
+		// * use combo_color for default color (skin, todo)
+		// * use combo_color_hax for beatmap color
+
 		// Set colors
-		color := beatmap.combo_color[(combo_color + o.color_offset) % beatmap.combo_color.len]
-		o.color = [f64(color.r), f64(color.g), f64(color.g)]
+		color := beatmap.combo_color[(combo_color_hax) % beatmap.combo_color.len]
+		o.color = [f64(color.r), f64(color.g), f64(color.b)]
 
 		o.set_id(i)
 		o.set_combo_number(combo_number)
