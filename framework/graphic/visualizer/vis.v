@@ -90,11 +90,12 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 			
 			if i == 1 { // Right
 				x = f32(position.x + size.x)
-				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
+				y = f32(position.y + size.y) - f32((f64(j) / vis.bars) * size.y)
 				height = thickness
 				width = f32(v * length * inverted)
 
 			} else if i == 2 { // Down
+				x = f32(position.x + size.x) - f32((f64(j) / vis.bars) * size.x)
 				y += f32(size.y)
 				height *= -1
 
@@ -128,11 +129,12 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 			
 			if i == 1 { // Right
 				x = f32(position.x + size.x)
-				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
+				y = f32(position.y + size.y) - f32((f64(j) / vis.bars) * size.y)
 				height = thickness
 				width = f32(v * length * inverted)
 
 			} else if i == 2 { // Down
+				x = f32(position.x + size.x) - f32((f64(j) / vis.bars) * size.x)
 				y += f32(size.y)
 				height *= -1
 
