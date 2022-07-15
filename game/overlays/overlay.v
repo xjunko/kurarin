@@ -38,7 +38,8 @@ pub struct GameplayOverlay {
 		key_counters [4]int
 		last_presses [4]f64
 		keys_background &sprite.Sprite = voidptr(0)
-		keys []&sprite.Sprite
+		keys 	  []&sprite.Sprite
+		keys_font &sprite.NumberSprite = voidptr(0)
 
 		ctx &gg.Context
 		
@@ -98,11 +99,20 @@ pub fn (mut overlay GameplayOverlay) draw() {
 	for i, mut sprite in overlay.keys {
 		// Sprite
 		sprite.draw(time: overlay.last_time, ctx: overlay.ctx)
+
 		// Text
-		relative_size := ((sprite.size.y * 8.0) / 16.0) * x.resolution.ui_camera.scale
-		pos_x := settings.global.window.width - 24.0 * 1.0
-		pos_y := settings.global.window.height / 2.0 - 64 + ((18.0 + (18 * (1.0 - (relative_size / 23.0)))) + f64(i) * 47.2) * x.resolution.ui_camera.scale
-		overlay.ctx.draw_text(int(pos_x), int(pos_y), overlay.key_counters[i].str(), gx.TextCfg{color: gx.white, align: .center, size: int(relative_size)})
+		pos_x := settings.global.window.width - 24 * x.resolution.ui_camera.scale
+		pos_y := (settings.global.window.height / 2.0 - 64 + (30.4 + f64(i) * 47.2) * x.resolution.ui_camera.scale)
+		scale := (sprite.size.y / sprite.raw_size.y) * x.resolution.ui_camera.scale
+
+		overlay.keys_font.draw_number(
+			overlay.key_counters[i].str(), 
+			vector.Vector2{pos_x, pos_y}, 
+			vector.centre, 
+			time: overlay.last_time, 
+			ctx: overlay.ctx, 
+			scale: scale
+		)
 	}
 
 	overlay.combo_counter.draw(ctx: overlay.ctx, scale: x.resolution.ui_camera.scale)
@@ -133,12 +143,14 @@ pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx
 	overlay.keys_background.textures << skin.get_texture("inputoverlay-background")
 	overlay.keys_background.reset_size_based_on_texture(factor: x.resolution.ui_camera.scale)
 	overlay.keys_background.reset_attributes_based_on_transforms()
-
+	
+	// Input keys
 	for i in 0 .. 4 {
+		// Key
 		pos_y := settings.global.window.height / 2.0 -  64.0 + (30.4 + f64(i) * 47.2) * x.resolution.ui_camera.scale
 		
 		mut key := &sprite.Sprite{}
-		key.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [settings.global.window.width - 24.0 * 1.0, pos_y])
+		key.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [settings.global.window.width - 24.0 * x.resolution.ui_camera.scale, pos_y])
 		key.textures << skin.get_texture("inputoverlay-key")
 		key.always_visible = true
 		key.reset_size_based_on_texture(factor: x.resolution.ui_camera.scale)
@@ -146,6 +158,12 @@ pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx
 
 		overlay.keys << key
 	}
+
+	// Number
+	overlay.keys_font = sprite.make_number_sprite(0, "default")
+	overlay.keys_font.always_visible = true
+	overlay.keys_font.reset_size_based_on_texture(factor: x.resolution.ui_camera.scale / 4.0)
+	overlay.keys_font.reset_attributes_based_on_transforms()
 
 	overlay.ruleset.set_listener(hit_received)
 
