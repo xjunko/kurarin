@@ -22,7 +22,7 @@ pub fn (mut number NumberSprite) draw_number(text string, position vector.Vector
 	if number.is_drawable_at(arg.time) || number.always_visible {
 		mut base_position := position.sub(
 			origin.multiply(
-				x: number.size.x * number.text.len,
+				x: number.size.x * text.len,
 				y: number.size.y
 			).scale(arg.scale)
 		)
