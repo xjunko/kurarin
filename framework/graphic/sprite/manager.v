@@ -4,14 +4,14 @@ import framework.math.camera
 
 pub struct Manager {
 	pub mut:
-		queue []&Sprite
+		queue []&ISprite
 		camera camera.Camera
 		dirty bool
 
 		last_time f64
 }
 
-pub fn (mut manager Manager) add(mut sprite Sprite) {
+pub fn (mut manager Manager) add(mut sprite ISprite) {
 	manager.queue << unsafe { &sprite }
 }
 
