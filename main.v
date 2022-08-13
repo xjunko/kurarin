@@ -3,9 +3,13 @@ module main
 import os
 import flag
 
-import runtime.play_old
-import runtime.play_new
-import runtime.constants
+// osu!
+import core.osu.runtime.play_old
+import core.osu.runtime.play_new
+import core.osu.runtime.constants
+
+// proseka
+import core.sekai.runtime.sekai
 
 import framework.logging
 
@@ -23,21 +27,30 @@ fn main() {
 	// New
 	gui_mode := fp.bool("ui", `u`, false, "Very early and experimental UI")
 
+	// Game
+	game_type := fp.string("game", `g`, "osu", "Option for game engines. (osu!/sekai)")
+
 	fp.finalize() or {
 		logging.error(err.str())
 		println(fp.usage())
 		return
 	}
 
-	// Old fallback
-	if !gui_mode && beatmap_path.len == 0 {
-		println(fp.usage())
-		return
-	}
+	// Default to osu! if game is not sekai
+	if game_type != "sekai" {
+		// Old fallback
+		if !gui_mode && beatmap_path.len == 0 {
+			println(fp.usage())
+			return
+		}
 
-	if gui_mode {
-		play_new.main()
+		if gui_mode {
+			play_new.main()
+		} else {
+			play_old.main(beatmap_path.replace("\\", ""), is_playing)
+		}
 	} else {
-		play_old.main(beatmap_path.replace("\\", ""), is_playing)
+		sekai.main()
 	}
+	
 }
