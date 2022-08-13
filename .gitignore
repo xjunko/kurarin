@@ -9,3 +9,6 @@ dementia
 settings.json
 *.json
 build/*
+assets/psekai/*
+assets/textures/*
+library/microui
