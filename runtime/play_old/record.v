@@ -1,6 +1,6 @@
 module play_old
 
-import game.settings // Load this first
+import core.osu.settings // Load this first
 
 import os
 import sokol.sapp

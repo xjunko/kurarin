@@ -1,6 +1,6 @@
 module audio
 
-import game.settings
+import core.osu.settings
 
 pub fn new_sample(path string) &Sample {
 	mut sample := &Sample{}

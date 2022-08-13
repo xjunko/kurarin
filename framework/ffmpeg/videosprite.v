@@ -8,8 +8,8 @@ import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite
 
-import game.x
-import game.settings
+import core.osu.x
+import core.osu.settings
 
 pub struct VideoSprite {
 	sprite.Sprite

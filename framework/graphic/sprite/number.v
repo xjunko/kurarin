@@ -3,7 +3,7 @@ module sprite
 import library.gg
 import framework.math.vector
 
-import game.skin
+import core.osu.skin
 
 pub struct NumberSprite {
 	Sprite
