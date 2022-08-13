@@ -1,4 +1,4 @@
-module play_new
+module old_gui
 
 import library.gg
 
@@ -6,8 +6,8 @@ import framework.logging
 import framework.math.time
 import framework.math.vector
 
-import game.cursor
-import game.ruleset
+import core.osu.cursor
+import core.osu.ruleset
 
 pub fn (mut window Window) key_down(key gg.KeyCode, _ gg.Modifier, _ voidptr) {
 	if window.task == .menu {

@@ -1,4 +1,4 @@
-module play_new
+module old_gui
 
 import os
 import gx
@@ -12,8 +12,8 @@ import framework.math.vector
 import framework.math.easing
 import framework.graphic.sprite
 
-import game.beatmap
-import game.settings
+import core.osu.beatmap
+import core.osu.settings
 
 const (
 	loading_font_size = int(32)
