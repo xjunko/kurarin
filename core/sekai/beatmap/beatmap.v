@@ -5,6 +5,8 @@ import regex
 
 import framework.math.time
 
+import object
+
 // god i fucking hate typescript/javascript
 // source: https://github.com/NonSpicyBurrito/sonolus-pjsekai-engine/blob/d2a3c6bda1ef43502e77dcc39cb6e965f86cec7e/src/lib/sus/analyze.ts#L3
 
@@ -45,22 +47,6 @@ pub struct RawObject {
 		value string
 }
 
-// Every note object inherit this class
-pub struct NoteGameObject {
-	pub mut:
-		time time.Time
-}
-
-pub struct NoteObject {
-	NoteGameObject
-
-	pub mut:
-		tick f64
-		lane f64
-		width f64
-		typ int
-}
-
 pub struct Timing {
 	pub mut:
 		tick f64
@@ -79,14 +65,11 @@ pub struct Beatmap {
 		
 		bpms map[string]f64
 		bpm_changes []RawObject
-		tap_notes []NoteObject
-		directional_notes []NoteObject
-		stream map[string]NoteObject
+		tap_notes []object.NoteObject
+		directional_notes []object.NoteObject
+		stream map[string]object.NoteObject
 		
 		timings []Timing
-
-	// pub mut:
-		
 }
 
 pub fn (mut beatmap Beatmap) analyze(path string) {
@@ -201,7 +184,7 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 
 	// temporary
 	beatmap.tap_notes.sort(a.tick < b.tick)
-	mut removed_duplicates := []NoteObject{}
+	mut removed_duplicates := []object.NoteObject{}
 
 	for note in beatmap.tap_notes {
 		if note !in removed_duplicates {
@@ -290,11 +273,11 @@ pub fn (mut beatmap Beatmap) to_raw_objects(line Line, measure_offset f64) []Raw
 	)
 }
 
-pub fn (mut beatmap Beatmap) to_note_objects(line Line, measure_offset f64) []NoteObject {
+pub fn (mut beatmap Beatmap) to_note_objects(line Line, measure_offset f64) []object.NoteObject {
 	lane := line.header[4].ascii_str().int()
 
 	return beatmap.to_raw_objects(line, measure_offset)
-		.map(NoteObject{
+		.map(object.NoteObject{
 			tick: it.tick,
 			lane: f64(lane),
 			width: it.value[1].ascii_str().int(),
