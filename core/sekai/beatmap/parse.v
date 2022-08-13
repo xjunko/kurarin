@@ -67,33 +67,15 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 			line.header[0 .. 3].f64() 
 			+ retarded_javascript_find<MeasureChange>(beatmap.measure, index).b
 
-		beatmap.barlengths << BarLength{
+		beatmap.bars.add_bar_length(timing.BarLength{
 			measure: measure,
 			length: line.data.f64()
-		}
+		})
 
 	}
 
-	// ticks pass
-	mut ticks := 0.0
-
-	mut temp_bars := beatmap.barlengths
-	temp_bars.sort(a.measure < b.measure)
-	
-	for i, bar in temp_bars {
-		if i > 0 {
-			prev := temp_bars[i - 1]
-			ticks += (bar.measure - prev.measure) * prev.length * ticks_per_beat
-		}
-
-		beatmap.bars << Bar{
-			measure: bar.measure,
-			ticks_per_measure: bar.length * ticks_per_beat,
-			ticks: ticks
-		}
-	}
-
-	beatmap.bars = beatmap.bars.reverse()
+	// Bars (ticks) pass
+	beatmap.bars.resolve_bars()
 
 	// objects pass
 	for index, line in beatmap.lines {

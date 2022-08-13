@@ -26,19 +26,6 @@ pub struct MeasureChange {
 		b f64
 }
 
-pub struct BarLength {
-	pub mut:
-		measure f64
-		length f64
-}
-
-pub struct Bar {
-	pub mut:
-		measure f64
-		ticks_per_measure f64
-		ticks f64
-}
-
 pub struct RawObject {
 	pub mut:
 		tick f64
@@ -50,8 +37,6 @@ pub struct Beatmap {
 	pub mut:
 		lines   []Line
 		measure []MeasureChange
-		bars []Bar
-		barlengths []BarLength
 		meta    map[string]string
 		
 		bpms map[string]f64
@@ -60,6 +45,7 @@ pub struct Beatmap {
 		directional_notes []object.NoteObject
 		stream map[string]object.NoteObject
 
+		bars timing.Bars
 		timings timing.Timing
 }
 
@@ -78,20 +64,7 @@ pub fn (mut beatmap Beatmap) resolve_note_sprite() {
 
 // Time converters
 pub fn (mut beatmap Beatmap) to_tick(measure f64, p f64, q f64) f64 {
-	mut bar := Bar{ticks: 0xDEAD}
-
-	for bar_to_find in beatmap.bars {
-		if measure >= bar_to_find.measure {
-			bar = bar_to_find
-			break
-		}
-	}
-
-	if bar.ticks == 0xDEAD { panic("Invalid bar") }
-
-	return bar.ticks + 
-		(measure - bar.measure) * bar.ticks_per_measure +
-		(p * bar.ticks_per_measure) / q
+	return beatmap.bars.to_tick(measure, p, q)
 }
 
 pub fn (mut beatmap Beatmap) to_time(tick f64) f64 {
