@@ -11,6 +11,7 @@ import framework.math.vector
 
 pub struct Sprite {
 	pub mut:
+		id                int
 		time              time.Time
 		transforms        []transform.Transform
 		textures          []gg.Image

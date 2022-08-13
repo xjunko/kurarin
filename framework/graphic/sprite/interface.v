@@ -29,6 +29,7 @@ pub struct CommonSpriteSizeResetArgument {
 
 pub interface ISprite {
 	mut:
+		id       int
 		time     time.Time
 		origin   vector.Origin
 		position vector.Vector2
