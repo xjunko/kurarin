@@ -4,7 +4,7 @@ import os
 import math
 
 import framework.logging
-// import game.settings
+// import core.osu.settings
 
 
 pub struct FFmpegReader {

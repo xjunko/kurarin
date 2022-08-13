@@ -1,6 +1,6 @@
 module play_old
 
-import game.settings // Load this first
+import core.osu.settings // Load this first
 
 import os
 import gx
@@ -14,13 +14,13 @@ import time as timelib
 import library.gg
 // import library.miru
 
-import game.x
-import game.skin
-import game.cursor
-import game.beatmap
-import game.ruleset
-import game.overlays
-import game.beatmap.object.graphic
+import core.osu.x
+import core.osu.skin
+import core.osu.cursor
+import core.osu.beatmap
+import core.osu.ruleset
+import core.osu.overlays
+import core.osu.beatmap.object.graphic
 
 import framework.audio
 import framework.logging
