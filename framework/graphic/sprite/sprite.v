@@ -92,6 +92,8 @@ pub fn (mut sprite Sprite) apply_event(t transform.Transform, time f64) {
 		.flip_horizontally {
 			sprite.flip_y = true
 		}
+
+		else {}
 	}
 }
 

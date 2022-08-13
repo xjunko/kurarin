@@ -1,6 +1,5 @@
 module sprite
 
-import time as timelib
 import framework.math.camera
 
 pub struct Manager {
