@@ -17,6 +17,7 @@ pub enum TransformType {
 	additive
 	flip_vertically
 	flip_horizontally
+	vector_shape
 }
 
 pub struct Transform {
@@ -66,6 +67,16 @@ pub fn (t Transform) as_three(time f64) []f64 {
 		t.easing(time - t.time.start, t.before[2], t.after[2] - t.before[2], t.time.duration()),	
 	]
 }
+
+pub fn (t Transform) as_four(time f64) []f64 {
+	return [
+		t.easing(time - t.time.start, t.before[0], t.after[0] - t.before[0], t.time.duration()),
+		t.easing(time - t.time.start, t.before[1], t.after[1] - t.before[1], t.time.duration()),
+		t.easing(time - t.time.start, t.before[2], t.after[2] - t.before[2], t.time.duration()),	
+		t.easing(time - t.time.start, t.before[3], t.after[3] - t.before[3], t.time.duration()),	
+	]
+}
+
 
 pub fn (t Transform) clone(time time.Time) &Transform {
 	return &Transform{
