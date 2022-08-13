@@ -1,8 +1,8 @@
 module play_new
 
-import osu
-import osu.database
-import scenes
+// import osu
+// import osu.database
+// import scenes
 
 import old_gui
 
