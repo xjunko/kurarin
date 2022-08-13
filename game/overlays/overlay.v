@@ -2,7 +2,7 @@ module overlays
 
 import math
 
-import gx
+// import gx
 import library.gg
 
 import game.x
