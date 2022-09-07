@@ -57,6 +57,8 @@ pub fn (mut bar Bars) to_tick(measure f64, p f64, q f64) f64 {
 	}
 
 	if current_bar.ticks == 0xDEAD { panic("Invalid bar") }
+	
+	// println("Measure: ${measure} | P: ${p} | Q: ${q}")
 
 	return current_bar.ticks + 
 		(measure - current_bar.measure) * current_bar.ticks_per_measure +
