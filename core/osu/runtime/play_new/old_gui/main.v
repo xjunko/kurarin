@@ -158,10 +158,11 @@ pub fn (mut window Window) update_loop() {
 	window.task = .loading
 
 	// HACK: Do something about this, some old relic code from kurarin 0.0.0 from 2020
-	time.reset()
+	mut g_time := time.get_time()
+	g_time.reset()
 
 	for window.task != .exit {
-		time.tick()
+		g_time.tick()
 		window.update()
 		window.limiter.sync()
 	}

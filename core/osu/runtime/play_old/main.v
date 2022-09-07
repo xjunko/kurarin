@@ -30,8 +30,6 @@ import framework.math.vector
 import framework.graphic.visualizer
 import framework.graphic.window
 
-import core.common.constants
-
 pub const (
 	// FIXME: move this to somewhre else
 	c_audio_check_delay = 500.0 // n seconds
@@ -457,8 +455,9 @@ pub fn initiate_game_loop(argument GameArgument) {
 	skin.bind_context(mut window.ctx)
 
 	if window.record {
-		time.stop()
-		time.reset()
+		mut g_time := time.get_time()
+		g_time.stop()
+		g_time.reset()
 	}
 
 	window.ctx.run()

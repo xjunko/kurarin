@@ -24,32 +24,6 @@ pub fn get_time() &TimeCounter {
 	}
 }
 
-pub fn reset() {
-	// Resets global time
-	mut time := get_time()
-	time.reset()
-}
-
-pub fn stop() {
-	mut time := get_time()
-	time.stop = true
-}
-
-pub fn tick() f64 {
-	mut time := get_time()
-	return time.tick()
-}
-
-pub fn tick_average() {
-	mut time := get_time()
-
-	if time.time == 0.0 {
-		time.reset()
-	}
-
-	time.tick_average_fps()
-}
-
 fn init() {
 	// Starts counting time on startup albeit with a countdown so it doesnt kill the cpu
 	go fn () {
@@ -81,6 +55,10 @@ pub struct TimeCounter {
 		
 		//
 		average f64
+}
+
+pub fn (mut t TimeCounter) stop() {
+	t.stop = true
 }
 
 pub fn (mut t TimeCounter) reset() {
