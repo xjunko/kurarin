@@ -3,7 +3,7 @@ module beatmap
 import os
 import regex
 
-import framework.logging
+// import framework.logging
 
 import object
 import timing
@@ -14,7 +14,6 @@ pub fn parse_beatmap(path string) &Beatmap {
 	bmap.analyze(path)
 
 	bmap.resolve_object_time()
-	bmap.resolve_note_sprite()
 
 	return bmap
 }
@@ -29,7 +28,7 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 		.map(it.trim_space())
 		.filter(it.starts_with("#"))
 
-	// basic reading
+	// Basic reading, verified.
 	for line in sus {
 		is_line := line.contains(":")
 
@@ -58,7 +57,8 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 		}
 	}
 
-	// pass two, this is where everything becomes retarded
+
+	// pass two, this is where everything becomes retarded, verified.
 	for index, line in beatmap.lines {
 		if line.header.len != 5 { continue }
 		if !line.header.ends_with("02") { continue }
@@ -73,21 +73,20 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 		})
 
 	}
-
-	// Bars (ticks) pass
+	// Bars (ticks) pass, verified.
 	beatmap.bars.resolve_bars()
 
 	// objects pass
 	for index, line in beatmap.lines {
 		measure_offset := retarded_javascript_find(beatmap.measure, index).b
 
-		// BPM
+		// BPM, verified.
 		if line.header.len == 5 && line.header.starts_with("BPM") {
 			beatmap.bpms[line.header[3 .. ]] = line.data.f64()
 			continue
 		}
 
-		// BPM Change
+		// BPM Change, verified.
 		if line.header.len == 5 && line.header.ends_with("08") {
 			beatmap.bpm_changes << beatmap.to_raw_objects(line, measure_offset)
 			continue
@@ -101,60 +100,90 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 
 		// Tap Notes (stream)
 		if line.header.len == 6 && line.header[3] == `3` {
-			logging.info("${@MOD}: TODO STREAM")
+			// logging.info("${@MOD}: TODO STREAM")
 			continue
 		}
 
 		// Directional Notes
 		if line.header.len == 5 && line.header[3] == `5` {
-			logging.info("${@MOD}: TODO DIRECTIONALS")
+			beatmap.directional_notes << beatmap.to_note_objects(line, measure_offset)
 			continue
 		}
 	}
 
 	// temporary
 	beatmap.tap_notes.sort(a.tick < b.tick)
-	mut removed_duplicates := []object.NoteObject{}
+	mut removed_duplicates := []&object.NoteObject{}
 
 	for note in beatmap.tap_notes {
 		if note !in removed_duplicates {
 			removed_duplicates << note
 		}
 	}
-	beatmap.tap_notes = removed_duplicates
-	//
 
-	
+	beatmap.tap_notes = removed_duplicates
+
 	mut temp_timings := beatmap.bpm_changes
 		.map(timing.TimingPoint{tick: it.tick, bpm: beatmap.bpms[it.value] or { 0 }})
 	
 	beatmap.timings.resolve_timing(temp_timings)
+
+	// TODO: Move this to somewhere else
+	for tap_note in beatmap.directional_notes {
+		key := get_key(tap_note.BaseNoteObject)
+
+		match tap_note.typ {
+			1 {
+				beatmap.flicks[key] = -1
+			}
+
+			3 {
+				beatmap.flicks[key] = 0
+			}
+
+			4 {
+				beatmap.flicks[key] = 1
+			}
+
+			else {}
+		}
+	}
+}
+
+// Utils
+pub fn get_key(n object.BaseNoteObject) string {
+	return "${n.lane}-${n.tick}"
 }
 
 // Converters
-pub fn (mut beatmap Beatmap) to_raw_objects(line Line, measure_offset f64) []RawObject {
+pub fn (mut beatmap Beatmap) to_raw_objects(line Line, measure_offset f64) []&RawObject {
 	mut re := regex.regex_opt(r".{2}") or { panic("${@METHOD}: ${err}") }
 	measure := line.header[0 .. 3].f64() + measure_offset
 
 	data := re.find_all_str(line.data)
 
-	return data.map(
-		RawObject{
-			tick: [f64(0xDEAD), beatmap.to_tick(measure, data.index(it), data.len)][int(it != "00")],
-			value: it
+	mut ret := []&RawObject{}
+
+	for i, current_data in data {
+		if current_data != "00" {
+			ret << &RawObject{
+				tick: beatmap.to_tick(measure, i, data.len),
+				value: current_data
+			}
 		}
-	).filter(
-		it.tick != f64(0xDEAD)
-	)
+	}
+
+
+	return ret
 }
 
-pub fn (mut beatmap Beatmap) to_note_objects(line Line, measure_offset f64) []object.NoteObject {
+pub fn (mut beatmap Beatmap) to_note_objects(line Line, measure_offset f64) []&object.NoteObject {
 	lane := line.header[4].ascii_str().int()
 
 	return beatmap.to_raw_objects(line, measure_offset)
-		.map(object.NoteObject{
+		.map(&object.NoteObject{
 			tick: it.tick,
-			lane: f64(lane),
+			lane: 11 - f64(lane),
 			width: it.value[1].ascii_str().int(),
 			typ: it.value[0].ascii_str().int()
 		})
