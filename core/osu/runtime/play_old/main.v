@@ -28,6 +28,7 @@ import framework.math.time
 import framework.math.glider
 import framework.math.vector
 import framework.graphic.visualizer
+import framework.graphic.window
 
 import core.common.constants
 
@@ -51,8 +52,9 @@ pub struct GameArgument {
 }
 
 pub struct Window {
+	window.GeneralWindow
+
 	pub mut:
-		ctx 		&gg.Context = voidptr(0)
 		beatmap 	&beatmap.Beatmap = voidptr(0)
 		cursors     []&cursor.Cursor
 		auto        &cursor.AutoCursor = voidptr(0)
@@ -61,7 +63,6 @@ pub struct Window {
 		// TODO: move this to somewhere else
 		audio_been_played bool
 		limiter           &time.Limiter = &time.Limiter{int(settings.global.window.fps), 0, 0}
-		draw_counter      &time.TimeCounter = &time.TimeCounter{}
 
 		// Ruleset
 		ruleset &ruleset.Ruleset = voidptr(0)
@@ -178,17 +179,7 @@ pub fn (mut window Window) draw() {
 
 	// Texts (only on windowed mode)
 	if !settings.global.video.record {
-		// Game info
-		window.ctx.draw_rect_filled(0, 50, 60, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(5, 50, constants.game_name, gx.TextCfg{color: gx.white})
-		window.ctx.draw_rect_filled(0, 50 + 16, 145, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(5, 50 + 16, constants.game_version, gx.TextCfg{color: gx.white})
-
-		// FPS info
-		window.ctx.draw_rect_filled(int(settings.global.window.width - 135), int(settings.global.window.height - 37), 155, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(int(settings.global.window.width - 5), int(settings.global.window.height - 37), "Update: ${time.global.get_average_fps():.0}fps [${time.global.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
-		window.ctx.draw_rect_filled(int(settings.global.window.width - 120), int(settings.global.window.height - 37 + 16), 150, 16, gx.Color{0, 0, 0, 100})
-		window.ctx.draw_text(int(settings.global.window.width - 5), int(settings.global.window.height - 37 + 16), "Draw: ${window.draw_counter.get_average_fps():.0}fps [${window.draw_counter.average:.0}ms]", gx.TextCfg{color: gx.white, align: .right})
+		window.GeneralWindow.draw_stats()
 	}
 
 	// // MicroUI
@@ -273,17 +264,16 @@ pub fn window_init(mut window &Window) {
 	if !window.record {
 		go fn (mut window &Window) {
 			mut g_time := time.get_time()
-			mut limiter := time.Limiter{480, 0, 0}
+			mut limiter := time.Limiter{1000, 0, 0}
 			g_time.reset()
 			g_time.set_speed(settings.global.window.speed)
-			window.draw_counter.reset()
 
 			// Disable mouse
 			sapp.show_mouse(false)
 			
 			for {
 				window.update(g_time.time, g_time.delta)
-				g_time.tick_average_fps()
+				window.GeneralWindow.tick_update()
 				limiter.sync()
 			}
 		}(mut window)
@@ -293,7 +283,7 @@ pub fn window_init(mut window &Window) {
 pub fn window_draw(mut window &Window) {
 	window.ctx.load_image_queue()
 	window.draw()
-	window.draw_counter.tick_average_fps()
+	window.GeneralWindow.tick_draw()
 	window.limiter.sync()
 }
 
