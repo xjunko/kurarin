@@ -8,7 +8,7 @@ shaders_dir="assets/shaders/slider.glsl"
 is_debug=false
 is_prod=false
 
-compiler="gcc"
+compiler="clang"
 
 build_command="v"
 
