@@ -43,7 +43,7 @@ pub fn bind_context(mut ctx &gg.Context) {
 	g.ctx = ctx
 	g.bind = true
 
-	logging.info("Skin's context is binded!")
+	logging.info("${@MOD}Skin's context is binded!")
 
 	logging.info("Loading skin assets!")
 	for file in required_files {
