@@ -9,7 +9,7 @@ import core.osu.x
 import core.osu.skin
 import core.osu.cursor
 import core.osu.ruleset
-import core.osu.settings
+import core.common.settings
 
 import framework.math.time
 import framework.math.vector

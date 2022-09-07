@@ -1,6 +1,6 @@
 module old_gui
 
-import core.osu.settings
+import core.common.settings
 
 import gx
 import library.gg

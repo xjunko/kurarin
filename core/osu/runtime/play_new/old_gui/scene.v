@@ -13,7 +13,7 @@ import framework.math.easing
 import framework.graphic.sprite
 
 import core.osu.beatmap
-import core.osu.settings
+import core.common.settings
 
 const (
 	loading_font_size = int(32)

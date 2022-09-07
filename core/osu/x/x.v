@@ -7,7 +7,7 @@ import framework.logging
 import framework.math.vector
 import framework.math.camera
 
-import core.osu.settings
+import core.common.settings
 
 pub const (
 	resolution = &Resolution{}

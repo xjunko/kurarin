@@ -13,7 +13,7 @@ import framework.math.easing
 import framework.math.vector
 import framework.math.time as time2
 
-import core.osu.settings
+import core.common.settings
 import core.osu.beatmap
 import core.osu.beatmap.object as gameobject
 import core.osu.skin

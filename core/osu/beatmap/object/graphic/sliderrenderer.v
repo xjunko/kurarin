@@ -18,7 +18,7 @@ module graphic
 	// OK DONE :DDDD
 */
 
-import core.osu.settings
+import core.common.settings
 import core.osu.x
 
 import math

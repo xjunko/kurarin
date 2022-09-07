@@ -9,7 +9,7 @@ import framework.math.easing
 import framework.graphic.sprite
 
 
-import core.osu.settings
+import core.common.settings
 import core.osu.beatmap.difficulty
 import core.osu.beatmap.timing
 import core.osu.audio

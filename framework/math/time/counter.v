@@ -6,7 +6,7 @@ module time
 
 import math
 import time as timelib 
-import core.osu.settings
+import core.common.settings
 
 pub const (
 	update_rate_fps = settings.global.window.fps

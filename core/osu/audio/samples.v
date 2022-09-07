@@ -1,7 +1,7 @@
 module audio
 
 import os
-import core.osu.settings
+import core.common.settings
 
 import framework.audio
 import framework.logging

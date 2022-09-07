@@ -9,7 +9,7 @@ import framework.math.vector
 import framework.graphic.sprite
 
 import core.osu.x
-import core.osu.settings
+import core.common.settings
 
 pub struct VideoSprite {
 	sprite.Sprite

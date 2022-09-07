@@ -11,7 +11,7 @@ import sokol.sgl
 import sokol.gfx
 import math
 
-import core.osu.settings
+import core.common.settings
 
 pub type TouchPoint = C.sapp_touchpoint
 

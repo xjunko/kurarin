@@ -2,7 +2,7 @@ module gameplay
 
 import math
 
-import core.osu.settings
+import core.common.settings
 
 import framework.audio as f_audio
 import core.osu.audio as g_audio

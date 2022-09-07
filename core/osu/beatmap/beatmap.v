@@ -21,7 +21,7 @@ import framework.graphic.sprite
 import core.osu.x
 import core.osu.skin
 import core.osu.audio
-import core.osu.settings
+import core.common.settings
 
 
 import storyboard

@@ -1,6 +1,6 @@
 module play_old
 
-import core.osu.settings // Load this first
+import core.common.settings // Load this first
 
 import os
 import gx

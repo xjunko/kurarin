@@ -2,7 +2,7 @@ module audio
 
 import framework.logging
 
-import core.osu.settings
+import core.common.settings
 
 const (
 	global = &GlobalMixer{}
