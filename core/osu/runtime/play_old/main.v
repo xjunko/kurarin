@@ -29,7 +29,7 @@ import framework.math.glider
 import framework.math.vector
 import framework.graphic.visualizer
 
-import runtime.constants
+import core.common.constants
 
 pub const (
 	// FIXME: move this to somewhre else
