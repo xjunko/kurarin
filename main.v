@@ -18,7 +18,6 @@ fn main() {
 	fp.application(constants.game_name)
 	fp.version(constants.game_version)
 	fp.description("UI is very very very (repeat 100 times) WIP, dont even try it.")
-	// fp.limit_free_args(0, 0) or {}
 
 	// Old
 	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file.")
