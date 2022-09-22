@@ -74,7 +74,7 @@ pub struct Beatmap {
 		temp_beatmap_sb  []string
 		last_update  	 f64
 		last_boost       f64
-		update_lock  	 &sync.Mutex = sync.new_mutex() // To prevent race, note that this might block the entire thing if draw or update method got stuck
+		
 }
 
 // General Helper
@@ -85,7 +85,7 @@ pub fn (mut beatmap Beatmap) load_full_beatmap() &Beatmap{
 
 // Method
 pub fn (mut beatmap Beatmap) bind_context(mut ctx &gg.Context) {
-	beatmap.ctx = ctx
+	beatmap.ctx = unsafe { ctx }
 }
 
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
@@ -199,8 +199,6 @@ pub fn (mut beatmap Beatmap) reset() {
 }
 
 pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
-	beatmap.update_lock.@lock()
-	
 	// Update shit
 	beatmap.last_update = time
 	beatmap.last_boost = boost
@@ -262,8 +260,10 @@ pub fn (mut beatmap Beatmap) update(time f64, boost f32) {
 		beatmap.playfield_size.y = x.resolution.playfield.y
 	}
 	
+	// last
+	beatmap.post_update(time)
+
 	// Done
-	beatmap.update_lock.unlock()
 }
 
 pub fn (mut beatmap Beatmap) post_update(time f64) {
@@ -291,7 +291,6 @@ pub fn (mut beatmap Beatmap) draw() {
 	// FIXME: This is kinda fucked ngl
 	// FIXME: data race or smth idk what its called
 	beatmap.storyboard.mutex.@lock()
-	beatmap.update_lock.@lock()
 
 	// Background/Storyboard draws
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
@@ -344,7 +343,6 @@ pub fn (mut beatmap Beatmap) draw() {
 	beatmap.free_slider_attr()
 	
 	//
-	beatmap.update_lock.unlock()
 	beatmap.storyboard.mutex.unlock()
 }
 
