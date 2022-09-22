@@ -42,20 +42,16 @@ pub enum GameAudioState {
 	fix_latency_done
 }
 
-// TODO: lol
-pub struct GameArgument {
-	pub mut:
-		beatmap_path string
-		playing      bool
-}
-
 pub struct Window {
 	window.GeneralWindow
+
+	mut:
+		play_mode PlayState
 
 	pub mut:
 		beatmap 	&beatmap.Beatmap = voidptr(0)
 		cursors     []&cursor.Cursor
-		auto        &cursor.AutoCursor = voidptr(0)
+		cursor_controller cursor.ICursorController = voidptr(0) // Used for auto and replay
 		argument    &GameArgument = voidptr(0)
 
 		// TODO: move this to somewhere else
@@ -80,11 +76,6 @@ pub struct Window {
 		// HACK: move this to somewhere else
 		beatmap_song &audio.Track = voidptr(0)
 		beatmap_song_boost f32 = f32(1.0)
-
-		// FIXME: Move this audio check stuff to somewhere else
-		audio_check_delta f64
-		audio_game_glider &glider.Glider = glider.new_glider(1.0)
-		audio_fix_flag GameAudioState = .fix_latency_done
 }
 
 pub fn (mut window Window) update_boost() {
@@ -98,8 +89,8 @@ pub fn (mut window Window) update_boost() {
 }
 
 pub fn (mut window Window) update_cursor(time f64, delta f64) {
-	if !window.argument.playing {
-		window.auto.update(time)
+	if window.argument.play_mode != .play {
+		window.cursor_controller.update(time)
 	}
 
 	for mut cursor in window.cursors {
@@ -230,11 +221,15 @@ pub fn window_init(mut window &Window) {
 	}
 
 	// Make cursor based on argument
-	if window.argument.playing {
+	if window.argument.play_mode == .play {
 		window.cursors << cursor.make_cursor(mut window.ctx)
+	} else if window.argument.play_mode == .replay {
+		// HACK: REPLAY HACK
+		window.cursor_controller = cursor.make_replay_cursor(mut window.ctx, "assets/replays/1/raw_data.lzma")
+		window.cursors << unsafe{ window.cursor_controller.cursor }
 	} else {
-		window.auto = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)
-		window.cursors << unsafe{ window.auto.cursor }
+		window.cursor_controller = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)
+		window.cursors << unsafe{ window.cursor_controller.cursor }
 	}
 
 	// Make ruleset
@@ -315,6 +310,7 @@ pub fn window_draw_recording(mut window &Window) {
 	mut video_time := 0.0
 
 	end_time := (window.beatmap.time.end + 7000.0) * settings.global.window.speed
+	
 	for video_time < end_time {
 		// Update and Audio
 		delta_sum_update += update_delta
@@ -387,7 +383,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 		move_fn: fn (x_ f32, y_ f32, mut window &Window) {
 			// C.mu_input_mousemove(&window.microui.ctx, int(x_), int(y_))
 
-			if !window.argument.playing {
+			if window.argument.play_mode != .play {
 				return
 			}
 
@@ -409,7 +405,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 		}
 
 		keydown_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window &Window) {
-			if !window.argument.playing {
+			if window.argument.play_mode != .play {
 				return
 			}
 
@@ -426,7 +422,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 		}
 		
 		keyup_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window &Window) {
-			if !window.argument.playing {
+			if window.argument.play_mode != .play {
 				return
 			}
 			
@@ -447,7 +443,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 	window.record = settings.global.video.record
 
 	// Don't record if we're playing the game, only record for auto (and replays soon).
-	if window.record && argument.playing {
+	if window.record && argument.play_mode == .play {
 		logging.error("Recording is unavailable rn due to gameplay refactor, try again later.")
 		exit(1)
 	}
@@ -467,17 +463,49 @@ pub fn initiate_game_loop(argument GameArgument) {
 	}
 }
 
-pub fn main(beatmap_path string, is_playing bool) {
+
+// Mountpoint
+pub enum PlayState {
+	auto
+	replay
+	play
+}
+
+pub struct GameArgument {
+	pub mut:
+		beatmap_path string
+		replay_path string
+		play_mode PlayState
+}
+
+pub fn main(beatmap_path string, replay_path string, _is_playing bool) {
+	mut play_mode := PlayState.auto
+
+	// Playing checks
+	if _is_playing {
+		play_mode = .play
+	}
+
+	if replay_path.len > 0 {
+		play_mode = .replay
+	}
+
 	// Checks
 	if !os.exists(beatmap_path) {
 		logging.error("Invalid beatmap path: ${beatmap_path}")
 		return
 	}
 
+	if !os.exists(replay_path) && replay_path.len != 0 {
+		logging.info("Invalid replay path, whatever, continuing with auto.")
+		play_mode = .auto
+	}
+
 	// Create GameArgument
 	argument := &GameArgument{
 		beatmap_path: beatmap_path,
-		playing: is_playing
+		replay_path: replay_path
+		play_mode: play_mode
 	}
 
 	logging.info("Beatmap: ${beatmap_path}")

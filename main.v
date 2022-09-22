@@ -24,6 +24,7 @@ fn main() {
 
 	// Old
 	beatmap_path := fp.string("beatmap", `b`, "", "Path to the .osu file.")
+	replay_path := fp.string("replay", `r`, "", "Path to the .osr file.")
 	is_playing := fp.bool("play", `p`, false, "Flag for playing in the client.")
 	
 	// New
@@ -49,7 +50,7 @@ fn main() {
 		if gui_mode {
 			play_new.main()
 		} else {
-			play_old.main(beatmap_path.replace("\\", ""), is_playing)
+			play_old.main(beatmap_path.replace("\\", ""), replay_path.replace("\\", ""), is_playing)
 		}
 	} else {
 		sekai.main()
