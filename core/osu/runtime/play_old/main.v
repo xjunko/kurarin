@@ -224,7 +224,7 @@ pub fn window_init(mut window &Window) {
 		window.cursors << cursor.make_cursor(mut window.ctx)
 	} else if window.argument.play_mode == .replay {
 		// HACK: REPLAY HACK
-		window.cursor_controller = cursor.make_replay_cursor(mut window.ctx, "assets/replays/1/raw_data.lzma")
+		window.cursor_controller = cursor.make_replay_cursor(mut window.ctx, window.argument.replay_path)
 		window.cursors << unsafe{ window.cursor_controller.cursor }
 	} else {
 		window.cursor_controller = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)

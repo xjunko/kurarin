@@ -56,6 +56,15 @@ pub fn make_replay_cursor(mut ctx &gg.Context, path_to_replay string) &ReplayCur
 	mut replay_time := 0.0
 	mut last_pos := [0.0, 0.0]
 
+	// Read skip offsets
+	skip_offs := actions[1].split_nth("|", 0)[0]
+	mut skip_offset := 0.0
+	
+	if skip_offs != "-1" {
+		skip_offset = skip_offs.f64()
+		replay_time = skip_offset
+	}
+
 	for action in actions {
 		items := action.split("|")
 
