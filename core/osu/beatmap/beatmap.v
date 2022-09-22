@@ -7,7 +7,6 @@ import timing
 import object
 import library.gg
 import gx
-import sync
 
 import sokol.gfx
 import sokol.sgl

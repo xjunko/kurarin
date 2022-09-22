@@ -103,7 +103,7 @@ pub fn (mut t TimeCounter) tick_average_fps() {
 		t.average = delta
 	}
 
-	rate := f64(1.0 - math.pow(0.1, delta / 100.0))
+	rate := f64(1.0 - math.pow(0.4, delta / 100.0))
 	t.average = t.average + (delta - t.average) * rate
 }
 
