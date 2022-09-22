@@ -2,6 +2,7 @@ module window
 
 import library.gg
 import gx
+import sync
 
 import framework.math.time
 import core.common.constants
@@ -16,6 +17,7 @@ pub struct GeneralWindow {
 
 	pub mut:
 		ctx &gg.Context = voidptr(0)
+		mutex &sync.Mutex = sync.new_mutex()
 }
 
 pub fn (mut window GeneralWindow) init() {}
