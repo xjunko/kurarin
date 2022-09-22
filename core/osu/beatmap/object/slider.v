@@ -211,8 +211,6 @@ pub fn (mut slider Slider) update(time f64) bool {
 }
 
 pub fn (mut slider Slider) post_update(time f64) {
-	// logging.debug("Freeing slider.")
-	// slider.slider_renderer_attr.free()
 }
 
 pub fn (mut slider Slider) is_retarded() bool {
@@ -647,9 +645,13 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 }
 
 pub fn (mut slider Slider) generate_slider_renderer() {
-	slider.slider_renderer_attr = graphic.make_slider_renderer_attr(
-		slider.diff.circle_radius, slider.get_slider_points(), slider.pixel_length
-	)
+	if slider.slider_renderer_attr == voidptr(0) {
+		slider.slider_renderer_attr = graphic.make_slider_renderer_attr(
+			slider.diff.circle_radius, slider.get_slider_points(), slider.pixel_length
+		)
+
+		slider.slider_renderer_attr.generate_vertices()
+	}
 }
 
 pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
