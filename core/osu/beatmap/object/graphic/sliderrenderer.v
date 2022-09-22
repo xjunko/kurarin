@@ -129,7 +129,7 @@ pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f
 
 }
 
-pub fn (mut attr SliderRendererAttr) make_vertices() {
+pub fn (mut attr SliderRendererAttr) generate_vertices() {
 	/*
 		for whatevrer reason i cant make buffer on gothread/coroutine, only on draw calls bruh
 	*/
@@ -170,7 +170,9 @@ pub fn (mut attr SliderRendererAttr) make_vertices() {
 	// 	.5, -.5, .0,				.0, 1.0, .0,
 	// 	.0, .5, .0,					.0, .0, 1.0,
 	// ]
+}
 
+pub fn (mut attr SliderRendererAttr) bind_slider() {
 	if attr.vertices.len == 0 {
 		return // Something went wrong or the slider is just straitght up retadred
 	}
@@ -218,7 +220,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	if !global_renderer.has_been_initialized { panic("global_renderer.has_been_initialized == False; This should not happen.") }
 
 	if !attr.has_been_initialized { 
-		attr.make_vertices()
+		attr.bind_slider()
 		return
 	}
 
