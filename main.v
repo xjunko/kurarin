@@ -6,10 +6,13 @@ import flag
 // osu!
 import core.osu.runtime.play_old
 import core.osu.runtime.play_new
-import core.common.constants
 
 // proseka
 import core.sekai.runtime.sekai
+
+// Cores
+import core.common.constants
+import core.common.settings
 
 import framework.logging
 
