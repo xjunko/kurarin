@@ -2,8 +2,10 @@ module sekai
 
 import sync
 import library.gg
-import core.sekai.beatmap
+
 import core.sekai.skin
+import core.sekai.beatmap
+import core.common.settings
 
 import framework.audio
 import framework.logging
@@ -29,7 +31,7 @@ pub fn (mut window Window) init() {
 	C._sapp_glx_swapinterval(0)
 
 	// Load beatmap
-	window.beatmap = beatmap.parse_beatmap("assets/psekai/maps/116/master.sus")
+	window.beatmap = beatmap.parse_beatmap("assets/psekai/maps/64/master.sus")
 	window.beatmap.bind_context(mut window.ctx)
 	window.beatmap.reset()
 
@@ -42,7 +44,7 @@ pub fn (mut window Window) init() {
 		start_at_offset := 2000.0
 		music_offset := 0.0
 		mut song_started := false
-		mut song := audio.new_track("assets/psekai/maps/116/audio.mp3")
+		mut song := audio.new_track("assets/psekai/maps/64/audio.mp3")
 
 		song.set_volume(0.3)
 		song.set_position(music_offset)
@@ -92,8 +94,8 @@ pub fn main() {
 
 	mut window := &Window{}
 	window.ctx = gg.new_context(
-		width: 1280, 
-		height: 720,
+		width: int(settings.global.window.width), 
+		height: int(settings.global.window.height),
 		user_data: window,
 
 		// FNs
