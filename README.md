@@ -13,7 +13,7 @@ Use [danser-go](https://github.com/Wieku/danser-go) or [McOsu](https://github.co
 
 ## Preview
 
-[Here](PREVIEWS.md)
+[Here!11111!!1!!](PREVIEWS.md)
 
 ## Releases
 
@@ -36,19 +36,17 @@ The next startup will be normal.
 
 Currently supports:
 
-* Gameplay (ripped off from danser)
-* Auto (If launched without the -play flag)
-* Rendering (abit primitive rn but it works, make sure you got [FFmpeg](https://ffmpeg.org/) installed)
-* Storyboard ("works")
-* and more idk bruh
+* Gameplay (thank you, wieku)
+* Auto (+ cursordance, again, thanks wieku)
+* Rendering (Requires [FFmpeg](https://ffmpeg.org/) to be installed in `$PATH`)
+* Storyboard
+* Replay (`.osr`) support
 
-WIP:
+Currently does not support:
 
-* User interface (Can be enabled with --ui flag.)
-
-TODO:
-
-* TODO
+* Stable memory management (this program leaks memory like a bitch in heat, especially on big sliders)
+* User interface
+* Aspire maps
 
 ## Building
 
@@ -56,12 +54,11 @@ TODO:
 
 * V
 * GCC/Clang
-* OpenGL 3.3
+* OpenGL 3
 
 #### Linux
 
-By default, the program will be built with VSYNC enabled, so max FPS is 60. I will add a patch for this eventually. <br/>
-Tested with Arch but it _should_ work elsewhere as long as it's linux.
+Tested with Arch but it _should_ work anywhere else as long as it's linux.
 
 Use [`ext/build.sh`](https://github.com/FireRedz/kurarin/blob/rewrite/ext/build.sh) to build the program, no makefile
 fuckery or smth like that.
@@ -70,7 +67,7 @@ fuckery or smth like that.
 
 Some of the code is _derived_ or literally copy-pasted from these projects, so big credits to them.
 
-* [McOsu](https://github.com/McKay42/McOsu) by [McKay](https://github.com/McKay42)
 * [danser-go](https://github.com/Wieku/danser-go) by [Wieku](https://github.com/Wieku)
+* [McOsu](https://github.com/McKay42/McOsu) by [McKay](https://github.com/McKay42)
 * [osr2mp4](https://github.com/uyitroa/osr2mp4-core) by [yuitora](https://github.com/uyitroa)
 * [opsu-dance](https://github.com/yugecin/opsu-dance) by [yugecin](https://github.com/yugecin)
