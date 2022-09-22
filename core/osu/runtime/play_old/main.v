@@ -263,7 +263,10 @@ pub fn window_init(mut window &Window) {
 			sapp.show_mouse(false)
 			
 			for {
+				window.mutex.@lock()
 				window.update(g_time.time, g_time.delta)
+				window.mutex.unlock()
+				
 				window.GeneralWindow.tick_update()
 				limiter.sync()
 			}
@@ -273,7 +276,11 @@ pub fn window_init(mut window &Window) {
 
 pub fn window_draw(mut window &Window) {
 	window.ctx.load_image_queue()
+
+	window.mutex.@lock()
 	window.draw()
+	window.mutex.unlock()
+	
 	window.GeneralWindow.tick_draw()
 	window.limiter.sync()
 }
