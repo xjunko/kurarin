@@ -79,12 +79,11 @@ pub fn make_replay_cursor(mut ctx &gg.Context, path_to_replay string) &ReplayCur
 
 		// Keys
 		keys := items[3].int()
+		
 		auto.events << ReplayEvent{
 			time: replay_time,
 			keys: keys
 		}
-
-		last_keys = keys
 	}
 
 	// Filter out retarded keys event
