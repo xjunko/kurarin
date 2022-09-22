@@ -25,7 +25,6 @@ import core.osu.beatmap.object.graphic
 import framework.audio
 import framework.logging
 import framework.math.time
-import framework.math.glider
 import framework.math.vector
 import framework.graphic.visualizer
 import framework.graphic.window

@@ -16,6 +16,10 @@ import core.common.settings
 
 import framework.logging
 
+const (
+	_ = settings.global
+)
+
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application(constants.game_name)

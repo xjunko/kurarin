@@ -1,7 +1,6 @@
 module lzma
 
 import dl
-import os
 
 type XzDecode = fn (&u8, u32, &u8, &u32) bool
 

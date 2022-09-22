@@ -7,13 +7,11 @@ import library.lzma
 
 import framework.math.time
 
-import core.osu.beatmap.object
-
 const (
-	osu_M1 = 1 << 0
-	osu_M2 = 1 << 1
-	osu_K1 = 1 << 2
-	osu_K2 = 1 << 3
+	osu_m1 = 1 << 0
+	osu_m2 = 1 << 1
+	osu_k1 = 1 << 2
+	osu_k2 = 1 << 3
 )
 
 pub struct ReplayEvent {
@@ -35,8 +33,8 @@ pub fn (mut replay ReplayCursor) update(time f64) {
 		if time >= replay.events[i].time {
 			keys := replay.events[i].keys
 
-			replay.cursor.left_button = ((keys & osu_M1) == osu_M1) || ((keys & osu_K1) == osu_K1)
-			replay.cursor.right_button = ((keys & osu_M2) == osu_M2) ||  ((keys & osu_K2) == osu_K2)
+			replay.cursor.left_button = ((keys & osu_m1) == osu_m1) || ((keys & osu_k1) == osu_k1)
+			replay.cursor.right_button = ((keys & osu_m2) == osu_m2) ||  ((keys & osu_k2) == osu_k2)
 
 			replay.events = replay.events[1..]
 		}
