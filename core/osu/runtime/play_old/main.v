@@ -29,6 +29,8 @@ import framework.math.vector
 import framework.graphic.visualizer
 import framework.graphic.window
 
+import framework.ffmpeg.export
+
 pub const (
 	// FIXME: move this to somewhre else
 	c_audio_check_delay = 500.0 // n seconds
@@ -67,10 +69,7 @@ pub struct Window {
 
 		// Recording stuff
 		record 		bool
-		video_proc  &os.Process = voidptr(0)
-		record_data &u8 = voidptr(0)
-		audio_proc  &os.Process = voidptr(0)
-		audio_data  []u8
+		video       &export.Video = voidptr(0)
 
 		// HACK: move this to somewhere else
 		beatmap_song &audio.Track = voidptr(0)
@@ -241,14 +240,14 @@ pub fn window_init(mut window &Window) {
 
 	// If recording
 	if window.record {
-		window.init_video_pipe_process()
-		window.init_audio_pipe_process()
+		window.video.init_video_pipe_process()
+		window.video.init_audio_pipe_process()
 
 		// Time shit
 		mut g_time := time.get_time()
 		g_time.set_speed(settings.global.window.speed)
 		g_time.use_custom_delta = true
-		g_time.custom_delta = frametime
+		g_time.custom_delta = 1000.0 / settings.global.video.fps
 	}
 
 
@@ -308,7 +307,7 @@ pub fn window_draw_recording(mut window &Window) {
 
 	mut video_time := 0.0
 
-	end_time := (window.beatmap.time.end + 7000.0) * settings.global.window.speed
+	end_time := (20000.0 + 7000.0) * settings.global.window.speed
 	
 	for video_time < end_time {
 		// Update and Audio
@@ -319,7 +318,7 @@ pub fn window_draw_recording(mut window &Window) {
 			window.update(video_time, update_delta)
 
 			// Submit audio
-			window.pipe_audio()
+			window.video.pipe_audio()
 			delta_sum_update -= game_update_delta
 		}
 
@@ -330,7 +329,7 @@ pub fn window_draw_recording(mut window &Window) {
 			window.draw()
 
 			// Pipe 
-			window.pipe_window() 
+			window.video.pipe_window() 
 
 			// Print progress
 			count++
@@ -439,7 +438,10 @@ pub fn initiate_game_loop(argument GameArgument) {
 	)
 
 	// Record or na
-	window.record = settings.global.video.record
+	if settings.global.video.record {
+		window.record = true
+		window.video = &export.Video{}
+	}
 
 	// Don't record if we're playing the game, only record for auto (and replays soon).
 	if window.record && argument.play_mode == .play {
@@ -458,7 +460,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 	window.ctx.run()
 
 	if window.record {
-		window.close_pipe_process()
+		window.video.close_pipe_process()
 	}
 }
 
