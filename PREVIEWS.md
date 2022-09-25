@@ -1,3 +1,8 @@
+## 25/9/2022 Preview
+* Managed to get minlzma working
+
+https://user-images.githubusercontent.com/44401509/192144425-a864b5ab-0a13-4c1f-9389-6c6ec471f9b9.mp4
+
 ## Gameplay branch preview
 https://user-images.githubusercontent.com/44401509/166099339-9d356ef9-3096-407f-b72e-aca91f82a3e2.mp4
 
