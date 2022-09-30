@@ -1,6 +1,5 @@
 module settings
 
-// TODO: split them up into their own type
 pub struct Window {
 	pub mut:
 		width  f64
