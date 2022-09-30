@@ -25,7 +25,7 @@ import math
 
 import sokol
 import sokol.gfx
-import sokol.sgl // TODO: use sokol's wrapper structs instead of C's 
+import sokol.sgl 
 
 import framework.logging
 import framework.math.vector
@@ -120,7 +120,7 @@ pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f
 	attr.colors[8] = f32(settings.global.gameplay.hitobjects.slider_width)
 	attr.colors[9] = f32(settings.global.gameplay.hitobjects.slider_lazer_style)
 
-	attr.uniform = C.sg_range{
+	attr.uniform = gfx.Range{
 		ptr: attr.colors.data,
 		size: usize(attr.colors.len * int(sizeof(f32)))
 	}
@@ -178,9 +178,9 @@ pub fn (mut attr SliderRendererAttr) bind_slider() {
 	}
 	
 	// Bind the shit
-	attr.bindings.vertex_buffers[0] = C.sg_make_buffer(&gfx.BufferDesc{
+	attr.bindings.vertex_buffers[0] = gfx.make_buffer(&gfx.BufferDesc{
 		size: usize(attr.vertices.len * int(sizeof(f32))),
-		data: C.sg_range{
+		data: gfx.Range{
 			ptr: attr.vertices.data,
 			size: usize(attr.vertices.len * int(sizeof(f32)))
 		}
@@ -283,7 +283,7 @@ pub fn (mut attr SliderRendererAttr) free() {
 	if !attr.has_been_initialized { return }
 
 	for mut buffer in attr.bindings.vertex_buffers {
-		C.sg_destroy_buffer(&buffer)
+		gfx.destroy_buffer(&buffer)
 	}
 
 	unsafe {
@@ -301,9 +301,9 @@ pub fn init_slider_renderer() {
 	mut renderer := unsafe { global_renderer }
 
 	// Normal slider shader
-	renderer.shader = C.sg_make_shader(
+	renderer.shader = gfx.make_shader(
 		C.fuck_shader_desc(
-			C.sg_query_backend()
+			gfx.query_backend()
 		)
 	)
 
@@ -329,7 +329,7 @@ pub fn init_slider_renderer() {
 	pipeline_desc.layout.attrs[C.ATTR_vs_in_position].format = .float3 // pos
 	pipeline_desc.layout.attrs[C.ATTR_vs_centre].format = .float3 // centre
 	pipeline_desc.layout.attrs[C.ATTR_vs_texture_coord].format = .float2 // texture coord
-	renderer.pip = C.sg_make_pipeline(pipeline_desc)
+	renderer.pip = gfx.make_pipeline(pipeline_desc)
 
 	// // Test Shader
 	// renderer.shader = C.sg_make_shader(
@@ -386,7 +386,7 @@ pub fn init_slider_renderer() {
 		f32(1.0), 0.0, 0.0, 0.0,
 	]
 	
-	renderer.uniform = C.sg_range{
+	renderer.uniform = gfx.Range{
 		ptr: renderer.uniform_values.data,
 		size: usize(renderer.uniform_values.len * int(sizeof(f32)))
 	}
