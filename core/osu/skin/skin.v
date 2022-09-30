@@ -46,6 +46,7 @@ pub fn bind_context(mut ctx &gg.Context) {
 	logging.info("${@MOD}Skin's context is binded!")
 
 	logging.info("Loading skin assets!")
+
 	for file in required_files {
 		logging.debug("Loading: ${file} from skin")
 		get_texture(file)
@@ -112,16 +113,24 @@ pub fn get_texture_with_fallback(name string, fallback string) gg.Image {
 
 	// Try get from normal name
 	if name !in skin.cache {
-		skin.cache[name] = skin.ctx.create_image(os.join_path(skin.fallback, name + '.png'))
+		original_path := os.join_path(skin.fallback, name + '.png')
+
+		skin.cache[name] = skin.ctx.create_image(original_path)
 
 		// Check if failed
-		if skin.cache[name].id == 0 {
+		if skin.cache[name].id == 0 || !os.exists(original_path) {
 			logging.debug("Failed getting ${name} from skin, trying ${fallback}!")
 			
 			// Get from fallback
 			// println(os.join_path(skin.fallback, fallback + '.png'))
 			skin.cache[fallback] = skin.ctx.create_image(os.join_path(skin.fallback, fallback + '.png'))
 			skin.cache[name] = skin.cache[fallback]
+
+			// If still fail, then fuck it, we ballin.
+			if skin.cache[fallback].id == skin.ctx.image_default.id {
+				skin.cache.delete(fallback)
+				skin.cache.delete(name)
+			}
 		}
 	}
 
