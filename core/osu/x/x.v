@@ -111,8 +111,7 @@ pub fn get_matrix_projection(res Resolution) m4.Mat4 {
 
 	matrix *= playfield
 	matrix *= scale
-
-	// HACK: ????
+	
 	matrix.set_e(10, 1.0)
 
 	return matrix
