@@ -88,7 +88,6 @@ pub fn (mut beatmap Beatmap) bind_context(mut ctx &gg.Context) {
 }
 
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
-	// TODO: use storyboard
 	if beatmap.storyboard.manager.queue.len == 0 {
 		// Video
 		mut has_video := false
