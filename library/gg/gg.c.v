@@ -103,12 +103,15 @@ mut:
 	// (so that the user can store image ids, not entire Image objects)
 	image_cache   []Image
 	image_queue   []&Image
-	image_default Image // Texture to fallback to incase the image cant be loaded.
 	needs_refresh bool = true
 	ticks         int // for ui mode only
 pub:
 	native_rendering bool
 pub mut:
+	// FireRedz
+	image_default Image // Texture to fallback to incase the image cant be loaded.
+	
+	// V
 	scale f32 = 1.0
 	// will get set to 2.0 for retina, will remain 1.0 for normal
 	width        int
