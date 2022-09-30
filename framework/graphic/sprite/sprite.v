@@ -4,7 +4,6 @@ import library.gg
 import gx
 import math
 
-import framework.logging
 import framework.math.time
 import framework.math.transform
 import framework.math.vector
@@ -193,14 +192,6 @@ pub fn (mut sprite Sprite) reset_time_based_on_transforms() {
 
 // 
 pub fn (mut sprite Sprite) is_drawable_at(time f64) bool {
-	// HACKHACKHACK: New bug appeared out of nowhere, broken as of 10/4/22
-	//               Was working fine the day before...
-	if isnil(sprite.time) {
-		logging.error("Time is nulled when checking sprite, returning false.")
-		// logging.error("Amount of transforms: ${sprite.transforms.len}")
-		return false // ?? huh
-	}
-
 	return time >= sprite.time.start && time <= sprite.time.end
 }
 
