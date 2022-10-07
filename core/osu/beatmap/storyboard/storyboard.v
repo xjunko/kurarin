@@ -279,7 +279,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 	}
 
 	command_type := items[0]
-	easing := easing.get_easing_from_enum(easing.Easing(items[1].i8())) // looks fucked
+	easing := easing.get_easing_from_enum(unsafe { easing.Easing(items[1].i8()) }) // looks fucked
 
 	mut start_time := items[2].f64()
 

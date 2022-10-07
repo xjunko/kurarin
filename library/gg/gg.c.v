@@ -423,12 +423,12 @@ fn gg_event_fn(ce voidptr, user_data voidptr) {
 	if e.typ == .mouse_down {
 		bitplace := int(e.mouse_button)
 		g.mbtn_mask |= byte(1 << bitplace)
-		g.mouse_buttons = MouseButtons(g.mbtn_mask)
+		g.mouse_buttons = unsafe { MouseButtons(g.mbtn_mask) }
 	}
 	if e.typ == .mouse_up {
 		bitplace := int(e.mouse_button)
 		g.mbtn_mask &= ~(u8(1 << bitplace))
-		g.mouse_buttons = MouseButtons(g.mbtn_mask)
+		g.mouse_buttons = unsafe { MouseButtons(g.mbtn_mask) }
 	}
 	if e.typ == .mouse_move && e.mouse_button == .invalid {
 		if g.mbtn_mask & 0x01 > 0 {
@@ -447,7 +447,7 @@ fn gg_event_fn(ce voidptr, user_data voidptr) {
 	g.mouse_dy = int(e.mouse_dy / g.scale)
 	g.scroll_x = int(e.scroll_x / g.scale)
 	g.scroll_y = int(e.scroll_y / g.scale)
-	g.key_modifiers = Modifier(e.modifiers)
+	g.key_modifiers = unsafe { Modifier(e.modifiers) }
 	g.key_repeat = e.key_repeat
 	if e.typ in [.key_down, .key_up] {
 		key_idx := int(e.key_code) % key_code_max
@@ -494,12 +494,12 @@ fn gg_event_fn(ce voidptr, user_data voidptr) {
 		}
 		.key_down {
 			if g.config.keydown_fn != voidptr(0) {
-				g.config.keydown_fn(e.key_code, Modifier(e.modifiers), g.config.user_data)
+				g.config.keydown_fn(e.key_code, unsafe { Modifier(e.modifiers) }, g.config.user_data)
 			}
 		}
 		.key_up {
 			if g.config.keyup_fn != voidptr(0) {
-				g.config.keyup_fn(e.key_code, Modifier(e.modifiers), g.config.user_data)
+				g.config.keyup_fn(e.key_code, unsafe { Modifier(e.modifiers) }, g.config.user_data)
 			}
 		}
 		.char {
