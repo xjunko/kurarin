@@ -89,16 +89,6 @@ pub fn (mut video VideoSprite) update(time f64) {
 	video.mutex.unlock()
 }
 
-pub fn (mut video VideoSprite) start_video_thread() {
-	// go fn (mut video VideoSprite) {
-	// 	video.last_time = time.global.time
-	// 	for {
-	// 		video.update(time.global.time)
-	// 		timelib.sleep(time.update_rate_ms)
-	// 	}
-	// }(mut video)
-}
-
 pub fn make_video_sprite(path string, mut ctx &gg.Context, offset f64) &VideoSprite {
 	mut video := &VideoSprite{ctx: ctx, always_visible: true}
 
