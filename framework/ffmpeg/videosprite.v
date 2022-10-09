@@ -89,11 +89,6 @@ pub fn (mut video VideoSprite) update(time f64) {
 	video.mutex.unlock()
 }
 
-pub fn (mut video VideoSprite) draw_and_update(arg sprite.CommonSpriteArgument) {
-	video.update(arg.time)
-	video.draw(arg)
-}
-
 pub fn (mut video VideoSprite) start_video_thread() {
 	// go fn (mut video VideoSprite) {
 	// 	video.last_time = time.global.time

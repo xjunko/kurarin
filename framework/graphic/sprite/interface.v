@@ -41,7 +41,6 @@ pub interface ISprite {
 
 		update(f64)
 		draw(CommonSpriteArgument)
-		draw_and_update(CommonSpriteArgument)
 
 		add_transform(transform.Transform)
 		reset_transform()

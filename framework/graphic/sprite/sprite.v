@@ -41,7 +41,6 @@ pub fn (mut sprite Sprite) apply_event(t transform.Transform, time f64) {
 			pos := t.as_vector(time)
 			sprite.position.x = pos.x
 			sprite.position.y = pos.y
-			// logging.info(pos)
 		}
 
 		.move_x {
@@ -239,19 +238,6 @@ pub fn (mut sprite Sprite) update(time f64) {
 	if sprite.texture_fps > 0 && sprite.texture_i >= sprite.textures.len {
 		sprite.texture_i = sprite.textures.len - 1
 	}
-
-
-	//for mut t in sprite.transforms {
-	// 	if time >= t.time.start {
-	// 		sprite.apply_event(t, time)
-
-	// 		if time >= t.time.end {
-	// 			sprite.apply_event(t, time)
-	// 			sprite.transforms.delete(sprite.transforms.index(t))
-	// 			continue
-	// 		}
-	// 	}
-	// }
 }
 pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 	if sprite.is_drawable_at(arg.time) || sprite.always_visible {
@@ -281,5 +267,3 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 		})
 	}
 }
-
-pub fn (mut sprite Sprite) draw_and_update(arg CommonSpriteArgument) {}
