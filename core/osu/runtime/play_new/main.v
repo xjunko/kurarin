@@ -1,7 +1,7 @@
 module play_new
 
 import os
-import sync
+// import sync
 import term.ui
 
 import framework.math.time
