@@ -6,7 +6,7 @@ this is where i put the game """engines""", all of them used the `framework` mod
 
 ### List of engines
 
-```
+```none
 * osu! standard [playable]
 * project sekai [view only, very wip, rarely updated]
 ```
