@@ -15,7 +15,7 @@ import framework.math.vector
 import object
 import timing
 
-// god i fucking hate typescript/javascript
+// what da fawgggg
 // source: https://github.com/NonSpicyBurrito/sonolus-pjsekai-engine/blob/d2a3c6bda1ef43502e77dcc39cb6e965f86cec7e/src/lib/sus/analyze.ts#L3
 
 pub const (
@@ -43,6 +43,7 @@ pub struct RawObject {
 }
 //
 
+[heap] // HACK
 pub struct Beatmap {
 	mut:
 		ctx &gg.Context = voidptr(0)
@@ -56,11 +57,16 @@ pub struct Beatmap {
 		bpm_changes []&RawObject
 		tap_notes []&object.NoteObject
 		directional_notes []&object.NoteObject
-		stream map[string]&object.NoteObject
+
+		stream map[string][]&object.NoteObject
+		slides [][]&object.NoteObject
+		slides2 []string // fuck off man
 
 		// Queue
 		queue []&object.NoteObject
 		finished []&object.NoteObject
+
+		slider_queue []&object.NoteObject
 
 		bars timing.Bars
 		timings timing.Timing
@@ -109,6 +115,10 @@ pub fn (mut beatmap Beatmap) update(time f64) {
 		beatmap.queue[i].update(time)
 	}
 
+	for i := 0; i < beatmap.slider_queue.len; i++ {
+		beatmap.slider_queue[i].update(time)
+	}
+
 }
 
 pub fn (mut beatmap Beatmap) draw(arg sprite.CommonSpriteArgument) {
@@ -136,6 +146,12 @@ pub fn (mut beatmap Beatmap) draw(arg sprite.CommonSpriteArgument) {
 	for mut note in beatmap.queue {
 		if arg.time >= note.time.start {
 			note.draw(arg)
+		}
+	}
+
+	for mut slider in beatmap.slider_queue {
+		if arg.time >= slider.time.start {
+			slider.draw(arg)
 		}
 	}
 
@@ -184,6 +200,12 @@ pub fn (mut beatmap Beatmap) resolve_object_time() {
 		note.time.start = time
 		note.time.end = time
 	}
+
+	for mut note in beatmap.slider_queue {
+		time := beatmap.to_time(note.tick)
+		note.time.start = time
+		note.time.end = time
+	}
 }
 
 pub fn (mut beatmap Beatmap) reset() {
@@ -194,11 +216,75 @@ pub fn (mut beatmap Beatmap) reset() {
 	for i := 0; i < beatmap.tap_notes.len; i++ {
 		key := get_key(beatmap.tap_notes[i].BaseNoteObject)
 
+		if key in beatmap.slides2 { continue } // Slider Start, End, Tick
+		if beatmap.tap_notes[i].typ !in [1, 2] {
+			// Most likely a tick
+			beatmap.tap_notes[i].initialize(false, true, 12)
+			continue
+		}
+
 		
 		is_flick := key in beatmap.flicks
 		is_critical := beatmap.tap_notes[i].typ == 2
+		mut direction := 0
 
-		beatmap.tap_notes[i].initialize(is_flick, is_critical)
+		if is_flick {
+			direction = beatmap.flicks[key]
+		}
+
+		
+		beatmap.tap_notes[i].initialize(is_flick, is_critical, direction)
+	}
+
+	// Init slider bullshit
+	mut slide_keys := []string{}
+	for mut slide in beatmap.slides {
+		mut key := slide.map(get_key(it.BaseNoteObject)).join("|")
+		if key in slide_keys { continue }
+		slide_keys << key
+
+		// Find the start note
+		mut start_note := slide[0]
+		mut found := false
+
+		for note in slide {
+			if note.typ == 1 || note.typ == 2 {
+				start_note = unsafe { note }
+				found = true
+				break
+			}
+		}
+
+		if !found { continue } // fucked up probably
+
+		mut is_critical := false // TODO: We dont have this yet
+		mut min_hidden_tick := math.floor(
+			start_note.tick / ticks_per_hidden + 1
+		) * ticks_per_hidden
+
+		// Start n End for now
+		for mut note in slide {
+			key = get_key(note.BaseNoteObject)
+
+			time := beatmap.to_time(note.tick)
+			note.time.start = time
+			note.time.end = time
+
+			match note.typ {
+				1 { 
+					note.initialize(false, true, 10)
+					beatmap.slider_queue << *note
+				} // Start
+
+				2 { 
+					note.initialize(false, true, 11) 
+					beatmap.slider_queue << *note
+				} // End
+				3 {} // Tick
+				else {}
+			}
+		}
+		
 	}
 }
 

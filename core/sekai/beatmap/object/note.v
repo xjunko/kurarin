@@ -1,6 +1,7 @@
 module object
 
 // import gx
+import math
 
 import core.sekai.skin
 
@@ -30,19 +31,28 @@ pub struct NoteObject {
 
 		is_flick bool
 		is_critical bool
+		is_path bool
 
 	pub mut:
 		sprites []&sprite.Sprite
 }
 
-pub fn (mut note NoteObject) initialize(is_flick bool, is_critical bool) {
+pub fn (mut note NoteObject) initialize(is_flick bool, is_critical bool, direction int) {
 	// note.lane = 6
 	// note.width = 5.0
-	note.is_flick = is_flick
+	note.is_flick = is_flick // troll
 	note.is_critical = is_critical
 	preempt := 700.0
 
-	for i, sprite_name in ["notes/notes_normal_middle", "notes/notes_normal_right", "notes/notes_normal_left"] {
+	mut type_of_note := "normal"
+
+	if note.is_flick {
+		type_of_note = "flick"
+	} else if note.is_critical {
+		type_of_note = "crtcl"
+	}
+
+	for i, sprite_name in ["notes/notes_${type_of_note}_middle", "notes/notes_${type_of_note}_right", "notes/notes_${type_of_note}_left"] {
 		mut note_sprite := &sprite.Sprite{origin: vector.centre, always_visible: true}
 		note_sprite.textures << skin.get_texture(sprite_name)
 
@@ -52,6 +62,15 @@ pub fn (mut note NoteObject) initialize(is_flick bool, is_critical bool) {
 			offset = 0.5
 		} else if i == 2 {
 			offset = -0.5
+		}
+
+		// SPECIAL FCUKIG HACK:
+		if direction == 12 {
+			note_sprite.color.r = 255
+			note_sprite.color.g = 255
+			note_sprite.color.b = 255
+			note_sprite.textures[0] = skin.get_texture("notes/tex_hold_path")
+			note.is_path = true
 		}
 
 		offset *= note.width
@@ -75,15 +94,24 @@ pub fn (mut note NoteObject) initialize(is_flick bool, is_critical bool) {
 			sprite_x_size = note.width * 0.5
 		}
 
-		if note.is_flick {
-			// Red
-			note_sprite.add_transform(typ: .color, time: time.Time{note.time.start, note.time.start}, before: [255.0, 0.0, 0.0])
-		} else if note.is_critical {
-			// Yellow
-			note_sprite.add_transform(typ: .color, time: time.Time{note.time.start, note.time.start}, before: [255.0, 255.0, 0.0])
+		if direction == 10 {
+			note_sprite.color.r = 255
+			note_sprite.color.g = 0
+			note_sprite.color.b = 0
 		}
 
-		note_sprite.reset_size_based_on_texture(size: vector.Vector2{sprite_x_size, 2.0})
+		if direction == 11 {
+			note_sprite.color.r = 0
+			note_sprite.color.g = 0
+			note_sprite.color.b = 255
+		}
+
+		if direction == 12 {
+			note_sprite.reset_size_based_on_texture(size: vector.Vector2{sprite_x_size, 10.0})
+		} else {
+			note_sprite.reset_size_based_on_texture(size: vector.Vector2{sprite_x_size, 2.0})
+		}
+		
 		note_sprite.reset_time_based_on_transforms()
 		note_sprite.reset_attributes_based_on_transforms()
 
@@ -93,6 +121,8 @@ pub fn (mut note NoteObject) initialize(is_flick bool, is_critical bool) {
 
 	// Flicks
 	if note.is_flick {
+		flick_size := int(math.clamp(math.round(note.width * 2), 1, 6))
+
 		//
 		start_x := f64(f32(note.lane - 6) * 0.5) / 2.0 + (0.0 / 4.0)
 		end_x := f64(f32(note.lane - 6) * 0.5) + 0.0 / 2.0
@@ -100,20 +130,21 @@ pub fn (mut note NoteObject) initialize(is_flick bool, is_critical bool) {
 		// Add kot
 		mut kot_sprite := &sprite.Sprite{
 			always_visible: true,
-			textures: [skin.get_texture("notes/kot")]
+			textures: [skin.get_texture("notes/notes_flick_arrow_0${flick_size}")]
 		}
 
 		kot_sprite.add_transform(
 			typ: .move, 
 			time: time.Time{note.time.start - preempt, note.time.end}, 
-			before: [start_x, 60.0], after: [end_x, -7.0]
+			before: [start_x, 50.0], after: [end_x, -6.5]
 		)
 
-		kot_sprite.add_transform(typ: .move, time: time.Time{note.time.end, note.time.end + 100}, before: [end_x, -7.0], after: [end_x, -10.5])
+		kot_sprite.add_transform(typ: .move, time: time.Time{note.time.end, note.time.end + 100}, before: [end_x, -6.5], after: [end_x, -10.0])
 
 		kot_sprite.angle = 180.0
+		kot_sprite.z = 0.4
 
-		kot_sprite.reset_size_based_on_texture(size: vector.Vector2{0.5, 2.0})
+		kot_sprite.reset_size_based_on_texture(size: vector.Vector2{0.7, 1.0})
 		kot_sprite.reset_time_based_on_transforms()
 		kot_sprite.reset_attributes_based_on_transforms()
 
@@ -123,7 +154,7 @@ pub fn (mut note NoteObject) initialize(is_flick bool, is_critical bool) {
 }
 
 pub fn (mut note NoteObject) update(time f64) {
-	if time >= note.time.end && !note.finished {
+	if time >= note.time.end && !note.finished && !note.is_path {
 		unsafe {
 
 			if note.is_critical {

@@ -100,7 +100,14 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 
 		// Tap Notes (stream)
 		if line.header.len == 6 && line.header[3] == `3` {
-			// logging.info("${@MOD}: TODO STREAM")
+			channel := line.header[5].ascii_str()
+			
+			if channel !in beatmap.stream {
+				beatmap.stream[channel] = []&object.NoteObject{}
+			}
+
+			beatmap.stream[channel] << beatmap.to_note_objects(line, measure_offset)
+
 			continue
 		}
 
@@ -111,7 +118,25 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 		}
 	}
 
-	// temporary
+	// Slides
+	// Scuffed but whatever
+	for mut slide in beatmap.stream.values() {
+		beatmap.slides <<  beatmap.to_slides(mut slide)
+	}
+
+	// TODO: Move this to somewhere else
+	for slide in beatmap.slides {
+		for note in slide {
+			key := get_key(note.BaseNoteObject)
+
+			match note.typ {
+				5 { beatmap.slides2 << key }
+				else {}
+			}
+		}
+	}
+
+	// Timings
 	beatmap.tap_notes.sort(a.tick < b.tick)
 	mut removed_duplicates := []&object.NoteObject{}
 
@@ -173,8 +198,32 @@ pub fn (mut beatmap Beatmap) to_raw_objects(line Line, measure_offset f64) []&Ra
 		}
 	}
 
-
 	return ret
+}
+
+pub fn (mut beatmap Beatmap) to_slides(mut stream []&object.NoteObject) [][]&object.NoteObject {
+	mut slides := [][]&object.NoteObject{}
+
+	mut current := []&object.NoteObject{}
+	mut reset := false
+	
+	stream.sort(a.tick < b.tick)
+
+	for note in stream {
+		if reset {
+			slides << current
+			current = []&object.NoteObject{}
+			reset = false
+		}
+
+		current << note
+
+		if note.typ == 2 {
+			reset = true
+		}
+	}
+
+	return slides
 }
 
 pub fn (mut beatmap Beatmap) to_note_objects(line Line, measure_offset f64) []&object.NoteObject {
