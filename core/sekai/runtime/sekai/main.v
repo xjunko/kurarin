@@ -16,7 +16,7 @@ import framework.graphic.window
 // Hacks to disable vsync
 fn C._sapp_glx_swapinterval(int)
 
-
+[heap]
 pub struct Window {
 	window.GeneralWindow
 
@@ -26,7 +26,7 @@ pub struct Window {
 		limiter &time.Limiter = &time.Limiter{fps: 480}
 }
 
-pub fn (mut window Window) init() {
+pub fn (mut window Window) init(_ voidptr) {
 	// Disable vsync
 	C._sapp_glx_swapinterval(0)
 
@@ -69,7 +69,7 @@ pub fn (mut window Window) init() {
 	}(mut window)
 }
 
-pub fn (mut window Window) draw() {
+pub fn (mut window Window) draw(_ voidptr) {
 	window.mutex.@lock()
 
 	// Draw FPS counter

@@ -10,6 +10,9 @@ import core.osu.runtime.play_old
 // proseka
 import core.sekai.runtime.sekai
 
+// diva
+import core.diva.runtime.diva
+
 // Cores
 import core.common.constants
 import core.common.settings
@@ -35,7 +38,7 @@ fn main() {
 	gui_mode := fp.bool("ui", `u`, false, "Very early and experimental UI")
 
 	// Game
-	game_type := fp.string("game", `g`, "osu", "Option for game engines. (osu!/sekai)")
+	game_type := fp.string("game", `g`, "osu", "Option for game engines. (osu!/sekai/diva)")
 
 	fp.finalize() or {
 		logging.error(err.str())
@@ -43,23 +46,33 @@ fn main() {
 		return
 	}
 
-	// Default to osu! if game is not sekai
-	if game_type != "sekai" {
-		// Old fallback
-		if !gui_mode && beatmap_path.len == 0 {
-			println(fp.usage())
-			return
+	match game_type {
+		"osu" {
+			if !gui_mode && beatmap_path.len == 0 {
+				println(fp.usage())
+				return
+			}
+
+			if gui_mode {
+				logging.error("Nope, disabled.")
+				exit(1)
+				// play_new.main()
+			} else {
+				play_old.main(beatmap_path.replace("\\", ""), replay_path.replace("\\", ""), is_playing)
+			}
 		}
 
-		if gui_mode {
-			logging.error("Nope, disabled.")
-			exit(1)
-			// play_new.main()
-		} else {
-			play_old.main(beatmap_path.replace("\\", ""), replay_path.replace("\\", ""), is_playing)
+		"sekai" {
+			sekai.main()
 		}
-	} else {
-		sekai.main()
-	}
-	
+
+		"diva" {
+			diva.main()
+		}
+
+		else {
+			logging.error("Invalid game_type: ${game_type}")
+			return
+		}
+	}	
 }
