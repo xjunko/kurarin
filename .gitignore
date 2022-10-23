@@ -23,5 +23,6 @@ assets/psekai/*
 
 
 assets/replays/*
-assets/shaders/*.h
-assets/maps/*
+assets/osu/shaders/*.h
+assets/osu/maps/*
+*.h
