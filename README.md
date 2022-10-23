@@ -1,7 +1,7 @@
 <div style="float: right; text-align: center;">
     <div>
         <a href="https://youtu.be/2b1IexhKPz4" title="Image is courtesy of Iyowa.">
-            <img width="200" align="right" style="float: right; margin: 0 10px 0 0;" alt="Kurarin" src="assets/textures/kurarin.png">
+            <img width="200" align="right" style="float: right; margin: 0 10px 0 0;" alt="Kurarin" src="assets/common/textures/kurarin.png">
         </a>
     </div>
 </div>
