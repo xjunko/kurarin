@@ -12,7 +12,6 @@ import sokol.sapp
 import time as timelib
 
 import library.gg
-// import library.miru
 
 import core.osu.x
 import core.osu.skin
@@ -30,18 +29,6 @@ import framework.graphic.visualizer
 import framework.graphic.window
 
 import framework.ffmpeg.export
-
-pub const (
-	// FIXME: move this to somewhre else
-	c_audio_check_delay = 500.0 // n seconds
-)
-
-pub enum GameAudioState {
-	fix_latency
-	fix_latency_intro
-	fix_latency_operation
-	fix_latency_done
-}
 
 pub struct Window {
 	window.GeneralWindow
