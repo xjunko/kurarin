@@ -9,19 +9,11 @@ settings.json
 build/*
 library/microui
 
-# Engine Specific Textures
-assets/psekai/*
-assets/textures/*
-
-assets/diva/*
-assets/scores/*
-assets/sfx/*
-
 # New Engine Assets structure
 assets/diva/*
 assets/psekai/*
 
-
+# Random shit
 assets/replays/*
 assets/osu/shaders/*.h
 assets/osu/maps/*

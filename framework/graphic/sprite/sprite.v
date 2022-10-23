@@ -24,6 +24,7 @@ pub struct Sprite {
 		always_visible bool
 		origin    vector.Origin = vector.centre
 		position  vector.Vector2
+		z         f32
 		size      vector.Vector2
 		raw_size  vector.Vector2
 		color     gx.Color = gx.white
@@ -263,7 +264,8 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 			additive: sprite.additive,
 			origin: sprite.origin,
 			flip_x: sprite.flip_x,
-			flip_y: sprite.flip_x
+			flip_y: sprite.flip_x,
+			z: sprite.z
 		})
 	}
 }
