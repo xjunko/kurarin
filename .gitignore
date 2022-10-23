@@ -17,6 +17,10 @@ assets/diva/*
 assets/scores/*
 assets/sfx/*
 
+# New Engine Assets structure
+assets/diva/*
+assets/psekai/*
+
 
 assets/replays/*
 assets/shaders/*.h
