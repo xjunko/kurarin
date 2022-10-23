@@ -3,7 +3,7 @@ with_gc=true # True by default
 gc_type="boehm_incr_opt"
 
 make_shaders=true
-shaders_dir="assets/shaders/slider.glsl"
+shaders_dir="assets/osu/shaders/slider.glsl"
 
 is_debug=false
 is_prod=false

@@ -64,7 +64,7 @@ pub struct Skin {
 
 		// Skin shit
 		path  	 string
-		fallback string = r"assets/skins/default" // Temporary
+		fallback string = r"assets/osu/skins/default" // Temporary
 		cache 	 map[string]gg.Image
 }
 

@@ -33,7 +33,7 @@ pub fn (mut window Window) init(_ voidptr) {
 	// Disable vsync
 	C._sapp_glx_swapinterval(0)
 
-	window.beatmap = beatmap.read_beatmap("./assets/scores/055/pv_055_extreme.dsc")
+	window.beatmap = beatmap.read_beatmap("./assets/diva/scores/055/pv_055_extreme.dsc")
 	window.beatmap.reset(mut sprite.CommonSpriteArgument{ctx: mut window.ctx})
 
 	go window.update(0)
@@ -43,7 +43,7 @@ pub fn (mut window Window) update(_ voidptr) {
 	mut g_time := time.get_time()
 	g_time.reset()
 
-	mut audio := audio.new_track("./assets/scores/055/kokoro.mp3")
+	mut audio := audio.new_track("./assets/diva/scores/055/kokoro.mp3")
 
 	play_at := 1000.0
 

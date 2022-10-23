@@ -31,11 +31,11 @@ const (
 		318845217,
 	]
 
-	hit_sfx = audio.new_sample("assets/sfx/hit.ogg")
+	hit_sfx = audio.new_sample("assets/diva/sfx/hit.ogg")
 )
 
 pub fn read_raw_beatmap(path string) []opcodes.OPCode {
-	raw_file_data := os.read_bytes(path) or { panic("Fucked up!") }
+	raw_file_data := os.read_bytes(path) or { panic("Fucked up: ${err}") }
 
 	mut commands := []opcodes.OPCode{}
 
