@@ -47,7 +47,7 @@ fn main() {
 	}
 
 	match game_type {
-		"osu" {
+		"osu", "osu!" {
 			if !gui_mode && beatmap_path.len == 0 {
 				println(fp.usage())
 				return

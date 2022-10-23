@@ -4,9 +4,9 @@ import dl
 
 type XzDecode = fn (&u8, u32, &u8, &u32) bool
 
-pub fn get_lzma_function() ?XzDecode {
-	mut lzma_object := dl.open_opt("${@VMODROOT}/lzma.so", dl.rtld_lazy) ?
-	lzma_xz_decode := XzDecode(dl.sym_opt(lzma_object, "XzDecode") ?)
+pub fn get_lzma_function() !XzDecode {
+	mut lzma_object := dl.open_opt("${@VMODROOT}/lzma.so", dl.rtld_lazy) !
+	lzma_xz_decode := XzDecode(dl.sym_opt(lzma_object, "XzDecode") !)
 
 	return lzma_xz_decode
 }
