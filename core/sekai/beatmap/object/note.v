@@ -1,6 +1,6 @@
 module object
 
-// import gx
+import gx
 import math
 
 import core.sekai.skin
