@@ -63,7 +63,7 @@ pub struct InternalBeatmap {
 		// Surface level stuff
 		notes []&object.NoteObject
 		flicks []&object.FlickObject
-		slider []&object.SliderObject
+		sliders []&object.SliderObject
 }
 
 // Resolver

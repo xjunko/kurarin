@@ -178,9 +178,9 @@ pub fn (mut beatmap InternalBeatmap) analyze(path string) {
 }
 
 pub fn (mut beatmap InternalBeatmap) resolve_objects() {
-	mut valid_tap_notes := []&object.NoteObject{}
-	mut valid_flick_notes := []&object.FlickObject{}
-	mut valid_slider_notes := []&object.SliderObject{}
+	// mut valid_tap_notes := []&object.NoteObject{}
+	// mut valid_flick_notes := []&object.FlickObject{}
+	// mut valid_slider_notes := []&object.SliderObject{}
 
 	for i := 0; i < beatmap.tap_notes.len; i++ {
 		key := get_key(beatmap.tap_notes[i].BaseNoteObject)
@@ -192,7 +192,7 @@ pub fn (mut beatmap InternalBeatmap) resolve_objects() {
 
 		// Flicker
 		if key in beatmap.flicks_direction {
-			valid_flick_notes << &object.FlickObject{
+			beatmap.flicks << &object.FlickObject{
 				BaseNoteObject: beatmap.tap_notes[i].BaseNoteObject
 				direction: beatmap.flicks_direction[key]
 			}
@@ -201,7 +201,7 @@ pub fn (mut beatmap InternalBeatmap) resolve_objects() {
 		}
 
 		// Normal notes
-		valid_tap_notes << beatmap.tap_notes[i]
+		beatmap.notes << beatmap.tap_notes[i]
 	}
 
 	// Slider is retarded
@@ -273,7 +273,7 @@ pub fn (mut beatmap InternalBeatmap) resolve_objects() {
 			}
 		}
 
-		valid_slider_notes << slider_note
+		beatmap.sliders << slider_note
 	}
 }
 
