@@ -191,10 +191,6 @@ pub fn (mut note NoteObjectSprite) update(time f64) {
 }
 
 pub fn (mut note NoteObjectSprite) draw(arg sprite.CommonSpriteArgument) {
-	if note.updated {
-		println(note.updated)
-	}
-
 	for mut sprite in note.sprites {
 		// arg.ctx.draw_rect_filled(
 		// 	f32(sprite.position.x), 
