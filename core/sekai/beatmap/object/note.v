@@ -24,7 +24,7 @@ const (
 )
 
 pub struct NoteObjectSprite {
-	NoteObject
+	BaseNoteObject
 
 	mut:
 		finished bool
@@ -36,13 +36,13 @@ pub struct NoteObjectSprite {
 		updated bool
 
 	pub mut:
-		object NoteObject
+		object BaseNoteObject
 		sprites []&sprite.Sprite
 }
 
 pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, direction int) {
 	// Inherit
-	note.NoteObject = note.object
+	note.BaseNoteObject = note.object
 
 	// note.lane = 6
 	// note.width = 5.0
@@ -56,6 +56,8 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 		type_of_note = "flick"
 	} else if note.is_critical {
 		type_of_note = "crtcl"
+	} else if direction >= 10 {
+		type_of_note = "long"
 	}
 
 	for i, sprite_name in ["notes/notes_${type_of_note}_middle", "notes/notes_${type_of_note}_right", "notes/notes_${type_of_note}_left"] {
@@ -91,7 +93,11 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 			before: [start_x, 50.0], after: [end_x, -6.5]
 		)
 
-		note_sprite.add_transform(typ: .move, time: time.Time{note.object.time.end, note.object.time.end + 100}, before: [end_x, -6.5], after: [end_x, -10.0])
+		time_after_object := 4.0
+		distance_y := (-6.5 - 50.0) * 4.0
+		after_time := preempt * 4.0
+
+		note_sprite.add_transform(typ: .move, time: time.Time{note.object.time.end, note.object.time.end + after_time}, before: [end_x, -6.5], after: [end_x, -6.5 + distance_y])
 		note_sprite.add_transform(typ: .scale, time: time.Time{note.object.time.start - preempt, note.object.time.end}, before: [0.4, 0.5], after: [1.0, 1.0])
 
 		mut sprite_x_size := 0.5
@@ -100,23 +106,7 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 			sprite_x_size = note.object.width * 0.5
 		}
 
-		if direction == 10 {
-			note_sprite.color.r = 255
-			note_sprite.color.g = 0
-			note_sprite.color.b = 0
-		}
-
-		if direction == 11 {
-			note_sprite.color.r = 0
-			note_sprite.color.g = 0
-			note_sprite.color.b = 255
-		}
-
-		if direction == 12 {
-			note_sprite.reset_size_based_on_texture(size: vector.Vector2{sprite_x_size, 10.0})
-		} else {
-			note_sprite.reset_size_based_on_texture(size: vector.Vector2{sprite_x_size, 2.0})
-		}
+		note_sprite.reset_size_based_on_texture(size: vector.Vector2{sprite_x_size, 2.0})
 		
 		note_sprite.reset_time_based_on_transforms()
 		note_sprite.reset_attributes_based_on_transforms()

@@ -32,7 +32,7 @@ pub fn (mut window Window) init(_ voidptr) {
 
 	// Load beatmap
 	window.beatmap = &beatmap.Beatmap{}
-	window.beatmap.internal = beatmap.parse_beatmap("assets/psekai/maps/64/master.sus")
+	window.beatmap.internal = beatmap.parse_beatmap("assets/psekai/maps/poem/master.sus")
 	window.beatmap.bind_context(mut window.ctx)
 	window.beatmap.reset()
 
@@ -46,7 +46,7 @@ pub fn (mut window Window) init(_ voidptr) {
 		start_at_offset := 2000.0
 		music_offset := 0.0
 		mut song_started := false
-		mut song := audio.new_track("assets/psekai/maps/64/audio.mp3")
+		mut song := audio.new_track("assets/psekai/maps/poem/audio.mp3")
 
 		song.set_volume(0.3)
 		song.set_position(music_offset)
@@ -102,7 +102,12 @@ pub fn main() {
 
 		// FNs
 		init_fn: window.init,
-		frame_fn: window.draw
+		frame_fn: window.draw,
+		keydown_fn: fn (keycode gg.KeyCode, modifier gg.Modifier, mut window Window) {
+			if keycode == .c {
+				window.beatmap.debug_view = !window.beatmap.debug_view
+			}
+		}
 	)
 
 	// Bind skin context
