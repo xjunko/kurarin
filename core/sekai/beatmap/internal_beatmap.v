@@ -68,7 +68,7 @@ pub struct InternalBeatmap {
 
 // Resolver
 pub fn (mut beatmap InternalBeatmap) resolve_object_time() {
-	for mut note in beatmap.notes {
+	for mut note in beatmap.tap_notes {
 		time := beatmap.to_time(note.tick)
 		note.time.start = time
 		note.time.end = time
