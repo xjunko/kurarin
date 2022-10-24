@@ -31,11 +31,10 @@ pub fn (mut window Window) init(_ voidptr) {
 	C._sapp_glx_swapinterval(0)
 
 	// Load beatmap
-	// window.beatmap = beatmap.parse_beatmap("assets/psekai/maps/64/master.sus")
 	window.beatmap = &beatmap.Beatmap{}
+	window.beatmap.internal = beatmap.parse_beatmap("assets/psekai/maps/64/master.sus")
 	window.beatmap.bind_context(mut window.ctx)
-	window.beatmap.ensure_background_loaded()
-	// window.beatmap.reset()
+	window.beatmap.reset()
 
 
 	// Update thread
