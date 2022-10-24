@@ -1,85 +1,50 @@
 module beatmap
 
 import object
-import timing
 
-// what da fawgggg
-// source: https://github.com/NonSpicyBurrito/sonolus-pjsekai-engine/blob/d2a3c6bda1ef43502e77dcc39cb6e965f86cec7e/src/lib/sus/analyze.ts#L3
-/*
-	`InternalBeatmap`: Contains internal values thats important on parse time
-	`Beatmap`: Light wrapper around `InternalBeatmap` to render objects
-*/
+import library.gg
 
-pub const (
-		ticks_per_beat = 480.0
-		ticks_per_hidden = ticks_per_beat / 2.0
-)
+import framework.math.time
+import framework.math.vector
+import framework.graphic.sprite
 
-// Structs
-pub struct Line {
-	pub mut:
-		header string
-		data string
-}
-
-pub struct MeasureChange {
-	pub mut:
-		a f64
-		b f64
-}
-
-pub struct RawObject {
-	pub mut:
-		tick f64
-		value string
-}
-//
-
-[heap] // HACK
-pub struct InternalBeatmap {
+pub struct Beatmap {
 	mut:
-		// Everything Internal
-		// This fucking shit is awful, but its important for parsing the fucking thing
-		lines   []Line
-		measure []MeasureChange
-		meta    map[string]string
-		
-		bpms map[string]f64
-		bpm_changes []&RawObject
-		tap_notes []&object.NoteObject
-		directional_notes []&object.NoteObject
-
-		stream map[string][]&object.NoteObject
-		slides [][]&object.NoteObject
-		slides2 []string
-
-		bars timing.Bars
-		timings timing.Timing
-
-		objects_i int
-		flicks_direction map[string]int
+		ctx &gg.Context = unsafe { 0 }
 
 	pub mut:
-		// Surface level stuff
-		notes []&object.NoteObject
-		flicks []&object.FlickObject
-		slider []&object.SliderObject
+		objects []object.INoteObject
+		sprites &sprite.Manager = sprite.make_manager()
 }
 
-// Resolver
-pub fn (mut beatmap InternalBeatmap) resolve_object_time() {
-	for mut note in beatmap.notes {
-		time := beatmap.to_time(note.tick)
-		note.time.start = time
-		note.time.end = time
-	}
+pub fn (mut beatmap Beatmap) bind_context(mut ctx &gg.Context) {
+	beatmap.ctx = unsafe { ctx }
 }
 
-// Time converters
-pub fn (mut beatmap InternalBeatmap) to_tick(measure f64, p f64, q f64) f64 {
-	return beatmap.bars.to_tick(measure, p, q)
+pub fn (mut beatmap Beatmap) ensure_background_loaded() {
+    // Background
+    for i, filename in ["default", "field"] {
+        mut sprite := &sprite.Sprite{always_visible: true}
+        sprite.textures << beatmap.ctx.create_image("assets/psekai/textures/${filename}.png")
+
+
+        sprite.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [1280.0 / 2.0, 720.0 / 2.0 + (f64(i) * 70.0)])
+
+        if i == 1 {
+            sprite.add_transform(typ: .scale_factor, time: time.Time{0.0, 0.0}, before: [1.18])
+        }
+
+        sprite.reset_size_based_on_texture(fit_size: true, source: vector.Vector2{1280, 720})        
+        sprite.reset_attributes_based_on_transforms()
+
+        beatmap.sprites.add(mut sprite)
+    }
 }
 
-pub fn (mut beatmap InternalBeatmap) to_time(tick f64) f64 {
-	return beatmap.timings.to_time(tick)
+pub fn (mut beatmap Beatmap) update(time f64) {
+	beatmap.sprites.update(time)
+}
+
+pub fn (mut beatmap Beatmap) draw(arg sprite.CommonSpriteArgument) {
+	beatmap.sprites.draw(arg)
 }
