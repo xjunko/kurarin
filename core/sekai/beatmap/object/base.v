@@ -43,19 +43,17 @@ pub struct SliderObject {
 // Interface
 pub interface INoteObject {
 	mut:
-		object NoteObject
+		time time.Time
+		tick f64
+		lane f64
+		width f64
+		typ  int
 
-		// time time.Time
-		// tick f64
-		// lane f64
-		// width f64
-		// typ  int
-
-		// is_critical bool
-		// is_flick bool
-		// is_slider_start bool
-		// is_slider_path bool
-		// is_slider_end bool
+		is_critical bool
+		is_flick bool
+		is_slider_start bool
+		is_slider_path bool
+		is_slider_end bool
 
 
 		update(f64)

@@ -39,7 +39,6 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 
 
         sprite.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [1280.0 / 2.0, 720.0 / 2.0 + (f64(i) * 70.0)])
-		sprite.add_transform(typ: .angle, time: time.Time{0.0, 10000.0}, before: [0.0], after: [10.0])
 
         if i == 1 {
             sprite.add_transform(typ: .scale_factor, time: time.Time{0.0, 0.0}, before: [1.18])
@@ -72,7 +71,7 @@ pub fn (mut beatmap Beatmap) update(time f64) {
 	beatmap.sprites.update(time)
 
 	for i := 0; i < beatmap.objects.len; i++ {
-		if time >= beatmap.objects[i].object.time.start - 1000 && time <= beatmap.objects[i].object.time.end + 1000 {
+		if time >= beatmap.objects[i].time.start - 1000 && time <= beatmap.objects[i].time.end + 1000 {
 			beatmap.objects[i].update(time)
 		}
 	}
@@ -85,7 +84,7 @@ pub fn (mut beatmap Beatmap) draw(arg sprite.CommonSpriteArgument) {
 
 	beatmap.switch_to_sekai_camera(arg)
 	for i := 0; i < beatmap.objects.len; i++ {
-		if beatmap.last_update_time >= beatmap.objects[i].object.time.start - 1000 && beatmap.last_update_time <= beatmap.objects[i].object.time.end + 1000 {
+		if beatmap.last_update_time >= beatmap.objects[i].time.start - 1000 && beatmap.last_update_time <= beatmap.objects[i].time.end + 1000 {
 			beatmap.objects[i].draw(arg)
 		}
 	}

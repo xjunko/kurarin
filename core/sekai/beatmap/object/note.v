@@ -24,6 +24,8 @@ const (
 )
 
 pub struct NoteObjectSprite {
+	NoteObject
+
 	mut:
 		finished bool
 
@@ -39,6 +41,9 @@ pub struct NoteObjectSprite {
 }
 
 pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, direction int) {
+	// Inherit
+	note.NoteObject = note.object
+
 	// note.lane = 6
 	// note.width = 5.0
 	note.is_flick = is_flick // troll
