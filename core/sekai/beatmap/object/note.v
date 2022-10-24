@@ -24,8 +24,6 @@ const (
 )
 
 pub struct NoteObjectSprite {
-	NoteObject
-
 	mut:
 		finished bool
 
@@ -33,7 +31,10 @@ pub struct NoteObjectSprite {
 		is_critical bool
 		is_path bool
 
+		updated bool
+
 	pub mut:
+		object NoteObject
 		sprites []&sprite.Sprite
 }
 
@@ -73,25 +74,25 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 			note.is_path = true
 		}
 
-		offset *= note.width
+		offset *= note.object.width
 
 		//
-		start_x := f64(f32(note.lane - 6) * 0.5) / 2.0 + (offset / 4.0)
-		end_x := f64(f32(note.lane - 6) * 0.5) + offset / 2.0
+		start_x := f64(f32(note.object.lane - 6) * 0.5) / 2.0 + (offset / 4.0)
+		end_x := f64(f32(note.object.lane - 6) * 0.5) + offset / 2.0
 
 		note_sprite.add_transform(
 			typ: .move, 
-			time: time.Time{note.time.start - preempt, note.time.end}, 
+			time: time.Time{note.object.time.start - preempt, note.object.time.end}, 
 			before: [start_x, 50.0], after: [end_x, -6.5]
 		)
 
-		note_sprite.add_transform(typ: .move, time: time.Time{note.time.end, note.time.end + 100}, before: [end_x, -6.5], after: [end_x, -10.0])
-		note_sprite.add_transform(typ: .scale, time: time.Time{note.time.start - preempt, note.time.end}, before: [0.4, 0.5], after: [1.0, 1.0])
+		note_sprite.add_transform(typ: .move, time: time.Time{note.object.time.end, note.object.time.end + 100}, before: [end_x, -6.5], after: [end_x, -10.0])
+		note_sprite.add_transform(typ: .scale, time: time.Time{note.object.time.start - preempt, note.object.time.end}, before: [0.4, 0.5], after: [1.0, 1.0])
 
 		mut sprite_x_size := 0.5
 
 		if i == 0 {
-			sprite_x_size = note.width * 0.5
+			sprite_x_size = note.object.width * 0.5
 		}
 
 		if direction == 10 {
@@ -121,11 +122,11 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 
 	// Flicks
 	if note.is_flick {
-		flick_size := int(math.clamp(math.round(note.width * 2), 1, 6))
+		flick_size := int(math.clamp(math.round(note.object.width * 2), 1, 6))
 
 		//
-		start_x := f64(f32(note.lane - 6) * 0.5) / 2.0 + (0.0 / 4.0)
-		end_x := f64(f32(note.lane - 6) * 0.5) + 0.0 / 2.0
+		start_x := f64(f32(note.object.lane - 6) * 0.5) / 2.0 + (0.0 / 4.0)
+		end_x := f64(f32(note.object.lane - 6) * 0.5) + 0.0 / 2.0
 
 		// Add kot
 		mut kot_sprite := &sprite.Sprite{
@@ -135,11 +136,11 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 
 		kot_sprite.add_transform(
 			typ: .move, 
-			time: time.Time{note.time.start - preempt, note.time.end}, 
+			time: time.Time{note.object.time.start - preempt, note.object.time.end}, 
 			before: [start_x, 50.0], after: [end_x, -6.5]
 		)
 
-		kot_sprite.add_transform(typ: .move, time: time.Time{note.time.end, note.time.end + 100}, before: [end_x, -6.5], after: [end_x, -10.0])
+		kot_sprite.add_transform(typ: .move, time: time.Time{note.object.time.end, note.object.time.end + 100}, before: [end_x, -6.5], after: [end_x, -10.0])
 
 		kot_sprite.angle = 180.0
 		kot_sprite.z = 0.4
@@ -154,7 +155,7 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 }
 
 pub fn (mut note NoteObjectSprite) update(time f64) {
-	if time >= note.time.end && !note.finished && !note.is_path {
+	if time >= note.object.time.end && !note.finished && !note.is_path {
 		unsafe {
 
 			if note.is_critical {
@@ -180,9 +181,15 @@ pub fn (mut note NoteObjectSprite) update(time f64) {
 	for mut sprite in note.sprites {
 		sprite.update(time)
 	}
+	
+	note.updated = true
 }
 
 pub fn (mut note NoteObjectSprite) draw(arg sprite.CommonSpriteArgument) {
+	if note.updated {
+		println(note.updated)
+	}
+
 	for mut sprite in note.sprites {
 		// arg.ctx.draw_rect_filled(
 		// 	f32(sprite.position.x), 
