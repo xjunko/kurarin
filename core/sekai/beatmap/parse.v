@@ -1,6 +1,7 @@
 module beatmap
 
 import os
+import math
 import regex
 
 // import framework.logging
@@ -9,17 +10,18 @@ import object
 import timing
 
 // Factory
-pub fn parse_beatmap(path string) &Beatmap {
-	mut bmap := &Beatmap{}
+pub fn parse_beatmap(path string) &InternalBeatmap {
+	mut bmap := &InternalBeatmap{}
 	bmap.analyze(path)
 
 	bmap.resolve_object_time()
+	bmap.resolve_objects()
 
 	return bmap
 }
 
 // Parse
-pub fn (mut beatmap Beatmap) analyze(path string) {
+pub fn (mut beatmap InternalBeatmap) analyze(path string) {
 	// losing my mind with these variable names
 	mut sus := os.read_lines(path) or { panic("Failed to read path: ${err}") }
 
@@ -159,19 +161,119 @@ pub fn (mut beatmap Beatmap) analyze(path string) {
 
 		match tap_note.typ {
 			1 {
-				beatmap.flicks[key] = -1
+				beatmap.flicks_direction[key] = -1
 			}
 
 			3 {
-				beatmap.flicks[key] = 0
+				beatmap.flicks_direction[key] = 0
 			}
 
 			4 {
-				beatmap.flicks[key] = 1
+				beatmap.flicks_direction[key] = 1
 			}
 
 			else {}
 		}
+	}
+}
+
+pub fn (mut beatmap InternalBeatmap) resolve_objects() {
+	mut valid_tap_notes := []&object.NoteObject{}
+	mut valid_flick_notes := []&object.FlickObject{}
+	mut valid_slider_notes := []&object.SliderObject{}
+
+	for i := 0; i < beatmap.tap_notes.len; i++ {
+		key := get_key(beatmap.tap_notes[i].BaseNoteObject)
+
+		// Slider checks
+		if key in beatmap.slides2 || beatmap.tap_notes[i].typ !in [1, 2] {
+			continue // Not our note, ignore.
+		}
+
+		// Flicker
+		if key in beatmap.flicks_direction {
+			valid_flick_notes << &object.FlickObject{
+				BaseNoteObject: beatmap.tap_notes[i].BaseNoteObject
+				direction: beatmap.flicks_direction[key]
+			}
+
+			continue
+		}
+
+		// Normal notes
+		valid_tap_notes << beatmap.tap_notes[i]
+	}
+
+	// Slider is retarded
+	// so it has its own pass
+	mut i_slide_keys := []string{}
+
+	for i := 0; i < beatmap.slides.len; i++ {
+		mut key := beatmap.slides[i].map(get_key(it.BaseNoteObject)).join("|")
+
+		if key in i_slide_keys {
+			continue
+		} else {
+			i_slide_keys << key
+		}
+
+		// Find the start note
+		mut found := false
+		mut start_note := &object.NoteObject{typ: 0xDEAD}
+
+		for j := 0; j < beatmap.slides[i].len; j++ {
+			if beatmap.slides[i][j].typ in [1, 2] {
+				start_note = beatmap.slides[i][j]
+				found = true
+				break
+			}
+		}
+
+		if !found { continue } // i dont fucking know
+
+		mut is_critical := false
+		mut min_hidden_tick := math.floor(
+			start_note.tick / ticks_per_hidden + 1
+		) * ticks_per_hidden
+
+		_ := min_hidden_tick + int(is_critical) // HACK: shut the fuck up v
+
+		// Slider
+		mut slider_note := &object.SliderObject{}
+
+		// Get start, end slider head fornow
+		for j := 0; j < beatmap.slides[i].len; j++ {
+			key = get_key(beatmap.slides[i][j].BaseNoteObject)
+
+			time := beatmap.to_time(beatmap.slides[i][j].tick)
+			beatmap.slides[i][j].time.start = time
+			beatmap.slides[i][j].time.end = time
+
+			match beatmap.slides[i][j].typ {
+				1 {
+					// Start
+					beatmap.slides[i][j].is_slider_start = true
+					slider_note.BaseNoteObject = beatmap.slides[i][j].BaseNoteObject
+					slider_note.start = beatmap.slides[i][j]
+				}
+
+				2 {
+					// End
+					beatmap.slides[i][j].is_slider_end = true
+					slider_note.end = beatmap.slides[i][j]
+				}
+
+				3 {
+					// Tick
+					beatmap.slides[i][j].is_slider_path = true
+					slider_note.ticks << beatmap.slides[i][j]
+				}
+
+				else {}
+			}
+		}
+
+		valid_slider_notes << slider_note
 	}
 }
 
@@ -181,7 +283,7 @@ pub fn get_key(n object.BaseNoteObject) string {
 }
 
 // Converters
-pub fn (mut beatmap Beatmap) to_raw_objects(line Line, measure_offset f64) []&RawObject {
+pub fn (mut beatmap InternalBeatmap) to_raw_objects(line Line, measure_offset f64) []&RawObject {
 	mut re := regex.regex_opt(r".{2}") or { panic("${@METHOD}: ${err}") }
 	measure := line.header[0 .. 3].f64() + measure_offset
 
@@ -201,7 +303,7 @@ pub fn (mut beatmap Beatmap) to_raw_objects(line Line, measure_offset f64) []&Ra
 	return ret
 }
 
-pub fn (mut beatmap Beatmap) to_slides(mut stream []&object.NoteObject) [][]&object.NoteObject {
+pub fn (mut beatmap InternalBeatmap) to_slides(mut stream []&object.NoteObject) [][]&object.NoteObject {
 	mut slides := [][]&object.NoteObject{}
 
 	mut current := []&object.NoteObject{}
@@ -226,7 +328,7 @@ pub fn (mut beatmap Beatmap) to_slides(mut stream []&object.NoteObject) [][]&obj
 	return slides
 }
 
-pub fn (mut beatmap Beatmap) to_note_objects(line Line, measure_offset f64) []&object.NoteObject {
+pub fn (mut beatmap InternalBeatmap) to_note_objects(line Line, measure_offset f64) []&object.NoteObject {
 	lane := line.header[4].ascii_str().int()
 
 	return beatmap.to_raw_objects(line, measure_offset)
