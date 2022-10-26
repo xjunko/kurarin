@@ -1,3 +1,14 @@
+## 24/10/2022 Preview
+### Diva
+
+https://user-images.githubusercontent.com/44401509/197488463-ebd998a3-5c8f-4502-86f1-5218c750eb2b.mp4
+
+### Sekai
+
+https://user-images.githubusercontent.com/44401509/197488681-42b26223-1a25-4953-b270-2ec228fb88f3.mp4
+
+As you can see its clearly broken.
+
 ## 25/9/2022 Preview
 * Managed to get minlzma working
 
