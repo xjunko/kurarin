@@ -5,7 +5,7 @@ import flag
 
 // osu!
 import core.osu.runtime.play_old
-// import core.osu.runtime.play_new
+import core.osu.runtime.play_new
 
 // proseka
 import core.sekai.runtime.sekai
@@ -54,9 +54,7 @@ fn main() {
 			}
 
 			if gui_mode {
-				logging.error("Nope, disabled.")
-				exit(1)
-				// play_new.main()
+				play_new.main()
 			} else {
 				play_old.main(beatmap_path.replace("\\", ""), replay_path.replace("\\", ""), is_playing)
 			}
