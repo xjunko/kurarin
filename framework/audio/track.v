@@ -29,6 +29,7 @@ pub struct Track {
 		speed   f64
 		fft     []f32 = []f32{len: 512}
 		boost   f32
+		boost_sm f32 // Smoothed boost
 		playing bool
 }
 
@@ -81,6 +82,7 @@ pub fn (mut track Track) update(time f64) {
 	}
 
 	track.boost = boost
+	track.boost_sm = track.boost * 0.1 + track.boost_sm - track.boost_sm * 0.1
 }
 
 pub fn (mut track Track) get_position() f64 {
