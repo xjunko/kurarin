@@ -48,13 +48,13 @@ fn main() {
 
 	match game_type {
 		"osu", "osu!" {
-			if !gui_mode && beatmap_path.len == 0 {
+			if beatmap_path.len == 0 {
 				println(fp.usage())
 				return
 			}
 
 			if gui_mode {
-				play_new.main()
+				play_new.main(beatmap_path.replace("\\", ""))
 			} else {
 				play_old.main(beatmap_path.replace("\\", ""), replay_path.replace("\\", ""), is_playing)
 			}

@@ -1,12 +1,15 @@
 module play_new
 
-// import gx
+import gx
 import sync
+import math
 import library.gg
 
 import core.common.settings
 
+import core.osu.x
 import core.osu.beatmap
+import core.osu.beatmap.object.graphic as slider
 
 import framework.audio
 
@@ -26,6 +29,8 @@ pub struct Window {
 	window.GeneralWindow
 
 	mut:
+		cfg InternalInitConfig
+
 		song &audio.Track = unsafe { 0 }
 		logo &sprite.Sprite = unsafe { 0 }
 		background &sprite.Sprite = unsafe { 0 }
@@ -35,20 +40,36 @@ pub struct Window {
 		beatmap &beatmap.Beatmap = unsafe { 0 }
 
 	pub mut:
+		backgrounds &sprite.Manager = sprite.make_manager()
 		sprites &sprite.Manager = sprite.make_manager()
 		mutex   &sync.Mutex = sync.new_mutex()
 		limiter &time.Limiter = &time.Limiter{fps: frame_rate}
 		visualizer &visualizer.Visualizer = unsafe { 0 }
 }
 
+pub struct InternalInitConfig {
+	pub:
+		map_path string
+}
+
+pub fn (mut window Window) init_internal(cfg InternalInitConfig) {
+	window.cfg = cfg
+}
+
 pub fn (mut window Window) init(_ voidptr) {
+	// Slider
+	slider.init_slider_renderer()
+
 	// Load beatmap
 	window.beatmap = beatmap.parse_beatmap(
-		"/home/junko/.local/share/osu/exports/MachineGunPoemDoll/cosMo@BousouP feat. Hatsune Miku - Machinegun Poem Doll (AutotelicBrown) [Elegy].osu", 
+		window.cfg.map_path,
 		true
 	)
 
-	// Make some crap
+	window.beatmap.bind_context(mut window.ctx)
+	window.beatmap.reset()
+
+	// Background
 	window.background = &sprite.Sprite{
 		textures: [window.ctx.create_image(window.beatmap.get_bg_path())]
 		always_visible: true,
@@ -64,8 +85,12 @@ pub fn (mut window Window) init(_ voidptr) {
 
 	window.background.reset_size_based_on_texture(source: vector.Vector2{settings.global.window.width + 100, 768.0}, fit_size: true) // Make it a lil bigger than screen size
 	window.background_glow.reset_size_based_on_texture(source: vector.Vector2{settings.global.window.width + 100, 768.0}, fit_size: true) // Make it a lil bigger than screen size
-	window.sprites.add(mut window.background)
-	window.sprites.add(mut window.background_glow)
+
+	// Add background if theres no storybord
+	if window.beatmap.get_sb_path().len == 0 {
+		window.backgrounds.add(mut window.background)
+		window.backgrounds.add(mut window.background_glow)
+	}
 
 	// Logo
 	window.logo = &sprite.Sprite{
@@ -135,7 +160,9 @@ pub fn (mut window Window) init(_ voidptr) {
 			window.GeneralWindow.tick_update()
 
 			// Updates
+			window.beatmap.update(g_time.time, 1.0)
 			window.sprites.update(g_time.time)
+			window.backgrounds.update(g_time.time)
 			window.song.update(g_time.time)
 			window.visualizer.update(g_time.time)
 
@@ -150,7 +177,7 @@ pub fn (mut window Window) init(_ voidptr) {
 			window.visualizer.logo_size = window.logo.size
 
 			// GLow shit
-			window.sides[0].color.a = u8(255.0 * (window.song.boost_sm * 4.0) * 0.25 + f64(window.sides[0].color.a) - f64(window.sides[0].color.a) * 0.25)
+			window.sides[0].color.a = u8(math.min<f64>(255.0 * (window.song.boost_sm * 4.0) * 0.25 + f64(window.sides[0].color.a) - f64(window.sides[0].color.a) * 0.25, 255.0))
 			window.sides[1].color.a = window.sides[0].color.a
 			window.background_glow.color.a = window.sides[0].color.a / 4
 
@@ -165,6 +192,14 @@ pub fn (mut window Window) draw(_ voidptr) {
 
 	// Tick info
 	window.GeneralWindow.tick_draw()
+	window.backgrounds.draw(ctx: window.ctx, time: 0.0)
+
+	window.beatmap.storyboard.mutex.@lock()
+	window.beatmap.storyboard.draw()
+	window.beatmap.storyboard.mutex.unlock()
+
+	// Dim
+	window.ctx.draw_rect_filled(0, 0, int(settings.global.window.width), int(settings.global.window.height), gx.Color{0,0,0, 100})
 
 	window.sprites.draw(ctx: window.ctx, time: 0.0)
 	window.visualizer.draw(mut window.ctx)
@@ -176,7 +211,7 @@ pub fn (mut window Window) draw(_ voidptr) {
 	window.limiter.sync()
 }
 
-pub fn main() {
+pub fn main(map_path string) {
 	mut window := &Window{}
 
 	window.ctx = gg.new_context(
@@ -188,6 +223,8 @@ pub fn main() {
 		init_fn: window.init,
 		frame_fn: window.draw,
 	)
+
+	window.init_internal(map_path: map_path)
 
 	window.ctx.run()
 }
