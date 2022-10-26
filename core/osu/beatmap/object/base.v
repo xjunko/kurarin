@@ -147,6 +147,10 @@ pub fn common_parse(items []string, extra_index int) &HitObject {
 	// Extra data
 	if extra_index < items.len && items[extra_index].len > 0 {
 		extras := items[extra_index].split(":")
+		
+		if extras.len <= 1 {
+			return hitobject // This map is probably retarded.
+		}
 
 		hitobject.hitsound.sample_set = extras[0].int()
 		hitobject.hitsound.addition_set = extras[1].int()

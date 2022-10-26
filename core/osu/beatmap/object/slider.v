@@ -598,6 +598,8 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 	
 	slider.get_slider_points() // Make slider points
 
+	if slider.points.len == 0 { return } // This map is retarded.
+
 	size_ratio := f64((slider.diff.circle_radius * 1.05 * 2) / 128)
 
 	for i := 1; i <= slider.repeated; i++ {
