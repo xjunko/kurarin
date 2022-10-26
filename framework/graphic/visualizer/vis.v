@@ -13,7 +13,8 @@ pub struct Visualizer {
 		bars int = 200
 		update_delay f64 = 50.0
 		decay_value f64 = 0.0024
-		bar_length f64 = 400
+		bar_length f64 = 400 // Internal
+		bar_draw_length f64 = 400 // Used when drawing
 		start_distance f64 = 1.0
 		last_time f64
 		counter f64
@@ -59,7 +60,7 @@ pub fn (mut vis Visualizer) update(time f64) {
 			vis.fft[i] = 0
 		}
 	}
-
+	
 	vis.last_time = time
 }
 
@@ -69,7 +70,7 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 	position := vis.logo_position
 	size := vis.logo_size
 	inverted := [1, -1][int(vis.inverted)]
-	length := 400.0 // TODO: move thsi somwhre else
+	length := vis.bar_draw_length // TODO: move thsi somwhre else
 
 	// Top
 	for i := 0; i < 4; i++ {

@@ -1,6 +1,6 @@
 module object
 
-import gx
+// import gx
 import math
 
 import core.sekai.skin
@@ -93,7 +93,7 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 			before: [start_x, 50.0], after: [end_x, -6.5]
 		)
 
-		time_after_object := 4.0
+		// time_after_object := 4.0
 		distance_y := (-6.5 - 50.0) * 4.0
 		after_time := preempt * 4.0
 
