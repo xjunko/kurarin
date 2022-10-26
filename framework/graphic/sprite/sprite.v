@@ -206,16 +206,22 @@ pub fn (mut sprite Sprite) get_texture() &gg.Image {
 
 
 // Draw/Update FNs
+const (
+	time_to_catch_up = f64(100.0)
+)
+
 pub fn (mut sprite Sprite) update(time f64) {
-	// Old style: wont show up properly if time is too fast
 	// TODO: make better updater
 	for t in sprite.transforms {
-		if time >= t.time.start && time <= t.time.end + 100 {
-			sprite.apply_event(t, math.min(time, t.time.end)) // HACKHACHKHACK: extra 100ms to make sure the transform doesnt get skipped
+		if time >= t.time.start && time <= t.time.end + time_to_catch_up {
+			sprite.apply_event(t, math.min(time, t.time.end)) // HACKHACHKHACK: extra 100ms to make sure the transform catch up
 		}
 	}
 
+	sprite.update_sprite(time)
+}
 
+pub fn (mut sprite Sprite) update_sprite(time f64) {
 	// TODO: Put this somewhere else
 	if sprite.textures.len > 1 && sprite.texture_fps > 0 && sprite.texture_i < sprite.textures.len {
 		if sprite.texture_last_t == 0.0 {
@@ -240,6 +246,64 @@ pub fn (mut sprite Sprite) update(time f64) {
 		sprite.texture_i = sprite.textures.len - 1
 	}
 }
+
+pub fn (mut sprite Sprite) update_peppy(time f64) {
+	// osu!-esque update style from certain 2016 code
+	// Note: This doesn't work
+
+	mut has_future := false
+	mut has_past := false
+	mut should_draw := true
+
+	// Check for active transform
+	for t in sprite.transforms {
+		if t.time.start >= time || t.time.end > time {
+			has_future = true
+
+			if t.time.start > time {
+				continue
+			}
+		}
+
+		if t.time.end <= time {
+			has_past = true
+
+			if t.time.end < time {
+				continue
+			}
+		}
+
+		should_draw = true
+		sprite.apply_event(t, math.min(time, t.time.end))
+	}
+
+	// Past
+	if !has_future && !should_draw {
+		return 
+	}
+
+	// Not current
+	if !(has_future && has_past) && !should_draw {
+		return 
+	}
+
+	// Apply past transforms
+	for i := sprite.transforms.len - 1; i >= 0; i-- {
+		if sprite.transforms[i].time.end >= time { continue }
+		sprite.apply_event(sprite.transforms[i], sprite.transforms[i].time.end)
+	}
+	
+
+	// Apply future transforms
+	if has_future {
+		for i := 0; i < sprite.transforms.len; i++ {
+			if sprite.transforms[i].time.start < time { continue }
+			sprite.apply_event(sprite.transforms[i], sprite.transforms[i].time.start)
+		}
+	}
+}
+
+
 pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 	if sprite.is_drawable_at(arg.time) || sprite.always_visible {
 		size := sprite.size
