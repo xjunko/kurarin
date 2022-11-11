@@ -275,7 +275,8 @@ pub fn system_font_path() string {
 			}
 		}
 	}
-	mut fm := os.execute("fc-match --format='%\{file\}\n' -s")
+	
+	mut fm := os.execute("fc-match --format='%{file}\n' -s")
 	if fm.exit_code == 0 {
 		lines := fm.output.split('\n')
 		for l in lines {
