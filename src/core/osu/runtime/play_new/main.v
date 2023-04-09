@@ -7,7 +7,6 @@ import library.gg
 
 import core.common.settings
 
-import core.osu.x
 import core.osu.beatmap
 import core.osu.beatmap.object.graphic as slider
 

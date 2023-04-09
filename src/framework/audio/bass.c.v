@@ -4,7 +4,7 @@ module audio
 #include "bass.h"
 #include "bass_fx.h"
 #include "bassmix.h"
-#flag -Wl,-rpath=assets/common/dll,-L@VMODROOT/assets/common/dll -lbass -lbass_fx -lbassmix
+#flag -Wl,-rpath=assets/common/dll,-L@VMODROOT/../assets/common/dll -lbass -lbass_fx -lbassmix
 
 // Important bits
 fn C.BASS_Init(int, int, int, int, int) int

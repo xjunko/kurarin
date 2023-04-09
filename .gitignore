@@ -6,8 +6,10 @@ videos/*
 dementia
 settings.json
 *.json
+
 build/*
 library/microui
+src/library/microui
 
 # New Engine Assets structure
 assets/diva/*

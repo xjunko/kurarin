@@ -468,13 +468,13 @@ fn generate_opcode_based_on_dict_to_v_code() {
         arguments []int
 }\n'
 
-	os.write_file('./core/diva/beatmap/opcodes/opcodes.v', result_code) or {
+	os.write_file('${@VMODROOT}/core/diva/beatmap/opcodes/opcodes.v', result_code) or {
 		panic('Failed to save generated opcodes: ${err}')
 	}
 }
 
 fn init() {
-	if !os.exists('./core/diva/beatmap/opcodes/opcodes.v') {
+	if !os.exists('${@VMODROOT}/core/diva/beatmap/opcodes/opcodes.v') {
 		println('No OPCODEs file detected, generating one.')
 		generate_opcode_based_on_dict_to_v_code()
 		println('OPCODEs generation done!')
