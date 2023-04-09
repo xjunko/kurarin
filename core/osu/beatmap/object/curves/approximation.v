@@ -13,7 +13,7 @@ pub fn approximate_circular_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.
 	mut lines := []Linear{len: segments}
 
 	for i := 0; i < segments; i++ {
-		lines[i] = make_linear(arc.point_at(f64(i) / f64(segments)), arc.point_at(f64(i + 1)/f64(segments)))
+		lines[i] = make_linear(arc.point_at(f64(i) / f64(segments)), arc.point_at(f64(i + 1) / f64(segments)))
 	}
 
 	return lines
@@ -25,7 +25,7 @@ pub fn approximate_catmullrom(points []vector.Vector2, detail int) []Linear {
 	mut lines := []Linear{len: detail}
 
 	for i := 0; i < detail; i++ {
-		lines[i] = make_linear(catmull.point_at(f64(i)/f64(detail)), catmull.point_at(f64(i+1)/f64(detail)))
+		lines[i] = make_linear(catmull.point_at(f64(i) / f64(detail)), catmull.point_at(f64(i + 1) / f64(detail)))
 	}
 
 	return lines
@@ -38,7 +38,7 @@ pub fn approximate_bezier(points []vector.Vector2) []Linear {
 	mut lines := []Linear{len: extracted.len - 1}
 
 	for i := 0; i < lines.len; i++ {
-		lines[i] = make_linear(extracted[i], extracted[i+1])
+		lines[i] = make_linear(extracted[i], extracted[i + 1])
 	}
 
 	return lines

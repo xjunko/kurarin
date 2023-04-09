@@ -83,11 +83,11 @@ pub fn (mut result HitResults) add_result(_time f64, _result ruleset.HitResult, 
 	result.sprites << hit
 }
 
-pub fn (mut result HitResults) update(time f64) {
+pub fn (mut result HitResults) update(update_time f64) {
 	for mut sprite in result.sprites {
-		sprite.update(time)
+		sprite.update(update_time)
 	}
-	result.last_time = time
+	result.last_time = update_time
 }
 
 pub fn (mut result HitResults) draw() {

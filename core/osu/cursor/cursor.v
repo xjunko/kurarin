@@ -126,12 +126,12 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	cursor.mutex.unlock()
 }
 
-pub fn (mut cursor Cursor) update(time f64, _delta f64) {
+pub fn (mut cursor Cursor) update(update_time f64, _delta f64) {
 	cursor.mutex.@lock()
-	cursor.Sprite.update(time) // Update the main cursor itself
+	cursor.Sprite.update(update_time) // Update the main cursor itself
 
 	// Delta
-	delta := time - cursor.last_time
+	delta := update_time - cursor.last_time
 
 	// Time
 	cursor.sixty_delta += delta
@@ -139,9 +139,9 @@ pub fn (mut cursor Cursor) update(time f64, _delta f64) {
 	// Normal trails
 	if settings.global.gameplay.cursor.style == 0 && cursor.sixty_delta >= osu_cursor_trail_delta {
 		mut trail := &sprite.Sprite{textures: [cursor.textures[1]]}
-		trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [255.0], after: [0.0])
-		trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{time, time + 150}, before: [cursor.position.x, cursor.position.y])
-		trail.add_transform(typ: .scale_factor, time: time2.Time{time, time}, before: [settings.global.gameplay.cursor.size])
+		trail.add_transform(typ: .fade, easing: easing.quad_out, time: time2.Time{update_time, update_time + 150}, before: [255.0], after: [0.0])
+		trail.add_transform(typ: .move, easing: easing.quad_out, time: time2.Time{update_time, update_time + 150}, before: [cursor.position.x, cursor.position.y])
+		trail.add_transform(typ: .scale_factor, time: time2.Time{update_time, update_time}, before: [settings.global.gameplay.cursor.size])
 		trail.reset_size_based_on_texture()
 		trail.reset_attributes_based_on_transforms()
 		cursor.trails << trail
@@ -171,19 +171,19 @@ pub fn (mut cursor Cursor) update(time f64, _delta f64) {
 
 	// TODO: this is fucked
 	for mut trail in cursor.trails {
-		if time > trail.time.end {
+		if update_time > trail.time.end {
 			cursor.trails.delete(cursor.trails.index(trail))
 			continue
 		}
 
-		trail.update(time)
+		trail.update(update_time)
 	}
 
 
 	// Done
 	cursor.last_position.x = cursor.position.x
 	cursor.last_position.y = cursor.position.y
-	cursor.last_time = time
+	cursor.last_time = update_time
 
 	cursor.mutex.unlock()
 }

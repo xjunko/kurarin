@@ -149,8 +149,8 @@ pub fn (mut note NoteObjectSprite) initialize(is_flick bool, is_critical bool, d
 	
 }
 
-pub fn (mut note NoteObjectSprite) update(time f64) {
-	if time >= note.object.time.end && !note.finished && !note.is_path {
+pub fn (mut note NoteObjectSprite) update(update_time f64) {
+	if update_time >= note.object.time.end && !note.finished && !note.is_path {
 		unsafe {
 
 			if note.is_critical {
@@ -174,7 +174,7 @@ pub fn (mut note NoteObjectSprite) update(time f64) {
 
 	// Update sprite
 	for mut sprite in note.sprites {
-		sprite.update(time)
+		sprite.update(update_time)
 	}
 	
 	note.updated = true

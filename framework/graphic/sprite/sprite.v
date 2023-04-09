@@ -36,45 +36,45 @@ pub struct Sprite {
 
 
 // Transform FNs
-pub fn (mut sprite Sprite) apply_event(t transform.Transform, time f64) {
+pub fn (mut sprite Sprite) apply_event(t transform.Transform, current_time f64) {
 	match t.typ {
 		.move {
-			pos := t.as_vector(time)
+			pos := t.as_vector(current_time)
 			sprite.position.x = pos.x
 			sprite.position.y = pos.y
 		}
 
 		.move_x {
-			sprite.position.x = t.as_one(time)
+			sprite.position.x = t.as_one(current_time)
 		}
 		
 		.move_y {
-			sprite.position.y = t.as_one(time) 
+			sprite.position.y = t.as_one(current_time) 
 		}
 
 		.angle {
-			sprite.angle = (t.as_one(time) * 180 / math.pi) * -1.0
+			sprite.angle = (t.as_one(current_time) * 180 / math.pi) * -1.0
 		}
 
 		.color {
-			pos := t.as_three(time)
+			pos := t.as_three(current_time)
 			sprite.color.r = u8(pos[0])
 			sprite.color.g = u8(pos[1])
 			sprite.color.b = u8(pos[2])
 		}
 		
 		.fade {
-			sprite.color.a = u8(t.as_one(time))
+			sprite.color.a = u8(t.as_one(current_time))
 		}
 
 		.scale {
-			v := t.as_vector(time)
+			v := t.as_vector(current_time)
 			sprite.size.x = sprite.raw_size.x * v.x
 			sprite.size.y = sprite.raw_size.y * v.y
 		}
 
 		.scale_factor {
-			factor := t.as_one(time)
+			factor := t.as_one(current_time)
 			sprite.size.x = sprite.raw_size.x * factor
 			sprite.size.y = sprite.raw_size.y * factor
 		}
@@ -191,8 +191,8 @@ pub fn (mut sprite Sprite) reset_time_based_on_transforms() {
 }
 
 // 
-pub fn (mut sprite Sprite) is_drawable_at(time f64) bool {
-	return time >= sprite.time.start && time <= sprite.time.end
+pub fn (mut sprite Sprite) is_drawable_at(update_time f64) bool {
+	return update_time >= sprite.time.start && update_time <= sprite.time.end
 }
 
 // Texture
@@ -210,29 +210,29 @@ const (
 	time_to_catch_up = f64(100.0)
 )
 
-pub fn (mut sprite Sprite) update(time f64) {
+pub fn (mut sprite Sprite) update(update_time f64) {
 	// TODO: make better updater
 	for t in sprite.transforms {
-		if time >= t.time.start && time <= t.time.end + time_to_catch_up {
-			sprite.apply_event(t, math.min(time, t.time.end)) // HACKHACHKHACK: extra 100ms to make sure the transform catch up
+		if update_time >= t.time.start && update_time <= t.time.end + time_to_catch_up {
+			sprite.apply_event(t, math.min(update_time, t.time.end)) // HACKHACHKHACK: extra 100ms to make sure the transform catch up
 		}
 	}
 
-	sprite.update_sprite(time)
+	sprite.update_sprite(update_time)
 }
 
-pub fn (mut sprite Sprite) update_sprite(time f64) {
+pub fn (mut sprite Sprite) update_sprite(update_time f64) {
 	// TODO: Put this somewhere else
 	if sprite.textures.len > 1 && sprite.texture_fps > 0 && sprite.texture_i < sprite.textures.len {
 		if sprite.texture_last_t == 0.0 {
-			sprite.texture_last_t = time
+			sprite.texture_last_t = update_time
 		}
 
 		texture_frametime := 1000.0 / f64(sprite.texture_fps) 
 
-		delta := time - sprite.texture_last_t
+		delta := update_time - sprite.texture_last_t
 		sprite.texture_delta += delta
-		sprite.texture_last_t = time
+		sprite.texture_last_t = update_time
 
 		if sprite.texture_delta >= texture_frametime {
 			sprite.texture_i++
@@ -247,7 +247,7 @@ pub fn (mut sprite Sprite) update_sprite(time f64) {
 	}
 }
 
-pub fn (mut sprite Sprite) update_peppy(time f64) {
+pub fn (mut sprite Sprite) update_peppy(update_time f64) {
 	// osu!-esque update style from certain 2016 code
 	// Note: This doesn't work
 
@@ -257,24 +257,24 @@ pub fn (mut sprite Sprite) update_peppy(time f64) {
 
 	// Check for active transform
 	for t in sprite.transforms {
-		if t.time.start >= time || t.time.end > time {
+		if t.time.start >= update_time || t.time.end > update_time {
 			has_future = true
 
-			if t.time.start > time {
+			if t.time.start > update_time {
 				continue
 			}
 		}
 
-		if t.time.end <= time {
+		if t.time.end <= update_time {
 			has_past = true
 
-			if t.time.end < time {
+			if t.time.end < update_time {
 				continue
 			}
 		}
 
 		should_draw = true
-		sprite.apply_event(t, math.min(time, t.time.end))
+		sprite.apply_event(t, math.min(update_time, t.time.end))
 	}
 
 	// Past
@@ -289,7 +289,7 @@ pub fn (mut sprite Sprite) update_peppy(time f64) {
 
 	// Apply past transforms
 	for i := sprite.transforms.len - 1; i >= 0; i-- {
-		if sprite.transforms[i].time.end >= time { continue }
+		if sprite.transforms[i].time.end >= update_time { continue }
 		sprite.apply_event(sprite.transforms[i], sprite.transforms[i].time.end)
 	}
 	
@@ -297,7 +297,7 @@ pub fn (mut sprite Sprite) update_peppy(time f64) {
 	// Apply future transforms
 	if has_future {
 		for i := 0; i < sprite.transforms.len; i++ {
-			if sprite.transforms[i].time.start < time { continue }
+			if sprite.transforms[i].time.start < update_time { continue }
 			sprite.apply_event(sprite.transforms[i], sprite.transforms[i].time.start)
 		}
 	}

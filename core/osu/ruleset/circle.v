@@ -22,12 +22,12 @@ pub fn (circle &Circle) get_number() i64 {
 	return circle.hitcircle.get_id()
 }
 
-pub fn (mut circle Circle) init(ruleset &Ruleset, object object.IHitObject, players []&DifficultyPlayer) {
+pub fn (mut circle Circle) init(ruleset &Ruleset, current_object object.IHitObject, players []&DifficultyPlayer) {
 	circle.ruleset = unsafe { ruleset }
 	circle.players = players
 	circle.state = []ObjectState{}
 	
-	mut t_object := unsafe { &object }
+	mut t_object := unsafe { &current_object }
 	if mut t_object is object.Circle {
 		circle.hitcircle = t_object
 	}

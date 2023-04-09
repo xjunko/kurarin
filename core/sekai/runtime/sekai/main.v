@@ -11,14 +11,14 @@ import framework.audio
 import framework.logging
 import framework.math.time
 
-import framework.graphic.window
+import framework.graphic.window as i_window
 
 // Hacks to disable vsync
 fn C._sapp_glx_swapinterval(int)
 
 [heap]
 pub struct Window {
-	window.GeneralWindow
+	i_window.GeneralWindow
 
 	mut:
 		mutex &sync.Mutex = sync.new_mutex()

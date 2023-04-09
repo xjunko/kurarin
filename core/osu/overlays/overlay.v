@@ -122,14 +122,14 @@ pub fn (mut overlay GameplayOverlay) draw() {
 	overlay.score_font.draw_number("${overlay.score_smooth:08d}", vector.Vector2{settings.global.window.width - 5 - (8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0}, vector.top_left, ctx: overlay.ctx, time: overlay.last_time, scale: x.resolution.ui_camera.scale)
 }
 
-pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
-	mut hitresult := gameplay.make_hit_result(ctx, ruleset.beatmap.difficulty.Difficulty)
+pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
+	mut hitresult := gameplay.make_hit_result(ctx, player_ruleset.beatmap.difficulty.Difficulty)
 	mut counter := gameplay.make_combo_counter()
 	mut score_font := sprite.make_number_font("score")
 
 	mut overlay := &GameplayOverlay{
-		ruleset: unsafe { ruleset },
-		cursor: unsafe { cursor },
+		ruleset: unsafe { player_ruleset },
+		cursor: unsafe { player_cursor },
 		ctx: unsafe { ctx },
 		hitresult: hitresult,
 		combo_counter: counter,
@@ -175,10 +175,10 @@ pub fn new_gameplay_overlay(ruleset &ruleset.Ruleset, cursor &cursor.Cursor, ctx
 
 
 // Some hack
-pub fn hit_received(time f64, number i64, position vector.Vector2, result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
+pub fn hit_received(current_time f64, number i64, position vector.Vector2, result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
 	mut g_overlay := unsafe { g_overlay_hack }
 	g_overlay.score = score
-	g_overlay.hitresult.add_result(time, result, position)
+	g_overlay.hitresult.add_result(current_time, result, position)
 
 	if combo == .increase {
 		g_overlay.combo_counter.increase()

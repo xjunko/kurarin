@@ -192,36 +192,36 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 		}
 		origin := vector.parse_origin(items[2])
 	
-		mut sprite := &sprite.Sprite{
+		mut storyboard_sprite := &sprite.Sprite{
 			origin: origin,
 			textures: [storyboard.get_image(img_path)] // ez
 		}
 
-		sprite.position.x = position.x
-		sprite.position.y = position.y
+		storyboard_sprite.position.x = position.x
+		storyboard_sprite.position.y = position.y
 		transforms := parse_sprite_commands(commands)
 
 		// FIXME: This is a hack
 		for transform in transforms {
-			sprite.add_transform(transform)
+			storyboard_sprite.add_transform(transform)
 		}
 
-		if sprite.transforms.len > 0 {
-			sprite.reset_size_based_on_texture()
-			sprite.reset_attributes_based_on_transforms()
-			storyboard.manager.add(mut sprite)
+		if storyboard_sprite.transforms.len > 0 {
+			storyboard_sprite.reset_size_based_on_texture()
+			storyboard_sprite.reset_attributes_based_on_transforms()
+			storyboard.manager.add(mut storyboard_sprite)
 		}	
 
 		// check for stuff that doesnt have scale transforms
 		mut has_been_scaled := false
-		for transform in sprite.transforms {
+		for transform in storyboard_sprite.transforms {
 			if transform.typ == .scale || transform.typ == .scale_factor {
 				has_been_scaled = true
 			}
 		}
 
 		if !has_been_scaled {
-			sprite.reset_size_based_on_texture()
+			storyboard_sprite.reset_size_based_on_texture()
 		}
 	}
 }
@@ -279,7 +279,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 	}
 
 	command_type := items[0]
-	easing := easing.get_easing_from_enum(unsafe { easing.Easing(items[1].i8()) }) // looks fucked
+	transform_easing := easing.get_easing_from_enum(unsafe { easing.Easing(items[1].i8()) }) // looks fucked
 
 	mut start_time := items[2].f64()
 
@@ -352,7 +352,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'F' {
 			transforms << &transform.Transform{
 				typ: .fade, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]
@@ -362,7 +362,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'R' {
 			transforms << &transform.Transform{
 				typ: .angle, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]
@@ -372,7 +372,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'S' {
 			transforms << &transform.Transform{
 				typ: .scale_factor, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]
@@ -382,7 +382,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'MX' {
 			transforms << &transform.Transform{
 				typ: .move_x, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]
@@ -392,7 +392,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'MY' {
 			transforms << &transform.Transform{
 				typ: .move_y, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]
@@ -402,7 +402,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'M' {
 			transforms << &transform.Transform{
 				typ: .move, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]
@@ -412,7 +412,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'V' {
 			transforms << &transform.Transform{
 				typ: .scale, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]
@@ -422,7 +422,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		'C' {
 			transforms << &transform.Transform{
 				typ: .color, 
-				easing: easing, 
+				easing: transform_easing, 
 				time: time2.Time{start_time, end_time},
 				before: sections[0],
 				after: sections[1]

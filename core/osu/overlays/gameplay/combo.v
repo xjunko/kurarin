@@ -45,11 +45,11 @@ pub fn (mut counter ComboCounter) reset() {
 	counter.combo = 0
 }
 
-pub fn (mut counter ComboCounter) update(time f64) {
-	counter.main_glider.update(time)
-	counter.pop_glider.update(time)
+pub fn (mut counter ComboCounter) update(update_time f64) {
+	counter.main_glider.update(update_time)
+	counter.pop_glider.update(update_time)
 
-	counter.last_time = time
+	counter.last_time = update_time
 }
 
 pub fn (mut counter ComboCounter) draw(arg sprite.CommonSpriteArgument) {

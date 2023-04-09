@@ -227,14 +227,14 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	// Fuck around with the colors
 	// Literally copy-pasted from mcosu lmaooo credit to mckay
 	if settings.global.gameplay.hitobjects.rainbow_slider {
-		time := time.global.time / 100.0
-		attr.colors[0] = f32(math.sin(0.3 * time + 0 + 10) * 127 + 128) / 255
-		attr.colors[1] = f32(math.sin(0.3 * time + 2 + 10) * 127 + 128) / 255
-		attr.colors[2] = f32(math.sin(0.3 * time + 4 + 10) * 127 + 128) / 255
+		current_time := time.global.time / 100.0
+		attr.colors[0] = f32(math.sin(0.3 * current_time + 0 + 10) * 127 + 128) / 255
+		attr.colors[1] = f32(math.sin(0.3 * current_time + 2 + 10) * 127 + 128) / 255
+		attr.colors[2] = f32(math.sin(0.3 * current_time + 4 + 10) * 127 + 128) / 255
 
-		attr.colors[4] = f32(math.sin(0.3 * time * 1.5 + 0 + 10) * 127 + 128) / 255
-		attr.colors[5] = f32(math.sin(0.3 * time * 1.5 + 2 + 10) * 127 + 128) / 255
-		attr.colors[6] = f32(math.sin(0.3 * time * 1.5 + 4 + 10) * 127 + 128) / 255
+		attr.colors[4] = f32(math.sin(0.3 * current_time * 1.5 + 0 + 10) * 127 + 128) / 255
+		attr.colors[5] = f32(math.sin(0.3 * current_time * 1.5 + 2 + 10) * 127 + 128) / 255
+		attr.colors[6] = f32(math.sin(0.3 * current_time * 1.5 + 4 + 10) * 127 + 128) / 255
 	}
 
 	// Body color

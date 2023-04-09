@@ -4,14 +4,14 @@ import sync
 import framework.math.vector
 
 const (
-	_bezier_quantization = 0.5
+	_bezier_quantization    = 0.5
 	_bezier_quantization_sq = _bezier_quantization * _bezier_quantization
 )
 
 pub struct ItemStack {
-	pub mut:
-		items [][]vector.Vector2
-		mutex &sync.RwMutex = sync.new_rwmutex()
+pub mut:
+	items [][]vector.Vector2
+	mutex &sync.RwMutex = sync.new_rwmutex()
 }
 
 pub fn (mut s ItemStack) push(t []vector.Vector2) {
@@ -23,7 +23,7 @@ pub fn (mut s ItemStack) push(t []vector.Vector2) {
 pub fn (mut s ItemStack) pop() []vector.Vector2 {
 	s.mutex.@lock()
 	item := s.items[s.items.len - 1]
-	s.items = s.items[0 .. s.items.len - 1]
+	s.items = s.items[0..s.items.len - 1]
 	s.mutex.unlock()
 	return item
 }
@@ -33,25 +33,25 @@ pub fn (mut s ItemStack) count() int {
 }
 
 pub struct BezierApproximator {
-	pub mut:
-		count int
-		control_points []vector.Vector2
-		subdivisionbuffer1 []vector.Vector2
-		subdivisionbuffer2 []vector.Vector2
+pub mut:
+	count              int
+	control_points     []vector.Vector2
+	subdivisionbuffer1 []vector.Vector2
+	subdivisionbuffer2 []vector.Vector2
 }
 
 pub fn make_bezier_approximator(control_points []vector.Vector2) &BezierApproximator {
 	return &BezierApproximator{
-		count: control_points.len,
-		control_points: control_points,
-		subdivisionbuffer1: []vector.Vector2{len: control_points.len},
+		count: control_points.len
+		control_points: control_points
+		subdivisionbuffer1: []vector.Vector2{len: control_points.len}
 		subdivisionbuffer2: []vector.Vector2{len: control_points.len * 2 - 1}
 	}
 }
 
 pub fn is_flat_enough(control_points []vector.Vector2) bool {
 	for i := 1; i < control_points.len - 1; i++ {
-		if control_points[i - 1].sub(control_points[i].scale(2)).add(control_points[i+1]).length_squared() > _bezier_quantization_sq {
+		if control_points[i - 1].sub(control_points[i].scale(2)).add(control_points[i + 1]).length_squared() > curves._bezier_quantization_sq {
 			return false
 		}
 	}
@@ -138,7 +138,6 @@ pub fn (mut approximator BezierApproximator) create_bezier() []vector.Vector2 {
 				parent[i] = left_child[i]
 			}
 		}
-
 		to_flatten.push(right_child)
 		to_flatten.push(parent)
 	}

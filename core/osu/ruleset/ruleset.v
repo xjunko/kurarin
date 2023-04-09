@@ -116,14 +116,14 @@ pub fn (mut ruleset Ruleset) set_listener(func HitListener) {
 	ruleset.hit_listener = func
 }
 
-pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut object IHitObject, _player &DifficultyPlayer) Action {
+pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut current_object IHitObject, _player &DifficultyPlayer) Action {
 	mut player := &ruleset.subset[0].player
 
-	if mut object is Circle {
+	if mut current_object is Circle {
 		mut index := -1
 
 		for i, mut g in ruleset.processed {
-			if g.get_number() == object.get_number() {
+			if g.get_number() == current_object.get_number() {
 				index = i
 			}
 		}
@@ -135,8 +135,8 @@ pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut object IHitObject, _player
 
 	for mut g in ruleset.processed {
 		if !g.is_hit(player) {
-			if g.get_number() != object.get_number() {
-				if ruleset.beatmap.objects[g.get_number()].get_end_time() + tolerance_2b < ruleset.beatmap.objects[object.get_number()].get_start_time() {
+			if g.get_number() != current_object.get_number() {
+				if ruleset.beatmap.objects[g.get_number()].get_end_time() + tolerance_2b < ruleset.beatmap.objects[current_object.get_number()].get_start_time() {
 					return Action.shake
 				}
 			} else {
@@ -152,7 +152,7 @@ pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut object IHitObject, _player
 		hit_range -= 200.0
 	}
 
-	if math.abs<f64>(time - ruleset.beatmap.objects[object.get_number()].get_start_time()) >= hit_range {
+	if math.abs<f64>(time - ruleset.beatmap.objects[current_object.get_number()].get_start_time()) >= hit_range {
 		return Action.shake
 	}
 
@@ -190,7 +190,7 @@ pub fn (mut ruleset Ruleset) update(time f64) {
 }
 
 
-pub fn (mut ruleset Ruleset) update_click_for(cursor &cursor.Cursor, time f64) {
+pub fn (mut ruleset Ruleset) update_click_for(player_cursor &cursor.Cursor, time f64) {
 	mut player := &ruleset.subset[0].player
 
 	player.already_stolen = true
@@ -234,7 +234,7 @@ pub fn (mut ruleset Ruleset) update_click_for(cursor &cursor.Cursor, time f64) {
 	}
 }
 
-pub fn (mut ruleset Ruleset) update_normal_for(cursor &cursor.Cursor, time f64, process_slider_ends_ahead bool) {
+pub fn (mut ruleset Ruleset) update_normal_for(player_cursor &cursor.Cursor, time f64, process_slider_ends_ahead bool) {
 	mut player := &ruleset.subset[0].player
 
 	mut was_slider_already := false
@@ -258,7 +258,7 @@ pub fn (mut ruleset Ruleset) update_normal_for(cursor &cursor.Cursor, time f64, 
 	}
 }
 
-pub fn (mut ruleset Ruleset) update_post_for(cursor &cursor.Cursor, time f64, process_slider_ends_ahead bool) {
+pub fn (mut ruleset Ruleset) update_post_for(player_cursor &cursor.Cursor, time f64, process_slider_ends_ahead bool) {
 	mut player := &ruleset.subset[0].player
 
 	if ruleset.processed.len > 0 {
@@ -270,7 +270,7 @@ pub fn (mut ruleset Ruleset) update_post_for(cursor &cursor.Cursor, time f64, pr
 	}
 }
 
-pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult, combo ComboResult) {
+pub fn (mut ruleset Ruleset) send_result(time f64, mut player_cursor &cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult, combo ComboResult) {
 	mut number := src.get_number()
 	mut subset := &ruleset.subset[0]
 
@@ -289,10 +289,10 @@ pub fn (mut ruleset Ruleset) send_result(time f64, mut cursor &cursor.Cursor, mu
 }
 
 // Factory
-pub fn new_ruleset(mut beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &Ruleset {
+pub fn new_ruleset(mut loaded_beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &Ruleset {
 	logging.info("Creating osu! ruleset.")	
 	
-	mut ruleset := &Ruleset{beatmap: unsafe { beatmap }}
+	mut ruleset := &Ruleset{beatmap: unsafe { loaded_beatmap }}
 	ruleset.cursors = []&cursor.Cursor{}
 	ruleset.subset = []&SubSet{}
 
@@ -300,7 +300,7 @@ pub fn new_ruleset(mut beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &
 	mut diff_players := unsafe { []&DifficultyPlayer{len: cursors.len} }
 
 	for i, mut cursor in cursors {
-		mut diff := beatmap.difficulty.Difficulty
+		mut diff := loaded_beatmap.difficulty.Difficulty
 
 		mut player := &DifficultyPlayer{cursor: unsafe { *cursor }, diff: diff}
 		diff_players[i] = player
@@ -311,7 +311,7 @@ pub fn new_ruleset(mut beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &
 		}
 	}
 
-	for mut hitobject in beatmap.objects {
+	for mut hitobject in loaded_beatmap.objects {
 		if mut hitobject is object.Circle {
 			mut r_circle := &Circle{}
 			r_circle.init(ruleset, hitobject, diff_players)

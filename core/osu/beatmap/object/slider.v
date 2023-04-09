@@ -112,9 +112,9 @@ pub fn (mut slider Slider) draw(arg sprite.CommonSpriteArgument) {
 	}
 }
 
-pub fn (mut slider Slider) hit_edge(index int, time f64, is_hit bool) {
+pub fn (mut slider Slider) hit_edge(index int, current_time f64, is_hit bool) {
 	if index == 0 {
-		slider.arm_start(is_hit, time)
+		slider.arm_start(is_hit, current_time)
 	} else {
 		// slider.play_hitsound_generic(index)
 	}
@@ -169,30 +169,30 @@ pub fn (mut slider Slider) play_hitsound_generic(sample_set_ int, addition_set_ 
 	)
 }
 
-pub fn (mut slider Slider) update(time f64) bool {
-	slider.slider_renderer_fade.update(time)
-	slider.hitcircle.update(time)
+pub fn (mut slider Slider) update(update_time f64) bool {
+	slider.slider_renderer_fade.update(update_time)
+	slider.hitcircle.update(update_time)
 
 	for mut sprite in slider.sprites {
-		sprite.update(time)
+		sprite.update(update_time)
 	}
 
 	// HACK: MOVe this to somwhre else
-	slider_current_position := slider.get_position_at_lazer(time)
+	slider_current_position := slider.get_position_at_lazer(update_time)
 	slider.slider_overlay_sprite.position.x = slider_current_position.x
 	slider.slider_overlay_sprite.position.y = slider_current_position.y
 	slider.slider_b_sprite.position.x = slider_current_position.x
 	slider.slider_b_sprite.position.y = slider_current_position.y
 
 	// SliderBall angle
-	if time >= slider.time.start && time <= slider.time.end - 5.0 {
-		slider_future_infront_position := slider.get_position_at_lazer(math.min<f64>(time + 1.0, slider.time.end))
+	if update_time >= slider.time.start && update_time <= slider.time.end - 5.0 {
+		slider_future_infront_position := slider.get_position_at_lazer(math.min<f64>(update_time + 1.0, slider.time.end))
 		slider.slider_b_sprite.angle = (slider_current_position.angle_rv(slider_future_infront_position) * 180 / math.pi) * -1.0 + 180.0
 		// ^^^^ FIXME: what the fuck huh
 	}
 
 	// Generate renderer way before the slider appears
-	if time >= (slider.time.start - slider.diff.preempt - 50.0) && slider.slider_renderer_attr == voidptr(0) {
+	if update_time >= (slider.time.start - slider.diff.preempt - 50.0) && slider.slider_renderer_attr == voidptr(0) {
 		slider.generate_slider_renderer()
 	}
 
@@ -200,25 +200,25 @@ pub fn (mut slider Slider) update(time f64) bool {
 		for i := 1; i < slider.repeated; i++ {
 			edge_time := slider.time.start + math.floor(f64(i * slider.duration))
 
-			if slider.last_time < edge_time && time >= edge_time {
-				slider.hit_edge(int(i), time, true)
+			if slider.last_time < edge_time && update_time >= edge_time {
+				slider.hit_edge(int(i), update_time, true)
 			}
 		}
 	}
 
-	slider.last_time = time
+	slider.last_time = update_time
 	return false
 }
 
-pub fn (mut slider Slider) post_update(time f64) {
+pub fn (mut slider Slider) post_update(update_time f64) {
 }
 
 pub fn (mut slider Slider) is_retarded() bool {
 	return slider.score_path.len == 0 || slider.time.start == slider.time.end
 }
 
-pub fn (mut slider Slider) arm_start(clicked bool, time f64) {
-	slider.hitcircle.arm(clicked, time)
+pub fn (mut slider Slider) arm_start(clicked bool, current_time f64) {
+	slider.hitcircle.arm(clicked, current_time)
 }
 
 pub fn (mut slider Slider) init_slide(_time f64) {
@@ -578,18 +578,18 @@ pub fn (mut slider Slider) generate_slider_tickpoints() {
 		end_time := math.min<f64>(a + 150.0, p.time - 36.0)
 
 		// TODO: bruh
-		mut sprite := &sprite.Sprite{}
-		sprite.textures << texture
+		mut tick_sprite := &sprite.Sprite{}
+		tick_sprite.textures << texture
 
-		sprite.add_transform(typ: .move, time: time.Time{slider.time.start, slider.time.end}, before: [p.pos.x, p.pos.y])
-		sprite.add_transform(typ: .scale_factor, time: time.Time{a, end_time}, before: [size_ratio * 0.5], after: [size_ratio * 1.2])
-		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{end_time, end_time + 150.0}, before: [size_ratio * 1.2], after: [size_ratio * 1.0])
-		sprite.add_transform(typ: .fade, time: time.Time{a, end_time}, before: [0.0], after: [255.0])
-		sprite.add_transform(typ: .fade, time: time.Time{p.time, p.time + 16.0}, before: [255.0], after: [0.0])
-		sprite.reset_size_based_on_texture()
-		sprite.reset_attributes_based_on_transforms()
+		tick_sprite.add_transform(typ: .move, time: time.Time{slider.time.start, slider.time.end}, before: [p.pos.x, p.pos.y])
+		tick_sprite.add_transform(typ: .scale_factor, time: time.Time{a, end_time}, before: [size_ratio * 0.5], after: [size_ratio * 1.2])
+		tick_sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{end_time, end_time + 150.0}, before: [size_ratio * 1.2], after: [size_ratio * 1.0])
+		tick_sprite.add_transform(typ: .fade, time: time.Time{a, end_time}, before: [0.0], after: [255.0])
+		tick_sprite.add_transform(typ: .fade, time: time.Time{p.time, p.time + 16.0}, before: [255.0], after: [0.0])
+		tick_sprite.reset_size_based_on_texture()
+		tick_sprite.reset_attributes_based_on_transforms()
 
-		slider.sprites << sprite
+		slider.sprites << tick_sprite
 	}
 }
 
@@ -624,25 +624,25 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 			angle = slider.start_angle
 		}
 
-		mut sprite := &sprite.Sprite{}
-		sprite.textures << skin.get_texture("reversearrow")
-		sprite.add_transform(typ: .move, time: time.Time{appear_time, appear_time}, before: [position.x, position.y])
+		mut repeat_sprite := &sprite.Sprite{}
+		repeat_sprite.textures << skin.get_texture("reversearrow")
+		repeat_sprite.add_transform(typ: .move, time: time.Time{appear_time, appear_time}, before: [position.x, position.y])
 		
-		sprite.add_transform(typ: .scale_factor, time: time.Time{appear_time, appear_time}, before: [size_ratio])
-		sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [angle])
-		sprite.add_transform(typ: .fade, time: time.Time{appear_time, math.min<f64>(circle_time, appear_time + 150.0)}, before: [0.0], after: [255.0])
-		sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}, before: [255.0], after: [0.0])
-		sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}, before: [size_ratio], after: [size_ratio * 1.4])
-		sprite.reset_size_based_on_texture()
-		sprite.reset_attributes_based_on_transforms()
+		repeat_sprite.add_transform(typ: .scale_factor, time: time.Time{appear_time, appear_time}, before: [size_ratio])
+		repeat_sprite.add_transform(typ: .angle, time: time.Time{appear_time, appear_time}, before: [angle])
+		repeat_sprite.add_transform(typ: .fade, time: time.Time{appear_time, math.min<f64>(circle_time, appear_time + 150.0)}, before: [0.0], after: [255.0])
+		repeat_sprite.add_transform(typ: .fade, time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}, before: [255.0], after: [0.0])
+		repeat_sprite.add_transform(typ: .scale_factor, easing: easing.quad_out, time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}, before: [size_ratio], after: [size_ratio * 1.4])
+		repeat_sprite.reset_size_based_on_texture()
+		repeat_sprite.reset_attributes_based_on_transforms()
 
 		bounce_start_time := math.min<f64>(slider.diff.preempt, 15000)
 		for t := f64(slider.time.start) - bounce_start_time; t < circle_time; t += 300.0 {
 			length := math.min(300.0, circle_time - t)
-			sprite.add_transform(typ: .scale_factor, time: time.Time{t, t+length}, before: [size_ratio * 1.3], after: [size_ratio * 1.0])
+			repeat_sprite.add_transform(typ: .scale_factor, time: time.Time{t, t+length}, before: [size_ratio * 1.3], after: [size_ratio * 1.0])
 		}
 
-		slider.sprites << sprite
+		slider.sprites << repeat_sprite
 	}
 }
 
@@ -672,7 +672,7 @@ pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
 	return slider.points
 }
 
-pub fn (mut slider Slider) get_position_at_stable(time f64) vector.Vector2 {
+pub fn (mut slider Slider) get_position_at_stable(current_time f64) vector.Vector2 {
 	if slider.is_retarded() {
 		return slider.position
 	}
@@ -680,14 +680,14 @@ pub fn (mut slider Slider) get_position_at_stable(time f64) vector.Vector2 {
 	mut index := 0
 
 	for i := 0; i < slider.score_path.len; i++ {
-		if f64(slider.score_path[i].time2) >= time {
+		if f64(slider.score_path[i].time2) >= current_time {
 			index = i
 			break
 		}
 	}
 
 	p_line := slider.score_path[int(math.clamp(index, 0, slider.score_path.len - 1))]
-	clamped := math.clamp(time, f64(p_line.time1), f64(p_line.time2))
+	clamped := math.clamp(current_time, f64(p_line.time1), f64(p_line.time2))
 
 	mut pos := vector.Vector2{}
 
@@ -703,8 +703,8 @@ pub fn (mut slider Slider) get_position_at_stable(time f64) vector.Vector2 {
 	return pos
 }
 
-pub fn (mut slider Slider) get_position_at_lazer(time f64) vector.Vector2 {
-	t1 := math.clamp(time, slider.time.start, slider.time.end)
+pub fn (mut slider Slider) get_position_at_lazer(update_time f64) vector.Vector2 {
+	t1 := math.clamp(update_time, slider.time.start, slider.time.end)
 	mut progress := (t1 - slider.time.start) / slider.duration
 
 	progress = math.mod(progress, 2)

@@ -155,9 +155,9 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 					logging.info("Beatmap difficulty calculated.")
 				}
 
-				mut object := object.make_object(common_parse_with_key_value(line, ","))
+				mut hitobject := object.make_object(common_parse_with_key_value(line, ","))
 
-				beatmap.objects << &object
+				beatmap.objects << &hitobject
 			}
 
 			else {}

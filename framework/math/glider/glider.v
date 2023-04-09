@@ -62,17 +62,17 @@ pub fn (mut glider Glider) add_event_start(start_time f64, end_time f64, start_v
 	glider.dirty = true
 }
 
-pub fn (mut glider Glider) update(time f64) {
+pub fn (mut glider Glider) update(update_time f64) {
 	if glider.dirty && glider.sorting {
 		// TODO: What the fuck is slice in go
 		glider.dirty = false
 	}
-	glider.time = time
+	glider.time = update_time
 
-	glider.update_current(time)
+	glider.update_current(update_time)
 
 	if glider.queue.len > 0 {
-		for i := 0; glider.queue.len > 0 && glider.queue[i].time.start <= time; i++ {
+		for i := 0; glider.queue.len > 0 && glider.queue[i].time.start <= update_time; i++ {
 			e := &glider.queue[i]
 
 			if e.has_start_value {
@@ -93,17 +93,17 @@ pub fn (mut glider Glider) update(time f64) {
 				glider.value = glider.current.target_value
 			}
 
-			glider.update_current(time)
+			glider.update_current(update_time)
 			glider.queue = glider.queue[1 .. ]
 			i--
 		}
 	}
 }
 
-pub fn (mut glider Glider) update_current(time f64) {
-	if time < glider.current.time.end {
+pub fn (mut glider Glider) update_current(update_time f64) {
+	if update_time < glider.current.time.end {
 		e := glider.current
-		glider.value = e.easing(time - e.time.start, e.start_value, e.target_value - e.start_value, e.time.duration())
+		glider.value = e.easing(update_time - e.time.start, e.start_value, e.target_value - e.start_value, e.time.duration())
 	} else {
 		glider.value = glider.current.target_value
 		glider.start_value = glider.value

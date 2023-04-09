@@ -60,10 +60,10 @@ pub fn (mut video VideoSprite) update_texture() {
 	video.ctx.update_pixel_data(video.tex_id, video.source.buffer.data)
 }
 
-pub fn (mut video VideoSprite) update(time f64) {
-	video.Sprite.update(time)
+pub fn (mut video VideoSprite) update(update_time f64) {
+	video.Sprite.update(update_time)
 
-	if time <= video.start_at {
+	if update_time <= video.start_at {
 		return
 	}
 
@@ -81,7 +81,7 @@ pub fn (mut video VideoSprite) update(time f64) {
 	// video.mutex.unlock()
 
 	video.mutex.@lock()
-	for video.videotime <= time {
+	for video.videotime <= update_time {
 		video.videotime += video.frametime
 		video.update_video()
 		video.need_update = true

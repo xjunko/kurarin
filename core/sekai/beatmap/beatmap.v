@@ -40,20 +40,20 @@ pub fn (mut beatmap Beatmap) reset() {
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
     // Background
     for i, filename in ["default", "field"] {
-        mut sprite := &sprite.Sprite{always_visible: true}
-        sprite.textures << beatmap.ctx.create_image("assets/psekai/textures/${filename}.png")
+        mut background_sprite := &sprite.Sprite{always_visible: true}
+        background_sprite.textures << beatmap.ctx.create_image("assets/psekai/textures/${filename}.png")
 
 
-        sprite.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [1280.0 / 2.0, 720.0 / 2.0 + (f64(i) * 70.0)])
+        background_sprite.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [1280.0 / 2.0, 720.0 / 2.0 + (f64(i) * 70.0)])
 
         if i == 1 {
-            sprite.add_transform(typ: .scale_factor, time: time.Time{0.0, 0.0}, before: [1.18])
+            background_sprite.add_transform(typ: .scale_factor, time: time.Time{0.0, 0.0}, before: [1.18])
         }
 
-        sprite.reset_size_based_on_texture(fit_size: true, source: vector.Vector2{1280, 720})        
-        sprite.reset_attributes_based_on_transforms()
+        background_sprite.reset_size_based_on_texture(fit_size: true, source: vector.Vector2{1280, 720})        
+        background_sprite.reset_attributes_based_on_transforms()
 
-        beatmap.sprites.add(mut sprite)
+        beatmap.sprites.add(mut background_sprite)
     }
 }
 
@@ -140,18 +140,18 @@ pub fn (mut beatmap Beatmap) load_objects() {
 	}
 }
 
-pub fn (mut beatmap Beatmap) update(time f64) {
-	beatmap.sprites.update(time)
-	beatmap.objects_layer.update(time)
+pub fn (mut beatmap Beatmap) update(update_time f64) {
+	beatmap.sprites.update(update_time)
+	beatmap.objects_layer.update(update_time)
 	
 
 	for i := 0; i < beatmap.objects.len; i++ {
-		if time >= beatmap.objects[i].time.start - 1000 && time <= beatmap.objects[i].time.end + 1000 {
-			beatmap.objects[i].update(time)
+		if update_time >= beatmap.objects[i].time.start - 1000 && update_time <= beatmap.objects[i].time.end + 1000 {
+			beatmap.objects[i].update(update_time)
 		}
 	}
 
-	beatmap.last_update_time = time
+	beatmap.last_update_time = update_time
 }
 
 pub fn (mut beatmap Beatmap) draw(arg sprite.CommonSpriteArgument) {

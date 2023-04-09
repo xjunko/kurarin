@@ -30,11 +30,11 @@ pub fn (mut mover Mover) init(mut start &object.IHitObject, mut end &object.IHit
 	mover.time.end = end.get_start_time()
 }
 
-pub fn (mover &Mover) get_multiplier(time f64) f64 {
-	return (time - mover.time.start) / mover.time.duration()
+pub fn (mover &Mover) get_multiplier(update_time f64) f64 {
+	return (update_time - mover.time.start) / mover.time.duration()
 }
 
-pub fn (mut mover Mover) get_point_at(time f64) vector.Vector2 {
+pub fn (mut mover Mover) get_point_at(update_time f64) vector.Vector2 {
 	panic("Not implemented!")
 }
 

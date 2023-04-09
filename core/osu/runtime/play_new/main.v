@@ -13,7 +13,7 @@ import core.osu.beatmap.object.graphic as slider
 
 import framework.audio
 
-import framework.graphic.window
+import framework.graphic.window as i_window
 import framework.graphic.sprite
 import framework.graphic.visualizer
 
@@ -26,7 +26,7 @@ const (
 
 [heap]
 pub struct Window {
-	window.GeneralWindow
+	i_window.GeneralWindow
 
 	mut:
 		cfg InternalInitConfig
@@ -107,28 +107,28 @@ pub fn (mut window Window) init(_ voidptr) {
 
 	// Side glows
 	for i in 0 .. 2 {
-		mut sprite := &sprite.Sprite{
+		mut menu_sprite := &sprite.Sprite{
 			textures: [window.ctx.create_image("assets/common/textures/menu-side-glow.png")],
 			always_visible: true,
 			origin: vector.top_left,
 			additive: true
 		}
 
-		sprite.reset_size_based_on_texture(size: vector.Vector2{f64(sprite.textures[0].width) * rate, settings.global.window.height})
+		menu_sprite.reset_size_based_on_texture(size: vector.Vector2{f64(menu_sprite.textures[0].width) * rate, settings.global.window.height})
 		
-		sprite.color.r = 0
-		sprite.color.g = 90
-		sprite.color.b = 100
+		menu_sprite.color.r = 0
+		menu_sprite.color.g = 90
+		menu_sprite.color.b = 100
 
 		if i == 1 {
-			sprite.origin = vector.bottom_centre
-			sprite.position.x = settings.global.window.width - (f64(sprite.textures[0].width) * rate) / 2.0
-			sprite.angle = -180.0
+			menu_sprite.origin = vector.bottom_centre
+			menu_sprite.position.x = settings.global.window.width - (f64(menu_sprite.textures[0].width) * rate) / 2.0
+			menu_sprite.angle = -180.0
 		}
 
-		window.sprites.add(mut sprite)
+		window.sprites.add(mut menu_sprite)
 
-		window.sides << sprite
+		window.sides << menu_sprite
 	}
 
 

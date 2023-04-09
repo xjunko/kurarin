@@ -1,6 +1,6 @@
 # Variables
 with_gc=true # True by default
-gc_type="boehm_incr_opt"
+gc_type="boehm"
 
 make_shaders=true
 shaders_dir="assets/osu/shaders/slider.glsl"

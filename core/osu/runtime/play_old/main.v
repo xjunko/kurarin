@@ -26,12 +26,12 @@ import framework.logging
 import framework.math.time
 import framework.math.vector
 import framework.graphic.visualizer
-import framework.graphic.window
+import framework.graphic.window as i_window
 
 import framework.ffmpeg.export
 
 pub struct Window {
-	window.GeneralWindow
+	i_window.GeneralWindow
 
 	mut:
 		play_mode PlayState
@@ -73,55 +73,55 @@ pub fn (mut window Window) update_boost() {
 	}
 }
 
-pub fn (mut window Window) update_cursor(time f64, delta f64) {
+pub fn (mut window Window) update_cursor(update_time f64, delta f64) {
 	if window.argument.play_mode != .play {
-		window.cursor_controller.update(time)
+		window.cursor_controller.update(update_time)
 	}
 
 	for mut cursor in window.cursors {
-		cursor.update(time, delta)
+		cursor.update(update_time, delta)
 	}
 
 	// Rainbow mode if theres only one cursor
 	if window.cursors.len == 1 {
-		color_index := (f32(math.fmod(time / 100.0, 10000)) / 10000.0) + 0.1
-		window.cursors[0].trail_color.r = u8(f32(math.sin(0.3*(time / 1000.0) + 0 + 1 * color_index) * 127.0 + 128.0))
-		window.cursors[0].trail_color.g = u8(f32(math.sin(0.3*(time / 1000.0) + 2 + 1 * color_index) * 127.0 + 128.0))
-		window.cursors[0].trail_color.b = u8(f32(math.sin(0.3*(time / 1000.0) + 4 + 1 * color_index) * 127.0 + 128.0))
+		color_index := (f32(math.fmod(update_time / 100.0, 10000)) / 10000.0) + 0.1
+		window.cursors[0].trail_color.r = u8(f32(math.sin(0.3*(update_time / 1000.0) + 0 + 1 * color_index) * 127.0 + 128.0))
+		window.cursors[0].trail_color.g = u8(f32(math.sin(0.3*(update_time / 1000.0) + 2 + 1 * color_index) * 127.0 + 128.0))
+		window.cursors[0].trail_color.b = u8(f32(math.sin(0.3*(update_time / 1000.0) + 4 + 1 * color_index) * 127.0 + 128.0))
 	}
 }
 
-pub fn (mut window Window) update(time f64, delta f64) {
-	if time >= settings.global.gameplay.playfield.lead_in_time && !window.audio_been_played {
+pub fn (mut window Window) update(update_time f64, delta f64) {
+	if update_time >= settings.global.gameplay.playfield.lead_in_time && !window.audio_been_played {
 		window.audio_been_played = true
 		window.beatmap_song.set_speed(settings.global.window.speed)
 		window.beatmap_song.set_pitch(settings.global.audio.pitch)
 		window.beatmap_song.set_volume(f32((settings.global.audio.music / 100.0) * (settings.global.audio.global / 100.0)))
-		window.beatmap_song.set_position(time - settings.global.gameplay.playfield.lead_in_time) // HACK: Catch up with the game_time, sometime its too fast.
+		window.beatmap_song.set_position(update_time - settings.global.gameplay.playfield.lead_in_time) // HACK: Catch up with the game_time, sometime its too fast.
 		window.beatmap_song.play()
 	}
 
 	// Ruleset
 	window.ruleset_mutex.@lock()
-	window.ruleset.update_click_for(window.cursors[0], time - settings.global.gameplay.playfield.lead_in_time)
-	window.ruleset.update_normal_for(window.cursors[0], time - settings.global.gameplay.playfield.lead_in_time, false)
-	window.ruleset.update_post_for(window.cursors[0], time - settings.global.gameplay.playfield.lead_in_time, false)
-	window.ruleset.update(time - settings.global.gameplay.playfield.lead_in_time)
+	window.ruleset.update_click_for(window.cursors[0], update_time - settings.global.gameplay.playfield.lead_in_time)
+	window.ruleset.update_normal_for(window.cursors[0], update_time - settings.global.gameplay.playfield.lead_in_time, false)
+	window.ruleset.update_post_for(window.cursors[0], update_time - settings.global.gameplay.playfield.lead_in_time, false)
+	window.ruleset.update(update_time - settings.global.gameplay.playfield.lead_in_time)
 	window.ruleset_mutex.unlock()
 
-	window.beatmap.update(time - settings.global.gameplay.playfield.lead_in_time, window.beatmap_song_boost)
+	window.beatmap.update(update_time - settings.global.gameplay.playfield.lead_in_time, window.beatmap_song_boost)
 
 	// Overlay
 	if settings.global.gameplay.overlay.info {
-		window.overlay.update(time - settings.global.gameplay.playfield.lead_in_time)
+		window.overlay.update(update_time - settings.global.gameplay.playfield.lead_in_time)
 	}
 	
 	if settings.global.gameplay.overlay.visualizer {
-		window.visualizer.update(time - settings.global.gameplay.playfield.lead_in_time)
+		window.visualizer.update(update_time - settings.global.gameplay.playfield.lead_in_time)
 	}
 	
-	window.beatmap_song.update(time - settings.global.gameplay.playfield.lead_in_time)
-	window.update_cursor(time - settings.global.gameplay.playfield.lead_in_time, delta)
+	window.beatmap_song.update(update_time - settings.global.gameplay.playfield.lead_in_time)
+	window.update_cursor(update_time - settings.global.gameplay.playfield.lead_in_time, delta)
 	window.update_boost()
 }
 
@@ -178,13 +178,13 @@ pub fn window_init(mut window &Window) {
 	// Turn that shit off
     C._sapp_glx_swapinterval(0)
 
-	mut beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)
+	mut loaded_beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)
 
 	// init slider renderer
 	graphic.init_slider_renderer()
 
 	// 
-	window.beatmap = beatmap
+	window.beatmap = loaded_beatmap
 	window.beatmap.bind_context(mut window.ctx)
 	window.beatmap.reset()
 
@@ -388,11 +388,11 @@ pub fn initiate_game_loop(argument GameArgument) {
 			// C.mu_input_scroll(&window.microui.ctx, -ev.scroll_x, -ev.scroll_y * 6)
 		}
 
-		click_fn: fn (x f32, y f32, button gg.MouseButton, mut window &Window) {
+		click_fn: fn (pos_x f32, pos_y f32, button gg.MouseButton, mut window &Window) {
 			// C.mu_input_mousedown(&window.microui.ctx, int(x), int(y), int(button) + 1)
 		}
 
-		unclick_fn: fn (x f32, y f32, button gg.MouseButton, mut window &Window) {
+		unclick_fn: fn (pos_x f32, pos_y f32, button gg.MouseButton, mut window &Window) {
 			// C.mu_input_mouseup(&window.microui.ctx, int(x), int(y), int(button) + 1)
 		}
 

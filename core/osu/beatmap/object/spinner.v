@@ -29,15 +29,15 @@ pub fn (mut spinner Spinner) draw(arg sprite.CommonSpriteArgument) {
 	}
 }
 
-pub fn (mut spinner Spinner) update(time f64) bool {
-	spinner.last_time = time
+pub fn (mut spinner Spinner) update(update_time f64) bool {
+	spinner.last_time = update_time
 
 	for mut sprite in spinner.sprites {
-		sprite.update(time)
+		sprite.update(update_time)
 	}
 
 	// Play hitsound when finished
-	if time >= spinner.get_end_time() && !spinner.done {
+	if update_time >= spinner.get_end_time() && !spinner.done {
 		spinner.done = true
 		audio.play_sample(
 			spinner.hitsound.sample_set,

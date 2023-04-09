@@ -4,21 +4,23 @@ import math
 import framework.math.vector
 
 pub struct Bezier {
-	pub mut:
-		points []vector.Vector2
-		approx_length f64
-		control_length f64
+pub mut:
+	points         []vector.Vector2
+	approx_length  f64
+	control_length f64
 }
 
 pub fn make_bezier(points []vector.Vector2) &Bezier {
-	mut bezier := &Bezier{points: points}
+	mut bezier := &Bezier{
+		points: points
+	}
 
 	for i := 1; i < bezier.points.len; i++ {
-		bezier.control_length += bezier.points[i].distance(bezier.points[i-1])
+		bezier.control_length += bezier.points[i].distance(bezier.points[i - 1])
 	}
 
 	sections := math.ceil(bezier.control_length)
-	
+
 	mut previous := bezier.points[0]
 	for i := 1; i <= sections; i++ {
 		current := bezier.n_point_at(f64(i) / sections)
@@ -45,7 +47,7 @@ pub fn (bezier Bezier) point_at(time f64) vector.Vector2 {
 	mut width := f64(0.0)
 	mut c := f64(0.0)
 	mut pos := bezier.points[0]
-	
+
 	for width < desired_width {
 		pt := bezier.n_point_at(c)
 		width += pt.distance(pos)
@@ -80,10 +82,10 @@ pub fn binomial_coeff(n i64, k i64) i64 {
 		return 1
 	}
 
-	kk := math.min(k, n-k)
+	kk := math.min(k, n - k)
 	mut c := i64(1)
 	mut i := 0
-	for ;i < kk; i++ {
+	for ; i < kk; i++ {
 		c = c * (n - i) / (i + 1)
 	}
 

@@ -4,20 +4,24 @@ import math
 import framework.math.vector
 
 pub struct CircArc {
-	pub mut:
-		p1 vector.Vector2
-		p2 vector.Vector2
-		p3 vector.Vector2
-		centre vector.Vector2
-		start_angle f64
-		total_angle f64
-		r f64
-		dir f64
-		unstable bool
+pub mut:
+	p1          vector.Vector2
+	p2          vector.Vector2
+	p3          vector.Vector2
+	centre      vector.Vector2
+	start_angle f64
+	total_angle f64
+	r           f64
+	dir         f64
+	unstable    bool
 }
 
 pub fn make_circ_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.Vector2) &CircArc {
-	mut arc := &CircArc{p1: p1, p2: p2, p3: p3}
+	mut arc := &CircArc{
+		p1: p1
+		p2: p2
+		p3: p3
+	}
 
 	if vector.is_straight_line(p1, p2, p3) {
 		arc.unstable = true

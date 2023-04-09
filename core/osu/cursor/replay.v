@@ -28,9 +28,9 @@ pub struct ReplayCursor {
 		events []ReplayEvent
 }
 
-pub fn (mut replay ReplayCursor) update(time f64) {
+pub fn (mut replay ReplayCursor) update(update_time f64) {
 	for i := 0; i < replay.events.len; i++ {
-		if time >= replay.events[i].time {
+		if update_time >= replay.events[i].time {
 			keys := replay.events[i].keys
 
 			replay.cursor.left_button = ((keys & osu_m1) == osu_m1) || ((keys & osu_k1) == osu_k1)
