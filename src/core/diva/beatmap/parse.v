@@ -139,12 +139,20 @@ pub fn (mut note Note) init(mut arg sprite.CommonSpriteArgument) {
 					before: [start_x, start_y]
 					after: [note.position.x, note.position.y]
 				)
-				note_sprite.add_transform(typ: .scale_factor, time: time.Time{note.time.end,
-					note.time.end + 100}, before: [1.0 * common_scale], after: [
-					1.5 * common_scale,
-				])
-				note_sprite.add_transform(typ: .fade, time: time.Time{note.time.end,
-					note.time.end + 100}, before: [255.0], after: [0.0])
+				note_sprite.add_transform(
+					typ: .scale_factor
+					time: time.Time{note.time.end, note.time.end + 100}
+					before: [1.0 * common_scale]
+					after: [
+						1.5 * common_scale,
+					]
+				)
+				note_sprite.add_transform(
+					typ: .fade
+					time: time.Time{note.time.end, note.time.end + 100}
+					before: [255.0]
+					after: [0.0]
+				)
 			}
 		} else {
 			note_sprite.origin = vector.bottom_centre
@@ -164,14 +172,23 @@ pub fn (mut note Note) init(mut arg sprite.CommonSpriteArgument) {
 
 		// sprite.add_transform(typ: .fade, time: time.Time{note.time.start - note.tft, note.time.end}, before: [0.0], after: [255.0])
 		// sprite.add_transform(typ: .fade, time: time.Time{note.time.end, note.time.end + 100}, before: [0.0], after: [0.0])
-		note_sprite.add_transform(typ: .scale_factor, time: time.Time{note.time.start - f64(note.tft),
-			note.time.start - f64(note.tft) + 30}, before: [1.0 * common_scale], after: [
-			1.2 * common_scale,
-		])
-		note_sprite.add_transform(typ: .scale_factor, time: time.Time{
-			note.time.start - f64(note.tft) + 30, note.time.start - f64(note.tft) + 60}, before: [
-			1.2 * common_scale,
-		], after: [1.0 * common_scale])
+		note_sprite.add_transform(
+			typ: .scale_factor
+			time: time.Time{note.time.start - f64(note.tft), note.time.start - f64(note.tft) + 30}
+			before: [1.0 * common_scale]
+			after: [
+				1.2 * common_scale,
+			]
+		)
+		note_sprite.add_transform(
+			typ: .scale_factor
+			time: time.Time{note.time.start - f64(note.tft) + 30, note.time.start - f64(note.tft) +
+				60}
+			before: [
+				1.2 * common_scale,
+			]
+			after: [1.0 * common_scale]
+		)
 		// sprite.add_transform(typ: .scale_factor, time: time.Time{note.time.start - 30, note.time.start}, before: [1.4], after: [1.0])
 
 		note_sprite.reset_size_based_on_texture()
@@ -188,18 +205,26 @@ pub fn (mut note Note) init(mut arg sprite.CommonSpriteArgument) {
 		}
 		effect_sprite.textures << skin.get_texture(sprite_name)
 
-		effect_sprite.add_transform(typ: .fade, time: time.Time{note.time.end + 200,
-			note.time.end + 300}, before: [255.0], after: [0.0])
+		effect_sprite.add_transform(
+			typ: .fade
+			time: time.Time{note.time.end + 200, note.time.end + 300}
+			before: [255.0]
+			after: [0.0]
+		)
 		effect_sprite.add_transform(
 			typ: .move
 			time: time.Time{note.time.end, note.time.end + 200}
 			before: [note.position.x, note.position.y]
 			after: [note.position.x, note.position.y]
 		)
-		effect_sprite.add_transform(typ: .scale_factor, time: time.Time{note.time.end,
-			note.time.end + 200}, before: [0.75 * common_scale], after: [
-			(1.0 + (f64(1 - i) / 2.0)) * common_scale,
-		])
+		effect_sprite.add_transform(
+			typ: .scale_factor
+			time: time.Time{note.time.end, note.time.end + 200}
+			before: [0.75 * common_scale]
+			after: [
+				(1.0 + (f64(1 - i) / 2.0)) * common_scale,
+			]
+		)
 
 		effect_sprite.reset_size_based_on_texture()
 		effect_sprite.reset_attributes_based_on_transforms()

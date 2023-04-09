@@ -3,12 +3,12 @@ module sprite
 import framework.math.camera
 
 pub struct Manager {
-	pub mut:
-		queue []&Sprite
-		camera camera.Camera
-		dirty bool
+pub mut:
+	queue  []&Sprite
+	camera camera.Camera
+	dirty  bool
 
-		last_time f64
+	last_time f64
 }
 
 pub fn (mut manager Manager) add(mut sprite Sprite) {
@@ -19,7 +19,9 @@ pub fn (mut manager Manager) add(mut sprite Sprite) {
 // TODO: This is slow cuz `O(n)`, but only used once per end time so idk
 pub fn (mut manager Manager) find_index_by_id(id int) int {
 	for i, s in manager.queue {
-		if s.id == id { return i }
+		if s.id == id {
+			return i
+		}
 	}
 
 	return -1
@@ -37,7 +39,7 @@ pub fn (mut manager Manager) update(time f64) {
 			} $else {
 				manager.queue.delete(manager.queue.index(sprite))
 			}
-			
+
 			// println("Took: ${f64(timelib.ticks()) - start:.10} to finish")
 			continue
 		}
@@ -55,9 +57,8 @@ pub fn (mut manager Manager) draw(arg CommonSpriteArgument) {
 }
 
 pub fn (mut manager Manager) draw_internal_camera(arg CommonSpriteArgument) {
-	manager.draw(CommonSpriteArgument{...arg, camera: manager.camera})
+	manager.draw(CommonSpriteArgument{ ...arg, camera: manager.camera })
 }
-
 
 // Make
 pub fn make_manager() &Manager {

@@ -3,20 +3,18 @@ module beatmap
 import os
 
 pub struct Beatmap {
-	pub mut:
-		title  string
-		artist string
-		audio  string
-		bg     string
-		file   string
-		root   string
+pub mut:
+	title  string
+	artist string
+	audio  string
+	bg     string
+	file   string
+	root   string
 }
-
 
 pub fn (b Beatmap) get_audio() string {
 	return os.join_path(b.root, b.audio)
 }
-
 
 pub fn (b Beatmap) get_background() string {
 	return os.join_path(b.root, b.bg)
@@ -43,7 +41,7 @@ pub fn parse_beatmap(path string) Beatmap {
 	}
 
 	mut beatmap := Beatmap{
-		root: os.dir(path),
+		root: os.dir(path)
 		file: os.base(path)
 	}
 	mut category := ''
@@ -70,7 +68,6 @@ pub fn parse_beatmap(path string) Beatmap {
 					else {}
 				}
 			}
-
 			'Events' {
 				if beatmap.bg.len == 0 && (line.starts_with('0') || line.starts_with('Sprite')) {
 					beatmap.bg = line.split(',')[2].replace('"', '')
@@ -79,7 +76,6 @@ pub fn parse_beatmap(path string) Beatmap {
 			else {}
 		}
 	}
-
 
 	return beatmap
 }

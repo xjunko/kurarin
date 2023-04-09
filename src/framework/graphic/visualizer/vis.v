@@ -3,29 +3,27 @@ module visualizer
 import framework.audio
 import library.gg
 import gx
-
 import framework.math.vector
 
 pub struct Visualizer {
-	pub mut:
-		jump_size int = 10
-		jump_counter int
-		bars int = 200
-		update_delay f64 = 50.0
-		decay_value f64 = 0.0024
-		bar_length f64 = 400 // Internal
-		bar_draw_length f64 = 400 // Used when drawing
-		start_distance f64 = 1.0
-		last_time f64
-		counter f64
-		fft []f64 = []f64{len: 200} // TODO: fix this, make a visualizer factor yor smth
-		music &audio.Track
-		multiplier f64 = 0.5 // Change this to increase the "oopmh"
-		inverted bool // Invert the visualizer
-
-		// logo stuff
-		logo_position vector.Vector2 = vector.Vector2{640, 480}
-		logo_size     vector.Vector2 = vector.Vector2{100, 100}
+pub mut:
+	jump_size       int = 10
+	jump_counter    int
+	bars            int = 200
+	update_delay    f64 = 50.0
+	decay_value     f64 = 0.0024
+	bar_length      f64 = 400 // Internal
+	bar_draw_length f64 = 400 // Used when drawing
+	start_distance  f64 = 1.0
+	last_time       f64
+	counter         f64
+	fft             []f64 = []f64{len: 200} // TODO: fix this, make a visualizer factor yor smth
+	music           &audio.Track
+	multiplier      f64 = 0.5 // Change this to increase the "oopmh"
+	inverted        bool  // Invert the visualizer
+	// logo stuff
+	logo_position vector.Vector2 = vector.Vector2{640, 480}
+	logo_size     vector.Vector2 = vector.Vector2{100, 100}
 }
 
 pub fn (mut vis Visualizer) update_logo(position vector.Vector2, size vector.Vector2) {
@@ -60,11 +58,11 @@ pub fn (mut vis Visualizer) update(time f64) {
 			vis.fft[i] = 0
 		}
 	}
-	
+
 	vis.last_time = time
 }
 
-pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
+pub fn (mut vis Visualizer) draw(mut ctx gg.Context) {
 	cutoff := 1.0 / vis.bar_length
 
 	position := vis.logo_position
@@ -78,28 +76,25 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 			if v < cutoff {
 				continue
 			}
-			
+
 			// const
 			mut thickness := f32(1)
-			
+
 			// Default for Top
 			mut x := f32(position.x) + f32((f64(j) / vis.bars) * size.x)
 			mut y := f32(position.y)
 			mut width := thickness
 			mut height := -f32(v * length * inverted)
 
-			
 			if i == 1 { // Right
 				x = f32(position.x + size.x)
 				y = f32(position.y + size.y) - f32((f64(j) / vis.bars) * size.y)
 				height = thickness
 				width = f32(v * length * inverted)
-
 			} else if i == 2 { // Down
 				x = f32(position.x + size.x) - f32((f64(j) / vis.bars) * size.x)
 				y += f32(size.y)
 				height *= -1
-
 			} else if i == 3 { // Left
 				x = f32(position.x)
 				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
@@ -117,28 +112,25 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 			if v < cutoff {
 				continue
 			}
-			
+
 			// const
 			mut thickness := f32(2)
-			
+
 			// Default for Top
 			mut x := f32(position.x) + f32((f64(j) / vis.bars) * size.x)
 			mut y := f32(position.y)
 			mut width := thickness
 			mut height := -f32(v * length * inverted)
 
-			
 			if i == 1 { // Right
 				x = f32(position.x + size.x)
 				y = f32(position.y + size.y) - f32((f64(j) / vis.bars) * size.y)
 				height = thickness
 				width = f32(v * length * inverted)
-
 			} else if i == 2 { // Down
 				x = f32(position.x + size.x) - f32((f64(j) / vis.bars) * size.x)
 				y += f32(size.y)
 				height *= -1
-
 			} else if i == 3 { // Left
 				x = f32(position.x)
 				y = f32(position.y) + f32((f64(j) / vis.bars) * size.y)
@@ -149,6 +141,4 @@ pub fn (mut vis Visualizer) draw(mut ctx &gg.Context) {
 			ctx.draw_rect_filled_add(x, y, width, height, gx.purple)
 		}
 	}
-
-	
 }

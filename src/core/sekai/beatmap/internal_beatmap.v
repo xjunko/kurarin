@@ -1,69 +1,70 @@
 module beatmap
 
-import object
-import timing
+import core.sekai.beatmap.object
+import core.sekai.beatmap.timing
 
 // what da fawgggg
 // source: https://github.com/NonSpicyBurrito/sonolus-pjsekai-engine/blob/d2a3c6bda1ef43502e77dcc39cb6e965f86cec7e/src/lib/sus/analyze.ts#L3
 /*
-	`InternalBeatmap`: Contains internal values thats important on parse time
+`InternalBeatmap`: Contains internal values thats important on parse time
 	`Beatmap`: Light wrapper around `InternalBeatmap` to render objects
 */
 
 pub const (
-		ticks_per_beat = 480.0
-		ticks_per_hidden = ticks_per_beat / 2.0
+	ticks_per_beat   = 480.0
+	ticks_per_hidden = ticks_per_beat / 2.0
 )
 
 // Structs
 pub struct Line {
-	pub mut:
-		header string
-		data string
+pub mut:
+	header string
+	data   string
 }
 
 pub struct MeasureChange {
-	pub mut:
-		a f64
-		b f64
+pub mut:
+	a f64
+	b f64
 }
 
 pub struct RawObject {
-	pub mut:
-		tick f64
-		value string
+pub mut:
+	tick  f64
+	value string
 }
+
 //
 
-[heap] // HACK
+// HACK
+[heap]
 pub struct InternalBeatmap {
-	mut:
-		// Everything Internal
-		// This fucking shit is awful, but its important for parsing the fucking thing
-		lines   []Line
-		measure []MeasureChange
-		meta    map[string]string
-		
-		bpms map[string]f64
-		bpm_changes []&RawObject
-		tap_notes []&object.NoteObject
-		directional_notes []&object.NoteObject
+mut:
+	// Everything Internal
+	// This fucking shit is awful, but its important for parsing the fucking thing
+	lines   []Line
+	measure []MeasureChange
+	meta    map[string]string
 
-		stream map[string][]&object.NoteObject
-		slides [][]&object.NoteObject
-		slides2 []string
+	bpms              map[string]f64
+	bpm_changes       []&RawObject
+	tap_notes         []&object.NoteObject
+	directional_notes []&object.NoteObject
 
-		bars timing.Bars
-		timings timing.Timing
+	stream  map[string][]&object.NoteObject
+	slides  [][]&object.NoteObject
+	slides2 []string
 
-		objects_i int
-		flicks_direction map[string]int
+	bars    timing.Bars
+	timings timing.Timing
 
-	pub mut:
-		// Surface level stuff
-		notes []&object.NoteObject
-		flicks []&object.FlickObject
-		sliders []&object.SliderObject
+	objects_i        int
+	flicks_direction map[string]int
+pub mut:
+	// Surface level stuff
+	notes   []&object.NoteObject
+	flicks  []&object.FlickObject
+	sliders []&object.SliderObject
 }
 
 // Resolver

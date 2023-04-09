@@ -27,7 +27,6 @@ pub fn (result HitResult) get_value() i64 {
 		.slider_start, .slider_repeat, .slider_end { return 30 }
 		.slider_point { return 100 }
 		.spinner_bonus { return 1100 }
-		
 		else {}
 	}
 

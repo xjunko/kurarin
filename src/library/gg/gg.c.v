@@ -10,7 +10,6 @@ import sokol.sapp
 import sokol.sgl
 import sokol.gfx
 import math
-
 import core.common.settings
 
 pub type TouchPoint = C.sapp_touchpoint
@@ -53,26 +52,26 @@ pub:
 	borderless_window bool
 	always_on_top     bool
 	bg_color          gx.Color
-	init_fn           FNCb   = voidptr(0)
-	frame_fn          FNCb   = voidptr(0)
-	native_frame_fn   FNCb   = voidptr(0)
-	cleanup_fn        FNCb   = voidptr(0)
-	fail_fn           FNFail = voidptr(0)
+	init_fn           FNCb   = unsafe { nil }
+	frame_fn          FNCb   = unsafe { nil }
+	native_frame_fn   FNCb   = unsafe { nil }
+	cleanup_fn        FNCb   = unsafe { nil }
+	fail_fn           FNFail = unsafe { nil }
 	//
-	event_fn FNEvent = voidptr(0)
-	quit_fn  FNEvent = voidptr(0)
+	event_fn FNEvent = unsafe { nil }
+	quit_fn  FNEvent = unsafe { nil }
 	//
-	keydown_fn FNKeyDown = voidptr(0)
-	keyup_fn   FNKeyUp   = voidptr(0)
-	char_fn    FNChar    = voidptr(0)
+	keydown_fn FNKeyDown = unsafe { nil }
+	keyup_fn   FNKeyUp   = unsafe { nil }
+	char_fn    FNChar    = unsafe { nil }
 	//
-	move_fn    FNMove    = voidptr(0)
-	click_fn   FNClick   = voidptr(0)
-	unclick_fn FNUnClick = voidptr(0)
-	leave_fn   FNEvent   = voidptr(0)
-	enter_fn   FNEvent   = voidptr(0)
-	resized_fn FNEvent   = voidptr(0)
-	scroll_fn  FNEvent   = voidptr(0)
+	move_fn    FNMove    = unsafe { nil }
+	click_fn   FNClick   = unsafe { nil }
+	unclick_fn FNUnClick = unsafe { nil }
+	leave_fn   FNEvent   = unsafe { nil }
+	enter_fn   FNEvent   = unsafe { nil }
+	resized_fn FNEvent   = unsafe { nil }
+	scroll_fn  FNEvent   = unsafe { nil }
 	// wait_events       bool // set this to true for UIs, to save power
 	fullscreen    bool
 	scale         f32 = 1.0
@@ -110,7 +109,6 @@ pub:
 pub mut:
 	// FireRedz
 	image_default Image // Texture to fallback to incase the image cant be loaded.
-	
 	// V
 	scale f32 = 1.0
 	// will get set to 2.0 for retina, will remain 1.0 for normal
@@ -192,7 +190,7 @@ fn gg_init_sokol_window(user_data voidptr) {
 		} else {
 			sfont := system_font_path()
 			if g.config.font_path != '' {
-				eprintln('font file "$g.config.font_path" does not exist, the system font ($sfont) was used instead.')
+				eprintln('font file "${g.config.font_path}" does not exist, the system font (${sfont}) was used instead.')
 			}
 
 			g.ft = new_ft(
@@ -238,16 +236,16 @@ fn gg_init_sokol_window(user_data voidptr) {
 	g.additive_pip = sgl.make_pipeline(&additive_pipdesc)
 
 	// Load default texture
-	g.image_default = g.create_image("assets/textures/default.png")
+	g.image_default = g.create_image('assets/textures/default.png')
 
 	// Call init fn
-	if g.config.init_fn != voidptr(0) {
+	if g.config.init_fn != unsafe { nil } {
 		g.config.init_fn(g.user_data)
 	}
 	// Create images now that we can do that after sg is inited
 	if g.native_rendering {
 		return
-	}	
+	}
 
 	for i in 0 .. g.image_cache.len {
 		if g.image_cache[i].simg.id == 0 {
@@ -390,7 +388,7 @@ fn (ctx &Context) internal_draw_rect_filled(x f32, y f32, w f32, h f32, c gx.Col
 fn gg_frame_fn(user_data voidptr) {
 	mut ctx := unsafe { &Context(user_data) }
 	ctx.frame++
-	if ctx.config.frame_fn == voidptr(0) {
+	if ctx.config.frame_fn == unsafe { nil } {
 		return
 	}
 	if ctx.native_rendering {
@@ -456,64 +454,64 @@ fn gg_event_fn(ce voidptr, user_data voidptr) {
 		g.pressed_keys[key_idx] = next
 		g.pressed_keys_edge[key_idx] = prev != next
 	}
-	if g.config.event_fn != voidptr(0) {
+	if g.config.event_fn != unsafe { nil } {
 		g.config.event_fn(e, g.config.user_data)
 	}
 	match e.typ {
 		.mouse_move {
-			if g.config.move_fn != voidptr(0) {
+			if g.config.move_fn != unsafe { nil } {
 				g.config.move_fn(e.mouse_x / g.scale, e.mouse_y / g.scale, g.config.user_data)
 			}
 		}
 		.mouse_down {
-			if g.config.click_fn != voidptr(0) {
+			if g.config.click_fn != unsafe { nil } {
 				g.config.click_fn(e.mouse_x / g.scale, e.mouse_y / g.scale, e.mouse_button,
 					g.config.user_data)
 			}
 		}
 		.mouse_up {
-			if g.config.unclick_fn != voidptr(0) {
+			if g.config.unclick_fn != unsafe { nil } {
 				g.config.unclick_fn(e.mouse_x / g.scale, e.mouse_y / g.scale, e.mouse_button,
 					g.config.user_data)
 			}
 		}
 		.mouse_leave {
-			if g.config.leave_fn != voidptr(0) {
+			if g.config.leave_fn != unsafe { nil } {
 				g.config.leave_fn(e, g.config.user_data)
 			}
 		}
 		.mouse_enter {
-			if g.config.enter_fn != voidptr(0) {
+			if g.config.enter_fn != unsafe { nil } {
 				g.config.enter_fn(e, g.config.user_data)
 			}
 		}
 		.mouse_scroll {
-			if g.config.scroll_fn != voidptr(0) {
+			if g.config.scroll_fn != unsafe { nil } {
 				g.config.scroll_fn(e, g.config.user_data)
 			}
 		}
 		.key_down {
-			if g.config.keydown_fn != voidptr(0) {
+			if g.config.keydown_fn != unsafe { nil } {
 				g.config.keydown_fn(e.key_code, unsafe { Modifier(e.modifiers) }, g.config.user_data)
 			}
 		}
 		.key_up {
-			if g.config.keyup_fn != voidptr(0) {
+			if g.config.keyup_fn != unsafe { nil } {
 				g.config.keyup_fn(e.key_code, unsafe { Modifier(e.modifiers) }, g.config.user_data)
 			}
 		}
 		.char {
-			if g.config.char_fn != voidptr(0) {
+			if g.config.char_fn != unsafe { nil } {
 				g.config.char_fn(e.char_code, g.config.user_data)
 			}
 		}
 		.resized {
-			if g.config.resized_fn != voidptr(0) {
+			if g.config.resized_fn != unsafe { nil } {
 				g.config.resized_fn(e, g.config.user_data)
 			}
 		}
 		.quit_requested {
-			if g.config.quit_fn != voidptr(0) {
+			if g.config.quit_fn != unsafe { nil } {
 				g.config.quit_fn(e, g.config.user_data)
 			}
 		}
@@ -525,7 +523,7 @@ fn gg_event_fn(ce voidptr, user_data voidptr) {
 
 fn gg_cleanup_fn(user_data voidptr) {
 	mut g := unsafe { &Context(user_data) }
-	if g.config.cleanup_fn != voidptr(0) {
+	if g.config.cleanup_fn != unsafe { nil } {
 		g.config.cleanup_fn(g.config.user_data)
 	}
 	gfx.shutdown()
@@ -534,10 +532,10 @@ fn gg_cleanup_fn(user_data voidptr) {
 fn gg_fail_fn(msg &char, user_data voidptr) {
 	mut g := unsafe { &Context(user_data) }
 	vmsg := unsafe { tos3(msg) }
-	if g.config.fail_fn != voidptr(0) {
+	if g.config.fail_fn != unsafe { nil } {
 		g.config.fail_fn(vmsg, g.config.user_data)
 	} else {
-		eprintln('gg error: $vmsg')
+		eprintln('gg error: ${vmsg}')
 	}
 }
 
@@ -552,7 +550,8 @@ pub fn (gg &Context) begin() {
 	}
 	sgl.defaults()
 	sgl.matrix_mode_projection()
-	sgl.ortho(0.0, int(settings.global.window.width), int(settings.global.window.height), 0.0, -1.0, 1.0)
+	sgl.ortho(0.0, int(settings.global.window.width), int(settings.global.window.height),
+		0.0, -1.0, 1.0)
 }
 
 // Finishes drawing for the context

@@ -4,7 +4,6 @@ module gg
 
 import os
 import stbi
-
 import sokol.gfx
 import sokol.sgl
 
@@ -26,7 +25,7 @@ pub mut:
 pub fn (mut ctx Context) load_image_queue() {
 	for i := 0; i < ctx.image_queue.len; i++ {
 		ctx.image_cache[ctx.image_queue[i].id].init_sokol_image()
-		ctx.image_queue = ctx.image_queue[1 ..]
+		ctx.image_queue = ctx.image_queue[1..]
 		i--
 	}
 }
@@ -76,13 +75,13 @@ pub fn (mut img Image) init_sokol_image() &Image {
 		wrap_u: .clamp_to_edge
 		wrap_v: .clamp_to_edge
 		label: img.path.str
-		d3d11_texture: 0,
+		d3d11_texture: 0
 	}
 
 	$if !no_aa ? {
 		// Antialiasing
 		img_desc.min_filter = .linear
-		img_desc.mag_filter = .linear 
+		img_desc.mag_filter = .linear
 	}
 
 	img_desc.data.subimage[0][0] = gfx.Range{
@@ -99,7 +98,7 @@ pub fn (mut img Image) init_sokol_image() &Image {
 pub fn (ctx &Context) draw_image(x f32, y f32, width f32, height f32, img_ &Image) {
 	$if macos {
 		if img_.id >= ctx.image_cache.len {
-			eprintln('gg: draw_image() bad img id $img_.id (img cache len = $ctx.image_cache.len)')
+			eprintln('gg: draw_image() bad img id ${img_.id} (img cache len = ${ctx.image_cache.len})')
 			return
 		}
 		if ctx.native_rendering {
@@ -197,7 +196,7 @@ pub fn (mut ctx Context) create_image_with_size(file string, width int, height i
 // TODO remove this
 fn create_image(file string) Image {
 	if !os.exists(file) {
-		println('gg.create_image(): file not found: $file')
+		println('gg.create_image(): file not found: ${file}')
 		return Image{} // none
 	}
 	stb_img := stbi.load(file) or { return Image{} }
@@ -249,7 +248,7 @@ pub struct StreamingImageConfig {
 pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 	id := if !isnil(config.img) { config.img.id } else { config.img_id }
 	if id >= ctx.image_cache.len {
-		eprintln('gg: draw_image() bad img id $id (img cache len = $ctx.image_cache.len)')
+		eprintln('gg: draw_image() bad img id ${id} (img cache len = ${ctx.image_cache.len})')
 		return
 	}
 
@@ -289,14 +288,12 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 	mut v0f := if !flip_y { v0 } else { v1 }
 	mut v1f := if !flip_y { v1 } else { v0 }
 
-	
-		
 	if config.additive {
 		sgl.load_pipeline(ctx.additive_pip)
 	} else {
 		sgl.load_pipeline(ctx.timage_pip)
 	}
-	
+
 	sgl.enable_texture()
 	sgl.texture(img.simg)
 
@@ -323,7 +320,6 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
 				sgl.translate(-x0 - width, -y0, 0)
 			}
-
 			.centre_left {
 				sgl.translate(x0, y0 + (height / 2), 0)
 				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
@@ -339,8 +335,6 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
 				sgl.translate(-x0 - width, -y0 - (height / 2), 0)
 			}
-
-
 			.bottom_left {
 				sgl.translate(x0, y0 + height, 0)
 				sgl.rotate(sgl.rad(-config.rotate), 0, 0, 1)
@@ -357,7 +351,6 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 				sgl.translate(-x0 - width, -y0 - height, 0)
 			}
 		}
-
 	}
 
 	sgl.begin_quads()
@@ -373,7 +366,7 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 	}
 
 	sgl.disable_texture()
-	
+
 	// println("========")
 	// println("${img_rect.width} ${img_rect.height} | ${img_rect.x} ${img_rect.y}")
 	// println("${x0} ${y0} ${u0f} ${v0f}")

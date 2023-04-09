@@ -59,7 +59,6 @@ pub mut:
 	objects     []object.IHitObject
 	queue       []object.IHitObject
 	finished    []object.IHitObject
-	to_be_freed []&graphic.SliderRendererAttr
 	combo_color []gx.Color
 	objects_i   int
 	// Temporary
@@ -67,6 +66,9 @@ pub mut:
 	temp_beatmap_sb []string
 	last_update     f64
 	last_boost      f64
+	// vfmt off
+	to_be_freed []&graphic.SliderRendererAttr
+	// vfmt on
 }
 
 // General Helper
@@ -111,14 +113,23 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 		}
 
 		// fade
-		beatmap_bg.add_transform(typ: .fade, time: time.Time{-1500, -500}, before: [
-			0.0,
-		], after: [255.0])
+		beatmap_bg.add_transform(
+			typ: .fade
+			time: time.Time{-1500, -500}
+			before: [
+				0.0,
+			]
+			after: [255.0]
+		)
 
 		if has_video {
-			beatmap_bg.add_transform(typ: .fade, time: time.Time{1100, 1200}, before: [
-				0.0,
-			])
+			beatmap_bg.add_transform(
+				typ: .fade
+				time: time.Time{1100, 1200}
+				before: [
+					0.0,
+				]
+			)
 			beatmap_bg.always_visible = false
 		}
 

@@ -1,51 +1,52 @@
 module overlays
 
-import math
-
 // import gx
+import math
 import library.gg
-
 import core.osu.x
 import core.osu.skin
 import core.osu.cursor
 import core.osu.ruleset
 import core.common.settings
-
 import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite
-
-import gameplay
+import core.osu.overlays.gameplay
 
 const (
-	g_overlay_hack = &GameplayOverlay{ctx: 0, ruleset: 0, cursor: 0, hitresult: 0, combo_counter: 0}
+	g_overlay_hack = &GameplayOverlay{
+		ctx: 0
+		ruleset: 0
+		cursor: 0
+		hitresult: 0
+		combo_counter: 0
+	}
 )
 
 pub struct GameplayOverlay {
-	pub mut:
-		last_time f64
-		combo     i64
-		new_combo i64
+pub mut:
+	last_time f64
+	combo     i64
+	new_combo i64
 
-		score        i64
-		score_smooth i64
-		score_font   &sprite.NumberSprite = voidptr(0)
+	score        i64
+	score_smooth i64
+	score_font   &sprite.NumberSprite = unsafe { nil }
 
-		ruleset &ruleset.Ruleset
-		cursor  &cursor.Cursor
+	ruleset &ruleset.Ruleset
+	cursor  &cursor.Cursor
 
-		key_states [4]bool
-		key_counters [4]int
-		last_presses [4]f64
-		keys_background &sprite.Sprite = voidptr(0)
-		keys 	  []&sprite.Sprite
-		keys_font &sprite.NumberSprite = voidptr(0)
+	key_states      [4]bool
+	key_counters    [4]int
+	last_presses    [4]f64
+	keys_background &sprite.Sprite = unsafe { nil }
+	keys            []&sprite.Sprite
+	keys_font       &sprite.NumberSprite = unsafe { nil }
 
-		ctx &gg.Context
-		
-		// 
-		hitresult &gameplay.HitResults
-		combo_counter &gameplay.ComboCounter
+	ctx &gg.Context
+	//
+	hitresult     &gameplay.HitResults
+	combo_counter &gameplay.ComboCounter
 }
 
 pub fn (mut overlay GameplayOverlay) update(_time f64) {
@@ -70,8 +71,24 @@ pub fn (mut overlay GameplayOverlay) update(_time f64) {
 			mut key := &overlay.keys[i]
 
 			key.remove_transform_by_type(.scale_factor)
-			key.add_transform(typ: .scale_factor, time: time.Time{_time, _time + 100.0}, before: [1.0], after: [0.8])
-			key.add_transform(typ: .color, time: time.Time{_time, _time + 100.0}, before: [255.0, 255.0, 255.0], after: color)
+			key.add_transform(
+				typ: .scale_factor
+				time: time.Time{_time, _time + 100.0}
+				before: [
+					1.0,
+				]
+				after: [0.8]
+			)
+			key.add_transform(
+				typ: .color
+				time: time.Time{_time, _time + 100.0}
+				before: [
+					255.0,
+					255.0,
+					255.0,
+				]
+				after: color
+			)
 
 			overlay.key_counters[i]++
 			overlay.last_presses[i] = _time + 100.0
@@ -81,8 +98,24 @@ pub fn (mut overlay GameplayOverlay) update(_time f64) {
 			mut key := &overlay.keys[i]
 
 			key.remove_transform_by_type(.scale_factor)
-			key.add_transform(typ: .scale_factor, time: time.Time{math.max<f64>(_time, overlay.last_presses[i]), _time + 100.0}, before: [key.size.y / key.raw_size.y], after: [1.0])
-			key.add_transform(typ: .color, time: time.Time{_time, _time + 100.0}, before: color, after: [255.0, 255.0, 255.0])
+			key.add_transform(
+				typ: .scale_factor
+				time: time.Time{math.max[f64](_time, overlay.last_presses[i]), _time + 100.0}
+				before: [key.size.y / key.raw_size.y]
+				after: [
+					1.0,
+				]
+			)
+			key.add_transform(
+				typ: .color
+				time: time.Time{_time, _time + 100.0}
+				before: color
+				after: [
+					255.0,
+					255.0,
+					255.0,
+				]
+			)
 		}
 
 		overlay.key_states[i] = state
@@ -102,15 +135,14 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 		// Text
 		pos_x := settings.global.window.width - 24 * x.resolution.ui_camera.scale
-		pos_y := (settings.global.window.height / 2.0 - 64 + (30.4 + f64(i) * 47.2) * x.resolution.ui_camera.scale)
+		pos_y := (settings.global.window.height / 2.0 - 64 + (30.4 +
+			f64(i) * 47.2) * x.resolution.ui_camera.scale)
 		scale := (sprite.size.y / sprite.raw_size.y) * x.resolution.ui_camera.scale
 
-		overlay.keys_font.draw_number(
-			overlay.key_counters[i].str(), 
-			vector.Vector2{pos_x, pos_y}, 
-			vector.centre, 
-			time: overlay.last_time, 
-			ctx: overlay.ctx, 
+		overlay.keys_font.draw_number(overlay.key_counters[i].str(), vector.Vector2{pos_x, pos_y},
+			vector.centre,
+			time: overlay.last_time
+			ctx: overlay.ctx
 			scale: scale
 		)
 	}
@@ -119,39 +151,75 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 	// Score
 	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) - f64(overlay.score_smooth) * 0.5)
-	overlay.score_font.draw_number("${overlay.score_smooth:08d}", vector.Vector2{settings.global.window.width - 5 - (8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0}, vector.top_left, ctx: overlay.ctx, time: overlay.last_time, scale: x.resolution.ui_camera.scale)
+	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2{settings.global.window.width - 5 - (8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0},
+		vector.top_left,
+		ctx: overlay.ctx
+		time: overlay.last_time
+		scale: x.resolution.ui_camera.scale
+	)
 }
 
 pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
 	mut hitresult := gameplay.make_hit_result(ctx, player_ruleset.beatmap.difficulty.Difficulty)
 	mut counter := gameplay.make_combo_counter()
-	mut score_font := sprite.make_number_font("score")
+	mut score_font := sprite.make_number_font('score')
 
 	mut overlay := &GameplayOverlay{
-		ruleset: unsafe { player_ruleset },
-		cursor: unsafe { player_cursor },
-		ctx: unsafe { ctx },
-		hitresult: hitresult,
-		combo_counter: counter,
+		ruleset: unsafe { player_ruleset }
+		cursor: unsafe { player_cursor }
+		ctx: unsafe { ctx }
+		hitresult: hitresult
+		combo_counter: counter
 		score_font: score_font
 	}
 
-	overlay.keys_background = &sprite.Sprite{origin: vector.top_left, always_visible: true}
-	overlay.keys_background.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [settings.global.window.width, settings.global.window.height / 2.0 - 64.0])
-	overlay.keys_background.add_transform(typ: .angle, time: time.Time{0.0, 0.0}, before: [math.pi / 2.0])
-	overlay.keys_background.add_transform(typ: .scale, time: time.Time{0.0, 0.0}, before: [1.05, 1.0])
-	overlay.keys_background.textures << skin.get_texture("inputoverlay-background")
+	overlay.keys_background = &sprite.Sprite{
+		origin: vector.top_left
+		always_visible: true
+	}
+	overlay.keys_background.add_transform(
+		typ: .move
+		time: time.Time{0.0, 0.0}
+		before: [
+			settings.global.window.width,
+			settings.global.window.height / 2.0 - 64.0,
+		]
+	)
+	overlay.keys_background.add_transform(
+		typ: .angle
+		time: time.Time{0.0, 0.0}
+		before: [
+			math.pi / 2.0,
+		]
+	)
+	overlay.keys_background.add_transform(
+		typ: .scale
+		time: time.Time{0.0, 0.0}
+		before: [
+			1.05,
+			1.0,
+		]
+	)
+	overlay.keys_background.textures << skin.get_texture('inputoverlay-background')
 	overlay.keys_background.reset_size_based_on_texture(factor: x.resolution.ui_camera.scale)
 	overlay.keys_background.reset_attributes_based_on_transforms()
-	
+
 	// Input keys
 	for i in 0 .. 4 {
 		// Key
-		pos_y := settings.global.window.height / 2.0 -  64.0 + (30.4 + f64(i) * 47.2) * x.resolution.ui_camera.scale
-		
+		pos_y := settings.global.window.height / 2.0 - 64.0 + (30.4 +
+			f64(i) * 47.2) * x.resolution.ui_camera.scale
+
 		mut key := &sprite.Sprite{}
-		key.add_transform(typ: .move, time: time.Time{0.0, 0.0}, before: [settings.global.window.width - 24.0 * x.resolution.ui_camera.scale, pos_y])
-		key.textures << skin.get_texture("inputoverlay-key")
+		key.add_transform(
+			typ: .move
+			time: time.Time{0.0, 0.0}
+			before: [
+				settings.global.window.width - 24.0 * x.resolution.ui_camera.scale,
+				pos_y,
+			]
+		)
+		key.textures << skin.get_texture('inputoverlay-key')
 		key.always_visible = true
 		key.reset_size_based_on_texture(factor: x.resolution.ui_camera.scale)
 		key.reset_attributes_based_on_transforms()
@@ -160,7 +228,7 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 	}
 
 	// Number
-	overlay.keys_font = sprite.make_number_sprite(0, "default")
+	overlay.keys_font = sprite.make_number_sprite(0, 'default')
 	overlay.keys_font.always_visible = true
 	overlay.keys_font.reset_size_based_on_texture(factor: x.resolution.ui_camera.scale / 4.0)
 	overlay.keys_font.reset_attributes_based_on_transforms()
@@ -168,15 +236,15 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 	overlay.ruleset.set_listener(hit_received)
 
 	// HACK: bruh
-	unsafe { g_overlay_hack = overlay  }
-
+	unsafe {
+		overlays.g_overlay_hack = overlay
+	}
 	return overlay
 }
 
-
 // Some hack
 pub fn hit_received(current_time f64, number i64, position vector.Vector2, result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
-	mut g_overlay := unsafe { g_overlay_hack }
+	mut g_overlay := unsafe { overlays.g_overlay_hack }
 	g_overlay.score = score
 	g_overlay.hitresult.add_result(current_time, result, position)
 

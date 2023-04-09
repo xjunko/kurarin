@@ -47,8 +47,10 @@ fn init() {
 
 	// unepic global hack
 	unsafe {
+		// vfmt off
 		mut g_settings := global
 		replace_attribute_from[Settings](mut g_settings, mut settings)
+		// vfmt on
 	}
 }
 

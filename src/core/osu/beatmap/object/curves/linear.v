@@ -3,9 +3,9 @@ module curves
 import framework.math.vector
 
 pub struct Linear {
-	pub mut:
-		p1 vector.Vector2
-		p2 vector.Vector2
+pub mut:
+	p1 vector.Vector2
+	p2 vector.Vector2
 }
 
 pub fn make_linear(p1 vector.Vector2, p2 vector.Vector2) &Linear {

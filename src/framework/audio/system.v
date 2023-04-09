@@ -1,16 +1,15 @@
 module audio
 
 import framework.logging
-
 import core.common.settings
 
 const (
 	global = &GlobalMixer{}
 )
 
-pub struct GlobalMixer{
-	pub mut:
-		master C.HSTREAM
+pub struct GlobalMixer {
+pub mut:
+	master C.HSTREAM
 }
 
 // Start Bass and shit
@@ -32,13 +31,13 @@ fn init() {
 	mut mixer_flags := C.BASS_MIXER_NONSTOP
 
 	if settings.global.video.record {
-		logging.info("BASS in recording mode")
+		logging.info('BASS in recording mode')
 		device_id = 0
 		mixer_flags |= C.BASS_SAMPLE_FLOAT | C.BASS_STREAM_DECODE
 	}
 
 	if C.BASS_Init(device_id, 48000, 0, 0, 0) != 0 {
-		logging.info("BASS Started!")
+		logging.info('BASS Started!')
 
 		// Mixer
 		master_mixer := C.BASS_Mixer_StreamCreate(48000, 2, mixer_flags)
@@ -49,14 +48,13 @@ fn init() {
 
 		// Point global to that mixer
 		unsafe {
-			mut g_mixer := global
+			mut g_mixer := audio.global
 			g_mixer.master = master_mixer
 		}
 	} else {
-		logging.error("Failed to start BASS!")
+		logging.error('Failed to start BASS!')
 	}
 }
-
 
 // Just a test ignore this
 // pub fn start_piping_audio() {

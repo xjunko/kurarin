@@ -4,10 +4,10 @@ import math
 import framework.math.transform
 
 pub struct LoopProcessor {
-	pub mut:
-		start f64
-		repeats i64
-		transforms []&transform.Transform
+pub mut:
+	start      f64
+	repeats    i64
+	transforms []&transform.Transform
 }
 
 pub fn (mut loop LoopProcessor) add(mut command []string) {
@@ -29,8 +29,8 @@ pub fn (mut loop LoopProcessor) finalize() []&transform.Transform {
 			continue
 		}
 
-		start_time = math.min<f64>(start_time, t.time.start)
-		end_time = math.max<f64>(end_time, t.time.end)
+		start_time = math.min[f64](start_time, t.time.start)
+		end_time = math.max[f64](end_time, t.time.end)
 	}
 
 	iteration_time := end_time - start_time
@@ -40,8 +40,8 @@ pub fn (mut loop LoopProcessor) finalize() []&transform.Transform {
 
 		for t in loop.transforms {
 			transforms << t.clone(
-				start: t.time.start + part_start,
-				end:  t.time.end + part_start
+				start: t.time.start + part_start
+				end: t.time.end + part_start
 			)
 		}
 	}
@@ -51,7 +51,7 @@ pub fn (mut loop LoopProcessor) finalize() []&transform.Transform {
 
 pub fn make_loop_processor(data []string) &LoopProcessor {
 	mut loop := &LoopProcessor{}
-	
+
 	loop.start = data[1].f64()
 	loop.repeats = data[2].i64()
 

@@ -1,22 +1,22 @@
 module timing
 
 pub struct BarLength {
-	pub mut:
-		measure f64
-		length f64
+pub mut:
+	measure f64
+	length  f64
 }
 
 pub struct BarPoint {
-	pub mut:
-		measure f64
-		ticks_per_measure f64
-		ticks f64
+pub mut:
+	measure           f64
+	ticks_per_measure f64
+	ticks             f64
 }
 
 pub struct Bars {
-	pub mut:
-		barlengths []BarLength
-		bars []BarPoint
+pub mut:
+	barlengths []BarLength
+	bars       []BarPoint
 }
 
 pub fn (mut bars Bars) add_bar_length(length BarLength) {
@@ -37,8 +37,8 @@ pub fn (mut bar Bars) resolve_bars() {
 		}
 
 		bar.bars << BarPoint{
-			measure: current_bar.measure,
-			ticks_per_measure: current_bar.length * ticks_per_beat,
+			measure: current_bar.measure
+			ticks_per_measure: current_bar.length * ticks_per_beat
 			ticks: ticks
 		}
 	}
@@ -47,7 +47,9 @@ pub fn (mut bar Bars) resolve_bars() {
 }
 
 pub fn (mut bar Bars) to_tick(measure f64, p f64, q f64) f64 {
-	mut current_bar := BarPoint{ticks: 0xDEAD}
+	mut current_bar := BarPoint{
+		ticks: 0xDEAD
+	}
 
 	for bar_to_find in bar.bars {
 		if measure >= bar_to_find.measure {
@@ -56,11 +58,12 @@ pub fn (mut bar Bars) to_tick(measure f64, p f64, q f64) f64 {
 		}
 	}
 
-	if current_bar.ticks == 0xDEAD { panic("Invalid bar") }
-	
+	if current_bar.ticks == 0xDEAD {
+		panic('Invalid bar')
+	}
+
 	// println("Measure: ${measure} | P: ${p} | Q: ${q}")
 
-	return current_bar.ticks + 
-		(measure - current_bar.measure) * current_bar.ticks_per_measure +
+	return current_bar.ticks + (measure - current_bar.measure) * current_bar.ticks_per_measure +
 		(p * current_bar.ticks_per_measure) / q
 }

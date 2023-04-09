@@ -1,47 +1,45 @@
 module ruleset
 
-import math
-
-import framework.math.vector
-
 // import core.osu.beatmap.difficulty
+import math
+import framework.math.vector
 import core.osu.beatmap.object
 
 const (
-	left_button = Buttons(1 << 0)
+	left_button  = Buttons(1 << 0)
 	right_button = Buttons(1 << 1)
 )
 
 pub struct SliderState {
-	pub mut:
-		down_button Buttons
-		is_start_hit bool
-		is_hit bool
-		points []TickPoint
-		scored int
-		missed int
-		slide_start f64
-		sliding bool
-		start_result HitResult
+pub mut:
+	down_button  Buttons
+	is_start_hit bool
+	is_hit       bool
+	points       []TickPoint
+	scored       int
+	missed       int
+	slide_start  f64
+	sliding      bool
+	start_result HitResult
 }
 
 pub struct TickPoint {
-	pub mut:
-		time f64
-		score_given HitResult
-		edge_num int
+pub mut:
+	time        f64
+	score_given HitResult
+	edge_num    int
 }
 
 pub struct Slider {
-	pub mut:
-		ruleset &Ruleset = voidptr(0)
-		hitslider &object.Slider = voidptr(0)
-		players []&DifficultyPlayer
-		state []SliderState
-		fade_start_relative f64
+pub mut:
+	ruleset             &Ruleset       = unsafe { nil }
+	hitslider           &object.Slider = unsafe { nil }
+	players             []&DifficultyPlayer
+	state               []SliderState
+	fade_start_relative f64
 
-		last_slider_time f64
-		slider_position vector.Vector2
+	last_slider_time f64
+	slider_position  vector.Vector2
 }
 
 pub fn (slider &Slider) get_number() i64 {
@@ -65,7 +63,7 @@ pub fn (mut slider Slider) init(ruleset &Ruleset, hitobject object.IHitObject, p
 	slider.fade_start_relative = 100000.0
 
 	for mut player in slider.players {
-		slider.fade_start_relative = math.min<f64>(slider.fade_start_relative, player.diff.preempt)
+		slider.fade_start_relative = math.min[f64](slider.fade_start_relative, player.diff.preempt)
 		slider.state << &SliderState{}
 		slider.state[0].start_result = HitResult.miss
 
@@ -81,7 +79,9 @@ pub fn (mut slider Slider) init(ruleset &Ruleset, hitobject object.IHitObject, p
 		}
 
 		if slider.state[0].points.len > 0 {
-			slider.state[0].points[slider.state[0].points.len - 1].time =  math.max<f64>((slider.hitslider.time.start)+(slider.hitslider.time.end-slider.hitslider.time.start)/2, (slider.hitslider.time.end)-36) //slider ends 36ms before the real end for scoring
+			slider.state[0].points[slider.state[0].points.len - 1].time = math.max[f64](
+				(slider.hitslider.time.start) +
+				(slider.hitslider.time.end - slider.hitslider.time.start) / 2, (slider.hitslider.time.end) - 36) // slider ends 36ms before the real end for scoring
 			slider.state[0].points[slider.state[0].points.len - 1].score_given = HitResult.slider_end
 		}
 	}
@@ -113,16 +113,16 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 				}
 
 				if player.left_cond {
-					state.down_button = left_button
+					state.down_button = ruleset.left_button
 				} else if player.right_cond {
-					state.down_button = right_button
+					state.down_button = ruleset.right_button
 				} else {
 					state.down_button = player.mouse_down_button
 				}
 
 				mut hit := HitResult.slider_miss
 				mut combo := ComboResult.reset
-				relative := math.abs<f64>(time - slider.hitslider.time.start)
+				relative := math.abs[f64](time - slider.hitslider.time.start)
 
 				if relative < player.diff.hit300 {
 					state.start_result = .hit300
@@ -145,7 +145,8 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 						slider.hitslider.hit_edge(0, time, hit != .slider_miss)
 					}
 
-					slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
+					slider.ruleset.send_result(time, mut player.cursor, mut slider, position,
+						hit, combo)
 
 					state.is_start_hit = true
 				}
@@ -177,18 +178,20 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 
 	if time >= slider.hitslider.time.start && !state.is_hit {
 		mut mouse_down_acceptable := false
-		mut mouse_down_acceptable_swap := player.game_down_state &&
-				!(player.last_button == (left_button | right_button) &&
-					player.last_button2 == player.mouse_down_button)
+		mut mouse_down_acceptable_swap := player.game_down_state
+			&& !(player.last_button == (ruleset.left_button | ruleset.right_button)
+			&& player.last_button2 == player.mouse_down_button)
 
 		if player.game_down_state {
-			if state.down_button == Buttons(0) || (player.mouse_down_button != (left_button | right_button) && mouse_down_acceptable_swap) {
+			if state.down_button == Buttons(0)
+				|| (player.mouse_down_button != (ruleset.left_button | ruleset.right_button)
+				&& mouse_down_acceptable_swap) {
 				state.down_button = Buttons(0)
 
 				if player.left_cond {
-					state.down_button = left_button
+					state.down_button = ruleset.left_button
 				} else if player.right_cond {
-					state.down_button = right_button
+					state.down_button = ruleset.right_button
 				} else {
 					state.down_button = player.mouse_down_button
 				}
@@ -208,7 +211,8 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 			radius_needed *= 2.4
 		}
 
-		allowable := mouse_down_acceptable && player.cursor.position.distance(slider_position) <= radius_needed
+		allowable := mouse_down_acceptable
+			&& player.cursor.position.distance(slider_position) <= radius_needed
 
 		if allowable && !state.sliding {
 			state.sliding = true
@@ -222,7 +226,8 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 		mut points_passed := 0
 
 		for i, point in state.points {
-			if point.time > time && !(i == state.points.len - 1 && process_slider_ends_ahead && point.time - time == 1) {
+			if point.time > time && !(i == state.points.len - 1 && process_slider_ends_ahead
+				&& point.time - time == 1) {
 				break
 			}
 
@@ -235,17 +240,19 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 
 			if allowable && state.slide_start <= point.time {
 				state.scored++
-				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_point, .increase)
+				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position,
+					.slider_point, .increase)
 			} else {
 				state.missed++
 
-				mut combo := ComboResult.reset 
+				mut combo := ComboResult.reset
 
 				if (state.scored + state.missed) == state.points.len {
 					combo = .hold
 				}
 
-				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position, .slider_miss, combo)
+				slider.ruleset.send_result(time, mut player.cursor, mut slider, slider_position,
+					.slider_miss, combo)
 			}
 		}
 
@@ -258,7 +265,6 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 		}
 	}
 
-	
 	return true
 }
 
@@ -273,12 +279,13 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 
 		position := slider.hitslider.get_start_position()
 
-		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, .miss, .reset)
+		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, .miss,
+			.reset)
 
 		if player.left_cond {
-			state.down_button = left_button
+			state.down_button = ruleset.left_button
 		} else if player.right_cond {
-			state.down_button = right_button
+			state.down_button = ruleset.right_button
 		} else {
 			state.down_button = player.mouse_down_button
 		}
@@ -287,7 +294,8 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 		state.start_result = .miss
 	}
 
-	if (time >= slider.hitslider.time.end || (process_slider_ends_ahead && slider.hitslider.time.end - time == 1)) && !state.is_hit {
+	if (time >= slider.hitslider.time.end || (process_slider_ends_ahead
+		&& slider.hitslider.time.end - time == 1)) && !state.is_hit {
 		if state.start_result != .miss {
 			state.scored++
 		}
@@ -295,7 +303,7 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 		mut hit := HitResult.miss
 		mut combo := ComboResult.reset
 		rate := f64(state.scored) / f64(state.points.len + 1)
-	
+
 		if rate > 0 && slider.players.len == 1 {
 			slider.hitslider.hit_edge(slider.hitslider.tick_reverse.len, time, true)
 		}
@@ -312,15 +320,15 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 			combo = .hold
 		}
 
-
 		// // FIXME: Slider Repeat acc might be fucked rn, it keeps giving 100s
 		// if hit == .miss || hit == .hit50 {
-			// position := slider.hitslider.get_end_position()
-			// slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
+		// position := slider.hitslider.get_end_position()
+		// slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
 		// }
 
 		position := slider.hitslider.get_end_position()
-		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit, combo)
+		slider.ruleset.send_result(time, mut player.cursor, mut slider, position, hit,
+			combo)
 
 		state.is_hit = true
 	}

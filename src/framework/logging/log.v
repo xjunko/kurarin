@@ -3,13 +3,18 @@ module logging
 import log
 
 const (
-	global = &log.Log{level: .info, output_target: .console}
+	global = &log.Log{
+		level: .info
+		output_target: .console
+	}
 )
 
-interface Any { str() string }
+interface Any {
+	str() string
+}
 
 pub fn get_logger() &log.Log {
-	return global
+	return logging.global
 }
 
 pub fn fatal(s Any) {

@@ -8,11 +8,11 @@ const (
 )
 
 pub struct MultiCurve {
-	pub mut:
-		sections []f64
-		lines []Linear
-		length f64
-		first_point vector.Vector2
+pub mut:
+	sections    []f64
+	lines       []Linear
+	length      f64
+	first_point vector.Vector2
 }
 
 pub fn (mut m_curve MultiCurve) point_at(time f64) vector.Vector2 {
@@ -22,7 +22,7 @@ pub fn (mut m_curve MultiCurve) point_at(time f64) vector.Vector2 {
 
 	desired_width := f64(m_curve.length * math.clamp(time, 0.0, 1.0))
 
-	without_first := m_curve.sections[1 ..]
+	without_first := m_curve.sections[1..]
 	mut index := m_curve.lines.len
 
 	for i, value in without_first {
@@ -34,14 +34,14 @@ pub fn (mut m_curve MultiCurve) point_at(time f64) vector.Vector2 {
 
 	// panic("Lines: ${m_curve.lines.len} | Length: ${m_curve.length} | Index: ${index}")
 
-	index = math.min<int>(index, m_curve.lines.len - 1)
+	index = math.min[int](index, m_curve.lines.len - 1)
 
 	if m_curve.sections[index + 1] - m_curve.sections[index] == 0.0 {
 		return m_curve.lines[index].p1
 	}
 
-	return m_curve.lines[index].point_at((desired_width - m_curve.sections[index]) / (m_curve.sections[index+1] - m_curve.sections[index]))
-	
+	return m_curve.lines[index].point_at((desired_width - m_curve.sections[index]) / (m_curve.sections[
+		index + 1] - m_curve.sections[index]))
 }
 
 pub fn (mut m_curve MultiCurve) get_length() f64 {
@@ -72,10 +72,10 @@ pub fn new_multi_curve(typ string, points []vector.Vector2) &MultiCurve {
 	mut lines := []Linear{}
 
 	match typ {
-		"P" { lines = process_perfect(points) }
-		"L" { lines = process_linear(points) }
-		"B" { lines = process_bezier(points) }
-		"C" { lines = process_catmull(points) }
+		'P' { lines = process_perfect(points) }
+		'L' { lines = process_linear(points) }
+		'B' { lines = process_bezier(points) }
+		'C' { lines = process_catmull(points) }
 		else {}
 	}
 
@@ -107,7 +107,7 @@ pub fn new_multi_curve_t(typ string, points []vector.Vector2, desired_length f64
 		for m_curve.lines.len > 0 {
 			mut line := m_curve.lines[m_curve.lines.len - 1]
 
-			if line.get_length() > diff + min_part_width {
+			if line.get_length() > diff + curves.min_part_width {
 				if !line.p1.equal(line.p2) {
 					pt := line.point_at((line.get_length() - f64(diff)) / line.get_length())
 					m_curve.lines[m_curve.lines.len - 1] = make_linear(line.p1, pt)
@@ -117,7 +117,7 @@ pub fn new_multi_curve_t(typ string, points []vector.Vector2, desired_length f64
 			}
 
 			diff -= line.get_length()
-			m_curve.lines = m_curve.lines[.. m_curve.lines.len - 1]
+			m_curve.lines = m_curve.lines[..m_curve.lines.len - 1]
 		}
 	}
 
@@ -156,7 +156,7 @@ pub fn process_linear(points []vector.Vector2) []Linear {
 			continue
 		}
 
-		lines << make_linear(points[i], points[i+1])
+		lines << make_linear(points[i], points[i + 1])
 	}
 
 	return lines
@@ -171,7 +171,7 @@ pub fn process_bezier(points []vector.Vector2) []Linear {
 		multi := i < points.len - 2 && points[i].equal(points[i + 1])
 
 		if multi || i == points.len - 1 {
-			sub_points := points[int(last_index) .. int(i + 1)]
+			sub_points := points[int(last_index)..int(i + 1)]
 
 			if sub_points.len == 2 {
 				lines << make_linear(sub_points[0], sub_points[1])

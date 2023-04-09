@@ -17,7 +17,7 @@ fn C._sapp_glx_swapinterval(int)
 pub struct Window {
 	i_window.GeneralWindow
 mut:
-	draw_limiter   &time.Limiter = &time.Limiter{
+	draw_limiter &time.Limiter = &time.Limiter{
 	fps: 60
 }
 	thread_limiter &time.Limiter = &time.Limiter{

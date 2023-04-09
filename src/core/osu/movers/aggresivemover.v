@@ -1,10 +1,8 @@
 module movers
 
 import math
-
 import framework.math.easing
 import framework.math.vector
-
 import core.osu.beatmap.object
 import core.osu.beatmap.object.curves
 
@@ -12,13 +10,12 @@ import core.osu.beatmap.object.curves
 // https://github.com/Wieku/danser-go/blob/master/app/dance/movers/aggressive.go
 pub struct AggressiveMover {
 	Mover
-
-	pub mut:
-		line &curves.Bezier = voidptr(0)
-		last_angle f64 
+pub mut:
+	line       &curves.Bezier = unsafe { nil }
+	last_angle f64
 }
 
-pub fn (mut aggressive AggressiveMover) init(mut start &object.IHitObject, mut end &object.IHitObject, direction int) { 
+pub fn (mut aggressive AggressiveMover) init(mut start object.IHitObject, mut end object.IHitObject, direction int) {
 	aggressive.Mover.init(mut &start, mut &end, direction)
 
 	start_pos := start.get_end_position()
@@ -26,7 +23,7 @@ pub fn (mut aggressive AggressiveMover) init(mut start &object.IHitObject, mut e
 	scaled_distance := aggressive.time.duration()
 
 	mut new_angle := aggressive.last_angle + math.pi
-	
+
 	if mut start is object.Slider {
 		new_angle = start.get_end_angle()
 	}
@@ -34,7 +31,7 @@ pub fn (mut aggressive AggressiveMover) init(mut start &object.IHitObject, mut e
 	mut points := []vector.Vector2{}
 	points << [
 		start_pos,
-		vector.new_vec_rad(new_angle, scaled_distance).add(start_pos)
+		vector.new_vec_rad(new_angle, scaled_distance).add(start_pos),
 	]
 
 	if scaled_distance > 1 {
@@ -51,7 +48,7 @@ pub fn (mut aggressive AggressiveMover) init(mut start &object.IHitObject, mut e
 }
 
 pub fn (aggressive &AggressiveMover) get_point_at(time f64) vector.Vector2 {
-	if aggressive.line == voidptr(0) {
+	if aggressive.line == unsafe { nil } {
 		return aggressive.start
 	}
 

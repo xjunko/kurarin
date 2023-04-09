@@ -2,39 +2,39 @@ module beatmap
 
 import os
 import gx
-import difficulty
-import object
+import core.osu.beatmap.difficulty
+import core.osu.beatmap.object
 import math
-
 import framework.logging
 
 pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 	if !os.exists(path) {
-		logging.fatal("Beatmap file: ${path} doesnt exists.")
+		logging.fatal('Beatmap file: ${path} doesnt exists.')
 		exit(1)
 	}
 
 	mut lines := os.read_lines(path) or {
-		logging.fatal("Failed to read file: ${path}, reason: ${err}")
+		logging.fatal('Failed to read file: ${path}, reason: ${err}')
 		exit(1)
 	}
 
 	if !lazy {
 		// Only print this when actually loading the map.
-		logging.info("Parsing beatmap!")
+		logging.info('Parsing beatmap!')
 	}
-	
 
 	mut beatmap := &Beatmap{}
 	beatmap.root = os.dir(path)
 	beatmap.filename = os.base(path)
 
 	// temp attrs
-	mut category := ""
+	mut category := ''
 	mut background_done := false
 
 	for mut line in lines {
-		if line.trim_space().len == 0 || line.starts_with('//') { continue }
+		if line.trim_space().len == 0 || line.starts_with('//') {
+			continue
+		}
 
 		if temp_category := parse_category(line) {
 			category = temp_category
@@ -42,23 +42,23 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 		}
 
 		match category {
-			"General" {
-				items := common_parse_with_key_value_and_limit(line, ":", 2)
-				general_beatmap_parser<BeatmapGeneralInfo>(mut beatmap.general, items[0], items[1])
+			'General' {
+				items := common_parse_with_key_value_and_limit(line, ':', 2)
+				general_beatmap_parser[BeatmapGeneralInfo](mut beatmap.general, items[0],
+					items[1])
 			}
-
-			"Metadata" {
-				items := common_parse_with_key_value_and_limit(line, ":", 2)
-				general_beatmap_parser<BeatmapMetadataInfo>(mut beatmap.metadata, items[0], items[1])
+			'Metadata' {
+				items := common_parse_with_key_value_and_limit(line, ':', 2)
+				general_beatmap_parser[BeatmapMetadataInfo](mut beatmap.metadata, items[0],
+					items[1])
 			}
-
-			"Difficulty" {
-				items := common_parse_with_key_value_and_limit(line, ":", 2)
-				general_beatmap_parser<difficulty.Difficulty>(mut beatmap.difficulty.Difficulty, items[0], items[1])
+			'Difficulty' {
+				items := common_parse_with_key_value_and_limit(line, ':', 2)
+				general_beatmap_parser[difficulty.Difficulty](mut beatmap.difficulty.Difficulty,
+					items[0], items[1])
 			}
-
-			"TimingPoints" {
-				items := common_parse_with_key_value(line, ",")
+			'TimingPoints' {
+				items := common_parse_with_key_value(line, ',')
 
 				point_time := items[0].f64()
 				bpm := items[1].f64()
@@ -91,32 +91,28 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 				}
 
 				if items.len > 6 {
-					inherited = items[6] == "0"
+					inherited = items[6] == '0'
 				}
 
 				if items.len > 7 {
 					kiai = (items[7].int() & 1) > 0
 				}
 
-				beatmap.timing.add_point(
-					point_time, bpm, sample_set, sample_index, sample_volume,
-					signature, inherited, kiai
-				)
+				beatmap.timing.add_point(point_time, bpm, sample_set, sample_index, sample_volume,
+					signature, inherited, kiai)
 				beatmap.timing.last_set = sample_set
-				
 			}
-
-			"Events" {
+			'Events' {
 				// Normal BG
-				if (line.starts_with("0") || line.starts_with("Sprite")) && !background_done {
-					items := common_parse_with_key_value(line, ",")
-					beatmap.general.bg_filename = items[2].replace('"', "")
+				if (line.starts_with('0') || line.starts_with('Sprite')) && !background_done {
+					items := common_parse_with_key_value(line, ',')
+					beatmap.general.bg_filename = items[2].replace('"', '')
 					background_done = true
 					continue
 				}
 
 				// Background video
-				if line.starts_with('Video') || line.starts_with("1") {
+				if line.starts_with('Video') || line.starts_with('1') {
 					items := common_parse_with_key_value(line, ',')
 					beatmap.general.video_filename = items[2].replace('"', '')
 					beatmap.general.video_offset = math.abs(items[1].f64())
@@ -125,22 +121,24 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 
 				// TODO: huh?
 				if beatmap.temp_beatmap_sb.len == 0 {
-					beatmap.temp_beatmap_sb << "[Events]"
+					beatmap.temp_beatmap_sb << '[Events]'
 				}
 				beatmap.temp_beatmap_sb << line
 			}
+			'Colours' {
+				if lazy {
+					continue
+				}
 
-			"Colours" {
-				if lazy { continue }
-
-				items := common_parse_with_key_value(line, ":")
-				rgb := common_parse_with_key_value(items[1], ",")
+				items := common_parse_with_key_value(line, ':')
+				rgb := common_parse_with_key_value(items[1], ',')
 				color := gx.Color{u8(rgb[0].int()), u8(rgb[1].int()), u8(rgb[2].int()), u8(255)}
 				beatmap.combo_color << color
 			}
-
-			"HitObjects" {
-				if lazy { continue }
+			'HitObjects' {
+				if lazy {
+					continue
+				}
 
 				// Calculate difficulty and timing if havent
 				if !beatmap.difficulty.calculated {
@@ -152,20 +150,20 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 					beatmap.timing.slider_tick_rate = beatmap.difficulty.slider_tick_rate
 
 					//
-					logging.info("Beatmap difficulty calculated.")
+					logging.info('Beatmap difficulty calculated.')
 				}
 
-				mut hitobject := object.make_object(common_parse_with_key_value(line, ","))
+				mut hitobject := object.make_object(common_parse_with_key_value(line,
+					','))
 
 				beatmap.objects << &hitobject
 			}
-
 			else {}
 		}
 	}
 
 	if !lazy {
-		logging.info("Done parsing beatmap!")
+		logging.info('Done parsing beatmap!')
 	}
 
 	return beatmap
@@ -188,10 +186,11 @@ pub fn parse_category(line string) ?string {
 	return none
 }
 
-pub fn general_beatmap_parser<T>(mut cls T, name string, value string) {
+pub fn general_beatmap_parser[T](mut cls T, name string, value string) {
 	$for field in T.fields {
 		// No attrs defined       // Attrs Defined										// No _SKIP defined in attrs
-		if (field.name == name || (field.attrs.len > 0 && field.attrs[0] == name)) && !field.attrs.contains("_SKIP"){
+		if (field.name == name || (field.attrs.len > 0 && field.attrs[0] == name))
+			&& !field.attrs.contains('_SKIP') {
 			// V cant do this... for now....... :trolldecai:
 			// match field.typ {
 			// 	string  { cls.$field.name = value }
@@ -216,7 +215,7 @@ pub fn general_beatmap_parser<T>(mut cls T, name string, value string) {
 			} $else $if field.typ is bool {
 				cls.$(field.name) = value == '1'
 			} $else {
-				panic("Type not supported: ${field.typ}")
+				panic('Type not supported: ${field.typ}')
 			}
 		}
 	}

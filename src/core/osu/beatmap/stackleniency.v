@@ -20,13 +20,13 @@ pub fn (mut beatmap Beatmap) process_stack_position() {
 		mut n := i
 
 		mut object_i := &beatmap.objects[i]
-		 
+
 		if object_i.stack_index != 0 || object_i.is_spinner {
 			continue
 		}
 
-		/* 	
-			If this object is a hitcircle, then we enter this "special" case.
+		/*
+		If this object is a hitcircle, then we enter this "special" case.
 				* It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.
 				* Any other case is handled by the "is_slider" code below this.
 		*/
@@ -58,7 +58,8 @@ pub fn (mut beatmap Beatmap) process_stack_position() {
 				}
 
 				// Object behind a slider
-				if object_n.is_slider && object_n.raw_end_position.distance(object_i.raw_position) < stack_distance {
+				if object_n.is_slider
+					&& object_n.raw_end_position.distance(object_i.raw_position) < stack_distance {
 					offset := object_i.stack_index - object_n.stack_index + 1
 
 					for j in n + 1 .. i + 1 {
@@ -101,12 +102,13 @@ pub fn (mut beatmap Beatmap) process_stack_position() {
 				n -= 1
 			}
 		}
-
 	}
 
 	// Apply the stacking
 	for mut object in beatmap.objects {
-		if object.is_spinner { continue }
+		if object.is_spinner {
+			continue
+		}
 		space := -stack_space * object.stack_index
 		object.position.x = object.raw_position.x + space
 		object.position.y = object.raw_position.y + space
@@ -114,5 +116,4 @@ pub fn (mut beatmap Beatmap) process_stack_position() {
 		object.end_position.x = object.raw_end_position.x + space
 		object.end_position.y = object.raw_end_position.y + space
 	}
-
 }

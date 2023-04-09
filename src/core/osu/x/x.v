@@ -1,12 +1,10 @@
 module x
 
-/* "x" module is for shit that im not sure where to put so itll be here for now */
+//"x" module is for shit that im not sure where to put so itll be here for now
 import gg.m4
-
 import framework.logging
 import framework.math.vector
 import framework.math.camera
-
 import core.common.settings
 
 pub const (
@@ -14,15 +12,15 @@ pub const (
 )
 
 pub struct Resolution {
-	pub mut:
-		resolution 		vector.Vector2
-		playfield  		vector.Vector2
-		playfield_scale f64
-		offset          vector.Vector2
-		scale			f64
-		camera          camera.Camera
-		ui_camera       camera.Camera
-		projection      m4.Mat4
+pub mut:
+	resolution      vector.Vector2
+	playfield       vector.Vector2
+	playfield_scale f64
+	offset          vector.Vector2
+	scale           f64
+	camera          camera.Camera
+	ui_camera       camera.Camera
+	projection      m4.Mat4
 }
 
 pub fn (mut res Resolution) calculate() {
@@ -41,7 +39,7 @@ pub fn (mut res Resolution) calculate() {
 
 	// osr2mp4
 	res.playfield.y = res.resolution.y * 0.8
-	res.playfield.x = res.playfield.y * 4/3
+	res.playfield.x = res.playfield.y * 4 / 3
 	res.playfield_scale = res.playfield.x / 512
 	res.scale = res.resolution.y / 768
 	res.offset.x = (res.resolution.x - res.playfield.x) / 2.0
@@ -66,9 +64,8 @@ pub fn (mut res Resolution) calculate() {
 	res.projection = get_matrix_projection(res)
 
 	logging.debug(res.str())
-	logging.debug("Resolution calculated!")
+	logging.debug('Resolution calculated!')
 }
-
 
 // from mcosu
 pub fn get_playfield_size_factor(res Resolution) f64 {
@@ -93,13 +90,14 @@ pub fn get_playfield_offset(res Resolution) vector.Vector2 {
 	bottom_border_size := 0.0834 * res.resolution.y
 	playfield_y_offset := (res.resolution.y / 2.0 - (playfield_size.y / 2.0)) - bottom_border_size
 
-	return vector.Vector2{(res.resolution.x - playfield_size.x) / 2.0, (res.resolution.y - playfield_size.y) / 2.0 + playfield_y_offset}
-	
+	return vector.Vector2{(res.resolution.x - playfield_size.x) / 2.0,
+		(res.resolution.y - playfield_size.y) / 2.0 + playfield_y_offset}
 }
 
 pub fn get_matrix_projection(res Resolution) m4.Mat4 {
 	mult := f32(res.playfield_scale)
-	mut matrix := m4.ortho(-f32(res.resolution.x) / 2.0, f32(res.resolution.x) / 2.0, f32(res.resolution.y) / 2, -f32(res.resolution.y )/ 2.0, 1.0, -1.0)
+	mut matrix := m4.ortho(-f32(res.resolution.x) / 2.0, f32(res.resolution.x) / 2.0,
+		f32(res.resolution.y) / 2, -f32(res.resolution.y) / 2.0, 1.0, -1.0)
 
 	mut playfield := m4.unit_m4()
 	playfield.set_e(3, -512.0 * mult / 2)
@@ -111,7 +109,7 @@ pub fn get_matrix_projection(res Resolution) m4.Mat4 {
 
 	matrix *= playfield
 	matrix *= scale
-	
+
 	matrix.set_e(10, 1.0)
 
 	return matrix
@@ -120,7 +118,7 @@ pub fn get_matrix_projection(res Resolution) m4.Mat4 {
 //
 fn init() {
 	unsafe {
-		mut r := resolution
+		mut r := x.resolution
 		r.calculate()
 	}
 }

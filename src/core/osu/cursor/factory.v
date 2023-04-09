@@ -1,31 +1,31 @@
 module cursor
 
 import math
-
 import core.osu.beatmap
 import core.osu.beatmap.object as gameobject
 import core.osu.movers
-
 import framework.math.time
 import framework.math.vector
 import framework.math.easing
 
 const (
-	offset = osu_cursor_trail_delta // 120fps
+	offset           = osu_cursor_trail_delta // 120fps
 	tag_on_new_combo = true
 )
 
 // [deprecated: "TODO: remove this after we got realtime auto."]
-pub fn make_replay(mut current_beatmap &beatmap.Beatmap, mut cursor &Cursor, player_number int, max_player int) {
+pub fn make_replay(mut current_beatmap beatmap.Beatmap, mut cursor Cursor, player_number int, max_player int) {
 	mut last_object := unsafe { &current_beatmap.objects[0] }
 	mut last_position := current_beatmap.objects[0].get_start_position()
 	mut direction := 1
 	mut counter := 0
 
 	for n, mut object in current_beatmap.objects {
+		// vfmt off
 		if tag_on_new_combo {
+			// vfmt on
 			if object.is_new_combo() {
-			counter++
+				counter++
 			}
 
 			if ((counter - 1) % max_player) != (player_number - 1) {
@@ -41,10 +41,10 @@ pub fn make_replay(mut current_beatmap &beatmap.Beatmap, mut cursor &Cursor, pla
 		if mut object is gameobject.Circle || mut object is gameobject.Slider {
 			// Color
 			cursor.add_transform(
-				typ: .color,
-				easing: easing.linear,
-				time: time.Time{last_object.time.end , object.time.start},
-				before: last_object.color,
+				typ: .color
+				easing: easing.linear
+				time: time.Time{last_object.time.end, object.time.start}
+				before: last_object.color
 				after: object.color
 			)
 
@@ -53,19 +53,23 @@ pub fn make_replay(mut current_beatmap &beatmap.Beatmap, mut cursor &Cursor, pla
 
 			if (object.time.start - last_object.time.end) >= 50.0 {
 				// Use halfcircle for far objects
-				mover = &movers.HalfCircleMover{} // Uncomment to use 
+				mover = &movers.HalfCircleMover{} // Uncomment to use
 			}
 
 			mover.init(mut last_object, mut object, direction)
 			direction *= -1 // Invert direction
 
+			// vfmt off
 			for i := mover.time.start; i < mover.time.end; i += offset {
+				// vfmt on
 				position := mover.get_point_at(i)
 				cursor.add_transform(
-					typ: .move, 
-					easing: easing.quad_out, 
-					time: time.Time{i, i + offset}, 
-					before: [last_position.x, last_position.y], 
+					typ: .move
+					easing: easing.quad_out
+					// vfmt off
+					time: time.Time{i, i + offset}
+					// vfmt on
+					before: [last_position.x, last_position.y]
 					after: [position.x, position.y]
 				)
 				last_position = position
@@ -74,7 +78,9 @@ pub fn make_replay(mut current_beatmap &beatmap.Beatmap, mut cursor &Cursor, pla
 			// Slider movement
 			if mut object is gameobject.Slider {
 				// Normal movement
-				for temp_time := int(object.time.start); temp_time <= int(object.time.end) + offset; temp_time += int(offset) {
+				// vfmt off
+				for temp_time := int(object.time.start); temp_time <= int(object.time.end) +
+					offset; temp_time += int(offset) {
 					times := int(((temp_time - object.time.start) / object.duration) + 1)
 					t_time := (f64(temp_time) - object.time.start - (times - 1) * object.duration)
 					rt := object.pixel_length / object.curve.length
@@ -87,8 +93,20 @@ pub fn make_replay(mut current_beatmap &beatmap.Beatmap, mut cursor &Cursor, pla
 						pos = object.curve.point_at((1.0 - t_time / object.duration) * rt)
 						last_position = object.curve.point_at((1.0 - (t_time - offset) / object.duration) * rt)
 					}
-					cursor.add_transform(typ: .move, easing: easing.quad_out, time: time.Time{temp_time, temp_time + offset}, before: [last_position.x, last_position.y], after: [pos.x, pos.y])
+					
+
+					cursor.add_transform(
+						typ: .move
+						easing: easing.quad_out
+						time: time.Time{temp_time, temp_time + offset}
+						before: [last_position.x, last_position.y]
+						after: [
+							pos.x,
+							pos.y,
+						]
+					)
 				}
+				// vfmt on
 
 				// Dance Movement
 				// mut slider_mover := &movers.HalfCircleMover{}
@@ -105,10 +123,10 @@ pub fn make_replay(mut current_beatmap &beatmap.Beatmap, mut cursor &Cursor, pla
 				// for i := slider_mover.time.start; i < slider_mover.time.end; i += offset {
 				// 	position := slider_mover.get_point_at(i)
 				// 	cursor.add_transform(
-				// 		typ: .move, 
-				// 		easing: easing.quad_out, 
-				// 		time: time.Time{i, i + offset}, 
-				// 		before: [last_position.x, last_position.y], 
+				// 		typ: .move,
+				// 		easing: easing.quad_out,
+				// 		time: time.Time{i, i + offset},
+				// 		before: [last_position.x, last_position.y],
 				// 		after: [position.x, position.y]
 				// 	)
 				// 	last_position = position
@@ -122,31 +140,25 @@ pub fn make_replay(mut current_beatmap &beatmap.Beatmap, mut cursor &Cursor, pla
 			timeframe := 16.6667
 			mut rotation := 0.0
 
-			last_position = vector.Vector2{
-				math.cos(rotation) * radius + 512.0 / 2.0,
-				math.sin(rotation) * radius + 384.0 / 2.0
-			}
+			last_position = vector.Vector2{math.cos(rotation) * radius + 512.0 / 2.0,
+				math.sin(rotation) * radius + 384.0 / 2.0}
 
 			for i := object.time.start; i < object.time.end; i += timeframe {
-				position := vector.Vector2{
-					math.cos(rotation) * radius + 512.0 / 2.0,
-					math.sin(rotation) * radius + 384.0 / 2.0
-				}
+				position := vector.Vector2{math.cos(rotation) * radius + 512.0 / 2.0,
+					math.sin(rotation) * radius + 384.0 / 2.0}
 
 				cursor.add_transform(
-					typ: .move, 
-					easing: easing.linear, 
-					time: time.Time{i, i + timeframe},
-					before: [last_position.x, last_position.y],
-					after: [position.x, position.y],
-
+					typ: .move
+					easing: easing.linear
+					time: time.Time{i, i + timeframe}
+					before: [last_position.x, last_position.y]
+					after: [position.x, position.y]
 				)
-				
+
 				rotation += speed
 				last_position = position
 			}
 		}
-
 
 		last_object = unsafe { object }
 	}

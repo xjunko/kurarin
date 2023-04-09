@@ -5,17 +5,17 @@ import core.osu.beatmap.object
 // import core.osu.beatmap.difficulty
 
 pub struct ObjectState {
-	pub mut:
-		is_hit bool
+pub mut:
+	is_hit bool
 }
 
 pub struct Circle {
-	pub mut:
-		ruleset &Ruleset = voidptr(0)
-		hitcircle &object.Circle = voidptr(0)
-		players []&DifficultyPlayer
-		state []ObjectState
-		fade_start_relative f64
+pub mut:
+	ruleset             &Ruleset       = unsafe { nil }
+	hitcircle           &object.Circle = unsafe { nil }
+	players             []&DifficultyPlayer
+	state               []ObjectState
+	fade_start_relative f64
 }
 
 pub fn (circle &Circle) get_number() i64 {
@@ -26,7 +26,7 @@ pub fn (mut circle Circle) init(ruleset &Ruleset, current_object object.IHitObje
 	circle.ruleset = unsafe { ruleset }
 	circle.players = players
 	circle.state = []ObjectState{}
-	
+
 	mut t_object := unsafe { &current_object }
 	if mut t_object is object.Circle {
 		circle.hitcircle = t_object
@@ -36,7 +36,7 @@ pub fn (mut circle Circle) init(ruleset &Ruleset, current_object object.IHitObje
 
 	for player in circle.players {
 		circle.state << &ObjectState{}
-		circle.fade_start_relative = math.min<f64>(circle.fade_start_relative, player.diff.preempt)
+		circle.fade_start_relative = math.min[f64](circle.fade_start_relative, player.diff.preempt)
 	}
 }
 
@@ -62,10 +62,9 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 
 		in_range := player.cursor.position.distance(position) <= radius
 
-
-		if clicked {	
+		if clicked {
 			action := circle.ruleset.can_be_hit(time, mut circle, player)
-			
+
 			if in_range {
 				if action == .click {
 					if player.left_cond_e {
@@ -76,7 +75,7 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 
 					mut hit := HitResult.miss
 
-					relative := math.abs<f64>(time - circle.hitcircle.get_end_time())
+					relative := math.abs[f64](time - circle.hitcircle.get_end_time())
 
 					if relative < player.diff.hit300 {
 						hit = .hit300
@@ -101,7 +100,8 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 							circle.hitcircle.arm(hit != .miss, time)
 						}
 
-						circle.ruleset.send_result(time, mut player.cursor, mut circle, position, hit, combo)
+						circle.ruleset.send_result(time, mut player.cursor, mut circle,
+							position, hit, combo)
 
 						state.is_hit = true
 					}
@@ -129,7 +129,8 @@ pub fn (mut circle Circle) update_post_for(_player &DifficultyPlayer, time f64, 
 
 	if time > circle.hitcircle.get_end_time() + player.diff.hit50 && !state.is_hit {
 		position := circle.hitcircle.position
-		circle.ruleset.send_result(time, mut player.cursor, mut circle, position, .miss, .reset)
+		circle.ruleset.send_result(time, mut player.cursor, mut circle, position, .miss,
+			.reset)
 
 		if circle.players.len == 1 {
 			circle.hitcircle.arm(false, time)
@@ -137,7 +138,7 @@ pub fn (mut circle Circle) update_post_for(_player &DifficultyPlayer, time f64, 
 
 		state.is_hit = true
 	}
-	
+
 	return state.is_hit
 }
 

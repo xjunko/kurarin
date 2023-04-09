@@ -7,10 +7,10 @@ module curves
 import framework.math.vector
 
 pub struct SliderCurve {
-	pub mut:
-		curves []Curve
-		sections []f64
-		length f64
+pub mut:
+	curves   []Curve
+	sections []f64
+	length   f64
 }
 
 pub fn new_slider_curve(typp string, points []vector.Vector2) SliderCurve {
@@ -19,35 +19,35 @@ pub fn new_slider_curve(typp string, points []vector.Vector2) SliderCurve {
 	mut typ := typp
 
 	if points.len < 3 {
-		typ = "L"
+		typ = 'L'
 	}
 
 	match typ {
-		"L" {
+		'L' {
 			for i := 1; i < points.len; i++ {
-				c := curves.make_linear(points[i-1], points[i])
+				c := make_linear(points[i - 1], points[i])
 				curves_list << c
 				length += c.get_length()
 			}
 		}
-		"B" {
+		'B' {
 			mut last_index := 0
 			for i, p in points {
 				if i == points.len - 1 || points[i + 1] == p {
-					c := curves.make_bezier(points[last_index .. i + 1])
+					c := make_bezier(points[last_index..i + 1])
 					curves_list << c
 					length += c.get_length()
 					last_index = i + 1
 				}
 			}
 		}
-		"P" {
-			c := curves.make_circ_arc(points[0], points[1], points[2])
+		'P' {
+			c := make_circ_arc(points[0], points[1], points[2])
 			curves_list << c
 			length += c.get_length()
 		}
 		else {
-			println("> THE FUCK: Slider type: ${typ}")
+			println('> THE FUCK: Slider type: ${typ}')
 		}
 	}
 	mut sections := []f64{len: curves_list.len + 1}
@@ -57,7 +57,7 @@ pub fn new_slider_curve(typp string, points []vector.Vector2) SliderCurve {
 	if curves_list.len > 0 {
 		for i := 0; i < curves_list.len; i++ {
 			prev += curves_list[i].get_length() / length
-			sections[i+1] = prev
+			sections[i + 1] = prev
 		}
 	}
 
@@ -77,7 +77,7 @@ pub fn (slider SliderCurve) point_at(time f64) vector.Vector2 {
 		}
 	}
 
-	return vector.Vector2{512/2, 384/2}
+	return vector.Vector2{512 / 2, 384 / 2}
 }
 
 pub fn (slider SliderCurve) get_length() f64 {

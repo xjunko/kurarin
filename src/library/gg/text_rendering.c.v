@@ -57,7 +57,7 @@ fn new_ft(c FTConfig) ?&FT {
 
 	if c.font_path == '' || !os.exists(c.font_path) {
 		$if !android {
-			println('failed to load font "$c.font_path"')
+			println('failed to load font "${c.font_path}"')
 			return none
 		}
 	}
@@ -70,13 +70,13 @@ fn new_ft(c FTConfig) ?&FT {
 		if bytes.len == 0 {
 			// ... then try the APK asset path
 			bytes = os.read_apk_asset(c.font_path) or {
-				println('failed to load font "$c.font_path"')
+				println('failed to load font "${c.font_path}"')
 				return none
 			}
 		}
 	} $else {
 		bytes = os.read_bytes(c.font_path) or {
-			println('failed to load font "$c.font_path"')
+			println('failed to load font "${c.font_path}"')
 			return none
 		}
 	}
@@ -86,27 +86,27 @@ fn new_ft(c FTConfig) ?&FT {
 		get_font_path_variant(c.font_path, .bold)
 	}
 	bytes_bold := os.read_bytes(bold_path) or {
-		debug_font_println('failed to load font "$bold_path"')
+		debug_font_println('failed to load font "${bold_path}"')
 		bold_path = c.font_path
 		bytes
 	}
 	mut mono_path := get_font_path_variant(c.font_path, .mono)
 	bytes_mono := os.read_bytes(mono_path) or {
-		debug_font_println('failed to load font "$mono_path"')
+		debug_font_println('failed to load font "${mono_path}"')
 		mono_path = c.font_path
 		bytes
 	}
 	mut italic_path := get_font_path_variant(c.font_path, .italic)
 	bytes_italic := os.read_bytes(italic_path) or {
-		debug_font_println('failed to load font "$italic_path"')
+		debug_font_println('failed to load font "${italic_path}"')
 		italic_path = c.font_path
 		bytes
 	}
 	fons := sfons.create(512, 512, 1)
-	debug_font_println('Font used for font_normal : $normal_path')
-	debug_font_println('Font used for font_bold   : $bold_path')
-	debug_font_println('Font used for font_mono   : $mono_path')
-	debug_font_println('Font used for font_italic : $italic_path')
+	debug_font_println('Font used for font_normal : ${normal_path}')
+	debug_font_println('Font used for font_bold   : ${bold_path}')
+	debug_font_println('Font used for font_mono   : ${mono_path}')
+	debug_font_println('Font used for font_italic : ${italic_path}')
 	return &FT{
 		fons: fons
 		font_normal: fons.add_font_mem('sans', bytes, false)
@@ -243,7 +243,7 @@ pub fn system_font_path() string {
 			'/Library/Fonts/Arial.ttf']
 		for font in fonts {
 			if os.is_file(font) {
-				debug_font_println('Using font "$font"')
+				debug_font_println('Using font "${font}"')
 				return font
 			}
 		}
@@ -265,7 +265,7 @@ pub fn system_font_path() string {
 							for location in font_locations {
 								candidate_path := os.join_path(location, candidate_font)
 								if os.is_file(candidate_path) && os.is_readable(candidate_path) {
-									debug_font_println('Using font "$candidate_path"')
+									debug_font_println('Using font "${candidate_path}"')
 									return candidate_path
 								}
 							}
@@ -275,13 +275,13 @@ pub fn system_font_path() string {
 			}
 		}
 	}
-	
+
 	mut fm := os.execute("fc-match --format='%{file}\n' -s")
 	if fm.exit_code == 0 {
 		lines := fm.output.split('\n')
 		for l in lines {
 			if !l.contains('.ttc') {
-				debug_font_println('Using font "$l"')
+				debug_font_println('Using font "${l}"')
 				return l
 			}
 		}

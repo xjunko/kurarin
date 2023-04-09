@@ -1,18 +1,16 @@
 module ruleset
 
 import math
-
 import core.osu.beatmap
 import core.osu.beatmap.object
 import core.osu.beatmap.difficulty
 import core.osu.cursor
-
 import framework.logging
 import framework.math.vector
 
 const (
 	tolerance_2b = int(3)
-	grades = ["None", "SSH", "SS", "S", "A", "B", "C", "D"]
+	grades       = ['None', 'SSH', 'SS', 'S', 'A', 'B', 'C', 'D']
 )
 
 pub enum Grade {
@@ -32,16 +30,16 @@ pub enum Action {
 	click
 }
 
-pub enum ComboResult  {
+pub enum ComboResult {
 	reset
 	hold
 	increase
 }
 
 pub struct ButtonState {
-	pub mut:
-		left bool
-		right bool
+pub mut:
+	left  bool
+	right bool
 }
 
 pub fn (state ButtonState) both_released() bool {
@@ -49,9 +47,8 @@ pub fn (state ButtonState) both_released() bool {
 }
 
 pub interface IHitObject {
-	mut:
-		ruleset &Ruleset
-
+mut:
+	ruleset &Ruleset
 	init(&Ruleset, object.IHitObject, []&DifficultyPlayer)
 	update_for(&DifficultyPlayer, f64, bool) bool
 	update_click_for(&DifficultyPlayer, f64) bool
@@ -65,49 +62,49 @@ pub interface IHitObject {
 type Buttons = i64
 
 const (
-	left_mouse = Buttons(1 << 0)
+	left_mouse  = Buttons(1 << 0)
 	right_mouse = Buttons(1 << 1)
 )
 
 pub struct DifficultyPlayer {
-	pub mut:
-		cursor &cursor.Cursor
-		diff   difficulty.Difficulty
-		double_click bool
-		already_stolen bool
-		buttons ButtonState
-		game_down_state bool
-		mouse_down_button Buttons
-		last_button Buttons
-		last_button2 Buttons
-		left_cond bool
-		left_cond_e bool
-		right_cond bool
-		right_cond_e bool
+pub mut:
+	cursor            &cursor.Cursor
+	diff              difficulty.Difficulty
+	double_click      bool
+	already_stolen    bool
+	buttons           ButtonState
+	game_down_state   bool
+	mouse_down_button Buttons
+	last_button       Buttons
+	last_button2      Buttons
+	left_cond         bool
+	left_cond_e       bool
+	right_cond        bool
+	right_cond_e      bool
 }
 
 pub struct SubSet {
-	pub mut:
-		player &DifficultyPlayer
-		raw_score i64
-		accuracy f64
-		max_combo i64
-		nobject i64
-		grade Grade
+pub mut:
+	player    &DifficultyPlayer
+	raw_score i64
+	accuracy  f64
+	max_combo i64
+	nobject   i64
+	grade     Grade
 }
 
 pub struct Ruleset {
-	pub mut:
-		beatmap &beatmap.Beatmap
-		cursors []&cursor.Cursor
-		subset  []&SubSet
+pub mut:
+	beatmap &beatmap.Beatmap
+	cursors []&cursor.Cursor
+	subset  []&SubSet
 
-		ended bool
+	ended bool
 
-		queue []IHitObject
-		processed []IHitObject
+	queue     []IHitObject
+	processed []IHitObject
 
-		hit_listener HitListener
+	hit_listener HitListener
 }
 
 type HitListener = fn (f64, i64, vector.Vector2, HitResult, ComboResult, i64)
@@ -128,7 +125,9 @@ pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut current_object IHitObject,
 			}
 		}
 
-		if index > 0 && ruleset.beatmap.objects[ruleset.processed[index-1].get_number()].stack_index > 0 && !ruleset.processed[index-1].is_hit(player) {
+		if index > 0
+			&& ruleset.beatmap.objects[ruleset.processed[index - 1].get_number()].stack_index > 0
+			&& !ruleset.processed[index - 1].is_hit(player) {
 			return Action.ignored
 		}
 	}
@@ -136,9 +135,11 @@ pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut current_object IHitObject,
 	for mut g in ruleset.processed {
 		if !g.is_hit(player) {
 			if g.get_number() != current_object.get_number() {
+				// vfmt off
 				if ruleset.beatmap.objects[g.get_number()].get_end_time() + tolerance_2b < ruleset.beatmap.objects[current_object.get_number()].get_start_time() {
 					return Action.shake
 				}
+				// vfmt on
 			} else {
 				break
 			}
@@ -152,7 +153,7 @@ pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut current_object IHitObject,
 		hit_range -= 200.0
 	}
 
-	if math.abs<f64>(time - ruleset.beatmap.objects[current_object.get_number()].get_start_time()) >= hit_range {
+	if math.abs[f64](time - ruleset.beatmap.objects[current_object.get_number()].get_start_time()) >= hit_range {
 		return Action.shake
 	}
 
@@ -167,7 +168,7 @@ pub fn (mut ruleset Ruleset) update(time f64) {
 			is_done := g.update_post(time)
 
 			if is_done {
-				ruleset.processed = ruleset.processed[1 ..]
+				ruleset.processed = ruleset.processed[1..]
 				i--
 			}
 		}
@@ -183,12 +184,11 @@ pub fn (mut ruleset Ruleset) update(time f64) {
 
 			ruleset.processed << g
 			// ruleset.queue = ruleset.queue#[i+i .. i]
-			ruleset.queue = ruleset.queue[1 ..] // TODO: HACk
+			ruleset.queue = ruleset.queue[1..] // TODO: HACk
 			i--
 		}
 	}
 }
-
 
 pub fn (mut ruleset Ruleset) update_click_for(player_cursor &cursor.Cursor, time f64) {
 	mut player := &ruleset.subset[0].player
@@ -203,13 +203,15 @@ pub fn (mut ruleset Ruleset) update_click_for(player_cursor &cursor.Cursor, time
 		player.left_cond_e = player.left_cond
 		player.right_cond_e = player.right_cond
 
-		if player.buttons.left != player.cursor.left_button || player.buttons.right != player.cursor.right_button {
+		if player.buttons.left != player.cursor.left_button
+			|| player.buttons.right != player.cursor.right_button {
 			player.game_down_state = player.cursor.left_button || player.cursor.right_button
 			player.last_button2 = player.last_button
 			player.last_button = player.mouse_down_button
 
 			player.mouse_down_button = Buttons(0)
 
+			// vfmt off
 			if player.cursor.left_button {
 				player.mouse_down_button |= left_mouse
 			}
@@ -217,6 +219,7 @@ pub fn (mut ruleset Ruleset) update_click_for(player_cursor &cursor.Cursor, time
 			if player.cursor.right_button {
 				player.mouse_down_button |= right_mouse
 			}
+			// vfmt on
 		}
 	}
 
@@ -270,7 +273,7 @@ pub fn (mut ruleset Ruleset) update_post_for(player_cursor &cursor.Cursor, time 
 	}
 }
 
-pub fn (mut ruleset Ruleset) send_result(time f64, mut player_cursor &cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult, combo ComboResult) {
+pub fn (mut ruleset Ruleset) send_result(time f64, mut player_cursor cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult, combo ComboResult) {
 	mut number := src.get_number()
 	mut subset := &ruleset.subset[0]
 
@@ -289,10 +292,12 @@ pub fn (mut ruleset Ruleset) send_result(time f64, mut player_cursor &cursor.Cur
 }
 
 // Factory
-pub fn new_ruleset(mut loaded_beatmap &beatmap.Beatmap, mut cursors []&cursor.Cursor) &Ruleset {
-	logging.info("Creating osu! ruleset.")	
-	
-	mut ruleset := &Ruleset{beatmap: unsafe { loaded_beatmap }}
+pub fn new_ruleset(mut loaded_beatmap beatmap.Beatmap, mut cursors []&cursor.Cursor) &Ruleset {
+	logging.info('Creating osu! ruleset.')
+
+	mut ruleset := &Ruleset{
+		beatmap: unsafe { loaded_beatmap }
+	}
 	ruleset.cursors = []&cursor.Cursor{}
 	ruleset.subset = []&SubSet{}
 
@@ -302,7 +307,10 @@ pub fn new_ruleset(mut loaded_beatmap &beatmap.Beatmap, mut cursors []&cursor.Cu
 	for i, mut cursor in cursors {
 		mut diff := loaded_beatmap.difficulty.Difficulty
 
-		mut player := &DifficultyPlayer{cursor: unsafe { *cursor }, diff: diff}
+		mut player := &DifficultyPlayer{
+			cursor: unsafe { *cursor }
+			diff: diff
+		}
 		diff_players[i] = player
 
 		ruleset.cursors << unsafe { *cursor }

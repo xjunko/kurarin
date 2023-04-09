@@ -3,7 +3,7 @@ module easing
 import math
 
 /*
-	easing bullshit in here
+easing bullshit in here
 
     t is the current time (or position) of the tween.
     b is the beginning value of the property.
@@ -14,7 +14,7 @@ pub type EasingFunction = fn (f64, f64, f64, f64) f64
 
 // FNs starts here
 pub fn linear(t f64, b f64, c f64, d f64) f64 {
-	return c*t/d+b
+	return c * t / d + b
 }
 
 pub fn quad_in(tt f64, b f64, c f64, d f64) f64 {
@@ -169,7 +169,7 @@ pub fn elastic_in_out(_t f64, b f64, c f64, d f64) f64 {
 	if t == 0 {
 		return b
 	}
-		
+
 	t /= (d / 2)
 
 	if t == 2 {
@@ -182,7 +182,7 @@ pub fn elastic_in_out(_t f64, b f64, c f64, d f64) f64 {
 	} else {
 		s = p / (2 * math.pi) * math.asin(c / a)
 	}
-		
+
 	if t < 1 {
 		t -= 1
 		return -0.5 * (a * math.pow(2, 10 * t) * math.sin((t * d - s) * (2 * math.pi) / p)) + b

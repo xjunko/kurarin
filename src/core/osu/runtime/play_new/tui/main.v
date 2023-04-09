@@ -3,14 +3,12 @@ module tui
 import os
 // import sync
 import term.ui
-
 import framework.math.time
-
-import beatmap
+import core.osu.runtime.play_new.tui.beatmap
 import core.osu.runtime.play_old
 
 const (
-	osu_path = "/run/media/junko/2nd/Projects/player/files/"
+	osu_path = '/run/media/junko/2nd/Projects/player/files/'
 )
 
 enum ProgramStatus {
@@ -22,28 +20,29 @@ enum ProgramStatus {
 
 [heap]
 pub struct Window {
-	mut:
-		status 		ProgramStatus = .just_started
-		logs    	[]string
-		beatmaps 	[]beatmap.Beatmap
-		scroll      int
-
-	pub mut:
-		ctx 		&ui.Context = voidptr(0)
-		// mutex 		&sync.Mutex = sync.new_mutex()
+mut:
+	status   ProgramStatus = .just_started
+	logs     []string
+	beatmaps []beatmap.Beatmap
+	scroll   int
+pub mut:
+	ctx &ui.Context = unsafe { nil }
+	// mutex 		&sync.Mutex = sync.new_mutex()
 }
 
 pub fn (mut window Window) update_thread() {
-	window.logs << "Log started!"
+	window.logs << 'Log started!'
 
-	mut limiter := &time.Limiter{fps: 420}
+	mut limiter := &time.Limiter{
+		fps: 420
+	}
 
 	for {
 		// window.mutex.@lock()
 
 		if window.status == .beatmap_init {
 			window.status = .beatmap_update
-			go window.update_beatmaps()
+			spawn window.update_beatmaps()
 		}
 
 		limiter.sync()
@@ -52,11 +51,11 @@ pub fn (mut window Window) update_thread() {
 }
 
 pub fn (mut window Window) update_beatmaps() {
-	if folders := os.glob(os.join_path(osu_path, "*")) {
+	if folders := os.glob(os.join_path(tui.osu_path, '*')) {
 		// window.beatmaps = os.dir()
 		for folder in folders {
 			// Check if theres any *.osu files in there
-			if osu_files := os.glob(os.join_path(folder, "*.osu")) {
+			if osu_files := os.glob(os.join_path(folder, '*.osu')) {
 				for osu_file in osu_files {
 					// Found something, add this to beatmap list.
 					window.beatmaps << beatmap.parse_beatmap(osu_file) // TODO: Difficulty support instead of using whatever the first *.osu we get.\
@@ -79,13 +78,15 @@ pub fn (mut window Window) draw_menu() {
 
 	// List
 	for n, beatmap in window.beatmaps {
-		if n < window.scroll || n - window.scroll > height-3 { continue }
+		if n < window.scroll || n - window.scroll > height - 3 {
+			continue
+		}
 
-		beatmap_info_str := '[${["X", ">"][int(n == window.scroll)]}] ${n+1} | ${beatmap.artist} - ${beatmap.title}'
+		beatmap_info_str := '[${['X', '>'][int(n == window.scroll)]}] ${n + 1} | ${beatmap.artist} - ${beatmap.title}'
 		window.ctx.draw_text(0, n - window.scroll + 3, beatmap_info_str)
 	}
 
-	window.ctx.draw_text(0, height - 5, "BRUH: ${window.scroll}")
+	window.ctx.draw_text(0, height - 5, 'BRUH: ${window.scroll}')
 	// Bar
 	window.ctx.draw_text(0, height - 1, '─'.repeat(width))
 }
@@ -98,26 +99,21 @@ pub fn (mut window Window) event(e &ui.Event, _ voidptr) {
 				window.trigger_before()
 			} else if e.code == .down {
 				window.trigger_next()
-			} 
+			}
 
 			// Click
 			if e.code == .enter {
-				play_old.main(
-					window.beatmaps[window.scroll].get_full_path(),
-					"",
-					false
-				)
+				play_old.main(window.beatmaps[window.scroll].get_full_path(), '', false)
 				exit(1)
 			}
 		}
-
 		else {}
 	}
 }
 
 pub fn (mut window Window) trigger_before() {
 	window.scroll--
-	
+
 	if window.scroll < 0 {
 		window.scroll = window.beatmaps.len - 1
 	}
@@ -125,7 +121,7 @@ pub fn (mut window Window) trigger_before() {
 
 pub fn (mut window Window) trigger_next() {
 	window.scroll++
-	
+
 	if window.scroll > window.beatmaps.len - 1 {
 		window.scroll = 0
 	}
@@ -138,15 +134,14 @@ pub fn (mut window Window) frame(_ voidptr) {
 	if window.status == .just_started {
 		window.ctx.draw_text(1, 1, 'Starting')
 
-		window.logs << "Program started succesfully."
-		
-		go window.update_thread()
-		window.status = .beatmap_init
+		window.logs << 'Program started succesfully.'
 
+		spawn window.update_thread()
+		window.status = .beatmap_init
 	} else if window.status == .beatmap_init || window.status == .beatmap_update {
 		window.ctx.draw_text(1, 1, 'Loading beatmaps..')
 		window.ctx.draw_text(1, 2, 'Found: ${window.beatmaps.len}')
-		window.ctx.draw_text(1, 3, 'Recent: ${window.beatmaps[.. 1]}')
+		window.ctx.draw_text(1, 3, 'Recent: ${window.beatmaps[..1]}')
 	} else if window.status == .ready {
 		window.draw_menu()
 	}
@@ -160,12 +155,11 @@ pub fn main() {
 	mut window := &Window{}
 
 	window.ctx = ui.init(
-		user_data: window,
-
+		user_data: window
 		// FNs
-		event_fn: window.event,
+		event_fn: window.event
 		frame_fn: window.frame
 	)
 
-	window.ctx.run() or { panic("Failed to run TUI") }
+	window.ctx.run() or { panic('Failed to run TUI') }
 }
