@@ -1,9 +1,21 @@
 videos/*
 *.mp4
 *.mp3
-assets/shaders/*.h
 videos/*
 *.log
 dementia
 settings.json
 *.json
+
+build/*
+library/microui
+src/library/microui
+
+# New Engine Assets structure
+assets/diva/*
+assets/psekai/*
+
+# Random shit
+assets/replays/*
+assets/osu/shaders/*.h
+assets/osu/maps/*

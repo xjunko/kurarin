@@ -1,65 +1,73 @@
-## Info
+<div style="float: right; text-align: center;">
+    <div>
+        <a href="https://youtu.be/2b1IexhKPz4" title="Image is courtesy of Iyowa.">
+            <img width="200" align="right" style="float: right; margin: 0 10px 0 0;" alt="Kurarin" src="assets/common/textures/kurarin.png">
+        </a>
+    </div>
+</div>
 
-Repo might be dead for awhile, blame school and vacations.
+## Disclaimer
+
+This program is far from finished and it's not exactly stable either but it works most of the time. <br/>
+Use [danser-go](https://github.com/Wieku/danser-go) or [McOsu](https://github.com/McKay42/McOsu), if you're looking for client alternative.
 
 ## Preview
 
-(Gameplay branch preview (Not public, yet)) </br>
-Awful gameplay I know
-
-https://user-images.githubusercontent.com/44401509/165777649-ca6827de-0126-4ffe-9672-bc461c912ecc.mp4
-
-
-
-(Latest Preview)
-
-
-https://user-images.githubusercontent.com/44401509/162553604-c6ac7c7b-246d-4344-bad5-b616bd7421ed.mp4
-
-
-(Old: Proper video rendering straight from the program, can be enabled in settings.json)
-
-https://user-images.githubusercontent.com/44401509/159376175-38ea4796-1906-439b-9304-2657b2772cd0.mp4
-
+[Here!11111!!1!!](PREVIEWS.md)
 
 ## Releases
 
-You can get the latest development build from the CI/CD [here](https://github.com/FireRedz/kurarin/actions/workflows/ci.yml).
+~~You can get the latest development build from the CI/CD
+[here](https://github.com/FireRedz/kurarin/actions/workflows/ci.yml).~~ <br />
+Build CI is dead rn, [build it yourself](#building) for now.
 
 ## Running
 
 ```bash
 ./kurarin [...arguments]
 ```
+
 ## Settings
 
-The program will create the `settings.json` file on startup.
+The program will create a `settings.json` file on startup for the first time, and exit right after. <br/>
+The next startup will be normal.
 
+## Features
 
-### Rendering
+Currently supports:
 
-This program supports video renders. All you need to do is enable it in your
-`settings.json` and install [FFmpeg](https://ffmpeg.org/) and add it to your $PATH.
+* Gameplay (thank you, wieku)
+* Auto (+ cursordance, again, thanks wieku)
+* Rendering (Requires [FFmpeg](https://ffmpeg.org/) to be installed in `$PATH`)
+* Storyboard
+* Replay (`.osr`) support
 
+Currently does not support:
+
+* Stable memory management (this program leaks memory like a bitch in heat, especially on big sliders)
+* User interface
+* Aspire maps
 
 ## Building
 
 ### Requirements
 
 * V
-* BASS
-* OpenGL >= 3.0
+* GCC/Clang
+* OpenGL 3
 
-#### On Linux (Arch)
+#### Linux
 
-You might need to install a few library beforehand, [`libbass`](https://aur.archlinux.org/packages/libbass) and [`libbass_fx`](https://aur.archlinux.org/packages/libbass_fx). </br>
+Tested with Arch but it _should_ work anywhere else as long as it's linux.
 
-Then after that use the [`ext/build.sh`](https://github.com/FireRedz/kurarin/blob/rewrite/ext/build.sh) script to build, no makefile fuckery or something like that.
+Use [`ext/build.sh`](https://github.com/FireRedz/kurarin/blob/rewrite/ext/build.sh) to build the program, no makefile
+fuckery or smth like that.
+
 ## Credits
 
 Some of the code is _derived_ or literally copy-pasted from these projects, so big credits to them.
 
-* [McOsu](https://github.com/McKay42/McOsu) by [McKay](https://github.com/McKay42)
 * [danser-go](https://github.com/Wieku/danser-go) by [Wieku](https://github.com/Wieku)
+* [McOsu](https://github.com/McKay42/McOsu) by [McKay](https://github.com/McKay42)
 * [osr2mp4](https://github.com/uyitroa/osr2mp4-core) by [yuitora](https://github.com/uyitroa)
 * [opsu-dance](https://github.com/yugecin/opsu-dance) by [yugecin](https://github.com/yugecin)
