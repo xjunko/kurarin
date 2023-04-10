@@ -1,18 +1,11 @@
 module main
 
-// osu!
-// proseka
-// diva
-// Cores
 import os
 import flag
-import core.osu.runtime.play_old
-import core.osu.runtime.play_new
-import core.sekai.runtime.sekai
-import core.diva.runtime.diva
-import core.common.constants
-import core.common.settings
 import framework.logging
+import core.common.settings
+import core.common.constants
+import core.osu.runtime
 
 const (
 	_ = settings.global
@@ -27,13 +20,10 @@ fn main() {
 	// Old
 	beatmap_path := fp.string('beatmap', `b`, '', 'Path to the .osu file.')
 	replay_path := fp.string('replay', `r`, '', 'Path to the .osr file.')
-	is_playing := fp.bool('play', `p`, false, 'Flag for playing in the client.')
-
-	// New
-	gui_mode := fp.bool('ui', `u`, false, 'Very early and experimental UI')
+	is_playing := fp.bool('play', `p`, false, 'Enable to play the beatmap.')
 
 	// Game
-	game_type := fp.string('game', `g`, 'osu', 'Option for game engines. (osu!/sekai/diva)')
+	game_type := fp.string('game', `g`, 'osu', 'Option for game engines. [osu!] (Other modes is deprecated.)')
 
 	fp.finalize() or {
 		logging.error(err.str())
@@ -48,18 +38,8 @@ fn main() {
 				return
 			}
 
-			if gui_mode {
-				play_new.main(beatmap_path.replace('\\', ''))
-			} else {
-				play_old.main(beatmap_path.replace('\\', ''), replay_path.replace('\\',
-					''), is_playing)
-			}
-		}
-		'sekai' {
-			sekai.main()
-		}
-		'diva' {
-			diva.main()
+			runtime.run(beatmap_path.replace('\\', ''), replay_path.replace('\\', ''),
+				is_playing)
 		}
 		else {
 			logging.error('Invalid game_type: ${game_type}')

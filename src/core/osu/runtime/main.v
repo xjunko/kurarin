@@ -1,4 +1,4 @@
-module play_old
+module runtime
 
 import core.common.settings // Load this first
 import os
@@ -464,7 +464,7 @@ pub mut:
 	play_mode    PlayState
 }
 
-pub fn main(beatmap_path string, replay_path string, _is_playing bool) {
+pub fn run(beatmap_path string, replay_path string, _is_playing bool) {
 	mut play_mode := PlayState.auto
 
 	// Playing checks

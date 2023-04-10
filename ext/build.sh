@@ -19,6 +19,10 @@ what_mode="Development"
 
 
 # Functions
+format() {
+    v fmt -w .
+}
+
 build_shaders() {
     v shader $shaders_dir
 }
@@ -59,8 +63,10 @@ build() {
     
     # TODO: scuffed
     if [ "$make_shaders" = "true" ]; then
+        format 
         build_shaders && eval "$build_command"
     else 
+        format
         eval "$build_command"
     fi
 }
