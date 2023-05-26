@@ -214,7 +214,7 @@ fn create_image(file string) Image {
 	return img
 }
 
-pub fn (mut ctx Context) create_image_from_memory(buf &byte, bufsize int) Image {
+pub fn (mut ctx Context) create_image_from_memory(buf &u8, bufsize int) Image {
 	stb_img := stbi.load_from_memory(buf, bufsize) or { return Image{} }
 	mut img := Image{
 		width: stb_img.width
