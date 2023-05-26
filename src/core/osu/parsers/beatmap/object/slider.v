@@ -7,12 +7,12 @@ import framework.math.vector
 import framework.math.glider
 import framework.math.time
 import framework.logging
-import core.osu.beatmap.difficulty
-import core.osu.beatmap.timing
-import core.osu.audio
-import core.osu.skin
-import core.osu.beatmap.object.curves
-import core.osu.beatmap.object.graphic
+import core.osu.parsers.beatmap.difficulty
+import core.osu.parsers.beatmap.timing
+import core.osu.system.audio
+import core.osu.system.skin
+import core.osu.parsers.beatmap.object.curves
+import core.osu.parsers.beatmap.object.graphic
 
 pub struct TickPoint {
 pub mut:

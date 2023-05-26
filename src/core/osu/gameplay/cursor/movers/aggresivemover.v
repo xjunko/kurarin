@@ -3,8 +3,8 @@ module movers
 import math
 import framework.math.easing
 import framework.math.vector
-import core.osu.beatmap.object
-import core.osu.beatmap.object.curves
+import core.osu.parsers.beatmap.object
+import core.osu.parsers.beatmap.object.curves
 
 // Reimplentation (literally copy-pasted 8) ) based on
 // https://github.com/Wieku/danser-go/blob/master/app/dance/movers/aggressive.go

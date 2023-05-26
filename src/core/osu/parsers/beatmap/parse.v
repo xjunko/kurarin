@@ -2,8 +2,8 @@ module beatmap
 
 import os
 import gx
-import core.osu.beatmap.difficulty
-import core.osu.beatmap.object
+import core.osu.parsers.beatmap.difficulty
+import core.osu.parsers.beatmap.object
 import math
 import framework.logging
 

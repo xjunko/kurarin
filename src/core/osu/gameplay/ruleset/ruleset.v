@@ -1,10 +1,10 @@
 module ruleset
 
 import math
-import core.osu.beatmap
-import core.osu.beatmap.object
-import core.osu.beatmap.difficulty
-import core.osu.cursor
+import core.osu.parsers.beatmap
+import core.osu.parsers.beatmap.object
+import core.osu.parsers.beatmap.difficulty
+import core.osu.gameplay.cursor
 import framework.logging
 import framework.math.vector
 

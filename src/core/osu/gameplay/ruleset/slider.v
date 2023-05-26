@@ -1,9 +1,9 @@
 module ruleset
 
-// import core.osu.beatmap.difficulty
+// import core.osu.parsers.beatmap.difficulty
 import math
 import framework.math.vector
-import core.osu.beatmap.object
+import core.osu.parsers.beatmap.object
 
 const (
 	left_button  = Buttons(1 << 0)

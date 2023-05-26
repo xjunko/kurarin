@@ -1,6 +1,6 @@
 module cursor
 
-import core.osu.replay as i_replay
+import core.osu.parsers.replay as i_replay
 import framework.math.time
 import framework.graphic.context
 

@@ -2,9 +2,9 @@ module beatmap
 
 import os
 import math
-import core.osu.beatmap.difficulty
-import core.osu.beatmap.timing
-import core.osu.beatmap.object
+import core.osu.parsers.beatmap.difficulty
+import core.osu.parsers.beatmap.timing
+import core.osu.parsers.beatmap.object
 import gx
 import sokol.gfx
 import sokol.sgl
@@ -15,11 +15,11 @@ import framework.math.vector
 import framework.graphic.sprite
 import framework.graphic.context
 import core.osu.x
-import core.osu.skin
-import core.osu.audio
+import core.osu.system.skin
+import core.osu.system.audio
 import core.common.settings
-import core.osu.beatmap.storyboard
-import core.osu.beatmap.object.graphic
+import core.osu.parsers.beatmap.storyboard
+import core.osu.parsers.beatmap.object.graphic
 
 pub struct BeatmapGeneralInfo {
 pub mut:

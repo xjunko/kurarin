@@ -13,9 +13,9 @@ import framework.math.easing
 import framework.math.vector
 import framework.math.time as time2
 import core.common.settings
-import core.osu.beatmap
-import core.osu.beatmap.object as gameobject
-import core.osu.skin
+import core.osu.parsers.beatmap
+import core.osu.parsers.beatmap.object as gameobject
+import core.osu.system.skin
 import core.osu.x
 
 const (

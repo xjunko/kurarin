@@ -3,9 +3,9 @@ module object
 import math
 import framework.graphic.sprite
 import framework.math.time
-import core.osu.skin
-import core.osu.audio
-import core.osu.beatmap.difficulty
+import core.osu.system.skin
+import core.osu.system.audio
+import core.osu.parsers.beatmap.difficulty
 
 pub struct Spinner {
 	HitObject

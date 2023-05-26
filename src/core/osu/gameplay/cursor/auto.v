@@ -1,8 +1,8 @@
 module cursor
 
 import math
-import core.osu.beatmap.object
-import core.osu.movers
+import core.osu.parsers.beatmap.object
+import core.osu.gameplay.cursor.movers
 import framework.math.vector
 import framework.graphic.context
 

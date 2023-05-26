@@ -5,8 +5,8 @@ module object
 import framework.graphic.sprite
 import framework.math.time
 import framework.math.vector
-import core.osu.beatmap.timing
-import core.osu.beatmap.difficulty
+import core.osu.parsers.beatmap.timing
+import core.osu.parsers.beatmap.difficulty
 
 pub const (
 	used_imports = true

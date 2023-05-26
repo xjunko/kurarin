@@ -2,7 +2,7 @@ module sprite
 
 import gg
 import framework.math.vector
-import core.osu.skin
+import core.osu.system.skin
 
 pub struct NumberSprite {
 	Sprite

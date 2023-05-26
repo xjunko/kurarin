@@ -3,7 +3,7 @@ module gameplay
 import math
 import core.common.settings
 import framework.audio as f_audio
-import core.osu.audio as g_audio
+import core.osu.system.audio as g_audio
 import framework.math.time
 import framework.math.easing
 import framework.math.glider

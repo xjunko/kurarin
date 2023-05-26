@@ -3,15 +3,15 @@ module overlays
 // import gx
 import math
 import core.osu.x
-import core.osu.skin
-import core.osu.cursor
-import core.osu.ruleset
+import core.osu.system.skin
+import core.osu.gameplay.cursor
+import core.osu.gameplay.ruleset
 import core.common.settings
 import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite
 import framework.graphic.context
-import core.osu.overlays.gameplay
+import core.osu.gameplay.overlays.gameplay
 
 const (
 	g_overlay_hack = &GameplayOverlay{

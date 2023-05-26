@@ -8,7 +8,7 @@ module movers
 
 import framework.math.vector
 import framework.math.time
-import core.osu.beatmap.object
+import core.osu.parsers.beatmap.object
 
 pub struct Mover {
 pub mut:

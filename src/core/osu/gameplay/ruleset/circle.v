@@ -1,8 +1,8 @@
 module ruleset
 
 import math
-import core.osu.beatmap.object
-// import core.osu.beatmap.difficulty
+import core.osu.parsers.beatmap.object
+// import core.osu.parsers.beatmap.difficulty
 
 pub struct ObjectState {
 pub mut:

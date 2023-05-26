@@ -3,7 +3,7 @@ module movers
 import math
 import framework.math.vector
 import framework.math.easing
-import core.osu.beatmap.object
+import core.osu.parsers.beatmap.object
 
 pub struct HalfCircleMover {
 	Mover

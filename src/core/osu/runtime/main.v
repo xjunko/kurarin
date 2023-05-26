@@ -11,12 +11,12 @@ import sokol.sapp
 import time as timelib
 import gg
 import core.osu.x
-import core.osu.skin
-import core.osu.cursor
-import core.osu.beatmap
-import core.osu.ruleset
-import core.osu.overlays
-import core.osu.beatmap.object.graphic
+import core.osu.system.skin
+import core.osu.gameplay.cursor
+import core.osu.parsers.beatmap
+import core.osu.gameplay.ruleset
+import core.osu.gameplay.overlays
+import core.osu.parsers.beatmap.object.graphic
 import framework.audio
 import framework.logging
 import framework.math.time

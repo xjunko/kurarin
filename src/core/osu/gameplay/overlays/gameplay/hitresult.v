@@ -6,10 +6,10 @@ import framework.math.vector
 import framework.graphic.sprite
 import framework.graphic.context
 import core.osu.x
-import core.osu.skin
-import core.osu.ruleset
-// import core.osu.beatmap.object
-import core.osu.beatmap.difficulty
+import core.osu.system.skin
+import core.osu.gameplay.ruleset
+// import core.osu.parsers.beatmap.object
+import core.osu.parsers.beatmap.difficulty
 
 pub struct HitResults {
 pub mut:
