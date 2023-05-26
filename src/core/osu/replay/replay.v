@@ -120,6 +120,11 @@ pub fn (mut replay Replay) read_frames(data []u8) {
 
 			prev_keys = keys
 		}
+
+		// NOTE: noop to make the thing shup up
+		prev_keys += 42069
+		prev_keys -= 42069
+		prev_keys = prev_keys
 	} else {
 		panic("[Replay] Failed to decode replay's lzma data!!")
 	}

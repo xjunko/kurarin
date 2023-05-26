@@ -33,6 +33,7 @@ pub fn (mut context Context) create_image(path string) gg.Image {
 pub struct DrawImageConfig {
 	gg.DrawImageConfig
 pub:
+	rotate f32
 	origin vector.Origin = vector.centre
 }
 

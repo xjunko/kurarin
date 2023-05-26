@@ -308,7 +308,7 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 				width: f32(size.x)
 				height: f32(size.y)
 			}
-			rotate: int(sprite.angle)
+			rotate: f32(sprite.angle)
 			color: sprite.color
 			effect: [.alpha, .add][int(sprite.additive)]
 			origin: sprite.origin
