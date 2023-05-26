@@ -17,7 +17,7 @@ import core.osu.beatmap.object.graphic
 pub struct TickPoint {
 pub mut:
 	time       f64
-	pos        vector.Vector2
+	pos        vector.Vector2[f64]
 	is_reverse bool
 	// fade &glider.Glider = &glider.Glider{}
 	// scale &glider.Glider = &glider.Glider{}
@@ -40,7 +40,7 @@ pub mut:
 	repeated     int
 	pixel_length f64
 	duration     f64
-	points       []vector.Vector2
+	points       []vector.Vector2[f64]
 	curve        curves.MultiCurve
 	typ          string
 	//
@@ -516,12 +516,12 @@ pub fn (mut slider Slider) generate_slider_path() {
 	slider_points_raw := slider.data[5].split('|')
 	slider.typ = slider_points_raw[0]
 
-	mut slider_points := []vector.Vector2{}
+	mut slider_points := []vector.Vector2[f64]{}
 	slider_points << slider.position
 
 	for i := 1; i < slider_points_raw.len; i++ {
 		items := slider_points_raw[i].split(':')
-		slider_points << vector.Vector2{items[0].f64(), items[1].f64()}
+		slider_points << vector.Vector2[f64]{items[0].f64(), items[1].f64()}
 	}
 
 	// oh god
@@ -763,7 +763,7 @@ pub fn (mut slider Slider) generate_slider_renderer() {
 	}
 }
 
-pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
+pub fn (mut slider Slider) get_slider_points() []vector.Vector2[f64] {
 	if slider.points.len == 0 {
 		slider_quality := 100.0 // TODO: Move to settings
 		length := slider.curve.get_length()
@@ -779,7 +779,7 @@ pub fn (mut slider Slider) get_slider_points() []vector.Vector2 {
 	return slider.points
 }
 
-pub fn (mut slider Slider) get_position_at_stable(current_time f64) vector.Vector2 {
+pub fn (mut slider Slider) get_position_at_stable(current_time f64) vector.Vector2[f64] {
 	if slider.is_retarded() {
 		return slider.position
 	}
@@ -796,7 +796,7 @@ pub fn (mut slider Slider) get_position_at_stable(current_time f64) vector.Vecto
 	p_line := slider.score_path[int(math.clamp(index, 0, slider.score_path.len - 1))]
 	clamped := math.clamp(current_time, f64(p_line.time1), f64(p_line.time2))
 
-	mut pos := vector.Vector2{}
+	mut pos := vector.Vector2[f64]{}
 
 	if p_line.time2 == p_line.time1 {
 		pos = p_line.line.p2
@@ -807,7 +807,7 @@ pub fn (mut slider Slider) get_position_at_stable(current_time f64) vector.Vecto
 	return pos
 }
 
-pub fn (mut slider Slider) get_position_at_lazer(update_time f64) vector.Vector2 {
+pub fn (mut slider Slider) get_position_at_lazer(update_time f64) vector.Vector2[f64] {
 	t1 := math.clamp(update_time, slider.time.start, slider.time.end)
 	mut progress := (t1 - slider.time.start) / slider.duration
 

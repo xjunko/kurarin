@@ -17,11 +17,11 @@ mut:
 	id int
 	diff difficulty.Difficulty
 	time time.Time
-	position vector.Vector2
-	end_position vector.Vector2
-	raw_position vector.Vector2
-	raw_end_position vector.Vector2
-	stack_offset vector.Vector2
+	position vector.Vector2[f64]
+	end_position vector.Vector2[f64]
+	raw_position vector.Vector2[f64]
+	raw_end_position vector.Vector2[f64]
+	stack_offset vector.Vector2[f64]
 	stack_index int
 	color []f64
 	color_offset int
@@ -36,8 +36,8 @@ mut:
 	get_start_time() f64
 	get_end_time() f64
 	get_duration() f64
-	get_start_position() vector.Vector2
-	get_end_position() vector.Vector2
+	get_start_position() vector.Vector2[f64]
+	get_end_position() vector.Vector2[f64]
 	get_id() int
 	set_id(int)
 	is_new_combo() bool
@@ -60,13 +60,13 @@ pub mut:
 	diff difficulty.Difficulty
 
 	time         time.Time
-	position     vector.Vector2
-	end_position vector.Vector2
+	position     vector.Vector2[f64]
+	end_position vector.Vector2[f64]
 
-	raw_position     vector.Vector2
-	raw_end_position vector.Vector2
+	raw_position     vector.Vector2[f64]
+	raw_end_position vector.Vector2[f64]
 
-	stack_offset vector.Vector2
+	stack_offset vector.Vector2[f64]
 	stack_index  int
 
 	new_combo    bool
@@ -106,11 +106,11 @@ pub fn (hitobject &HitObject) get_duration() f64 {
 	return hitobject.time.duration()
 }
 
-pub fn (hitobject &HitObject) get_start_position() vector.Vector2 {
+pub fn (hitobject &HitObject) get_start_position() vector.Vector2[f64] {
 	return hitobject.position
 }
 
-pub fn (hitobject &HitObject) get_end_position() vector.Vector2 {
+pub fn (hitobject &HitObject) get_end_position() vector.Vector2[f64] {
 	return hitobject.end_position
 }
 
@@ -140,7 +140,7 @@ pub fn (mut hitobject HitObject) set_boost_level(boost f32) {
 
 // Utils
 pub fn common_parse(items []string, extra_index int) &HitObject {
-	position := vector.Vector2{items[0].f64(), items[1].f64()}
+	position := vector.Vector2[f64]{items[0].f64(), items[1].f64()}
 	object_time := time.Time{items[2].f64(), items[2].f64()}
 	object_type := items[3].int()
 

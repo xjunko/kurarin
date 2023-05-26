@@ -8,7 +8,7 @@ import core.osu.beatmap.object
 pub struct HalfCircleMover {
 	Mover
 pub mut:
-	middle vector.Vector2
+	middle vector.Vector2[f64]
 	radius f64
 	ang    f64
 }
@@ -21,9 +21,9 @@ pub fn (mut halfcircle HalfCircleMover) init(mut start object.IHitObject, mut en
 	halfcircle.ang = math.atan2(halfcircle.start.y - halfcircle.middle.y, halfcircle.start.x - halfcircle.middle.x)
 }
 
-pub fn (mut halfcircle HalfCircleMover) get_point_at(time f64) vector.Vector2 {
+pub fn (mut halfcircle HalfCircleMover) get_point_at(time f64) vector.Vector2[f64] {
 	ang := halfcircle.ang + math.pi * halfcircle.get_multiplier(time) * halfcircle.direction
-	return vector.Vector2{halfcircle.middle.x + math.cos(ang) * halfcircle.radius,
+	return vector.Vector2[f64]{halfcircle.middle.x + math.cos(ang) * halfcircle.radius,
 		halfcircle.middle.y + math.sin(ang) * halfcircle.radius}
 }
 

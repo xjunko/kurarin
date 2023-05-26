@@ -4,16 +4,16 @@ import framework.math.vector
 
 pub struct Linear {
 pub mut:
-	p1 vector.Vector2
-	p2 vector.Vector2
+	p1 vector.Vector2[f64]
+	p2 vector.Vector2[f64]
 }
 
-pub fn make_linear(p1 vector.Vector2, p2 vector.Vector2) &Linear {
+pub fn make_linear(p1 vector.Vector2[f64], p2 vector.Vector2[f64]) &Linear {
 	mut linear := &Linear{p1, p2}
 	return linear
 }
 
-pub fn (ln Linear) point_at(time f64) vector.Vector2 {
+pub fn (ln Linear) point_at(time f64) vector.Vector2[f64] {
 	return ln.p2.sub(ln.p1).scale(time).add(ln.p1)
 }
 

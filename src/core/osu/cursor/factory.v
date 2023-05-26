@@ -85,7 +85,7 @@ pub fn make_replay(mut current_beatmap beatmap.Beatmap, mut cursor Cursor, playe
 					t_time := (f64(temp_time) - object.time.start - (times - 1) * object.duration)
 					rt := object.pixel_length / object.curve.length
 
-					mut pos := vector.Vector2{}
+					mut pos := vector.Vector2[f64]{}
 					if (times % 2) == 1 {
 						pos = object.curve.point_at(rt * t_time / object.duration)
 						last_position = object.curve.point_at(rt * (t_time - offset) / object.duration)
@@ -140,11 +140,11 @@ pub fn make_replay(mut current_beatmap beatmap.Beatmap, mut cursor Cursor, playe
 			timeframe := 16.6667
 			mut rotation := 0.0
 
-			last_position = vector.Vector2{math.cos(rotation) * radius + 512.0 / 2.0,
+			last_position = vector.Vector2[f64]{math.cos(rotation) * radius + 512.0 / 2.0,
 				math.sin(rotation) * radius + 384.0 / 2.0}
 
 			for i := object.time.start; i < object.time.end; i += timeframe {
-				position := vector.Vector2{math.cos(rotation) * radius + 512.0 / 2.0,
+				position := vector.Vector2[f64]{math.cos(rotation) * radius + 512.0 / 2.0,
 					math.sin(rotation) * radius + 384.0 / 2.0}
 
 				cursor.add_transform(

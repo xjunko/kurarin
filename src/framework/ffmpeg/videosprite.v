@@ -120,7 +120,7 @@ pub fn make_video_sprite(path string, mut ctx context.Context, offset f64) &Vide
 	ratio := settings.global.window.width / video.source.metadata.width
 
 	video.reset_size_based_on_texture(
-		size: vector.Vector2{
+		size: vector.Vector2[f64]{
 			x: video.source.metadata.width * ratio
 			y: video.source.metadata.height * ratio
 		}

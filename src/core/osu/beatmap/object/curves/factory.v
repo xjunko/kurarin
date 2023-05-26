@@ -13,7 +13,7 @@ pub mut:
 	length   f64
 }
 
-pub fn new_slider_curve(typp string, points []vector.Vector2) SliderCurve {
+pub fn new_slider_curve(typp string, points []vector.Vector2[f64]) SliderCurve {
 	mut curves_list := []Curve{}
 	mut length := f64(0.0)
 	mut typ := typp
@@ -64,7 +64,7 @@ pub fn new_slider_curve(typp string, points []vector.Vector2) SliderCurve {
 	return SliderCurve{curves_list, sections, length}
 }
 
-pub fn (slider SliderCurve) point_at(time f64) vector.Vector2 {
+pub fn (slider SliderCurve) point_at(time f64) vector.Vector2[f64] {
 	if slider.curves.len == 1 {
 		return slider.curves[0].point_at(time)
 	} else {
@@ -77,7 +77,7 @@ pub fn (slider SliderCurve) point_at(time f64) vector.Vector2 {
 		}
 	}
 
-	return vector.Vector2{512 / 2, 384 / 2}
+	return vector.Vector2[f64]{512 / 2, 384 / 2}
 }
 
 pub fn (slider SliderCurve) get_length() f64 {

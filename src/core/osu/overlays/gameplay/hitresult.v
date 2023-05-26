@@ -30,7 +30,7 @@ pub fn make_hit_result(ctx &context.Context, diff difficulty.Difficulty) &HitRes
 	return hitresult
 }
 
-pub fn (mut result HitResults) add_result(_time f64, _result ruleset.HitResult, position vector.Vector2) {
+pub fn (mut result HitResults) add_result(_time f64, _result ruleset.HitResult, position vector.Vector2[f64]) {
 	mut tex_name := ''
 
 	match _result {

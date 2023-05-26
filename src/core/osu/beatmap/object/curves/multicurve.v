@@ -12,10 +12,10 @@ pub mut:
 	sections    []f64
 	lines       []Linear
 	length      f64
-	first_point vector.Vector2
+	first_point vector.Vector2[f64]
 }
 
-pub fn (mut m_curve MultiCurve) point_at(time f64) vector.Vector2 {
+pub fn (mut m_curve MultiCurve) point_at(time f64) vector.Vector2[f64] {
 	if m_curve.lines.len == 0 || m_curve.length == 0.0 {
 		return m_curve.first_point
 	}
@@ -68,7 +68,7 @@ pub fn (mut m_curve MultiCurve) get_lines() []Linear {
 	return m_curve.lines
 }
 
-pub fn new_multi_curve(typ string, points []vector.Vector2) &MultiCurve {
+pub fn new_multi_curve(typ string, points []vector.Vector2[f64]) &MultiCurve {
 	mut lines := []Linear{}
 
 	match typ {
@@ -98,7 +98,7 @@ pub fn new_multi_curve(typ string, points []vector.Vector2) &MultiCurve {
 	return &MultiCurve{sections, lines, length, first_point}
 }
 
-pub fn new_multi_curve_t(typ string, points []vector.Vector2, desired_length f64) &MultiCurve {
+pub fn new_multi_curve_t(typ string, points []vector.Vector2[f64], desired_length f64) &MultiCurve {
 	mut m_curve := new_multi_curve(typ, points)
 
 	if m_curve.length > 0 {
@@ -138,7 +138,7 @@ pub fn new_multi_curve_t(typ string, points []vector.Vector2, desired_length f64
 	return m_curve
 }
 
-pub fn process_perfect(points []vector.Vector2) []Linear {
+pub fn process_perfect(points []vector.Vector2[f64]) []Linear {
 	if points.len > 3 {
 		return process_bezier(points)
 	} else if points.len < 3 || vector.is_straight_line(points[0], points[1], points[2]) {
@@ -148,7 +148,7 @@ pub fn process_perfect(points []vector.Vector2) []Linear {
 	return approximate_circular_arc(points[0], points[1], points[2], 0.125)
 }
 
-pub fn process_linear(points []vector.Vector2) []Linear {
+pub fn process_linear(points []vector.Vector2[f64]) []Linear {
 	mut lines := []Linear{}
 
 	for i := 0; i < points.len - 1; i++ {
@@ -162,7 +162,7 @@ pub fn process_linear(points []vector.Vector2) []Linear {
 	return lines
 }
 
-pub fn process_bezier(points []vector.Vector2) []Linear {
+pub fn process_bezier(points []vector.Vector2[f64]) []Linear {
 	mut last_index := 0
 	mut lines := []Linear{}
 
@@ -190,14 +190,14 @@ pub fn process_bezier(points []vector.Vector2) []Linear {
 	return lines
 }
 
-pub fn process_catmull(points []vector.Vector2) []Linear {
+pub fn process_catmull(points []vector.Vector2[f64]) []Linear {
 	mut lines := []Linear{}
 
 	for i := 0; i < points.len - 1; i++ {
-		mut p1 := vector.Vector2{}
-		mut p2 := vector.Vector2{}
-		mut p3 := vector.Vector2{}
-		mut p4 := vector.Vector2{}
+		mut p1 := vector.Vector2[f64]{}
+		mut p2 := vector.Vector2[f64]{}
+		mut p3 := vector.Vector2[f64]{}
+		mut p4 := vector.Vector2[f64]{}
 
 		if i - 1 >= 0 {
 			p1 = points[i - 1]

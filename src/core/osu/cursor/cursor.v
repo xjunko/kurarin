@@ -32,7 +32,7 @@ pub mut:
 	ctx         &context.Context = unsafe { nil }
 	trails      []&sprite.Sprite
 	trail_color gx.Color = gx.Color{0, 25, 100, u8(255 * 0.5)}
-	delta_pos   []vector.Vector2
+	delta_pos   []vector.Vector2[f64]
 	delta_pos_i int
 	// Game control
 	left_button  bool
@@ -42,7 +42,7 @@ pub mut:
 mut:
 	sixty_delta   f64
 	last_time     f64
-	last_position vector.Vector2
+	last_position vector.Vector2[f64]
 }
 
 pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
@@ -53,7 +53,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 		for i, trail in cursor.delta_pos {
 			size := cursor.size.scale(0.9 * (0.1 + f64(i) / f64(cursor.delta_pos.len) * 0.9))
 
-			pos := trail.sub(cursor.origin.multiply(x: size.x, y: size.y))
+			pos := trail.sub(cursor.origin.Vector2.multiply(x: size.x, y: size.y))
 			cursor.ctx.draw_image_with_config(context.DrawImageConfig{
 				img: &cursor.textures[3]
 				img_id: cursor.textures[3].id
@@ -74,7 +74,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 				continue
 			}
 
-			pos := trail.position.sub(trail.origin.multiply(x: trail.size.x, y: trail.size.y))
+			pos := trail.position.sub(trail.origin.Vector2.multiply(x: trail.size.x, y: trail.size.y))
 
 			cursor.ctx.draw_image_with_config(context.DrawImageConfig{
 				img: trail.get_texture()
@@ -92,7 +92,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	}
 
 	// Cursor
-	pos := cursor.position.sub(cursor.origin.multiply(x: cursor.size.x, y: cursor.size.y))
+	pos := cursor.position.sub(cursor.origin.Vector2.multiply(x: cursor.size.x, y: cursor.size.y))
 
 	mut cursor_additive := false
 	mut cursor_color := cursor.color

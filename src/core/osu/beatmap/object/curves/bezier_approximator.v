@@ -10,17 +10,17 @@ const (
 
 pub struct ItemStack {
 pub mut:
-	items [][]vector.Vector2
+	items [][]vector.Vector2[f64]
 	mutex &sync.RwMutex = sync.new_rwmutex()
 }
 
-pub fn (mut s ItemStack) push(t []vector.Vector2) {
+pub fn (mut s ItemStack) push(t []vector.Vector2[f64]) {
 	s.mutex.@lock()
 	s.items << t
 	s.mutex.unlock()
 }
 
-pub fn (mut s ItemStack) pop() []vector.Vector2 {
+pub fn (mut s ItemStack) pop() []vector.Vector2[f64] {
 	s.mutex.@lock()
 	item := s.items[s.items.len - 1]
 	s.items = s.items[0..s.items.len - 1]
@@ -35,21 +35,21 @@ pub fn (mut s ItemStack) count() int {
 pub struct BezierApproximator {
 pub mut:
 	count              int
-	control_points     []vector.Vector2
-	subdivisionbuffer1 []vector.Vector2
-	subdivisionbuffer2 []vector.Vector2
+	control_points     []vector.Vector2[f64]
+	subdivisionbuffer1 []vector.Vector2[f64]
+	subdivisionbuffer2 []vector.Vector2[f64]
 }
 
-pub fn make_bezier_approximator(control_points []vector.Vector2) &BezierApproximator {
+pub fn make_bezier_approximator(control_points []vector.Vector2[f64]) &BezierApproximator {
 	return &BezierApproximator{
 		count: control_points.len
 		control_points: control_points
-		subdivisionbuffer1: []vector.Vector2{len: control_points.len}
-		subdivisionbuffer2: []vector.Vector2{len: control_points.len * 2 - 1}
+		subdivisionbuffer1: []vector.Vector2[f64]{len: control_points.len}
+		subdivisionbuffer2: []vector.Vector2[f64]{len: control_points.len * 2 - 1}
 	}
 }
 
-pub fn is_flat_enough(control_points []vector.Vector2) bool {
+pub fn is_flat_enough(control_points []vector.Vector2[f64]) bool {
 	for i := 1; i < control_points.len - 1; i++ {
 		if control_points[i - 1].sub(control_points[i].scale(2)).add(control_points[i + 1]).length_squared() > curves._bezier_quantization_sq {
 			return false
@@ -59,7 +59,7 @@ pub fn is_flat_enough(control_points []vector.Vector2) bool {
 	return true
 }
 
-pub fn (mut approximator BezierApproximator) subdivide(control_points []vector.Vector2, mut l []vector.Vector2, mut r []vector.Vector2) {
+pub fn (mut approximator BezierApproximator) subdivide(control_points []vector.Vector2[f64], mut l []vector.Vector2[f64], mut r []vector.Vector2[f64]) {
 	unsafe {
 		mut midpoints := &approximator.subdivisionbuffer1
 
@@ -78,7 +78,7 @@ pub fn (mut approximator BezierApproximator) subdivide(control_points []vector.V
 	}
 }
 
-pub fn (mut approximator BezierApproximator) approximate(control_points []vector.Vector2, mut output []vector.Vector2) {
+pub fn (mut approximator BezierApproximator) approximate(control_points []vector.Vector2[f64], mut output []vector.Vector2[f64]) {
 	mut l := &approximator.subdivisionbuffer2
 	mut r := &approximator.subdivisionbuffer1
 
@@ -99,8 +99,8 @@ pub fn (mut approximator BezierApproximator) approximate(control_points []vector
 	}
 }
 
-pub fn (mut approximator BezierApproximator) create_bezier() []vector.Vector2 {
-	mut output := []vector.Vector2{}
+pub fn (mut approximator BezierApproximator) create_bezier() []vector.Vector2[f64] {
+	mut output := []vector.Vector2[f64]{}
 
 	if approximator.count == 0 {
 		return output
@@ -123,12 +123,12 @@ pub fn (mut approximator BezierApproximator) create_bezier() []vector.Vector2 {
 			continue
 		}
 
-		mut right_child := []vector.Vector2{}
+		mut right_child := []vector.Vector2[f64]{}
 
 		if free_buffers.count() > 0 {
 			right_child = free_buffers.pop()
 		} else {
-			right_child = []vector.Vector2{len: approximator.count}
+			right_child = []vector.Vector2[f64]{len: approximator.count}
 		}
 
 		approximator.subdivide(parent, mut left_child, mut right_child)

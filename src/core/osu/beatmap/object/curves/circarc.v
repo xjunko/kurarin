@@ -5,10 +5,10 @@ import framework.math.vector
 
 pub struct CircArc {
 pub mut:
-	p1          vector.Vector2
-	p2          vector.Vector2
-	p3          vector.Vector2
-	centre      vector.Vector2
+	p1          vector.Vector2[f64]
+	p2          vector.Vector2[f64]
+	p3          vector.Vector2[f64]
+	centre      vector.Vector2[f64]
 	start_angle f64
 	total_angle f64
 	r           f64
@@ -16,7 +16,7 @@ pub mut:
 	unstable    bool
 }
 
-pub fn make_circ_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.Vector2) &CircArc {
+pub fn make_circ_arc(p1 vector.Vector2[f64], p2 vector.Vector2[f64], p3 vector.Vector2[f64]) &CircArc {
 	mut arc := &CircArc{
 		p1: p1
 		p2: p2
@@ -55,7 +55,7 @@ pub fn make_circ_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.Vector2) &C
 	mut total_angle := end - start
 
 	mut atoc := p3.sub(p1)
-	atoc = vector.Vector2{atoc.y, -atoc.x}
+	atoc = vector.Vector2[f64]{atoc.y, -atoc.x}
 
 	if atoc.dot(p2.sub(p1)) < 0 {
 		dir = -dir
@@ -72,8 +72,9 @@ pub fn make_circ_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.Vector2) &C
 	return arc
 }
 
-pub fn (circ CircArc) point_at(time f64) vector.Vector2 {
-	return vector.new_vec_rad(circ.start_angle + circ.dir * time * circ.total_angle, circ.r).add(circ.centre)
+pub fn (circ CircArc) point_at(time f64) vector.Vector2[f64] {
+	return vector.new_vec_rad[f64](circ.start_angle + circ.dir * time * circ.total_angle,
+		circ.r).add(circ.centre)
 }
 
 pub fn (circ CircArc) get_start_angle() f64 {

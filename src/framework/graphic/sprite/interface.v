@@ -23,8 +23,8 @@ pub mut:
 pub struct CommonSpriteSizeResetArgument {
 pub:
 	factor   f64 = 1.0
-	size     vector.Vector2
-	source   vector.Vector2
+	size     vector.Vector2[f64]
+	source   vector.Vector2[f64]
 	fit_size bool
 	// If false, just overide, if true factor it based on source
 }
@@ -34,8 +34,8 @@ mut:
 	id int
 	time time.Time
 	origin vector.Origin
-	position vector.Vector2
-	size vector.Vector2
+	position vector.Vector2[f64]
+	size vector.Vector2[f64]
 	color gx.Color
 	angle f64
 	additive bool

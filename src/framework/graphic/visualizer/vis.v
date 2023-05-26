@@ -22,11 +22,11 @@ pub mut:
 	multiplier      f64 = 0.5 // Change this to increase the "oopmh"
 	inverted        bool  // Invert the visualizer
 	// logo stuff
-	logo_position vector.Vector2 = vector.Vector2{640, 480}
-	logo_size     vector.Vector2 = vector.Vector2{100, 100}
+	logo_position vector.Vector2[f64] = vector.Vector2[f64]{640, 480}
+	logo_size     vector.Vector2[f64] = vector.Vector2[f64]{100, 100}
 }
 
-pub fn (mut vis Visualizer) update_logo(position vector.Vector2, size vector.Vector2) {
+pub fn (mut vis Visualizer) update_logo(position vector.Vector2[f64], size vector.Vector2[f64]) {
 	vis.logo_position = position
 	vis.logo_size = size
 }

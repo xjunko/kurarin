@@ -139,7 +139,7 @@ pub fn (mut overlay GameplayOverlay) draw() {
 			f64(i) * 47.2) * x.resolution.ui_camera.scale)
 		scale := (sprite.size.y / sprite.raw_size.y) * x.resolution.ui_camera.scale
 
-		overlay.keys_font.draw_number(overlay.key_counters[i].str(), vector.Vector2{pos_x, pos_y},
+		overlay.keys_font.draw_number(overlay.key_counters[i].str(), vector.Vector2[f64]{pos_x, pos_y},
 			vector.centre,
 			time: overlay.last_time
 			ctx: overlay.ctx
@@ -151,7 +151,7 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 	// Score
 	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) - f64(overlay.score_smooth) * 0.5)
-	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2{settings.global.window.width - 5 - (8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0},
+	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2[f64]{settings.global.window.width - 5 - (8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0},
 		vector.top_left,
 		ctx: overlay.ctx
 		time: overlay.last_time
@@ -243,7 +243,7 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 }
 
 // Some hack
-pub fn hit_received(current_time f64, number i64, position vector.Vector2, result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
+pub fn hit_received(current_time f64, number i64, position vector.Vector2[f64], result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
 	mut g_overlay := unsafe { overlays.g_overlay_hack }
 	g_overlay.score = score
 	g_overlay.hitresult.add_result(current_time, result, position)

@@ -22,10 +22,10 @@ pub mut:
 	additive       bool
 	always_visible bool
 	origin         vector.Origin = vector.centre
-	position       vector.Vector2
+	position       vector.Vector2[f64]
 	z              f32
-	size           vector.Vector2
-	raw_size       vector.Vector2
+	size           vector.Vector2[f64]
+	raw_size       vector.Vector2[f64]
 	color          gx.Color = gx.white
 	angle          f64
 
@@ -111,7 +111,7 @@ pub fn (mut sprite Sprite) reset_size_based_on_texture(arg CommonSpriteSizeReset
 		sprite.size = arg.size
 	} else if (arg.source.x != 0 || arg.source.y != 0) && arg.fit_size {
 		// Fit image within a given size and keep ratio.
-		mut size := vector.Vector2{}
+		mut size := vector.Vector2[f64]{}
 
 		// Use arg size if given
 		if arg.size.x != 0 || arg.size.y != 0 {
@@ -296,7 +296,7 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 
 		pos := sprite.position
 			.scale(arg.camera.scale)
-			.sub(sprite.origin.multiply(size))
+			.sub(sprite.origin.Vector2.multiply(size))
 			.add(arg.camera.offset)
 
 		arg.ctx.draw_image_with_config(context.DrawImageConfig{

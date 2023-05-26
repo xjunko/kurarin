@@ -5,12 +5,12 @@ import framework.math.vector
 
 pub struct Bezier {
 pub mut:
-	points         []vector.Vector2
+	points         []vector.Vector2[f64]
 	approx_length  f64
 	control_length f64
 }
 
-pub fn make_bezier(points []vector.Vector2) &Bezier {
+pub fn make_bezier(points []vector.Vector2[f64]) &Bezier {
 	mut bezier := &Bezier{
 		points: points
 	}
@@ -30,8 +30,8 @@ pub fn make_bezier(points []vector.Vector2) &Bezier {
 	return bezier
 }
 
-pub fn (bezier Bezier) n_point_at(time f64) vector.Vector2 {
-	mut p := vector.Vector2{}
+pub fn (bezier Bezier) n_point_at(time f64) vector.Vector2[f64] {
+	mut p := vector.Vector2[f64]{}
 	n := bezier.points.len - 1
 
 	for i := 0; i <= n; i++ {
@@ -42,7 +42,7 @@ pub fn (bezier Bezier) n_point_at(time f64) vector.Vector2 {
 	return p
 }
 
-pub fn (bezier Bezier) point_at(time f64) vector.Vector2 {
+pub fn (bezier Bezier) point_at(time f64) vector.Vector2[f64] {
 	desired_width := bezier.approx_length * time
 	mut width := f64(0.0)
 	mut c := f64(0.0)

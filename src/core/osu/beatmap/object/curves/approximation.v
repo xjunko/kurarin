@@ -2,7 +2,7 @@ module curves
 
 import framework.math.vector
 
-pub fn approximate_circular_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.Vector2, detail f64) []Linear {
+pub fn approximate_circular_arc(p1 vector.Vector2[f64], p2 vector.Vector2[f64], p3 vector.Vector2[f64], detail f64) []Linear {
 	arc := make_circ_arc(p1, p2, p3)
 
 	if arc.unstable {
@@ -19,7 +19,7 @@ pub fn approximate_circular_arc(p1 vector.Vector2, p2 vector.Vector2, p3 vector.
 	return lines
 }
 
-pub fn approximate_catmullrom(points []vector.Vector2, detail int) []Linear {
+pub fn approximate_catmullrom(points []vector.Vector2[f64], detail int) []Linear {
 	catmull := make_catmull(points)
 
 	mut lines := []Linear{len: detail}
@@ -31,7 +31,7 @@ pub fn approximate_catmullrom(points []vector.Vector2, detail int) []Linear {
 	return lines
 }
 
-pub fn approximate_bezier(points []vector.Vector2) []Linear {
+pub fn approximate_bezier(points []vector.Vector2[f64]) []Linear {
 	mut bezier_approx := make_bezier_approximator(points)
 	mut extracted := bezier_approx.create_bezier()
 

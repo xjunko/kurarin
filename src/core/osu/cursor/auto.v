@@ -104,7 +104,7 @@ pub fn (mut auto AutoCursor) update(time f64) {
 			if (time >= auto.mover.time.end + 10.0 && time >= cur_hitobject.time.start
 				&& time <= cur_hitobject.time.end) && mut cur_hitobject is object.Spinner {
 				radius := 100.0
-				position := vector.Vector2{math.cos(auto.rotation) * radius + 512.0 / 2.0,
+				position := vector.Vector2[f64]{math.cos(auto.rotation) * radius + 512.0 / 2.0,
 					math.sin(auto.rotation) * radius + 384.0 / 2.0}
 				auto.cursor.position.x = position.x
 				auto.cursor.position.y = position.y

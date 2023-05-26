@@ -13,10 +13,10 @@ pub const (
 
 pub struct Resolution {
 pub mut:
-	resolution      vector.Vector2
-	playfield       vector.Vector2
+	resolution      vector.Vector2[f64]
+	playfield       vector.Vector2[f64]
 	playfield_scale f64
-	offset          vector.Vector2
+	offset          vector.Vector2[f64]
 	scale           f64
 	camera          camera.Camera
 	ui_camera       camera.Camera
@@ -81,16 +81,16 @@ pub fn get_playfield_size_factor(res Resolution) f64 {
 	}
 }
 
-pub fn get_playfield_size(res Resolution) vector.Vector2 {
-	return vector.Vector2{512.0, 384.0}.scale(get_playfield_size_factor(res))
+pub fn get_playfield_size(res Resolution) vector.Vector2[f64] {
+	return vector.Vector2[f64]{512.0, 384.0}.scale(get_playfield_size_factor(res))
 }
 
-pub fn get_playfield_offset(res Resolution) vector.Vector2 {
+pub fn get_playfield_offset(res Resolution) vector.Vector2[f64] {
 	playfield_size := get_playfield_size(res)
 	bottom_border_size := 0.0834 * res.resolution.y
 	playfield_y_offset := (res.resolution.y / 2.0 - (playfield_size.y / 2.0)) - bottom_border_size
 
-	return vector.Vector2{(res.resolution.x - playfield_size.x) / 2.0,
+	return vector.Vector2[f64]{(res.resolution.x - playfield_size.x) / 2.0,
 		(res.resolution.y - playfield_size.y) / 2.0 + playfield_y_offset}
 }
 

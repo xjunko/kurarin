@@ -201,7 +201,7 @@ pub fn window_init(mut window Window) {
 		window.visualizer.multiplier = 1.0
 		window.visualizer.bar_length = 1000.0
 		window.visualizer.start_distance = 0.0
-		window.visualizer.update_logo(vector.Vector2{0, 0}, vector.Vector2{settings.global.window.width, settings.global.window.height})
+		window.visualizer.update_logo(vector.Vector2[f64]{0, 0}, vector.Vector2[f64]{settings.global.window.width, settings.global.window.height})
 	}
 
 	// Make cursor based on argument

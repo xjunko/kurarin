@@ -28,7 +28,7 @@ pub fn (mut aggressive AggressiveMover) init(mut start object.IHitObject, mut en
 		new_angle = start.get_end_angle()
 	}
 
-	mut points := []vector.Vector2{}
+	mut points := []vector.Vector2[f64]{}
 	points << [
 		start_pos,
 		vector.new_vec_rad(new_angle, scaled_distance).add(start_pos),
@@ -47,7 +47,7 @@ pub fn (mut aggressive AggressiveMover) init(mut start object.IHitObject, mut en
 	aggressive.line = curves.make_bezier(points)
 }
 
-pub fn (aggressive &AggressiveMover) get_point_at(time f64) vector.Vector2 {
+pub fn (aggressive &AggressiveMover) get_point_at(time f64) vector.Vector2[f64] {
 	if aggressive.line == unsafe { nil } {
 		return aggressive.start
 	}

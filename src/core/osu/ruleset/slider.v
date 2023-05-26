@@ -39,7 +39,7 @@ pub mut:
 	fade_start_relative f64
 
 	last_slider_time f64
-	slider_position  vector.Vector2
+	slider_position  vector.Vector2[f64]
 }
 
 pub fn (slider &Slider) get_number() i64 {
@@ -166,7 +166,7 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 	mut state := &slider.state[0]
 	mut player := unsafe { &_player }
 
-	mut slider_position := vector.Vector2{}
+	mut slider_position := vector.Vector2[f64]{}
 
 	// TODO: Mod support
 	if time != slider.last_slider_time {

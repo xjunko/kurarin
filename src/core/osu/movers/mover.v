@@ -12,8 +12,8 @@ import core.osu.beatmap.object
 
 pub struct Mover {
 pub mut:
-	start     vector.Vector2
-	end       vector.Vector2
+	start     vector.Vector2[f64]
+	end       vector.Vector2[f64]
 	time      time.Time
 	direction int
 }
@@ -31,19 +31,19 @@ pub fn (mover &Mover) get_multiplier(update_time f64) f64 {
 	return (update_time - mover.time.start) / mover.time.duration()
 }
 
-pub fn (mut mover Mover) get_point_at(update_time f64) vector.Vector2 {
+pub fn (mut mover Mover) get_point_at(update_time f64) vector.Vector2[f64] {
 	panic('Not implemented!')
 }
 
 // INterface
 pub interface IMover {
 mut:
-	start vector.Vector2
-	end vector.Vector2
+	start vector.Vector2[f64]
+	end vector.Vector2[f64]
 	time time.Time
 	init(mut start object.IHitObject, mut end object.IHitObject, direction int)
 	get_multiplier(time f64) f64
-	get_point_at(time f64) vector.Vector2
+	get_point_at(time f64) vector.Vector2[f64]
 }
 
 pub fn get_imover() &IMover {

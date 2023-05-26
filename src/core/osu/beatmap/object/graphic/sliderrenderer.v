@@ -46,7 +46,7 @@ pub struct SliderRendererAttr {
 pub mut:
 	cs                   f64
 	length               f64
-	points               []vector.Vector2
+	points               []vector.Vector2[f64]
 	vertices             []f32
 	colors               []f32 // [3]Body [3]Border [3]BorderWidth, Style, Unused
 	uniform              gfx.Range
@@ -80,8 +80,8 @@ pub fn update_boost_level(boost f32) {
 }
 
 // Maker
-pub fn make_circle_vertices(position vector.Vector2, cs f64) []vector.Vector2 {
-	mut points := []vector.Vector2{}
+pub fn make_circle_vertices(position vector.Vector2[f64], cs f64) []vector.Vector2[f64] {
+	mut points := []vector.Vector2[f64]{}
 	points << position
 
 	for i := 0; i < graphic.global_renderer.quality; i++ {
@@ -94,7 +94,7 @@ pub fn make_circle_vertices(position vector.Vector2, cs f64) []vector.Vector2 {
 	return points
 }
 
-pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f64) &SliderRendererAttr {
+pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2[f64], pixel_length f64) &SliderRendererAttr {
 	mut attr := &SliderRendererAttr{}
 
 	// Attributes

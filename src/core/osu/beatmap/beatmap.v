@@ -62,7 +62,7 @@ pub mut:
 	combo_color []gx.Color
 	objects_i   int
 	// Temporary
-	playfield_size  vector.Vector2
+	playfield_size  vector.Vector2[f64]
 	temp_beatmap_sb []string
 	last_update     f64
 	last_boost      f64
@@ -103,13 +103,13 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 			ratio += 0.05
 		}
 
-		end_size := vector.Vector2{f64(image.width * ratio), f64(image.height * ratio)}
+		end_size := vector.Vector2[f64]{f64(image.width * ratio), f64(image.height * ratio)}
 
 		mut beatmap_bg := &sprite.Sprite{
 			origin: vector.centre
 			textures: [image]
 			always_visible: true
-			position: vector.Vector2{320.0, 240.0}
+			position: vector.Vector2[f64]{320.0, 240.0}
 		}
 
 		// fade

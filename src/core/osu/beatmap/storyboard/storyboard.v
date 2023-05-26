@@ -219,7 +219,7 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 
 	// real shit
 	if items[0] == 'Sprite' {
-		position := vector.Vector2{
+		position := vector.Vector2[f64]{
 			x: items[4].f64()
 			y: items[5].f64()
 		}
@@ -475,7 +475,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 pub fn (mut storyboard Storyboard) initialize_camera() {
 	// Camera
 	storyboard.camera = camera.Camera{
-		offset: vector.Vector2{
+		offset: vector.Vector2[f64]{
 			x: 0
 			y: 0
 		}
@@ -484,7 +484,7 @@ pub fn (mut storyboard Storyboard) initialize_camera() {
 
 	// Scale and Center the storyboard somehow
 	mut scale := 0.0
-	mut storyboard_canvas := vector.Vector2{480 * (16 / 9), 480}
+	mut storyboard_canvas := vector.Vector2[f64]{480 * (16 / 9), 480}
 
 	// Make sure storyboard width hit the window
 	for storyboard_canvas.y * scale < x.resolution.resolution.y {

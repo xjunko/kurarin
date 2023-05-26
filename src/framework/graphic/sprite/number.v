@@ -16,9 +16,9 @@ pub fn (mut number NumberSprite) draw(arg CommonSpriteArgument) {
 }
 
 // draw_number is its own thing so we can use it as a generic number drawer
-pub fn (mut number NumberSprite) draw_number(text string, position vector.Vector2, origin vector.Origin, arg CommonSpriteArgument) {
+pub fn (mut number NumberSprite) draw_number(text string, position vector.Vector2[f64], origin vector.Origin, arg CommonSpriteArgument) {
 	if number.is_drawable_at(arg.time) || number.always_visible {
-		mut base_position := position.sub(origin.multiply(
+		mut base_position := position.sub(origin.Vector2.multiply(
 			x: number.size.x * text.len
 			y: number.size.y
 		).scale(arg.scale))
@@ -61,7 +61,7 @@ pub fn make_number_sprite(number int, prefix string) &NumberSprite {
 
 	// size
 	sprite.reset_size_based_on_texture(
-		size: vector.Vector2{sprite.fonts['0'].width, sprite.fonts['0'].height}
+		size: vector.Vector2[f64]{sprite.fonts['0'].width, sprite.fonts['0'].height}
 	)
 
 	return sprite

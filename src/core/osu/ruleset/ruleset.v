@@ -107,7 +107,7 @@ pub mut:
 	hit_listener HitListener
 }
 
-type HitListener = fn (f64, i64, vector.Vector2, HitResult, ComboResult, i64)
+type HitListener = fn (f64, i64, vector.Vector2[f64], HitResult, ComboResult, i64)
 
 pub fn (mut ruleset Ruleset) set_listener(func HitListener) {
 	ruleset.hit_listener = func
@@ -273,7 +273,7 @@ pub fn (mut ruleset Ruleset) update_post_for(player_cursor &cursor.Cursor, time 
 	}
 }
 
-pub fn (mut ruleset Ruleset) send_result(time f64, mut player_cursor cursor.Cursor, mut src IHitObject, position vector.Vector2, result HitResult, combo ComboResult) {
+pub fn (mut ruleset Ruleset) send_result(time f64, mut player_cursor cursor.Cursor, mut src IHitObject, position vector.Vector2[f64], result HitResult, combo ComboResult) {
 	mut number := src.get_number()
 	mut subset := &ruleset.subset[0]
 

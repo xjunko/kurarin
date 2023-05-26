@@ -56,12 +56,12 @@ pub fn (mut counter ComboCounter) update(update_time f64) {
 pub fn (mut counter ComboCounter) draw(arg sprite.CommonSpriteArgument) {
 	main_scale := math.max[f64](counter.main_glider.value, 1.0) * arg.scale
 	pop_scale := math.max[f64](counter.pop_glider.value, 1.0) * arg.scale
-	counter.main_font.draw_number(counter.combo.str(), vector.Vector2{5, (settings.global.window.height - 5) - counter.main_font.size.y * main_scale},
+	counter.main_font.draw_number(counter.combo.str(), vector.Vector2[f64]{5, (settings.global.window.height - 5) - counter.main_font.size.y * main_scale},
 		vector.top_left, sprite.CommonSpriteArgument{
 		...arg
 		scale: main_scale
 	})
-	counter.pop_font.draw_number(counter.combo.str(), vector.Vector2{5, (settings.global.window.height - 5) - counter.pop_font.size.y * pop_scale},
+	counter.pop_font.draw_number(counter.combo.str(), vector.Vector2[f64]{5, (settings.global.window.height - 5) - counter.pop_font.size.y * pop_scale},
 		vector.top_left, sprite.CommonSpriteArgument{
 		...arg
 		scale: pop_scale
