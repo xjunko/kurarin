@@ -149,10 +149,9 @@ pub fn (mut window Window) draw() {
 	window.ctx.begin()
 
 	// Texts (only on windowed mode)
-	// if !settings.global.video.record {
-	// 	window.GeneralWindow.draw_stats()
-	// }
-	window.GeneralWindow.draw_stats()
+	if !settings.global.video.record {
+		window.GeneralWindow.draw_stats()
+	}
 
 	// // MicroUI
 	// C.mu_begin(&window.microui.ctx)
