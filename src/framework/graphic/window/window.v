@@ -40,21 +40,21 @@ pub fn (mut window GeneralWindow) draw_stats() {
 	window.ctx.draw_rect_filled(0, 50 + 16 + 16, 125, 16, gx.Color{0, 0, 0, 100})
 	window.ctx.draw_text(5, 50 + 16 + 16, 'Work in Progress!!', gx.TextCfg{ color: gx.white })
 
-	// // FPS
-	// window.ctx.draw_rect_filled(int(settings.global.window.width) - 135, int(settings.global.window.height) - 37,
-	// 	155, 16, gx.Color{0, 0, 0, 100})
-	// window.ctx.draw_rect_filled(int(settings.global.window.width) - 120, int(settings.global.window.height) - (
-	// 	37 + 16), 150, 16, gx.Color{0, 0, 0, 100})
-	// window.ctx.draw_text(int(settings.global.window.width) - 5, int(settings.global.window.height) - 37,
-	// 	'Update: ${window.time_took_to_update.get_average_fps():.0}fps [${window.time_took_to_update.average:.0}ms]',
-	// 	gx.TextCfg{
-	// 	color: gx.white
-	// 	align: .right
-	// })
-	// window.ctx.draw_text(int(settings.global.window.width) - 5, int(settings.global.window.height) - (
-	// 	37 + 16), 'Draw: ${window.time_took_to_render.get_average_fps():.0}fps [${window.time_took_to_render.average:.0}ms]',
-	// 	gx.TextCfg{
-	// 	color: gx.white
-	// 	align: .right
-	// })
+	// FPS
+	window.ctx.draw_rect_filled(int(settings.global.window.width) - 135, int(settings.global.window.height) - 37,
+		155, 16, gx.Color{0, 0, 0, 100})
+	window.ctx.draw_rect_filled(int(settings.global.window.width) - 120, int(settings.global.window.height) - (
+		37 + 16), 150, 16, gx.Color{0, 0, 0, 100})
+	window.ctx.draw_text(int(settings.global.window.width) - 5, int(settings.global.window.height) - 37,
+		'Update: ${window.time_took_to_update.get_average_fps():.0}fps [${window.time_took_to_update.average:.0}ms]',
+		gx.TextCfg{
+		color: gx.white
+		align: .right
+	})
+	window.ctx.draw_text(int(settings.global.window.width) - 5, int(settings.global.window.height) - (
+		37 + 16), 'Draw: ${window.time_took_to_render.get_average_fps():.0}fps [${window.time_took_to_render.average:.0}ms]',
+		gx.TextCfg{
+		color: gx.white
+		align: .right
+	})
 }
