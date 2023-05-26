@@ -1,9 +1,10 @@
 module visualizer
 
-import framework.audio
-import library.gg
+import gg
 import gx
+import framework.audio
 import framework.math.vector
+import framework.graphic.context
 
 pub struct Visualizer {
 pub mut:
@@ -62,7 +63,7 @@ pub fn (mut vis Visualizer) update(time f64) {
 	vis.last_time = time
 }
 
-pub fn (mut vis Visualizer) draw(mut ctx gg.Context) {
+pub fn (mut vis Visualizer) draw(mut ctx context.Context) {
 	cutoff := 1.0 / vis.bar_length
 
 	position := vis.logo_position
@@ -138,7 +139,7 @@ pub fn (mut vis Visualizer) draw(mut ctx gg.Context) {
 				width = -f32(v * length * inverted)
 			}
 
-			ctx.draw_rect_filled_add(x, y, width, height, gx.purple)
+			ctx.draw_rect_filled(x, y, width, height, gx.purple)
 		}
 	}
 }

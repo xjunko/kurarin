@@ -1,10 +1,9 @@
 module cursor
 
 import os
-import library.gg
 import core.osu.replay as i_replay
 import framework.math.time
-// import framework.graphic.context
+import framework.graphic.context
 
 const (
 	osu_m1 = 1 << 0
@@ -42,7 +41,7 @@ pub fn (mut replay ReplayCursor) update(update_time f64) {
 	}
 }
 
-pub fn make_replay_cursor(mut ctx gg.Context, path_to_replay string) &ReplayCursor {
+pub fn make_replay_cursor(mut ctx context.Context, path_to_replay string) &ReplayCursor {
 	mut auto := &ReplayCursor{
 		cursor: make_cursor(mut ctx)
 	}

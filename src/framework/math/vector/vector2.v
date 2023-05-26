@@ -105,7 +105,7 @@ pub fn (v Vector2) clone() Vector2 {
 }
 
 pub fn (v Vector2) equal(t Vector2) bool {
-	return (v.x == t.x) && (v.y == t.y)
+	return v.x == t.x && v.y == t.y
 }
 
 pub fn is_straight_line(a Vector2, b Vector2, c Vector2) bool {

@@ -1,16 +1,17 @@
 module sprite
 
-import library.gg
+import gg
 import gx
 import framework.math.time
 import framework.math.camera
 import framework.math.vector
 import framework.math.transform
+import framework.graphic.context
 
 [params]
 pub struct CommonSpriteArgument {
 pub mut:
-	ctx   &gg.Context = unsafe { nil }
+	ctx   &context.Context = unsafe { nil }
 	time  f64
 	delta f64
 	scale f64 = f64(1.0)

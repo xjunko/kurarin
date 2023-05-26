@@ -23,45 +23,45 @@ pub mut:
 pub fn (mut video Video) init_video_pipe_process() {
 	video.video_proc = os.new_process(os.find_abs_path_of_executable('ffmpeg') or { panic(err) })
 
-	ffmpeg_arg := [
+	// vfmt off
+	mut ffmpeg_arg := [
 		'-y',
-		'-f',
-		'rawvideo',
-		'-vcodec',
-		'rawvideo',
-		'-s',
-		'${int(settings.global.window.width)}x${int(settings.global.window.height)}',
-		'-pix_fmt',
-		'rgba',
-		'-r',
-		settings.global.video.fps.str(),
-		'-i',
-		'-',
-		'-vf',
-		'vflip',
-		'-preset',
-		'faster',
-		'-crf',
-		'10',
-		'-c:v',
-		'libx264',
-		'-color_range',
-		'1',
-		'-colorspace',
-		'1',
-		'-color_trc',
-		'1',
-		'-color_primaries',
-		'1',
-		'-movflags',
-		'+write_colr',
-		'-pix_fmt',
-		'yuv420p',
+		"-hwaccel", "cuda",
+
+		'-f', 'rawvideo',
+		'-vcodec', 'rawvideo',
+		'-s', '${int(settings.global.window.width)}x${int(settings.global.window.height)}',
+		'-pix_fmt', 'rgba',
+		'-r', settings.global.video.fps.str(),
+		'-i', '-',
+
+		"-an"
+
+		'-vf', 'vflip',
+		'-c:v', 'h264_nvenc',
+		'-color_range', '1',
+		'-colorspace', '1',
+		'-color_trc', '1',
+		'-color_primaries', '1',
+		'-movflags', '+write_colr',
 		'-hide_banner',
-		'-loglevel',
-		'panic',
+		// '-loglevel', 'panic',
+	]
+
+	ffmpeg_arg << [
+		"-rc", "vbr",
+		"-b:v", "400M",
+		"-cq", "20",
+		"-profile", "high", 
+		"-preset", "p5"
+		'-pix_fmt', 'yuv420p',
+	]
+
+	ffmpeg_arg << [
 		'temp.mp4', // output
 	]
+
+	// vfmt on
 
 	video.video_proc.set_args(ffmpeg_arg)
 	video.video_proc.set_redirect_stdio()

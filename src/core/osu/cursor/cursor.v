@@ -3,11 +3,12 @@
 module cursor
 
 import time
-import library.gg
+import gg
 import gx
 import math
 import sync
 import framework.graphic.sprite
+import framework.graphic.context
 import framework.math.easing
 import framework.math.vector
 import framework.math.time as time2
@@ -27,8 +28,8 @@ const (
 pub struct Cursor {
 	sprite.Sprite
 pub mut:
-	mutex       &sync.Mutex = sync.new_mutex()
-	ctx         &gg.Context = unsafe { nil }
+	mutex       &sync.Mutex      = sync.new_mutex()
+	ctx         &context.Context = unsafe { nil }
 	trails      []&sprite.Sprite
 	trail_color gx.Color = gx.Color{0, 25, 100, u8(255 * 0.5)}
 	delta_pos   []vector.Vector2
@@ -53,7 +54,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 			size := cursor.size.scale(0.9 * (0.1 + f64(i) / f64(cursor.delta_pos.len) * 0.9))
 
 			pos := trail.sub(cursor.origin.multiply(x: size.x, y: size.y))
-			cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
+			cursor.ctx.draw_image_with_config(context.DrawImageConfig{
 				img: &cursor.textures[3]
 				img_id: cursor.textures[3].id
 				img_rect: gg.Rect{
@@ -63,7 +64,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 					height: f32(size.y * x.resolution.playfield_scale)
 				}
 				color: cursor.trail_color
-				additive: true
+				effect: .add
 			})
 		}
 	} else {
@@ -75,7 +76,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 
 			pos := trail.position.sub(trail.origin.multiply(x: trail.size.x, y: trail.size.y))
 
-			cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
+			cursor.ctx.draw_image_with_config(context.DrawImageConfig{
 				img: trail.get_texture()
 				img_id: trail.get_texture().id
 				img_rect: gg.Rect{
@@ -85,7 +86,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 					height: f32(trail.size.y * x.resolution.playfield_scale)
 				}
 				color: trail.color
-				additive: false
+				effect: .alpha
 			})
 		}
 	}
@@ -104,7 +105,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 		cursor_img = &cursor.textures[2]
 	}
 
-	cursor.ctx.draw_image_with_config(gg.DrawImageConfig{
+	cursor.ctx.draw_image_with_config(context.DrawImageConfig{
 		img: cursor_img
 		img_id: cursor_img.id
 		img_rect: gg.Rect{
@@ -113,7 +114,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 			width: f32(cursor.size.x * x.resolution.playfield_scale)
 			height: f32(cursor.size.y * x.resolution.playfield_scale)
 		}
-		additive: cursor_additive
+		effect: [.alpha, .add][int(cursor_additive)]
 		color: cursor_color
 	})
 
@@ -206,7 +207,7 @@ pub fn (mut cursor Cursor) update(update_time f64, _delta f64) {
 }
 
 // Factory
-pub fn make_cursor(mut ctx gg.Context) &Cursor {
+pub fn make_cursor(mut ctx context.Context) &Cursor {
 	mut cursor := &Cursor{
 		ctx: ctx
 		always_visible: true

@@ -2,7 +2,7 @@ module object
 
 // import framework.logging
 import math
-// import library.gg
+// import gg
 import framework.math.time
 import framework.math.easing
 import framework.graphic.sprite

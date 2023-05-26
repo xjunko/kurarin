@@ -3,7 +3,7 @@ module storyboard
 import os
 import sync
 import math
-import library.gg
+import gg
 import framework.ffmpeg
 import framework.logging
 import framework.math.time as time2
@@ -12,12 +12,13 @@ import framework.math.easing
 import framework.math.camera
 import framework.math.transform
 import framework.graphic.sprite
+import framework.graphic.context
 import core.osu.x
 
 pub struct Storyboard {
 pub mut:
 	root  string
-	ctx   &gg.Context = unsafe { nil }
+	ctx   &context.Context    = unsafe { nil }
 	video &ffmpeg.VideoSprite = unsafe { nil }
 
 	last_boost     f64
@@ -29,10 +30,13 @@ pub mut:
 	camera  camera.Camera
 	manager &sprite.Manager = sprite.make_manager()
 	// Cache
-	cache map[string]gg.Image
+	cache      map[string]gg.Image
+	path_cache &FileMap = unsafe { nil }
 }
 
-pub fn (mut storyboard Storyboard) get_image(path string) gg.Image {
+pub fn (mut storyboard Storyboard) get_image(path_ string) gg.Image {
+	path := storyboard.find_file_case_insensitive(path_)
+
 	if path !in storyboard.cache {
 		storyboard.cache[path] = storyboard.ctx.create_image(path)
 	}
@@ -167,6 +171,37 @@ pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 	if current_sprite.len != 0 {
 		storyboard.load_sprite(current_sprite, commands)
 	}
+}
+
+//
+pub struct FileMap {
+mut:
+	path  string
+	cache map[string]string
+}
+
+pub fn make_file_map(path string) &FileMap {
+	mut filemap := &FileMap{
+		path: path
+	}
+
+	println('Making filemap')
+	os.walk(path, fn [mut filemap] (os_path string) {
+		fixed_path := os_path.trim_space().replace('\\', '/')
+
+		filemap.cache[fixed_path.to_lower()] = fixed_path
+	})
+
+	println('DONE!')
+
+	return filemap
+}
+
+pub fn (mut storyboard Storyboard) find_file_case_insensitive(path_ string) string {
+	storyboard_path := storyboard.path_cache.path
+	file_path := path_.to_lower().replace('\\', '/').replace(storyboard_path, '')
+
+	return storyboard.path_cache.cache[file_path]
 }
 
 //
@@ -467,13 +502,16 @@ pub fn (mut storyboard Storyboard) initialize_camera() {
 }
 
 //
-pub fn parse_storyboard(path string, mut ctx gg.Context) &Storyboard {
+pub fn parse_storyboard(path string, mut ctx context.Context) &Storyboard {
 	mut sb := &Storyboard{
 		ctx: ctx
 	}
+
 	sb.root = os.dir(path)
 
 	if os.exists(path) {
+		sb.path_cache = make_file_map(sb.root)
+
 		mut lines := os.read_lines(path) or { panic('uwu i fucked up: ${err}') }
 		sb.parse_lines(lines)
 	}

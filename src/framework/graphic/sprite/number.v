@@ -1,6 +1,6 @@
 module sprite
 
-import library.gg
+import gg
 import framework.math.vector
 import core.osu.skin
 
@@ -39,7 +39,7 @@ pub fn (mut number NumberSprite) draw_number(text string, position vector.Vector
 					height: f32(size.y)
 				}
 				color: number.color
-				additive: number.additive
+				effect: [.alpha, .add][int(number.additive)]
 			)
 
 			base_position.x += number.size.x * (arg.scale)

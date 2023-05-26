@@ -5,7 +5,7 @@ import math
 import core.osu.beatmap.difficulty
 import core.osu.beatmap.timing
 import core.osu.beatmap.object
-import library.gg
+import gg
 import gx
 import sokol.gfx
 import sokol.sgl
@@ -14,6 +14,7 @@ import framework.logging
 import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite
+import framework.graphic.context
 import core.osu.x
 import core.osu.skin
 import core.osu.audio
@@ -53,7 +54,7 @@ pub mut:
 	difficulty BeatmapDifficultyInfo
 	timing     timing.Timings
 
-	ctx         &gg.Context = unsafe { nil }
+	ctx         &context.Context       = unsafe { nil }
 	storyboard  &storyboard.Storyboard = &storyboard.Storyboard{}
 	background  []sprite.ISprite
 	objects     []object.IHitObject
@@ -78,7 +79,7 @@ pub fn (mut beatmap Beatmap) load_full_beatmap() &Beatmap {
 }
 
 // Method
-pub fn (mut beatmap Beatmap) bind_context(mut ctx gg.Context) {
+pub fn (mut beatmap Beatmap) bind_context(mut ctx context.Context) {
 	beatmap.ctx = unsafe { ctx }
 }
 
@@ -223,7 +224,8 @@ pub fn (mut beatmap Beatmap) update(update_time f64, boost f32) {
 
 	// Update hitobjects
 	for i := beatmap.objects_i; i < beatmap.objects.len; i++ {
-		if (update_time >= (beatmap.objects[i].get_start_time() - beatmap.difficulty.preempt))&& (update_time <= (beatmap.objects[i].get_end_time() + difficulty.hit_fade_out + beatmap.difficulty.hit50)) {
+		if update_time >= (beatmap.objects[i].get_start_time() - beatmap.difficulty.preempt)
+			&& update_time <= (beatmap.objects[i].get_end_time() + difficulty.hit_fade_out + beatmap.difficulty.hit50) {
 			// logging.debug("Added hitobject ${i} into queue")
 			beatmap.queue << &beatmap.objects[i]
 			beatmap.objects_i++
@@ -234,8 +236,7 @@ pub fn (mut beatmap Beatmap) update(update_time f64, boost f32) {
 	// Queue
 	for i := 0; i < beatmap.queue.len; i++ {
 		// Remove if ended
-		if update_time >= (beatmap.queue[i].get_end_time() + difficulty.hit_fade_out +
-			beatmap.difficulty.hit50) {
+		if update_time >= (beatmap.queue[i].get_end_time() + (difficulty.hit_fade_out * 3.0)) {
 			// logging.debug("Removed hitobject ${i} from queue.")
 			beatmap.finished << &beatmap.queue[i]
 
@@ -369,7 +370,7 @@ pub fn (mut beatmap Beatmap) draw() {
 	}
 
 	// Free slider
-	beatmap.free_slider_attr()
+	// beatmap.free_slider_attr()
 
 	//
 	beatmap.storyboard.mutex.unlock()

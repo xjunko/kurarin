@@ -1,10 +1,11 @@
 module cursor
 
 import math
-import library.gg
+import gg
 import core.osu.beatmap.object
 import core.osu.movers
 import framework.math.vector
+import framework.graphic.context
 
 pub struct AutoCursor {
 pub mut:
@@ -118,7 +119,7 @@ pub fn (mut auto AutoCursor) update(time f64) {
 	auto.last_time = time
 }
 
-pub fn make_auto_cursor(mut ctx gg.Context, hitobjects []object.IHitObject) &AutoCursor {
+pub fn make_auto_cursor(mut ctx context.Context, hitobjects []object.IHitObject) &AutoCursor {
 	mut auto := &AutoCursor{
 		cursor: make_cursor(mut ctx)
 		queue: hitobjects

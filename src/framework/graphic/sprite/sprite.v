@@ -1,11 +1,12 @@
 module sprite
 
-import library.gg
+import gg
 import gx
 import math
 import framework.math.time
 import framework.math.transform
 import framework.math.vector
+import framework.graphic.context
 
 pub struct Sprite {
 pub mut:
@@ -298,7 +299,7 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 			.sub(sprite.origin.multiply(size))
 			.add(arg.camera.offset)
 
-		arg.ctx.draw_image_with_config(gg.DrawImageConfig{
+		arg.ctx.draw_image_with_config(context.DrawImageConfig{
 			img: sprite.get_texture()
 			img_id: sprite.get_texture().id
 			img_rect: gg.Rect{
@@ -307,9 +308,9 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 				width: f32(size.x)
 				height: f32(size.y)
 			}
-			rotate: f32(sprite.angle)
+			rotate: int(sprite.angle)
 			color: sprite.color
-			additive: sprite.additive
+			effect: [.alpha, .add][int(sprite.additive)]
 			origin: sprite.origin
 			flip_x: sprite.flip_x
 			flip_y: sprite.flip_x

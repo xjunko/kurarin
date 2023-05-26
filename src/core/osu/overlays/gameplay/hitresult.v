@@ -1,10 +1,11 @@
 module gameplay
 
 import rand
-import library.gg
+import gg
 import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite
+import framework.graphic.context
 import core.osu.x
 import core.osu.skin
 import core.osu.ruleset
@@ -13,14 +14,14 @@ import core.osu.beatmap.difficulty
 
 pub struct HitResults {
 pub mut:
-	ctx       &gg.Context
+	ctx       &context.Context
 	sprites   []&sprite.Sprite
 	diff      difficulty.Difficulty
 	last_time f64
 	ratio     f64
 }
 
-pub fn make_hit_result(ctx &gg.Context, diff difficulty.Difficulty) &HitResults {
+pub fn make_hit_result(ctx &context.Context, diff difficulty.Difficulty) &HitResults {
 	mut hitresult := &HitResults{
 		ctx: unsafe { ctx }
 		diff: diff

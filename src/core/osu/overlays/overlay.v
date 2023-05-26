@@ -2,7 +2,7 @@ module overlays
 
 // import gx
 import math
-import library.gg
+import gg
 import core.osu.x
 import core.osu.skin
 import core.osu.cursor
@@ -11,6 +11,7 @@ import core.common.settings
 import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite
+import framework.graphic.context
 import core.osu.overlays.gameplay
 
 const (
@@ -43,7 +44,7 @@ pub mut:
 	keys            []&sprite.Sprite
 	keys_font       &sprite.NumberSprite = unsafe { nil }
 
-	ctx &gg.Context
+	ctx &context.Context
 	//
 	hitresult     &gameplay.HitResults
 	combo_counter &gameplay.ComboCounter
@@ -159,7 +160,7 @@ pub fn (mut overlay GameplayOverlay) draw() {
 	)
 }
 
-pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, ctx &gg.Context) &GameplayOverlay {
+pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, ctx &context.Context) &GameplayOverlay {
 	mut hitresult := gameplay.make_hit_result(ctx, player_ruleset.beatmap.difficulty.Difficulty)
 	mut counter := gameplay.make_combo_counter()
 	mut score_font := sprite.make_number_font('score')

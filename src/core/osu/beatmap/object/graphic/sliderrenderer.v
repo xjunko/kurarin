@@ -41,6 +41,7 @@ pub const (
 	use_test_shader = false
 )
 
+[manualfree]
 pub struct SliderRendererAttr {
 pub mut:
 	cs                   f64
@@ -131,10 +132,6 @@ pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2, pixel_length f
 }
 
 pub fn (mut attr SliderRendererAttr) generate_vertices() {
-	/*
-	for whatevrer reason i cant make buffer on gothread/coroutine, only on draw calls bruh
-	*/
-
 	if attr.has_been_initialized {
 		return
 	}
@@ -146,10 +143,10 @@ pub fn (mut attr SliderRendererAttr) generate_vertices() {
 		tab := make_circle_vertices(v, attr.cs)
 		for j, _ in tab {
 			if j >= 2 {
-				p1, p2, p3 := tab[j - 1], tab[j], tab[0]
+				p1, p2, p3 := &tab[j - 1], &tab[j], &tab[0]
 				// Format
 				// Position [vec3], Centre [vec3], TextureCoord [vec2]
-				attr.vertices << &[
+				attr.vertices << [
 					f32(p1.x),
 					f32(p1.y),
 					1.0,
@@ -197,11 +194,17 @@ pub fn (mut attr SliderRendererAttr) bind_slider() {
 	// Bind the shit
 	attr.bindings.vertex_buffers[0] = gfx.make_buffer(&gfx.BufferDesc{
 		size: usize(attr.vertices.len * int(sizeof(f32)))
-		data: gfx.Range{
-			ptr: attr.vertices.data
-			size: usize(attr.vertices.len * int(sizeof(f32)))
-		}
+		// data: gfx.Range{
+		// 	ptr: attr.vertices.data
+		// 	size: usize(attr.vertices.len * int(sizeof(f32)))
+		// }
 		label: 'SliderBinding'.str
+		usage: .dynamic
+	})
+
+	C.sg_update_buffer(&attr.bindings.vertex_buffers[0], &gfx.Range{
+		ptr: attr.vertices.data
+		size: usize(attr.vertices.len * int(sizeof(f32)))
 	})
 
 	// Failed to create vertex_buffers
@@ -302,13 +305,21 @@ pub fn (mut attr SliderRendererAttr) free() {
 		return
 	}
 
-	for mut buffer in attr.bindings.vertex_buffers {
-		gfx.destroy_buffer(&buffer)
-	}
+	// for mut buffer in attr.bindings.vertex_buffers {
+	// 	gfx.destroy_buffer(&buffer)
+	// }
 
 	unsafe {
+		attr.vertices.clear()
+		attr.points.clear()
+
 		attr.vertices.free()
 		attr.points.free()
+	}
+	gfx.destroy_buffer(&attr.bindings.vertex_buffers[0])
+
+	for buffer in attr.bindings.vertex_buffers {
+		gfx.destroy_buffer(&buffer)
 	}
 }
 

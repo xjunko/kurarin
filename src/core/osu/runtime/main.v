@@ -9,7 +9,7 @@ import sokol.gfx
 import sokol.sgl
 import sokol.sapp
 import time as timelib
-import library.gg
+import gg
 import core.osu.x
 import core.osu.skin
 import core.osu.cursor
@@ -23,6 +23,7 @@ import framework.math.time
 import framework.math.vector
 import framework.graphic.visualizer
 import framework.graphic.window as i_window
+import framework.graphic.context
 import framework.ffmpeg.export
 
 pub struct Window {
@@ -121,6 +122,8 @@ pub fn (mut window Window) update(update_time f64, delta f64) {
 }
 
 pub fn (mut window Window) draw() {
+	window.beatmap.free_slider_attr()
+
 	// Background
 	window.ctx.begin()
 	window.ctx.end()
@@ -146,9 +149,10 @@ pub fn (mut window Window) draw() {
 	window.ctx.begin()
 
 	// Texts (only on windowed mode)
-	if !settings.global.video.record {
-		window.GeneralWindow.draw_stats()
-	}
+	// if !settings.global.video.record {
+	// 	window.GeneralWindow.draw_stats()
+	// }
+	window.GeneralWindow.draw_stats()
 
 	// // MicroUI
 	// C.mu_begin(&window.microui.ctx)
@@ -258,7 +262,7 @@ pub fn window_init(mut window Window) {
 }
 
 pub fn window_draw(mut window Window) {
-	window.ctx.load_image_queue()
+	// window.ctx.load_image_queue()
 
 	window.mutex.@lock()
 	window.draw()
@@ -362,7 +366,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 	}
 	window.argument = &argument
 
-	window.ctx = gg.new_context(
+	mut gg_context := gg.new_context(
 		width: int(settings.global.window.width)
 		height: int(settings.global.window.height)
 		user_data: window
@@ -422,6 +426,10 @@ pub fn initiate_game_loop(argument GameArgument) {
 			window.ruleset_mutex.unlock()
 		}
 	)
+
+	window.ctx = &context.Context{
+		Context: gg_context
+	}
 
 	// Record or na
 	if settings.global.video.record {

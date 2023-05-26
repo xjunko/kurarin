@@ -2,8 +2,9 @@ module skin
 
 import os
 import sync
-import library.gg
+import gg
 import framework.logging
+import framework.graphic.context
 
 const (
 	global         = &Skin{}
@@ -45,7 +46,7 @@ pub fn get_skin() &Skin {
 	}
 }
 
-pub fn bind_context(mut ctx gg.Context) {
+pub fn bind_context(mut ctx context.Context) {
 	mut g := get_skin()
 	g.ctx = ctx
 	g.bind = true
@@ -67,8 +68,8 @@ pub fn bind_context(mut ctx gg.Context) {
 pub struct Skin {
 pub mut:
 	bind bool
-	ctx  &gg.Context = unsafe { nil }
-	sync &sync.Mutex = sync.new_mutex()
+	ctx  &context.Context = unsafe { nil }
+	sync &sync.Mutex      = sync.new_mutex()
 	// Skin shit
 	path     string
 	fallback string = r'assets/osu/skins/default' // Temporary
@@ -134,7 +135,7 @@ pub fn get_texture_with_fallback(name string, fallback string) gg.Image {
 			skin.cache[name] = skin.cache[fallback]
 
 			// If still fail, then fuck it, we ballin.
-			if skin.cache[fallback].id == skin.ctx.image_default.id {
+			if skin.cache[fallback].id == skin.ctx.texture_not_found.id {
 				skin.cache.delete(fallback)
 				skin.cache.delete(name)
 			}
