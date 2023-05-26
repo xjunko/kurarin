@@ -5,7 +5,6 @@ import math
 import core.osu.beatmap.difficulty
 import core.osu.beatmap.timing
 import core.osu.beatmap.object
-import gg
 import gx
 import sokol.gfx
 import sokol.sgl

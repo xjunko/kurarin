@@ -1,6 +1,5 @@
 module window
 
-import gg
 import gx
 import sync
 import framework.math.time

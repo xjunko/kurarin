@@ -1,7 +1,6 @@
 module gameplay
 
 import rand
-import gg
 import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite

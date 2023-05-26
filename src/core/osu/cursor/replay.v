@@ -1,6 +1,5 @@
 module cursor
 
-import os
 import core.osu.replay as i_replay
 import framework.math.time
 import framework.graphic.context

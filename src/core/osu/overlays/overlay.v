@@ -2,7 +2,6 @@ module overlays
 
 // import gx
 import math
-import gg
 import core.osu.x
 import core.osu.skin
 import core.osu.cursor

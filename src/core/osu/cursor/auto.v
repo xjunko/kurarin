@@ -1,7 +1,6 @@
 module cursor
 
 import math
-import gg
 import core.osu.beatmap.object
 import core.osu.movers
 import framework.math.vector
