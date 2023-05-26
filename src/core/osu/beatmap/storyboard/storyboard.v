@@ -185,14 +185,14 @@ pub fn make_file_map(path string) &FileMap {
 		path: path
 	}
 
-	println('Making filemap')
+	logging.debug('Creating filemap for storyboard')
+
 	os.walk(path, fn [mut filemap] (os_path string) {
 		fixed_path := os_path.trim_space().replace('\\', '/')
-
 		filemap.cache[fixed_path.to_lower()] = fixed_path
 	})
 
-	println('DONE!')
+	logging.debug('Done creating filemap.')
 
 	return filemap
 }
