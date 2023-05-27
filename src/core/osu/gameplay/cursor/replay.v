@@ -54,7 +54,7 @@ pub fn make_replay_cursor(mut ctx context.Context, path_to_replay string) &Repla
 	mut replay_parser := i_replay.Replay{}
 	replay_parser.load(path_to_replay)
 
-	auto.player = replay_parser.Player
+	auto.player = replay_parser.player
 
 	mut replay_time := 0.0
 	mut last_pos := [0.0, 0.0]

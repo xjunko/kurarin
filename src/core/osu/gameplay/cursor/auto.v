@@ -25,7 +25,7 @@ pub mut:
 	mover_path int = 1
 	// Info
 	player player.Player = player.Player{
-		player_name: 'Suigintou'
+		name: 'Suigintou'
 	}
 }
 

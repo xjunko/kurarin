@@ -13,7 +13,6 @@ pub mut:
 }
 
 pub struct Replay {
-	player.Player
 mut:
 	data   []u8
 	offset int
@@ -21,8 +20,7 @@ pub mut:
 	mode        int
 	osu_version int
 
-	map_md5 string
-	// player_name string // I dont want it to be overrided
+	map_md5    string
 	replay_md5 string
 
 	n300  int
@@ -41,6 +39,7 @@ pub mut:
 	timestamp  i64
 
 	frames []ReplayFrame
+	player player.Player
 }
 
 pub fn (mut replay Replay) load(path string) {
@@ -50,7 +49,7 @@ pub fn (mut replay Replay) load(path string) {
 	replay.offset = 0
 	replay.parse()
 
-	println(replay.Player)
+	println(replay.player)
 }
 
 // High level reading
@@ -63,7 +62,7 @@ pub fn (mut replay Replay) parse_headers() {
 	replay.mode = replay.read_byte()
 	replay.osu_version = replay.read_int()
 	replay.map_md5 = replay.read_string()
-	replay.player_name = replay.read_string()
+	replay.player.name = replay.read_string()
 	replay.replay_md5 = replay.read_string()
 	replay.n300 = replay.read_short()
 	replay.n100 = replay.read_short()
