@@ -12,6 +12,7 @@ import time as timelib
 import gg
 import core.osu.x
 import core.osu.system.skin
+import core.osu.system.player
 import core.osu.gameplay.cursor
 import core.osu.parsers.beatmap
 import core.osu.gameplay.ruleset
@@ -204,15 +205,20 @@ pub fn window_init(mut window Window) {
 		window.visualizer.update_logo(vector.Vector2[f64]{0, 0}, vector.Vector2[f64]{settings.global.window.width, settings.global.window.height})
 	}
 
+	mut current_player := player.Player{
+		name: 'Player'
+	}
 	// Make cursor based on argument
 	if window.argument.play_mode == .play {
 		window.cursors << cursor.make_cursor(mut window.ctx)
 	} else if window.argument.play_mode == .replay {
 		// HACK: REPLAY HACK
 		window.cursor_controller = cursor.make_replay_cursor(mut window.ctx, window.argument.replay_path)
+		current_player = window.cursor_controller.player
 		window.cursors << unsafe { window.cursor_controller.cursor }
 	} else {
 		window.cursor_controller = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)
+		current_player = window.cursor_controller.player
 		window.cursors << unsafe { window.cursor_controller.cursor }
 	}
 
@@ -222,7 +228,7 @@ pub fn window_init(mut window Window) {
 	// Overlay
 	if settings.global.gameplay.overlay.info {
 		window.overlay = overlays.new_gameplay_overlay(window.ruleset, window.cursors[0],
-			window.cursor_controller.player, window.ctx)
+			current_player, window.ctx)
 	}
 
 	// If recording
@@ -400,11 +406,11 @@ pub fn initiate_game_loop(argument GameArgument) {
 			}
 
 			window.ruleset_mutex.@lock()
-			if keycode == .z {
+			if keycode == .a {
 				window.cursors[0].left_button = true
 			}
 
-			if keycode == .x {
+			if keycode == .s {
 				window.cursors[0].right_button = true
 			}
 
@@ -416,11 +422,11 @@ pub fn initiate_game_loop(argument GameArgument) {
 			}
 
 			window.ruleset_mutex.@lock()
-			if keycode == .z {
+			if keycode == .a {
 				window.cursors[0].left_button = false
 			}
 
-			if keycode == .x {
+			if keycode == .s {
 				window.cursors[0].right_button = false
 			}
 
