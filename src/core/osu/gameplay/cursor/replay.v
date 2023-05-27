@@ -1,8 +1,9 @@
 module cursor
 
-import core.osu.parsers.replay as i_replay
+import core.osu.system.player
 import framework.math.time
 import framework.graphic.context
+import core.osu.parsers.replay as i_replay
 
 const (
 	osu_m1 = 1 << 0
@@ -20,6 +21,7 @@ pub:
 pub struct ReplayCursor {
 pub mut:
 	cursor &Cursor
+	player player.Player
 
 	keys   [4]bool
 	events []ReplayEvent
@@ -51,6 +53,8 @@ pub fn make_replay_cursor(mut ctx context.Context, path_to_replay string) &Repla
 	// Read crap
 	mut replay_parser := i_replay.Replay{}
 	replay_parser.load(path_to_replay)
+
+	auto.player = replay_parser.Player
 
 	mut replay_time := 0.0
 	mut last_pos := [0.0, 0.0]

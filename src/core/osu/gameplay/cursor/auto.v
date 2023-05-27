@@ -4,6 +4,7 @@ import math
 import core.osu.parsers.beatmap.object
 import core.osu.gameplay.cursor.movers
 import framework.math.vector
+import core.osu.system.player
 import framework.graphic.context
 
 pub struct AutoCursor {
@@ -22,6 +23,10 @@ pub mut:
 	rotation f64
 	// Cursor-dance crap
 	mover_path int = 1
+	// Info
+	player player.Player = player.Player{
+		player_name: 'Suigintou'
+	}
 }
 
 pub fn (mut auto AutoCursor) update(time f64) {
