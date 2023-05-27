@@ -12,10 +12,10 @@ import framework.graphic.sprite
 
 pub struct ComboCounter {
 pub mut:
-	combo         int
-	combo_display int
-	main_font     &sprite.NumberSprite = unsafe { nil }
-	pop_font      &sprite.NumberSprite = unsafe { nil }
+	combo     int
+	max_combo int
+	main_font &sprite.NumberSprite = unsafe { nil }
+	pop_font  &sprite.NumberSprite = unsafe { nil }
 
 	combo_break f_audio.Sample
 
@@ -26,6 +26,10 @@ pub mut:
 
 pub fn (mut counter ComboCounter) increase() {
 	counter.combo++
+
+	if counter.combo > counter.max_combo {
+		counter.max_combo = counter.combo
+	}
 
 	counter.main_glider.add_event_start(counter.last_time, counter.last_time + 150.0,
 		1.0, 1.1)
