@@ -2,6 +2,7 @@ module replay
 
 import os
 import library.elzma as lzma
+import core.osu.system.player
 
 pub struct ReplayFrame {
 pub mut:
@@ -12,6 +13,7 @@ pub mut:
 }
 
 pub struct Replay {
+	player.Player
 mut:
 	data   []u8
 	offset int
@@ -19,9 +21,9 @@ pub mut:
 	mode        int
 	osu_version int
 
-	map_md5     string
-	player_name string
-	replay_md5  string
+	map_md5 string
+	// player_name string // I dont want it to be overrided
+	replay_md5 string
 
 	n300  int
 	n100  int
@@ -47,6 +49,8 @@ pub fn (mut replay Replay) load(path string) {
 	}
 	replay.offset = 0
 	replay.parse()
+
+	println(replay.Player)
 }
 
 // High level reading

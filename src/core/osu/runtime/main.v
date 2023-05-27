@@ -222,7 +222,7 @@ pub fn window_init(mut window Window) {
 	// Overlay
 	if settings.global.gameplay.overlay.info {
 		window.overlay = overlays.new_gameplay_overlay(window.ruleset, window.cursors[0],
-			window.ctx)
+			window.cursor_controller.player, window.ctx)
 	}
 
 	// If recording

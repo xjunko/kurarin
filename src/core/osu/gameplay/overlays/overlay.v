@@ -4,6 +4,7 @@ module overlays
 import math
 import core.osu.x
 import core.osu.system.skin
+import core.osu.system.player
 import core.osu.gameplay.cursor
 import core.osu.gameplay.ruleset
 import core.common.settings
@@ -20,6 +21,7 @@ const (
 		cursor: 0
 		hitresult: 0
 		combo_counter: 0
+		scoreboard: 0
 	}
 )
 
@@ -47,6 +49,7 @@ pub mut:
 	//
 	hitresult     &gameplay.HitResults
 	combo_counter &gameplay.ComboCounter
+	scoreboard    &gameplay.ScoreBoard
 }
 
 pub fn (mut overlay GameplayOverlay) update(_time f64) {
@@ -157,11 +160,15 @@ pub fn (mut overlay GameplayOverlay) draw() {
 		time: overlay.last_time
 		scale: x.resolution.ui_camera.scale
 	)
+
+	// Scoreboard
+	overlay.scoreboard.draw(ctx: overlay.ctx, scale: x.resolution.ui_camera.scale)
 }
 
-pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, ctx &context.Context) &GameplayOverlay {
+pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, player_info player.Player, ctx &context.Context) &GameplayOverlay {
 	mut hitresult := gameplay.make_hit_result(ctx, player_ruleset.beatmap.difficulty.Difficulty)
 	mut counter := gameplay.make_combo_counter()
+	mut scoreboard := gameplay.make_score_board(counter, player_info)
 	mut score_font := sprite.make_number_font('score')
 
 	mut overlay := &GameplayOverlay{
@@ -170,6 +177,7 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 		ctx: unsafe { ctx }
 		hitresult: hitresult
 		combo_counter: counter
+		scoreboard: scoreboard
 		score_font: score_font
 	}
 
