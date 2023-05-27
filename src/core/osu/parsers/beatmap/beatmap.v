@@ -83,7 +83,8 @@ pub fn (mut beatmap Beatmap) bind_context(mut ctx context.Context) {
 }
 
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
-	if beatmap.storyboard.manager.queue.len == 0 {
+	if true {
+		// if beatmap.storyboard.manager.queue.len == 0 {
 		// Video
 		mut has_video := false
 		if beatmap.general.video_filename.len != 0 && os.exists(beatmap.get_video_path())
