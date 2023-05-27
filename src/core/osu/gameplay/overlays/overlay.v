@@ -163,6 +163,12 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 	// Scoreboard
 	overlay.scoreboard.draw(ctx: overlay.ctx, scale: x.resolution.ui_camera.scale)
+	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2[f64]{10, 313 +
+		f32(50 * x.resolution.ui_camera.scale)}, vector.bottom_left,
+		ctx: overlay.ctx
+		time: overlay.last_time
+		scale: 0.45 * x.resolution.ui_camera.scale
+	)
 }
 
 pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, player_info player.Player, ctx &context.Context) &GameplayOverlay {

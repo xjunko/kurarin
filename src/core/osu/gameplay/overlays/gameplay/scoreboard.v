@@ -38,7 +38,7 @@ pub fn (mut scoreboard ScoreBoard) draw(arg sprite.CommonSpriteArgument) {
 	)
 
 	// Name
-	arg.ctx.draw_text(10, 313, scoreboard.player.player_name,
+	arg.ctx.draw_text(10, 313 + 10, scoreboard.player.player_name,
 		color: gg.Color{255, 255, 255, 255}
 		size: int(18 * arg.scale)
 	)
@@ -46,7 +46,7 @@ pub fn (mut scoreboard ScoreBoard) draw(arg sprite.CommonSpriteArgument) {
 	scoreboard.counter.main_font.draw_number(scoreboard.counter.combo.str(), vector.Vector2[f64]{133 * arg.scale,
 		313 + f32(50 * arg.scale)}, vector.bottom_right, sprite.CommonSpriteArgument{
 		...arg
-		scale: 0.5 * arg.scale
+		scale: 0.4 * arg.scale
 	})
 }
 
