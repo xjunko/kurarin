@@ -62,7 +62,7 @@ pub fn (mut scoreboard ScoreBoard) draw(arg sprite.CommonSpriteArgument) {
 	// Score
 	arg.ctx.draw_text(int(4 * arg.scale), int(313 + (64 * arg.scale) - (24 * arg.scale)),
 		'${humanize_number(scoreboard.overlay.score_smooth)}',
-		color: gg.Color{153, 237, 255, 255}
+		color: gg.Color{255, 255, 255, 255}
 		size: int(18 * arg.scale)
 	)
 }
