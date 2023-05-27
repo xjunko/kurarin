@@ -6,8 +6,15 @@ import core.osu.system.player
 import framework.math.vector
 import framework.graphic.sprite
 
+pub interface MainOverlay {
+mut:
+	score i64
+	score_smooth i64
+}
+
 pub struct ScoreBoard {
 pub mut:
+	overlay    MainOverlay
 	counter    &ComboCounter
 	player     player.Player
 	background gg.Image
@@ -38,24 +45,54 @@ pub fn (mut scoreboard ScoreBoard) draw(arg sprite.CommonSpriteArgument) {
 	)
 
 	// Name
-	arg.ctx.draw_text(10, 313 + 10, scoreboard.player.player_name,
+	arg.ctx.draw_text(int(4 * arg.scale), int(313 + (12 * arg.scale)), scoreboard.player.player_name,
+		
 		color: gg.Color{255, 255, 255, 255}
-		size: int(18 * arg.scale)
+		size: int(20 * arg.scale)
 	)
 
-	scoreboard.counter.main_font.draw_number(scoreboard.counter.combo.str(), vector.Vector2[f64]{133 * arg.scale,
-		313 + f32(50 * arg.scale)}, vector.bottom_right, sprite.CommonSpriteArgument{
-		...arg
-		scale: 0.4 * arg.scale
-	})
+	// Combo
+	arg.ctx.draw_text(int((140 * arg.scale) - (10 * arg.scale)), int(313 + (64 * arg.scale) - (24 * arg.scale)),
+		'${humanize_number(scoreboard.counter.max_combo)}x',
+		color: gg.Color{153, 237, 255, 255}
+		size: int(18 * arg.scale)
+		align: .right
+	)
+
+	// Score
+	arg.ctx.draw_text(int(4 * arg.scale), int(313 + (64 * arg.scale) - (24 * arg.scale)),
+		'${humanize_number(scoreboard.overlay.score_smooth)}',
+		color: gg.Color{153, 237, 255, 255}
+		size: int(18 * arg.scale)
+	)
 }
 
-pub fn make_score_board(counter &ComboCounter, player_info player.Player) &ScoreBoard {
+pub fn make_score_board(overlay MainOverlay, counter &ComboCounter, player_info player.Player) &ScoreBoard {
 	mut scoreboard := &ScoreBoard{
+		overlay: overlay
 		counter: unsafe { counter }
 		player: player_info
 		background: skin.get_texture('menu-button-background')
 	}
 
 	return scoreboard
+}
+
+// Temporary
+fn humanize_number[T](number T) string {
+	str_n := i64(number).str()
+
+	mut a := str_n.len % 3
+
+	if a == 0 {
+		a = 3
+	}
+
+	mut humanized := str_n#[0..a]
+
+	for i := a; i < str_n.len; i += 3 {
+		humanized += ',' + str_n#[i..i + 3]
+	}
+
+	return humanized
 }

@@ -55,6 +55,7 @@ pub mut:
 pub fn (mut overlay GameplayOverlay) update(_time f64) {
 	overlay.combo_counter.update(_time)
 	overlay.hitresult.update(_time)
+	overlay.scoreboard.update(_time)
 
 	for mut sprite in overlay.keys {
 		sprite.update(_time)
@@ -163,18 +164,11 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 	// Scoreboard
 	overlay.scoreboard.draw(ctx: overlay.ctx, scale: x.resolution.ui_camera.scale)
-	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2[f64]{10, 313 +
-		f32(50 * x.resolution.ui_camera.scale)}, vector.bottom_left,
-		ctx: overlay.ctx
-		time: overlay.last_time
-		scale: 0.45 * x.resolution.ui_camera.scale
-	)
 }
 
 pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, player_info player.Player, ctx &context.Context) &GameplayOverlay {
 	mut hitresult := gameplay.make_hit_result(ctx, player_ruleset.beatmap.difficulty.Difficulty)
 	mut counter := gameplay.make_combo_counter()
-	mut scoreboard := gameplay.make_score_board(counter, player_info)
 	mut score_font := sprite.make_number_font('score')
 
 	mut overlay := &GameplayOverlay{
@@ -183,9 +177,12 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 		ctx: unsafe { ctx }
 		hitresult: hitresult
 		combo_counter: counter
-		scoreboard: scoreboard
 		score_font: score_font
+		scoreboard: 0
 	}
+
+	mut scoreboard := gameplay.make_score_board(overlay, counter, player_info)
+	overlay.scoreboard = scoreboard
 
 	overlay.keys_background = &sprite.Sprite{
 		origin: vector.top_left
