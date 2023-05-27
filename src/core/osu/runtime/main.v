@@ -286,66 +286,65 @@ pub fn window_draw_recording(mut window Window) {
 
 	logging.info('Video rendering started!')
 
-	// Continue rendering
+	// Render
+	fps := settings.global.video.fps
+	update_fps := 1000.0
+	update_delta := 1000.0 / update_fps
+	fps_delta := 1000.0 / fps
+	audio_fps := settings.global.video.update_fps
+	audio_delta := 1000.0 / audio_fps
+
+	mut delta_sum_frame := fps_delta
+	mut delta_sum_audio := 0.0
+
+	end_time := (window.beatmap.time.end + 7000.0) * settings.global.window.speed
+	mut current_time := 0.0
+
+	// Stats
 	mut last_progress := int(0)
 	mut last_count := i64(0)
 	mut count := i64(0)
 	mut last_time := timelib.ticks()
 
-	// shrug
-	update_delta := 1000.0 / 1000.0
-	game_update_delta := 1000.0 / settings.global.video.update_fps // Render Update FPS
-	fps_delta := 1000.0 / settings.global.video.fps
+	for current_time <= end_time {
+		window.update(current_time, update_delta)
 
-	mut delta_sum_video := fps_delta
-	mut delta_sum_update := 0.0
+		delta_sum_audio += update_delta
 
-	mut video_time := 0.0
-
-	end_time := (window.beatmap.time.end + 7000.0) * settings.global.window.speed
-
-	for video_time < end_time {
-		// Update and Audio
-		delta_sum_update += update_delta
-		if delta_sum_update >= game_update_delta {
-			video_time += game_update_delta * settings.global.window.speed
-			// Update
-			window.update(video_time, update_delta)
-
-			// Submit audio
+		for delta_sum_audio >= audio_delta {
 			window.video.pipe_audio()
-			delta_sum_update -= game_update_delta
+
+			delta_sum_audio -= audio_delta
 		}
 
-		// Video
-		delta_sum_video += update_delta
-		if delta_sum_video >= fps_delta {
-			// Draw
-			window.draw()
+		delta_sum_frame += update_delta
 
-			// Pipe
+		if delta_sum_frame >= fps_delta {
+			window.draw()
 			window.video.pipe_window()
 
 			// Print progress
 			count++
-			progress := int((video_time / end_time) * 100.0)
+			progress := int((current_time / end_time) * 100.0)
 
 			if math.fmod(progress, 5) == 0 && progress != last_progress {
 				speed := f64(count - last_count) * (1000 / settings.global.video.fps) / (timelib.ticks() - last_time)
-				eta := int((end_time - video_time) / 1000.0 / speed)
+				eta := int((end_time - current_time) / 1000.0 / speed)
 
 				mut eta_text := ''
 
-				hours := eta / 3600
-				minutes := eta / 60
+				hours := (eta / 3600) % 24
+				minutes := (eta / 60) % 60
 
 				if hours > 0 {
 					eta_text += '${hours}h '
 				}
 
 				if minutes > 0 {
-					eta_text += '${minutes % 60:02d}m'
+					eta_text += '${minutes % 60:02}m '
 				}
+
+				eta_text += '${eta % 60}s'
 
 				logging.info('Progress: ${progress}% | Speed: ${speed:.2f}x | ETA: ${eta_text}')
 
@@ -353,9 +352,12 @@ pub fn window_draw_recording(mut window Window) {
 				last_count = count
 				last_progress = progress
 			}
-			delta_sum_video -= fps_delta
+			delta_sum_frame -= fps_delta
 		}
+
+		current_time += update_delta * settings.global.window.speed
 	}
+
 	window.ctx.quit() // Ok we're done...
 }
 

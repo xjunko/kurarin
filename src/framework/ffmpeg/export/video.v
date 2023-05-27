@@ -26,7 +26,6 @@ pub fn (mut video Video) init_video_pipe_process() {
 	// vfmt off
 	mut ffmpeg_arg := [
 		'-y',
-		"-hwaccel", "cuda",
 
 		'-f', 'rawvideo',
 		'-vcodec', 'rawvideo',
@@ -49,12 +48,12 @@ pub fn (mut video Video) init_video_pipe_process() {
 	]
 
 	ffmpeg_arg << [
+		'-pix_fmt', 'yuv420p',
 		"-rc", "vbr",
 		"-b:v", "400M",
-		"-cq", "20",
+		"-cq", "23",
 		"-profile", "high", 
-		"-preset", "p5"
-		'-pix_fmt', 'yuv420p',
+		"-preset", "p3"
 	]
 
 	ffmpeg_arg << [
@@ -126,12 +125,26 @@ pub fn (mut video Video) pipe_window() {
 	C.v_sapp_gl_read_rgba_pixels(0, 0, int(settings.global.window.width), int(settings.global.window.height),
 		video.record_data)
 
-	// hacky but works
+	// This might not be worth it after all.
 	unsafe {
-		// temp := window.record_data.vbytes(1280 * 720 * 4).bytestr()
-		temp := video.record_data.vstring_with_len(int(settings.global.window.width) * int(settings.global.window.height) * 4)
-		video.video_proc.stdin_write(temp)
-		temp.free()
+		img_size := int(settings.global.window.width) * int(settings.global.window.height) * 4
+		mut remaining := img_size
+
+		for remaining > 0 {
+			written := C.write(video.video_proc.stdio_fd[0], video.record_data, remaining)
+
+			if written < 0 {
+				return
+			}
+
+			remaining = remaining - written
+
+			video.record_data = voidptr(video.record_data + written)
+		}
+
+		free(video.record_data)
+
+		video.record_data = &u8(malloc(img_size))
 	}
 }
 
