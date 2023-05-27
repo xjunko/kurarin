@@ -184,16 +184,17 @@ pub fn (mut beatmap Beatmap) reset() {
 	}
 
 	// Storyboard
-	beatmap.storyboard = storyboard.parse_storyboard(['', beatmap.get_sb_path()][int(settings.global.gameplay.playfield.background.enable_storyboard)], mut
-		beatmap.ctx)
-	if settings.global.gameplay.playfield.background.enable_storyboard {
-		beatmap.storyboard.parse_lines(beatmap.temp_beatmap_sb) // Parse beatmap's storyboard too (if theres any)
-	}
-	logging.info('Storyboard loaded!')
+	beatmap.storyboard = storyboard.parse_storyboard(beatmap.get_sb_path(), mut beatmap.ctx)
 
 	beatmap.storyboard.initialize_camera()
 	beatmap.ensure_background_loaded()
 	beatmap.ensure_hitsound_loaded()
+
+	if settings.global.gameplay.playfield.background.enable_storyboard {
+		beatmap.storyboard.parse_lines(beatmap.temp_beatmap_sb) // Parse beatmap's storyboard too (if theres any)
+		beatmap.storyboard.parse_lines((os.read_file(beatmap.get_sb_path()) or { '' }).split('\n'))
+		logging.info('Storyboard loaded!')
+	}
 
 	// // Only start thread when needed and not recording
 	if beatmap.storyboard.manager.queue.len > 0 && !settings.global.video.record {
