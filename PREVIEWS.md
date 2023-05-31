@@ -2,6 +2,13 @@
 
 `diva` and `sekai` has been removed from the project because it's unmaintained and i'm just lazy. (unnecessary complexity)
 
+## 1/6/2023 Preview
+Replay comparison [Me vs Auto] (This is two video stitched together)
+
+https://github.com/xjunko/kurarin/assets/44401509/739c738b-2231-447f-aa9d-bbfe480f0b8c
+
+https://github.com/xjunko/kurarin/assets/44401509/6f64743b-7531-4083-8a57-03b5f85ecbe0
+
 ## 24/10/2022 Preview
 
 ### Diva
