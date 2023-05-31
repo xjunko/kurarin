@@ -13,7 +13,7 @@ Use [danser-go](https://github.com/Wieku/danser-go) or [McOsu](https://github.co
 
 ## Preview
 
-[Here!11111!!1!!](PREVIEWS.md)
+[Click here for video preview(s)](PREVIEWS.md)
 
 ## Releases
 
