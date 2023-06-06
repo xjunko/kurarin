@@ -15,6 +15,7 @@ pub mut:
 	time  f64
 	delta f64
 	scale f64 = f64(1.0)
+	batch bool
 	// Extra scale so we can use it with boost
 	camera camera.Camera
 }

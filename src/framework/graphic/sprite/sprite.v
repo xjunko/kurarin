@@ -299,22 +299,42 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 			.sub(sprite.origin.Vector2.multiply(size))
 			.add(arg.camera.offset)
 
-		arg.ctx.draw_image_with_config(context.DrawImageConfig{
-			img: sprite.get_texture()
-			img_id: sprite.get_texture().id
-			img_rect: gg.Rect{
-				x: f32(pos.x)
-				y: f32(pos.y)
-				width: f32(size.x)
-				height: f32(size.y)
-			}
-			rotate: f32(sprite.angle)
-			color: sprite.color
-			effect: [.alpha, .add][int(sprite.additive)]
-			origin: sprite.origin
-			flip_x: sprite.flip_x
-			flip_y: sprite.flip_x
-			z: sprite.z
-		})
+		if arg.batch {
+			arg.ctx.draw_image_batch_with_config(context.DrawImageConfig{
+				img: sprite.get_texture()
+				img_id: sprite.get_texture().id
+				img_rect: gg.Rect{
+					x: f32(pos.x)
+					y: f32(pos.y)
+					width: f32(size.x)
+					height: f32(size.y)
+				}
+				rotate: f32(sprite.angle)
+				color: sprite.color
+				effect: [.alpha, .add][int(sprite.additive)]
+				origin: sprite.origin
+				flip_x: sprite.flip_x
+				flip_y: sprite.flip_x
+				z: sprite.z
+			})
+		} else {
+			arg.ctx.draw_image_with_config(context.DrawImageConfig{
+				img: sprite.get_texture()
+				img_id: sprite.get_texture().id
+				img_rect: gg.Rect{
+					x: f32(pos.x)
+					y: f32(pos.y)
+					width: f32(size.x)
+					height: f32(size.y)
+				}
+				rotate: f32(sprite.angle)
+				color: sprite.color
+				effect: [.alpha, .add][int(sprite.additive)]
+				origin: sprite.origin
+				flip_x: sprite.flip_x
+				flip_y: sprite.flip_x
+				z: sprite.z
+			})
+		}
 	}
 }
