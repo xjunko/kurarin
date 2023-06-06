@@ -765,7 +765,7 @@ pub fn (mut slider Slider) generate_slider_renderer() {
 
 pub fn (mut slider Slider) get_slider_points() []vector.Vector2[f64] {
 	if slider.points.len == 0 {
-		slider_quality := 100.0 // TODO: Move to settings
+		slider_quality := 50.0 // TODO: Move to settings
 		length := slider.curve.get_length()
 		num_points := math.min[f64](math.ceil(length * (slider_quality / 100.0)), 10000)
 
