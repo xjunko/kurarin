@@ -8,6 +8,7 @@ import sync
 import sokol.gfx
 import sokol.sgl
 import sokol.sapp
+import mohamedlt.sokolgp as sgp
 import time as timelib
 import gg
 import core.osu.x
@@ -154,13 +155,6 @@ pub fn (mut window Window) draw() {
 		window.GeneralWindow.draw_stats()
 	}
 
-	// // MicroUI
-	// C.mu_begin(&window.microui.ctx)
-	// window.microui.execute_ui()
-	// window.microui.execute_ui_log()
-	// C.mu_end(&window.microui.ctx)
-	// window.microui.draw()
-
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width),
 		int(settings.global.window.height))
 	sgl.draw()
@@ -173,15 +167,24 @@ pub fn (mut window Window) draw() {
 fn C._sapp_glx_swapinterval(int)
 
 pub fn window_init(mut window Window) {
-	// Turn that shit off
-	C._sapp_glx_swapinterval(0)
+	// Init Renderer(s)
+	// Renderer: SGP
+	sgp_desc := sgp.Desc{}
+	sgp.setup(&sgp_desc)
 
-	mut loaded_beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)
+	if !sgp.is_valid() {
+		panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
+	}
 
-	// init slider renderer
+	// Renderer: Slider
 	graphic.init_slider_renderer()
 
-	//
+	// Renderer: Turn off VSync [HACK]
+	C._sapp_glx_swapinterval(0)
+
+	// NOTE: Routine starts here
+	mut loaded_beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)
+
 	window.beatmap = loaded_beatmap
 	window.beatmap.bind_context(mut window.ctx)
 	window.beatmap.reset()
