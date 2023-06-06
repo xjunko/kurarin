@@ -347,8 +347,6 @@ pub fn (ctx &Context) draw_image_batch_with_config(config DrawImageConfig) {
 
 	sokolgp.draw_textured_rect(x0, y0, img_rect.width, img_rect.height)
 
-	sokolgp.reset_blend_mode()
-
 	if config.rotate != 0 {
 		sokolgp.pop_transform()
 	}
