@@ -54,7 +54,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 			size := cursor.size.scale(0.9 * (0.1 + f64(i) / f64(cursor.delta_pos.len) * 0.9))
 
 			pos := trail.sub(cursor.origin.Vector2.multiply(x: size.x, y: size.y))
-			cursor.ctx.draw_image_with_config(context.DrawImageConfig{
+			cursor.ctx.draw_image_batch_with_config(context.DrawImageConfig{
 				img: &cursor.textures[3]
 				img_id: cursor.textures[3].id
 				img_rect: gg.Rect{
@@ -76,7 +76,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 
 			pos := trail.position.sub(trail.origin.Vector2.multiply(x: trail.size.x, y: trail.size.y))
 
-			cursor.ctx.draw_image_with_config(context.DrawImageConfig{
+			cursor.ctx.draw_image_batch_with_config(context.DrawImageConfig{
 				img: trail.get_texture()
 				img_id: trail.get_texture().id
 				img_rect: gg.Rect{
@@ -105,7 +105,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 		cursor_img = &cursor.textures[2]
 	}
 
-	cursor.ctx.draw_image_with_config(context.DrawImageConfig{
+	cursor.ctx.draw_image_batch_with_config(context.DrawImageConfig{
 		img: cursor_img
 		img_id: cursor_img.id
 		img_rect: gg.Rect{

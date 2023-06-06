@@ -142,6 +142,7 @@ pub fn (mut window Window) draw() {
 	}
 
 	// TODO: maybe move cursor to beatmap struct
+	window.ctx.begin_gp()
 	if settings.global.gameplay.cursor.visible {
 		for mut cursor in window.cursors {
 			cursor.draw()
@@ -157,6 +158,7 @@ pub fn (mut window Window) draw() {
 
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width),
 		int(settings.global.window.height))
+	window.ctx.end_gp()
 	sgl.draw()
 	gfx.end_pass()
 
