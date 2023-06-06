@@ -83,8 +83,7 @@ pub fn (mut beatmap Beatmap) bind_context(mut ctx context.Context) {
 }
 
 pub fn (mut beatmap Beatmap) ensure_background_loaded() {
-	if true {
-		// if beatmap.storyboard.manager.queue.len == 0 {
+	if beatmap.storyboard.manager.queue.len == 0 || beatmap.storyboard.no_background_layer_found {
 		// Video
 		mut has_video := false
 		if beatmap.general.video_filename.len != 0 && os.exists(beatmap.get_video_path())
@@ -138,7 +137,7 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 		beatmap_bg.reset_size_based_on_texture(size: end_size)
 		beatmap_bg.reset_attributes_based_on_transforms()
 
-		beatmap.storyboard.manager.add(mut beatmap_bg)
+		beatmap.storyboard.manager.add_front(mut beatmap_bg)
 		logging.info('No background, making one!')
 	}
 }
@@ -188,7 +187,6 @@ pub fn (mut beatmap Beatmap) reset() {
 	beatmap.storyboard = storyboard.parse_storyboard(beatmap.get_sb_path(), mut beatmap.ctx)
 
 	beatmap.storyboard.initialize_camera()
-	beatmap.ensure_background_loaded()
 	beatmap.ensure_hitsound_loaded()
 
 	if settings.global.gameplay.playfield.background.enable_storyboard {
@@ -196,6 +194,8 @@ pub fn (mut beatmap Beatmap) reset() {
 		beatmap.storyboard.parse_lines((os.read_file(beatmap.get_sb_path()) or { '' }).split('\n'))
 		logging.info('Storyboard loaded!')
 	}
+
+	beatmap.ensure_background_loaded()
 
 	// // Only start thread when needed and not recording
 	if beatmap.storyboard.manager.queue.len > 0 && !settings.global.video.record {
@@ -308,6 +308,9 @@ pub fn (mut beatmap Beatmap) draw() {
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width),
 		int(settings.global.window.height))
 
+	// HACK: SGP
+	beatmap.ctx.begin_gp()
+
 	beatmap.storyboard.draw() // Includes background
 
 	// Shitty background dim
@@ -332,6 +335,7 @@ pub fn (mut beatmap Beatmap) draw() {
 		gx.white)
 
 	// Done
+	beatmap.ctx.end_gp()
 	sgl.draw()
 	gfx.end_pass()
 	gfx.commit()

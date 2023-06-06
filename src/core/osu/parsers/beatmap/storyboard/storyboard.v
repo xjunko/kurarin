@@ -29,6 +29,8 @@ pub mut:
 	scale   f64
 	camera  camera.Camera
 	manager &sprite.Manager = sprite.make_manager()
+	// Hack
+	no_background_layer_found bool = true
 	// Cache
 	cache      map[string]gg.Image
 	path_cache &FileMap = unsafe { nil }
@@ -84,6 +86,7 @@ pub fn (mut storyboard Storyboard) draw() {
 		ctx: storyboard.ctx
 		camera: storyboard.camera
 		time: storyboard.last_time
+		batch: true
 	)
 
 	if storyboard.video != unsafe { nil } {
@@ -122,12 +125,18 @@ pub fn cut_whites(s string) (string, int) {
 pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 	mut current_section := ''
 	mut current_sprite := ''
+	mut current_layer := ''
 	mut commands := []string{}
 	mut variables := map[string]string{}
 	mut lines := lines_.clone()
 
 	for mut line in lines {
-		if line.starts_with('//') || line.trim_space().len == 0 {
+		if line.starts_with('//') {
+			current_layer = line.split('//')[1]
+			continue
+		}
+
+		if line.trim_space().len == 0 {
 			continue
 		}
 
@@ -156,6 +165,10 @@ pub fn (mut storyboard Storyboard) parse_lines(lines_ []string) {
 					if current_sprite.len != 0 {
 						// logging.debug("Loading sprite: ${current_sprite} - ${commands.len} events!")
 						storyboard.load_sprite(current_sprite, commands)
+
+						if current_layer.starts_with('Background') {
+							storyboard.no_background_layer_found = false
+						}
 					}
 
 					current_sprite = *line // ok lol
