@@ -2,14 +2,36 @@ module context
 
 import gg
 import sokol.sgl
+import sokol.sapp
 import mohamedlt.sokolgp
 import framework.logging
 import framework.math.vector
 
 pub struct Context {
 	gg.Context
+mut:
+	has_gp_begin bool
 pub mut:
 	texture_not_found gg.Image
+}
+
+pub fn (mut context Context) begin_gp() {
+	if !context.has_gp_begin {
+		width := sapp.width()
+		height := sapp.height()
+
+		sokolgp.begin(width, height)
+		sokolgp.viewport(0, 0, width, height)
+
+		context.has_gp_begin = true
+	}
+}
+
+pub fn (mut context Context) end_gp() {
+	sokolgp.flush()
+	sokolgp.end()
+
+	context.has_gp_begin = false
 }
 
 // create_image creates an image from the path specified, returns default texture if something went wrong.
