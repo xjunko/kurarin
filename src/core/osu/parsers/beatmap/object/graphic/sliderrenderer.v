@@ -272,31 +272,31 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	attr.colors[6] = f32(colors[2] / 255.0)
 
 	// FIXME: This is janky asf lmao but it works
+	// vfmt off
 	gfx.begin_pass(graphic.global_renderer.pass, &graphic.global_renderer.pass_action2)
-	gfx.apply_pipeline(graphic.global_renderer.pip)
-	gfx.apply_bindings(&attr.bindings)
-	gfx.apply_uniforms(.vs, C.SLOT_vs_uniform, graphic.global_renderer.uniform)
-	gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
-	gfx.draw(0, attr.vertices.len, 1)
-	gfx.end_pass()
+		gfx.apply_pipeline(graphic.global_renderer.pip)
+		gfx.apply_bindings(&attr.bindings)
+		gfx.apply_uniforms(.vs, C.SLOT_vs_uniform, graphic.global_renderer.uniform)
+		gfx.apply_uniforms(.fs, C.SLOT_fs_uniform, attr.uniform)
+			gfx.draw(0, attr.vertices.len, 1)
+		gfx.end_pass()
 	gfx.commit()
 
-	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width),
-		int(settings.global.window.height))
-	sgl.enable_texture()
-	sgl.texture(graphic.global_renderer.color_img)
-	sgl.c4b(255, 255, 255, u8(255 - (255 * alpha)))
-	sgl.begin_quads()
-	sgl.v3f_t2f(0, 0, 1, 0, 1)
-	sgl.v3f_t2f(int(settings.global.window.width), 0, 1, 1, 1)
-	sgl.v3f_t2f(int(settings.global.window.width), int(settings.global.window.height),
-		1, 1, 0)
-	sgl.v3f_t2f(0, int(settings.global.window.height), 1, 0, 0)
-	sgl.end()
+	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
+		sgl.enable_texture()
+		sgl.texture(graphic.global_renderer.color_img)
+		sgl.c4b(255, 255, 255, u8(255 - (255 * alpha)))
+		sgl.begin_quads()
+			sgl.v3f_t2f(0, 0, 1, 0, 1)
+			sgl.v3f_t2f(int(settings.global.window.width), 0, 1, 1, 1)
+			sgl.v3f_t2f(int(settings.global.window.width), int(settings.global.window.height), 1, 1, 0)
+			sgl.v3f_t2f(0, int(settings.global.window.height), 1, 0, 0)
+		sgl.end()
 	sgl.disable_texture()
-	sgl.draw()
+		sgl.draw()
 	gfx.end_pass()
 	gfx.commit()
+	// vfmt on
 }
 
 pub fn (mut attr SliderRendererAttr) free() {
@@ -305,9 +305,9 @@ pub fn (mut attr SliderRendererAttr) free() {
 		return
 	}
 
-	// for mut buffer in attr.bindings.vertex_buffers {
-	// 	gfx.destroy_buffer(&buffer)
-	// }
+	for mut buffer in attr.bindings.vertex_buffers {
+		gfx.destroy_buffer(&buffer)
+	}
 
 	unsafe {
 		attr.vertices.clear()
@@ -315,11 +315,6 @@ pub fn (mut attr SliderRendererAttr) free() {
 
 		attr.vertices.free()
 		attr.points.free()
-	}
-	gfx.destroy_buffer(&attr.bindings.vertex_buffers[0])
-
-	for buffer in attr.bindings.vertex_buffers {
-		gfx.destroy_buffer(&buffer)
 	}
 }
 
