@@ -11,6 +11,7 @@ pub struct Context {
 	gg.Context
 mut:
 	has_gp_begin bool
+	cache        map[string]gg.Image
 pub mut:
 	texture_not_found gg.Image
 }
@@ -47,10 +48,14 @@ pub fn (mut context Context) create_image(path string) gg.Image {
 		}
 	}
 
-	return context.Context.create_image(path) or {
-		logging.warn('Failed to create image!')
-		return context.texture_not_found
+	if path !in context.cache {
+		context.cache[path] = context.Context.create_image(path) or {
+			logging.warn('Failed to create image!')
+			return context.texture_not_found
+		}
 	}
+
+	return context.cache[path]
 }
 
 pub struct DrawImageConfig {
