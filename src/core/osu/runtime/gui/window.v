@@ -11,6 +11,10 @@ import framework.graphic.window as i_window
 import framework.math.time
 import math
 
+// Impl
+fn C._sapp_glx_swapinterval(int)
+
+// Const
 const (
 	c_scene_none         = 0 << 0
 	c_scene_main         = 1 << 0
@@ -18,6 +22,7 @@ const (
 	c_scene_gameplay     = 1 << 2
 )
 
+// Structs
 [heap]
 pub struct GUIWindow {
 	i_window.GeneralWindow
@@ -99,7 +104,8 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.gameplay.init(mut window.ctx, window.menu.current_beatmap)
 
-			window.time.reset(offset: settings.global.gameplay.playfield.lead_in_time)
+			window.time.reset()
+			C._sapp_glx_swapinterval(0) // Disable VSync when changing to gameplay.
 
 			logging.info('Gameplay loaded?')
 
@@ -109,6 +115,23 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.mutex.@lock()
 			window.gameplay.draw(mut window.ctx)
 			window.mutex.unlock()
+
+			window.ctx.begin()
+			window.ctx.begin_gp()
+			window.draw_stats()
+
+			// Draw the last 32 logs
+			mut t := 1
+			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32,
+				0); i-- {
+				t++
+				window.ctx.draw_rect_filled(0, 720 - t * 16, window.ctx.text_width(logging.global.logs[i]),
+					16, gg.Color{0, 0, 0, 200})
+				window.ctx.draw_text(0, 720 - t * 16, logging.global.logs[i],
+					color: gg.Color{255, 255, 255, 100}
+				)
+			}
+			window.ctx.end_gp_short()
 		}
 		else {}
 	}
@@ -163,7 +186,12 @@ pub fn (mut window GUIWindow) play_beatmap(path string) {
 
 // Events
 pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
-	if window.joe_s == gui.c_scene_pre_gameplay || window.joe_s == gui.c_scene_gameplay {
+	if window.joe_s == gui.c_scene_pre_gameplay {
+		return
+	}
+
+	if window.joe_s == gui.c_scene_gameplay {
+		window.gameplay.event_keydown(key)
 		return
 	}
 
@@ -191,6 +219,22 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 	}
 }
 
+pub fn (mut window GUIWindow) event_keyup(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
+	if window.joe_s != gui.c_scene_gameplay {
+		return
+	}
+
+	window.gameplay.event_keyup(key)
+}
+
+pub fn (mut window GUIWindow) event_mouse(x f32, y f32, _ voidptr) {
+	if window.joe_s != gui.c_scene_gameplay {
+		return
+	}
+
+	window.gameplay.event_mouse(x, y)
+}
+
 pub fn main() {
 	mut window := &GUIWindow{
 		manager: 0
@@ -211,6 +255,8 @@ pub fn main() {
 		frame_fn: window.draw
 		// Event
 		keydown_fn: window.event_keydown
+		keyup_fn: window.event_keyup
+		move_fn: window.event_mouse
 	)
 
 	window.ctx = &context.Context{
