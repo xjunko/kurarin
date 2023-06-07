@@ -31,12 +31,12 @@ pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
 
 	// New track
 	main_menu.current_track = audio.new_track(new_beatmap.get_audio_path())
-	main_menu.current_track.set_volume(0.4)
+	main_menu.current_track.set_volume(0.2)
 	main_menu.current_track.set_position(new_beatmap.general.preview_time)
 	main_menu.current_track.play()
 	logging.info('Playing new track.')
 
-	main_menu.background.fadeout_and_die(main_menu.window.time.time, 500.0)
+	main_menu.background.fadeout_and_die(main_menu.window.time.time, 50.0)
 
 	// Load background and other crap
 	mut background := &sprite.Sprite{
@@ -47,8 +47,8 @@ pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
 
 	background.add_transform(
 		typ: .fade
-		time: time.Time{main_menu.window.time.time, main_menu.window.time.time + 500.0}
-		before: [0.0]
+		time: time.Time{main_menu.window.time.time, main_menu.window.time.time + 50.0}
+		before: [195.0]
 		after: [255.0]
 	)
 
