@@ -16,10 +16,11 @@ fn C._sapp_glx_swapinterval(int)
 
 // Const
 const (
-	c_scene_none         = 0 << 0
-	c_scene_main         = 1 << 0
-	c_scene_pre_gameplay = 1 << 1
-	c_scene_gameplay     = 1 << 2
+	c_scene_none             = 0 << 0
+	c_scene_main             = 1 << 0
+	c_scene_pre_gameplay     = 1 << 1
+	c_scene_loading_gameplay = 1 << 2
+	c_scene_gameplay         = 1 << 3
 )
 
 // Structs
@@ -37,6 +38,7 @@ pub mut:
 	joe_i int    // Index of beatmap
 	joe_s int    // Current Scene
 	joe_p string // Path of the beatmap (Temp)
+	joe_c int    // Useless counter for uselss thing
 }
 
 pub fn (mut window GUIWindow) init(_ voidptr) {
@@ -96,6 +98,32 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.ctx.end()
 		}
 		gui.c_scene_pre_gameplay {
+			// Black screen with loading
+			window.ctx.begin()
+
+			window.mutex.@lock()
+			window.menu.draw(ctx: window.ctx)
+			window.mutex.unlock()
+
+			window.ctx.draw_rect_filled(0, 0, 1280, 720, gg.Color{0, 0, 0, 200})
+
+			window.ctx.draw_text(1280 / 2, 720 / 2, 'Loading...',
+				color: gg.Color{255, 255, 255, 255}
+				size: 64
+				align: .center
+				vertical_align: .middle
+			)
+
+			window.ctx.end()
+
+			// 10 frames to sokol can draw stuff properly
+			window.joe_c++
+
+			if window.joe_c > 10 {
+				window.joe_s = gui.c_scene_loading_gameplay
+			}
+		}
+		gui.c_scene_loading_gameplay {
 			// This is kinda hacky but whatever.
 			// Load gameplay.
 			logging.info('Loading gameplay.')
@@ -186,7 +214,7 @@ pub fn (mut window GUIWindow) play_beatmap(path string) {
 
 // Events
 pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
-	if window.joe_s == gui.c_scene_pre_gameplay {
+	if window.joe_s == gui.c_scene_pre_gameplay || window.joe_s == gui.c_scene_loading_gameplay {
 		return
 	}
 
