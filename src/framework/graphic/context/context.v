@@ -3,9 +3,11 @@ module context
 import gg
 import sokol.sgl
 import sokol.sapp
+import sokol.gfx
 import mohamedlt.sokolgp
 import framework.logging
 import framework.math.vector
+import core.common.settings
 
 pub struct Context {
 	gg.Context
@@ -14,6 +16,26 @@ mut:
 	cache        map[string]gg.Image
 pub mut:
 	texture_not_found gg.Image
+	invisible_pass    gfx.PassAction = gfx.PassAction{
+		colors: [
+			gfx.ColorAttachmentAction{
+				action: .dontcare
+				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+			},
+			gfx.ColorAttachmentAction{
+				action: .dontcare
+				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+			},
+			gfx.ColorAttachmentAction{
+				action: .dontcare
+				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+			},
+			gfx.ColorAttachmentAction{
+				action: .dontcare
+				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+			},
+		]!
+	}
 }
 
 pub fn (mut context Context) begin_gp() {
@@ -33,6 +55,18 @@ pub fn (mut context Context) end_gp() {
 	sokolgp.end()
 
 	context.has_gp_begin = false
+}
+
+pub fn (mut context Context) end_gp_short() {
+	gfx.begin_default_pass(context.invisible_pass, int(settings.global.window.width),
+		int(settings.global.window.height))
+
+	context.end_gp()
+
+	sgl.draw()
+	gfx.end_pass()
+
+	gfx.commit()
 }
 
 // create_image creates an image from the path specified, returns default texture if something went wrong.
