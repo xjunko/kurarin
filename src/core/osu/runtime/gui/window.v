@@ -9,6 +9,14 @@ import framework.logging
 import framework.graphic.context
 import framework.graphic.window as i_window
 import framework.math.time
+import math
+
+const (
+	c_scene_none         = 0 << 0
+	c_scene_main         = 1 << 0
+	c_scene_pre_gameplay = 1 << 1
+	c_scene_gameplay     = 1 << 2
+)
 
 [heap]
 pub struct GUIWindow {
@@ -27,6 +35,8 @@ pub mut:
 }
 
 pub fn (mut window GUIWindow) init(_ voidptr) {
+	window.joe_s = gui.c_scene_main
+
 	// Reset time
 	window.time = time.get_time()
 
@@ -58,7 +68,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 	// Draw scenes
 	match window.joe_s {
-		0 << 0 {
+		gui.c_scene_main {
 			window.ctx.begin()
 			window.mutex.@lock()
 			window.menu.draw(ctx: window.ctx)
@@ -66,16 +76,21 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.draw_stats()
 
-			// Draw logs (The last 32)
-			for i, log in logging.global.logs {
-				window.ctx.draw_rect_filled(0, i * 16, window.ctx.text_width(log), 16,
-					gg.Color{0, 0, 0, 255})
-				window.ctx.draw_text(0, i * 16, log, color: gg.Color{255, 255, 255, 255})
+			// Draw the last 32 logs
+			mut t := 1
+			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32,
+				0); i-- {
+				t++
+				window.ctx.draw_rect_filled(0, t * 16, window.ctx.text_width(logging.global.logs[i]),
+					16, gg.Color{0, 0, 0, 255})
+				window.ctx.draw_text(0, t * 16, logging.global.logs[i],
+					color: gg.Color{255, 255, 255, 255}
+				)
 			}
 
 			window.ctx.end()
 		}
-		1 << 2 {
+		gui.c_scene_pre_gameplay {
 			// This is kinda hacky but whatever.
 			// Load gameplay.
 			logging.info('Loading gameplay.')
@@ -88,9 +103,9 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			logging.info('Gameplay loaded?')
 
-			window.joe_s = 1 << 3
+			window.joe_s = gui.c_scene_gameplay
 		}
-		1 << 3 {
+		gui.c_scene_gameplay {
 			window.gameplay.draw(mut window.ctx)
 		}
 		else {}
@@ -121,10 +136,10 @@ pub fn (mut window GUIWindow) update(time_ms f64) {
 	window.tick_update()
 
 	match window.joe_s {
-		0 << 0 {
+		gui.c_scene_main {
 			window.menu.update(time_ms)
 		}
-		1 << 3 {
+		gui.c_scene_gameplay {
 			window.gameplay.update(time_ms, window.time.delta)
 		}
 		else {}
@@ -133,7 +148,7 @@ pub fn (mut window GUIWindow) update(time_ms f64) {
 
 // Enter
 pub fn (mut window GUIWindow) play_beatmap(path string) {
-	window.joe_s = 1 << 2 // Getting reading to load
+	window.joe_s = gui.c_scene_pre_gameplay // Getting reading to load
 	window.joe_p = path
 
 	logging.info('Getting ready to start gameplay.')
@@ -142,6 +157,36 @@ pub fn (mut window GUIWindow) play_beatmap(path string) {
 	window.menu.background.fadeout_and_die(window.time.time, 200.0)
 
 	logging.info('Killed background.')
+}
+
+// Events
+pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
+	if window.joe_s == gui.c_scene_pre_gameplay || window.joe_s == gui.c_scene_gameplay {
+		return
+	}
+
+	match key {
+		.right {
+			window.joe_i++
+
+			window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1..][0])
+		}
+		.left {
+			window.joe_i--
+
+			if window.joe_i < 0 {
+				window.joe_i = window.manager.beatmaps.len - 1
+			}
+
+			window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1..][0])
+		}
+		.p {
+			window.play_beatmap(os.join_path(window.menu.current_beatmap.root, window.menu.current_beatmap.filename))
+		}
+		else {
+			logging.debug('Unhandled key: ${key}')
+		}
+	}
 }
 
 pub fn main() {
@@ -162,30 +207,8 @@ pub fn main() {
 		// FNs
 		init_fn: window.init
 		frame_fn: window.draw
-		keydown_fn: fn (key gg.KeyCode, mod gg.Modifier, mut window GUIWindow) {
-			if window.joe_s == 1 << 3 || window.joe_s == 1 << 2 {
-				return
-			}
-
-			// vfmt off
-			if key == .right {
-				window.joe_i++
-
-				window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1 ..][0])
-			}
-
-			if key == .left {
-				window.joe_i--
-
-				window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1 ..][0])
-			}
-
-			// vfmt on
-
-			if key == .p {
-				window.play_beatmap(os.join_path(window.menu.current_beatmap.root, window.menu.current_beatmap.filename))
-			}
-		}
+		// Event
+		keydown_fn: window.event_keydown
 	)
 
 	window.ctx = &context.Context{
