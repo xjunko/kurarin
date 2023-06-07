@@ -81,10 +81,10 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32,
 				0); i-- {
 				t++
-				window.ctx.draw_rect_filled(0, t * 16, window.ctx.text_width(logging.global.logs[i]),
-					16, gg.Color{0, 0, 0, 255})
-				window.ctx.draw_text(0, t * 16, logging.global.logs[i],
-					color: gg.Color{255, 255, 255, 255}
+				window.ctx.draw_rect_filled(0, 720 - t * 16, window.ctx.text_width(logging.global.logs[i]),
+					16, gg.Color{0, 0, 0, 100})
+				window.ctx.draw_text(0, 720 - t * 16, logging.global.logs[i],
+					color: gg.Color{255, 255, 255, 100}
 				)
 			}
 
@@ -106,7 +106,9 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.joe_s = gui.c_scene_gameplay
 		}
 		gui.c_scene_gameplay {
+			window.mutex.@lock()
 			window.gameplay.draw(mut window.ctx)
+			window.mutex.unlock()
 		}
 		else {}
 	}

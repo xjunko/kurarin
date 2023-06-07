@@ -77,25 +77,58 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 
 	// NOTE: this is super scuffed rn
 
-	// Artist
-	main_menu.window.ctx.draw_rect_filled(1280 - 50 - (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.artist) * 2),
-		200 - 32, (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.artist) * 2),
-		30, gg.Color{0, 0, 0, 255})
-	main_menu.window.ctx.draw_text(1280 - 50, 200 - 32, main_menu.current_beatmap.metadata.artist,
-		
+	// // Artist
+	// main_menu.window.ctx.draw_rect_filled(1280 - 50 - (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.artist) * 2),
+	// 	200 - 32, (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.artist) * 2),
+	// 	30, gg.Color{0, 0, 0, 255})
+	// main_menu.window.ctx.draw_text(1280 - 50, 200 - 32, main_menu.current_beatmap.metadata.artist,
+
+	// 	color: gg.Color{255, 255, 255, 255}
+	// 	align: .right
+	// 	size: 30
+	// )
+
+	// // Title
+	// main_menu.window.ctx.draw_rect_filled(1280 - 100 - (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.title) * 2),
+	// 	200, (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.title) * 2),
+	// 	32, gg.Color{0, 0, 0, 255})
+	// main_menu.window.ctx.draw_text(1280 - 100, 200, main_menu.current_beatmap.metadata.title,
+
+	// 	color: gg.Color{255, 255, 255, 255}
+	// 	align: .right
+	// 	size: 32
+	// )
+
+	// Shapes
+	// Triangle transition
+	main_menu.window.ctx.draw_triangle_filled(500, 50, 370, 150, 370, 50, gg.Color{0, 0, 0, 255})
+	main_menu.window.ctx.draw_triangle_empty(500, 50, 370, 150, 370, 50, gg.Color{0, 0, 255, 255})
+
+	// Left
+	main_menu.window.ctx.draw_rect_filled(0, 0, 370, 150, gg.Color{0, 0, 0, 255})
+	main_menu.window.ctx.draw_rect_empty(0, 0, 370, 150, gg.Color{0, 0, 255, 255})
+
+	// Long
+	main_menu.window.ctx.draw_rect_filled(0, 0, 1280, 100, gg.Color{0, 0, 0, 255})
+	main_menu.window.ctx.draw_rect_empty(0, 0, 1280, 100, gg.Color{0, 0, 255, 255})
+
+	// Titles
+	main_menu.window.ctx.draw_text(10, 0, '${main_menu.current_beatmap.metadata.artist} - ${main_menu.current_beatmap.metadata.title} [${main_menu.current_beatmap.metadata.version}]',
+		color: gg.Color{255, 255, 255, 255}, size: 32)
+
+	main_menu.window.ctx.draw_text(10, 32, 'Mapped by idk',
 		color: gg.Color{255, 255, 255, 255}
-		align: .right
-		size: 30
+		size: 25
 	)
 
-	// Title
-	main_menu.window.ctx.draw_rect_filled(1280 - 100 - (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.title) * 2),
-		200, (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.title) * 2),
-		32, gg.Color{0, 0, 0, 255})
-	main_menu.window.ctx.draw_text(1280 - 100, 200, main_menu.current_beatmap.metadata.title,
+	main_menu.window.ctx.draw_text(10, 32 + 25, 'Length: 4:20 BPM: 69 Objects: 420',
+		color: gg.Color{255, 255, 255, 255}
+		size: 25
+	)
+
+	main_menu.window.ctx.draw_text(10, 32 + 25 + 25, 'CS:6 AR:9 OD:4 HP:2 Stars:0.0',
 		
 		color: gg.Color{255, 255, 255, 255}
-		align: .right
-		size: 32
+		size: 25
 	)
 }
