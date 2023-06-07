@@ -66,7 +66,7 @@ pub fn (mut window Window) update_boost() {
 
 pub fn (mut window Window) update_cursor(update_time f64, delta f64) {
 	if window.argument.play_mode != .play {
-		window.cursor_controller.update(update_time)
+		window.cursor_controller.update(update_time, delta)
 	}
 
 	for mut cursor in window.cursors {
