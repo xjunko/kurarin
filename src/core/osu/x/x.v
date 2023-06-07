@@ -122,3 +122,7 @@ fn init() {
 		r.calculate()
 	}
 }
+
+pub fn force_calculate() {
+	init()
+}

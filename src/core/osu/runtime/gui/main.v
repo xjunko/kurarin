@@ -1,7 +1,6 @@
 module gui
 
 import gg
-import core.osu.runtime
 import core.osu.parsers.beatmap
 import framework.audio
 import framework.graphic.sprite
@@ -121,12 +120,14 @@ mut:
 	logs []string
 	time &time.TimeCounter = unsafe { nil }
 pub mut:
-	manager &beatmap.BeatmapManager = unsafe { nil }
-	menu    &MainMenu = unsafe { nil }
+	manager  &beatmap.BeatmapManager = unsafe { nil }
+	menu     &MainMenu      = unsafe { nil }
+	gameplay &GameplayScene = unsafe { nil }
 
-	joe      bool
-	joe_i    int
-	joe_path string
+	joe   bool   // Has song loaded yet
+	joe_i int    // Index of beatmap
+	joe_s int    // Current Scene
+	joe_p string // Path of the beatmap (Temp)
 }
 
 pub fn (mut window GUIWindow) init(_ voidptr) {
@@ -159,24 +160,44 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 pub fn (mut window GUIWindow) draw(_ voidptr) {
 	window.tick_draw()
 
-	window.ctx.begin()
-
-	window.mutex.@lock()
-
 	// Draw scenes
-	window.menu.draw(ctx: window.ctx)
+	match window.joe_s {
+		0 << 0 {
+			window.ctx.begin()
+			window.mutex.@lock()
+			window.menu.draw(ctx: window.ctx)
+			window.mutex.unlock()
 
-	window.mutex.unlock()
+			window.draw_stats()
 
-	window.draw_stats()
+			// Draw logs (The last 32)
+			for i, log in window.logs#[-32..] {
+				window.ctx.draw_rect_filled(0, i * 16, window.ctx.text_width(log), 16,
+					gg.Color{0, 0, 0, 255})
+				window.ctx.draw_text(0, i * 16, log, color: gg.Color{255, 255, 255, 255})
+			}
 
-	// Draw logs (The last 32)
-	for i, log in window.logs#[-32..] {
-		window.ctx.draw_rect_filled(0, i * 16, window.ctx.text_width(log), 16, gg.Color{0, 0, 0, 255})
-		window.ctx.draw_text(0, i * 16, log, color: gg.Color{255, 255, 255, 255})
+			window.ctx.end()
+		}
+		1 << 2 {
+			// This is kinda hacky but whatever.
+			// Load gameplay.
+			window.logs << 'Loading gameplay.'
+
+			window.gameplay = &GameplayScene{}
+
+			window.gameplay.init(mut window, window.joe_p)
+			window.time.reset()
+
+			window.logs << 'Gameplay loaded?'
+
+			window.joe_s = 1 << 3
+		}
+		1 << 3 {
+			window.gameplay.draw()
+		}
+		else {}
 	}
-
-	window.ctx.end()
 }
 
 // Updates
@@ -202,7 +223,28 @@ pub fn (mut window GUIWindow) start_update_thread() {
 pub fn (mut window GUIWindow) update(time_ms f64) {
 	window.tick_update()
 
-	window.menu.update(time_ms)
+	match window.joe_s {
+		0 << 0 {
+			window.menu.update(time_ms)
+		}
+		1 << 3 {
+			window.gameplay.update(time_ms, window.time.delta)
+		}
+		else {}
+	}
+}
+
+// Enter
+pub fn (mut window GUIWindow) play_beatmap(path string) {
+	window.joe_s = 1 << 2 // Getting reading to load
+	window.joe_p = path
+
+	window.logs << 'Getting ready to start gameplay.'
+
+	window.menu.current_track.pause()
+	window.menu.background.fadeout_and_die(window.time.time, 200.0)
+
+	window.logs << 'Killed background.'
 }
 
 pub fn main() {
@@ -224,22 +266,27 @@ pub fn main() {
 		init_fn: window.init
 		frame_fn: window.draw
 		keydown_fn: fn (key gg.KeyCode, mod gg.Modifier, mut window GUIWindow) {
+			if window.joe_s == 1 << 3 || window.joe_s == 1 << 2 {
+				return
+			}
+
+			// vfmt off
 			if key == .right {
 				window.joe_i++
 
-				window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions[0])
+				window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1 ..][0])
 			}
 
 			if key == .left {
 				window.joe_i--
 
-				window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions[0])
+				window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1 ..][0])
 			}
 
+			// vfmt on
+
 			if key == .p {
-				window.joe_path = os.join_path(window.menu.current_beatmap.root, window.menu.current_beatmap.filename)
-				window.menu.current_track.pause()
-				window.ctx.quit()
+				window.play_beatmap(os.join_path(window.menu.current_beatmap.root, window.menu.current_beatmap.filename))
 			}
 		}
 	)
@@ -252,6 +299,4 @@ pub fn main() {
 	window.logs << 'Get ready to run.'
 
 	window.ctx.run()
-
-	runtime.run(window.joe_path, '', true)
 }
