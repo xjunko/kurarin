@@ -29,7 +29,7 @@ pub mut:
 	}
 }
 
-pub fn (mut auto AutoCursor) update(time f64) {
+pub fn (mut auto AutoCursor) update(time f64, delta f64) {
 	// Auto
 	// Looks abit janky compared to the pregenerated one.
 	if auto.queue_i < auto.queue.len {

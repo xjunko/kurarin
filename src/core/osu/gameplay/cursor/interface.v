@@ -6,5 +6,5 @@ pub interface ICursorController {
 mut:
 	cursor &Cursor
 	player player.Player
-	update(f64)
+	update(f64, f64)
 }

@@ -34,6 +34,7 @@ pub mut:
 	trail_color gx.Color = gx.Color{0, 25, 100, u8(255 * 0.5)}
 	delta_pos   []vector.Vector2[f64]
 	delta_pos_i int
+	manual      bool // Manual means the user can overwrite this cursor position.
 	// Game control
 	left_button  bool
 	right_button bool

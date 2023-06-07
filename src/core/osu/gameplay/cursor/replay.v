@@ -27,7 +27,7 @@ pub mut:
 	events []ReplayEvent
 }
 
-pub fn (mut replay ReplayCursor) update(update_time f64) {
+pub fn (mut replay ReplayCursor) update(update_time f64, update_delta f64) {
 	for i := 0; i < replay.events.len; i++ {
 		if update_time >= replay.events[i].time {
 			keys := replay.events[i].keys
