@@ -1,6 +1,7 @@
 module ruleset
 
 import math
+import sync
 import core.osu.parsers.beatmap
 import core.osu.parsers.beatmap.object
 import core.osu.parsers.beatmap.difficulty
@@ -105,6 +106,8 @@ pub mut:
 	processed []IHitObject
 
 	hit_listener HitListener
+
+	mutex &sync.Mutex = sync.new_mutex()
 }
 
 type HitListener = fn (f64, i64, vector.Vector2[f64], HitResult, ComboResult, i64)
