@@ -75,30 +75,6 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 		return
 	}
 
-	// NOTE: this is super scuffed rn
-
-	// // Artist
-	// main_menu.window.ctx.draw_rect_filled(1280 - 50 - (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.artist) * 2),
-	// 	200 - 32, (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.artist) * 2),
-	// 	30, gg.Color{0, 0, 0, 255})
-	// main_menu.window.ctx.draw_text(1280 - 50, 200 - 32, main_menu.current_beatmap.metadata.artist,
-
-	// 	color: gg.Color{255, 255, 255, 255}
-	// 	align: .right
-	// 	size: 30
-	// )
-
-	// // Title
-	// main_menu.window.ctx.draw_rect_filled(1280 - 100 - (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.title) * 2),
-	// 	200, (main_menu.window.ctx.text_width(main_menu.current_beatmap.metadata.title) * 2),
-	// 	32, gg.Color{0, 0, 0, 255})
-	// main_menu.window.ctx.draw_text(1280 - 100, 200, main_menu.current_beatmap.metadata.title,
-
-	// 	color: gg.Color{255, 255, 255, 255}
-	// 	align: .right
-	// 	size: 32
-	// )
-
 	// Shapes
 	// Triangle transition
 	main_menu.window.ctx.draw_triangle_filled(500, 50, 370, 150, 370, 50, gg.Color{0, 0, 0, 255})
