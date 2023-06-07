@@ -320,6 +320,11 @@ pub fn (mut attr SliderRendererAttr) free() {
 
 // Init
 pub fn init_slider_renderer() {
+	if graphic.global_renderer.has_been_initialized {
+		logging.warn('Slider renderer already initialized!!')
+		return
+	}
+
 	// Start
 	logging.info('Initializing slider renderer!')
 
