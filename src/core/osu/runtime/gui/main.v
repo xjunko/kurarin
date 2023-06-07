@@ -1,8 +1,11 @@
 module gui
 
 import gg
+import core.common.settings
 import core.osu.parsers.beatmap
+import core.osu.runtime.gameplay
 import framework.audio
+import framework.logging
 import framework.graphic.sprite
 import framework.graphic.context
 import framework.graphic.window as i_window
@@ -33,13 +36,13 @@ pub mut:
 }
 
 pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
-	main_menu.window.logs << '[${@METHOD}] Changing beatmap to ${new_beatmap.metadata.title} [${new_beatmap.metadata.version}]'
+	logging.info('[${@METHOD}] Changing beatmap to ${new_beatmap.metadata.title} [${new_beatmap.metadata.version}]')
 
 	if !isnil(main_menu.current_track) {
 		// Old track
 		main_menu.current_track.pause()
 		main_menu.current_track.set_volume(0.0)
-		main_menu.window.logs << 'Discarding old track.'
+		logging.info('Discarding old track.')
 	}
 
 	// New track
@@ -47,7 +50,7 @@ pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
 	main_menu.current_track.set_volume(0.4)
 	main_menu.current_track.set_position(new_beatmap.general.preview_time)
 	main_menu.current_track.play()
-	main_menu.window.logs << 'Playing new track.'
+	logging.info('Playing new track.')
 
 	main_menu.background.fadeout_and_die(main_menu.window.time.time, 500.0)
 
@@ -117,12 +120,11 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 pub struct GUIWindow {
 	i_window.GeneralWindow
 mut:
-	logs []string
 	time &time.TimeCounter = unsafe { nil }
 pub mut:
 	manager  &beatmap.BeatmapManager = unsafe { nil }
-	menu     &MainMenu      = unsafe { nil }
-	gameplay &GameplayScene = unsafe { nil }
+	menu     &MainMenu = unsafe { nil }
+	gameplay &gameplay.OSUGameplay = unsafe { nil }
 
 	joe   bool   // Has song loaded yet
 	joe_i int    // Index of beatmap
@@ -135,20 +137,20 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 	window.time = time.get_time()
 
 	// Start
-	window.logs << 'Initialize.'
+	logging.info('Initialize.')
 
 	window.manager = beatmap.make_manager('/run/media/junko/2nd/Projects/dementia/assets/osu/maps/')
 
-	window.logs << 'Found beatmaps: ${window.manager.beatmaps.len} beatmaps'
+	logging.info('Found beatmaps: ${window.manager.beatmaps.len} beatmaps')
 
 	// Scenes
-	window.logs << 'Setting up scenes.'
+	logging.info('Setting up scenes.')
 
 	window.menu = &MainMenu{
 		window: window
 	}
 
-	window.logs << 'Done setting up scenes.'
+	logging.info('Done setting up scenes.')
 
 	//
 	window.start_update_thread()
@@ -171,7 +173,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.draw_stats()
 
 			// Draw logs (The last 32)
-			for i, log in window.logs#[-32..] {
+			for i, log in logging.global.logs {
 				window.ctx.draw_rect_filled(0, i * 16, window.ctx.text_width(log), 16,
 					gg.Color{0, 0, 0, 255})
 				window.ctx.draw_text(0, i * 16, log, color: gg.Color{255, 255, 255, 255})
@@ -182,19 +184,20 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 		1 << 2 {
 			// This is kinda hacky but whatever.
 			// Load gameplay.
-			window.logs << 'Loading gameplay.'
+			logging.info('Loading gameplay.')
 
-			window.gameplay = &GameplayScene{}
+			window.gameplay = &gameplay.OSUGameplay{}
 
-			window.gameplay.init(mut window, window.joe_p)
-			window.time.reset()
+			window.gameplay.init(mut window.ctx, window.menu.current_beatmap)
 
-			window.logs << 'Gameplay loaded?'
+			window.time.reset(offset: settings.global.gameplay.playfield.lead_in_time)
+
+			logging.info('Gameplay loaded?')
 
 			window.joe_s = 1 << 3
 		}
 		1 << 3 {
-			window.gameplay.draw()
+			window.gameplay.draw(mut window.ctx)
 		}
 		else {}
 	}
@@ -202,10 +205,10 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 // Updates
 pub fn (mut window GUIWindow) start_update_thread() {
-	window.logs << 'Update thread starting.'
+	logging.info('Update thread starting.')
 
 	go fn (mut window GUIWindow) {
-		window.logs << 'Update thread started.'
+		logging.info('Update thread started.')
 
 		window.time.reset()
 
@@ -239,12 +242,12 @@ pub fn (mut window GUIWindow) play_beatmap(path string) {
 	window.joe_s = 1 << 2 // Getting reading to load
 	window.joe_p = path
 
-	window.logs << 'Getting ready to start gameplay.'
+	logging.info('Getting ready to start gameplay.')
 
 	window.menu.current_track.pause()
 	window.menu.background.fadeout_and_die(window.time.time, 200.0)
 
-	window.logs << 'Killed background.'
+	logging.info('Killed background.')
 }
 
 pub fn main() {
@@ -252,10 +255,10 @@ pub fn main() {
 		manager: 0
 	}
 
-	window.logs << 'Runtime logs:'
-	window.logs << 'Hello world.'
+	logging.info('Runtime logs:')
+	logging.info('Hello world.')
 
-	window.logs << 'Creating GG context.'
+	logging.info('Creating GG context.')
 
 	mut gg_context := gg.new_context(
 		// Basic
@@ -295,8 +298,8 @@ pub fn main() {
 		Context: gg_context
 	}
 
-	window.logs << 'Wrapping Context with our own impl.'
-	window.logs << 'Get ready to run.'
+	logging.info('Wrapping Context with our own impl.')
+	logging.info('Get ready to run.')
 
 	window.ctx.run()
 }
