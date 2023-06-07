@@ -48,8 +48,7 @@ pub fn (mut circle Circle) draw(arg sprite.CommonSpriteArgument) {
 
 		circle.combotext.color = circle.hitcircle.color
 		circle.approachcircle.color = circle.hitcircle.color
-		circle.hitcircleoverlay.color = circle.hitcircle.color // HACK: i dont think this will fuck with anything but considering this
-		//       is v and its kinda buggy, might as well put up a notice here
+		circle.hitcircleoverlay.color = circle.hitcircle.color
 	}
 
 	// Draw
