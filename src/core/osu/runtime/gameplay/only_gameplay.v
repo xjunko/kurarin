@@ -15,6 +15,7 @@ import core.osu.parsers.beatmap
 import core.osu.parsers.beatmap.object.graphic
 import core.osu.gameplay.ruleset
 import core.osu.gameplay.cursor
+import core.osu.gameplay.overlays
 
 pub struct OSUGameplay {
 mut:
@@ -22,7 +23,8 @@ mut:
 	beatmap_audio   &audio.Track     = unsafe { nil }
 	beatmap_ruleset &ruleset.Ruleset = unsafe { nil }
 
-	cursor cursor.ICursorController
+	cursor  cursor.ICursorController
+	overlay &overlays.GameplayOverlay = unsafe { nil }
 }
 
 pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap.Beatmap) {
@@ -49,8 +51,16 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 	osu.beatmap_audio = audio.new_track(osu.beatmap.get_audio_path())
 	osu.beatmap_audio.set_volume(0.2)
 
-	// HACK: Temporary player
+	// TODO: Implement replay/auto later.
 	osu.cursor = cursor.make_player_cursor(mut ctx)
+
+	// FIXME: Ruleset hack.
+	mut temp_cursor_hack := [osu.cursor.cursor]
+	osu.beatmap_ruleset = ruleset.new_ruleset(mut osu.beatmap, mut temp_cursor_hack)
+
+	// Overlay
+	osu.overlay = overlays.new_gameplay_overlay(osu.beatmap_ruleset, osu.cursor.cursor,
+		osu.cursor.player, ctx)
 }
 
 pub fn (mut osu OSUGameplay) draw(mut ctx context.Context) {
@@ -64,25 +74,69 @@ pub fn (mut osu OSUGameplay) draw(mut ctx context.Context) {
 	osu.beatmap.draw()
 
 	ctx.begin_gp()
+	osu.overlay.draw()
 	osu.cursor.cursor.draw()
 	ctx.end_gp_short()
 }
 
 pub fn (mut osu OSUGameplay) update(time_ms f64, time_delta f64) {
+	// Song
 	if time_ms >= settings.global.gameplay.playfield.lead_in_time && !osu.beatmap_audio.playing {
 		osu.beatmap_audio.set_position(time_ms - settings.global.gameplay.playfield.lead_in_time)
 		osu.beatmap_audio.play()
 	}
 
+	// Ruleset
+	osu.beatmap_ruleset.mutex.@lock()
+	osu.beatmap_ruleset.update_click_for(osu.cursor.cursor, time_ms - settings.global.gameplay.playfield.lead_in_time)
+	osu.beatmap_ruleset.update_normal_for(osu.cursor.cursor, time_ms - settings.global.gameplay.playfield.lead_in_time,
+		false)
+	osu.beatmap_ruleset.update_post_for(osu.cursor.cursor, time_ms - settings.global.gameplay.playfield.lead_in_time,
+		false)
+	osu.beatmap_ruleset.update(time_ms - settings.global.gameplay.playfield.lead_in_time)
+	osu.beatmap_ruleset.mutex.unlock()
+
+	// Beatmap
 	osu.beatmap.update(time_ms - settings.global.gameplay.playfield.lead_in_time, 1.0)
-	osu.cursor.update(time_ms, time_delta)
+
+	// Cursor
+	osu.cursor.update(time_ms - settings.global.gameplay.playfield.lead_in_time, time_delta)
+
+	// Overlay
+	osu.overlay.update(time_ms - settings.global.gameplay.playfield.lead_in_time)
 }
 
 // Events (Key, Mouse)
 pub fn (mut osu OSUGameplay) event_keydown(keycode gg.KeyCode) {
+	if !osu.cursor.cursor.manual {
+		return
+	}
+
+	osu.beatmap_ruleset.mutex.@lock()
+	if keycode == .a {
+		osu.cursor.cursor.left_button = true
+	}
+
+	if keycode == .s {
+		osu.cursor.cursor.right_button = true
+	}
+	osu.beatmap_ruleset.mutex.unlock()
 }
 
 pub fn (mut osu OSUGameplay) event_keyup(keycode gg.KeyCode) {
+	if !osu.cursor.cursor.manual {
+		return
+	}
+
+	osu.beatmap_ruleset.mutex.@lock()
+	if keycode == .a {
+		osu.cursor.cursor.left_button = false
+	}
+
+	if keycode == .s {
+		osu.cursor.cursor.right_button = false
+	}
+	osu.beatmap_ruleset.mutex.unlock()
 }
 
 pub fn (mut osu OSUGameplay) event_mouse(p_x f32, p_y f32) {

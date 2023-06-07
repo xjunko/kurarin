@@ -120,14 +120,14 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.ctx.begin_gp()
 			window.draw_stats()
 
-			// Draw the last 32 logs
+			// Draw the last 16 logs
 			mut t := 1
-			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32,
+			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 16,
 				0); i-- {
 				t++
-				window.ctx.draw_rect_filled(0, 720 - t * 16, window.ctx.text_width(logging.global.logs[i]),
+				window.ctx.draw_rect_filled(0, t * 16, window.ctx.text_width(logging.global.logs[i]),
 					16, gg.Color{0, 0, 0, 200})
-				window.ctx.draw_text(0, 720 - t * 16, logging.global.logs[i],
+				window.ctx.draw_text(0, t * 16, logging.global.logs[i],
 					color: gg.Color{255, 255, 255, 100}
 				)
 			}
