@@ -72,7 +72,7 @@ pub mut:
 }
 
 // General Helper
-pub fn (mut beatmap Beatmap) load_full_beatmap() &Beatmap {
+pub fn (beatmap &Beatmap) load_full_beatmap() &Beatmap {
 	// We load a new beatmap with everything loaded, to be use with lazy beatmap loading.
 	return parse_beatmap(os.join_path(beatmap.root, beatmap.filename), false)
 }
