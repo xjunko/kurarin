@@ -10,9 +10,10 @@ import framework.math.vector
 
 pub struct MainMenu {
 mut:
-	counter    int
-	window     &GUIWindow
-	background &CustomSpriteManager = &CustomSpriteManager{
+	counter        int
+	counter_smooth f64
+	window         &GUIWindow
+	background     &CustomSpriteManager = &CustomSpriteManager{
 	Manager: sprite.make_manager()
 }
 pub mut:
@@ -92,6 +93,9 @@ pub fn (mut main_menu MainMenu) prev_version() {
 
 pub fn (mut main_menu MainMenu) update(time_ms f64) {
 	main_menu.background.update(time_ms)
+
+	// HACK: simple math hack to smooth out the thing
+	main_menu.counter_smooth = f64(main_menu.counter) * 0.05 + main_menu.counter_smooth - main_menu.counter_smooth * 0.05
 }
 
 pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
@@ -120,7 +124,8 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 	main_menu.window.ctx.draw_text(10, 0, '${main_menu.current_version.metadata.artist} - ${main_menu.current_version.metadata.title} [${main_menu.current_version.metadata.version}]',
 		color: gg.Color{255, 255, 255, 255}, size: 32)
 
-	main_menu.window.ctx.draw_text(10, 32, 'Mapped by idk',
+	main_menu.window.ctx.draw_text(10, 32, 'Mapped by ${main_menu.current_version.metadata.creator}',
+		
 		color: gg.Color{255, 255, 255, 255}
 		size: 25
 	)
@@ -130,7 +135,7 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 		size: 25
 	)
 
-	main_menu.window.ctx.draw_text(10, 32 + 25 + 25, 'CS:6 AR:9 OD:4 HP:2 Stars:0.0',
+	main_menu.window.ctx.draw_text(10, 32 + 25 + 25, 'CS:${main_menu.current_version.difficulty.cs} AR:${main_menu.current_version.difficulty.ar} OD:${main_menu.current_version.difficulty.od} HP:${main_menu.current_version.difficulty.hp} Stars:0.0',
 		
 		color: gg.Color{255, 255, 255, 255}
 		size: 25
@@ -140,7 +145,7 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 	for i, version in main_menu.current_beatmap.versions {
 		are_we_picking_this_version := version.filename == main_menu.current_version.filename
 		y_size := 75
-		start_y := 200 + (i * y_size)
+		start_y := int(200.0 + ((f64(i) - main_menu.counter_smooth) * f64(y_size)))
 
 		mut text_color := gg.Color{200, 200, 200, 255}
 
@@ -154,7 +159,7 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 			gg.Color{0, 0, 0, 100})
 		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y, version.metadata.title,
 			color: text_color, size: 25)
-		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 25, '${version.metadata.artist} // CREATOR',
+		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 25, '${version.metadata.artist} // ${version.metadata.creator}',
 			color: text_color, size: 20)
 		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 20 + 25, version.metadata.version,
 			color: text_color, size: 25, bold: true)
