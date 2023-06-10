@@ -10,17 +10,27 @@ import framework.math.vector
 
 pub struct MainMenu {
 mut:
+	counter    int
 	window     &GUIWindow
 	background &CustomSpriteManager = &CustomSpriteManager{
 	Manager: sprite.make_manager()
 }
 pub mut:
-	current_beatmap &beatmap.Beatmap = unsafe { nil }
+	current_beatmap &beatmap.BeatmapContainer = unsafe { nil }
+	current_version &beatmap.Beatmap = unsafe { nil }
 	current_track   &audio.Track     = unsafe { nil }
 }
 
-pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
-	logging.info('[${@METHOD}] Changing beatmap to ${new_beatmap.metadata.title} [${new_beatmap.metadata.version}]')
+pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.BeatmapContainer) {
+	main_menu.counter = 0
+	main_menu.current_beatmap = unsafe { new_beatmap }
+	main_menu.change_version(main_menu.current_beatmap.versions[0])
+}
+
+pub fn (mut main_menu MainMenu) change_version(version &beatmap.Beatmap) {
+	main_menu.current_version = unsafe { version }
+
+	logging.info('[${@METHOD}] Changing beatmap to ${version.metadata.title} [${version.metadata.version}]')
 
 	if !isnil(main_menu.current_track) {
 		// Old track
@@ -30,9 +40,9 @@ pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
 	}
 
 	// New track
-	main_menu.current_track = audio.new_track(new_beatmap.get_audio_path())
+	main_menu.current_track = audio.new_track(main_menu.current_version.get_audio_path())
 	main_menu.current_track.set_volume(0.2)
-	main_menu.current_track.set_position(new_beatmap.general.preview_time)
+	main_menu.current_track.set_position(main_menu.current_version.general.preview_time)
 	main_menu.current_track.play()
 	logging.info('Playing new track.')
 
@@ -41,7 +51,7 @@ pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
 	// Load background and other crap
 	mut background := &sprite.Sprite{
 		always_visible: true
-		textures: [main_menu.window.ctx.create_image(new_beatmap.get_bg_path())]
+		textures: [main_menu.window.ctx.create_image(main_menu.current_version.get_bg_path())]
 		origin: vector.top_left
 	}
 
@@ -58,8 +68,26 @@ pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.Beatmap) {
 	)
 
 	main_menu.background.add(mut background)
+}
 
-	main_menu.current_beatmap = unsafe { new_beatmap }
+pub fn (mut main_menu MainMenu) next_version() {
+	main_menu.counter++
+
+	if main_menu.counter >= main_menu.current_beatmap.versions.len {
+		main_menu.counter = 0
+	}
+
+	main_menu.change_version(main_menu.current_beatmap.versions[main_menu.counter])
+}
+
+pub fn (mut main_menu MainMenu) prev_version() {
+	main_menu.counter--
+
+	if main_menu.counter < 0 {
+		main_menu.counter = main_menu.current_beatmap.versions.len - 1
+	}
+
+	main_menu.change_version(main_menu.current_beatmap.versions[main_menu.counter])
 }
 
 pub fn (mut main_menu MainMenu) update(time_ms f64) {
@@ -89,7 +117,7 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 	main_menu.window.ctx.draw_rect_empty(0, 0, 1280, 100, gg.Color{0, 0, 255, 255})
 
 	// Titles
-	main_menu.window.ctx.draw_text(10, 0, '${main_menu.current_beatmap.metadata.artist} - ${main_menu.current_beatmap.metadata.title} [${main_menu.current_beatmap.metadata.version}]',
+	main_menu.window.ctx.draw_text(10, 0, '${main_menu.current_version.metadata.artist} - ${main_menu.current_version.metadata.title} [${main_menu.current_version.metadata.version}]',
 		color: gg.Color{255, 255, 255, 255}, size: 32)
 
 	main_menu.window.ctx.draw_text(10, 32, 'Mapped by idk',
@@ -107,4 +135,28 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 		color: gg.Color{255, 255, 255, 255}
 		size: 25
 	)
+
+	// Difficulties/Version whatever its called
+	for i, version in main_menu.current_beatmap.versions {
+		are_we_picking_this_version := version.filename == main_menu.current_version.filename
+		y_size := 75
+		start_y := 200 + (i * y_size)
+
+		mut text_color := gg.Color{200, 200, 200, 255}
+
+		if are_we_picking_this_version {
+			text_color.r = 255
+			text_color.g = 182
+			text_color.b = 193
+		}
+
+		main_menu.window.ctx.draw_rect_filled(int(1280.0 * (2.5 / 4)), start_y, 500, y_size,
+			gg.Color{0, 0, 0, 100})
+		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y, version.metadata.title,
+			color: text_color, size: 25)
+		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 25, '${version.metadata.artist} // CREATOR',
+			color: text_color, size: 20)
+		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 20 + 25, version.metadata.version,
+			color: text_color, size: 25, bold: true)
+	}
 }

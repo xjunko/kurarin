@@ -67,7 +67,7 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 	window.start_update_thread()
 
 	// Test
-	window.menu.change_beatmap(&window.manager.beatmaps[0].versions[0])
+	window.menu.change_beatmap(&window.manager.beatmaps[0])
 }
 
 pub fn (mut window GUIWindow) draw(_ voidptr) {
@@ -130,7 +130,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.gameplay = &gameplay.OSUGameplay{}
 
-			window.gameplay.init(mut window.ctx, window.menu.current_beatmap)
+			window.gameplay.init(mut window.ctx, window.menu.current_version)
 
 			window.time.reset()
 			C._sapp_glx_swapinterval(0) // Disable VSync when changing to gameplay.
@@ -227,7 +227,7 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 		.right {
 			window.joe_i++
 
-			window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1..][0])
+			window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len])
 		}
 		.left {
 			window.joe_i--
@@ -236,10 +236,16 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 				window.joe_i = window.manager.beatmaps.len - 1
 			}
 
-			window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len].versions#[-1..][0])
+			window.menu.change_beatmap(&window.manager.beatmaps[window.joe_i % window.manager.beatmaps.len])
+		}
+		.up {
+			window.menu.prev_version()
+		}
+		.down {
+			window.menu.next_version()
 		}
 		.p {
-			window.play_beatmap(os.join_path(window.menu.current_beatmap.root, window.menu.current_beatmap.filename))
+			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename))
 		}
 		else {
 			logging.debug('Unhandled key: ${key}')
@@ -248,11 +254,12 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 }
 
 pub fn (mut window GUIWindow) event_keyup(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
-	if window.joe_s != gui.c_scene_gameplay {
-		return
+	match window.joe_s {
+		gui.c_scene_gameplay {
+			window.gameplay.event_keyup(key)
+		}
+		else {}
 	}
-
-	window.gameplay.event_keyup(key)
 }
 
 pub fn (mut window GUIWindow) event_mouse(x f32, y f32, _ voidptr) {
