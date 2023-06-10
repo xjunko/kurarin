@@ -37,6 +37,8 @@ pub mut:
 	title   string [Title]
 	artist  string [Artist]
 	version string [Version]
+	creator string [Creator]
+	id      int    [BeatmapID]
 }
 
 pub struct BeatmapDifficultyInfo {
