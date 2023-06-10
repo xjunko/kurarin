@@ -29,11 +29,19 @@ pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.BeatmapConta
 }
 
 pub fn (mut main_menu MainMenu) change_version(version &beatmap.Beatmap) {
-	main_menu.current_version = unsafe { version }
-
 	logging.info('[${@METHOD}] Changing beatmap to ${version.metadata.title} [${version.metadata.version}]')
 
-	if !isnil(main_menu.current_track) {
+	mut need_new_track := true
+	mut need_new_background := true
+
+	if !isnil(main_menu.current_version) {
+		need_new_track = main_menu.current_version.get_audio_path() != version.get_audio_path()
+		need_new_background = main_menu.current_version.get_bg_path() != version.get_bg_path()
+	}
+
+	main_menu.current_version = unsafe { version }
+
+	if !isnil(main_menu.current_track) && need_new_track {
 		// Old track
 		main_menu.current_track.pause()
 		main_menu.current_track.set_volume(0.0)
@@ -41,34 +49,38 @@ pub fn (mut main_menu MainMenu) change_version(version &beatmap.Beatmap) {
 	}
 
 	// New track
-	main_menu.current_track = audio.new_track(main_menu.current_version.get_audio_path())
-	main_menu.current_track.set_volume(0.2)
-	main_menu.current_track.set_position(main_menu.current_version.general.preview_time)
-	main_menu.current_track.play()
-	logging.info('Playing new track.')
-
-	main_menu.background.fadeout_and_die(main_menu.window.time.time, 50.0)
-
-	// Load background and other crap
-	mut background := &sprite.Sprite{
-		always_visible: true
-		textures: [main_menu.window.ctx.create_image(main_menu.current_version.get_bg_path())]
-		origin: vector.top_left
+	if need_new_track {
+		main_menu.current_track = audio.new_track(main_menu.current_version.get_audio_path())
+		main_menu.current_track.set_volume(0.2)
+		main_menu.current_track.set_position(main_menu.current_version.general.preview_time)
+		main_menu.current_track.play()
+		logging.info('Playing new track.')
 	}
 
-	background.add_transform(
-		typ: .fade
-		time: time.Time{main_menu.window.time.time, main_menu.window.time.time + 50.0}
-		before: [195.0]
-		after: [255.0]
-	)
+	if need_new_background {
+		main_menu.background.fadeout_and_die(main_menu.window.time.time, 50.0)
 
-	background.reset_size_based_on_texture(
-		fit_size: true
-		source: vector.Vector2[f64]{1280.0, 720.0}
-	)
+		// Load background and other crap
+		mut background := &sprite.Sprite{
+			always_visible: true
+			textures: [main_menu.window.ctx.create_image(main_menu.current_version.get_bg_path())]
+			origin: vector.top_left
+		}
 
-	main_menu.background.add(mut background)
+		background.add_transform(
+			typ: .fade
+			time: time.Time{main_menu.window.time.time, main_menu.window.time.time + 50.0}
+			before: [195.0]
+			after: [255.0]
+		)
+
+		background.reset_size_based_on_texture(
+			fit_size: true
+			source: vector.Vector2[f64]{1280.0, 720.0}
+		)
+
+		main_menu.background.add(mut background)
+	}
 }
 
 pub fn (mut main_menu MainMenu) next_version() {
