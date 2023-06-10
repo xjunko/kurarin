@@ -33,6 +33,8 @@ pub fn (mut manager BeatmapManager) load() {
 				container.versions << current_bm_version
 			}
 
+			container.versions.sort(a.metadata.id < b.metadata.id)
+
 			manager.beatmaps << container
 		}
 	}
