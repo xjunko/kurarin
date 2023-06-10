@@ -39,6 +39,7 @@ pub mut:
 	joe_s int    // Current Scene
 	joe_p string // Path of the beatmap (Temp)
 	joe_c int    // Useless counter for uselss thing
+	joe_t gameplay.OSUGameplayMode // Which mode to open gameplay with
 }
 
 pub fn (mut window GUIWindow) init(_ voidptr) {
@@ -130,7 +131,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.gameplay = &gameplay.OSUGameplay{}
 
-			window.gameplay.init(mut window.ctx, window.menu.current_version)
+			window.gameplay.init(mut window.ctx, window.menu.current_version, window.joe_t)
 
 			window.time.reset()
 			C._sapp_glx_swapinterval(0) // Disable VSync when changing to gameplay.
@@ -200,9 +201,10 @@ pub fn (mut window GUIWindow) update(time_ms f64) {
 }
 
 // Enter
-pub fn (mut window GUIWindow) play_beatmap(path string) {
+pub fn (mut window GUIWindow) play_beatmap(path string, typ gameplay.OSUGameplayMode) {
 	window.joe_s = gui.c_scene_pre_gameplay // Getting reading to load
 	window.joe_p = path
+	window.joe_t = typ
 
 	logging.info('Getting ready to start gameplay.')
 
@@ -245,7 +247,12 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 			window.menu.next_version()
 		}
 		.p {
-			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename))
+			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
+				.player)
+		}
+		.a {
+			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
+				.auto)
 		}
 		else {
 			logging.debug('Unhandled key: ${key}')

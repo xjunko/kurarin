@@ -17,6 +17,12 @@ import core.osu.gameplay.ruleset
 import core.osu.gameplay.cursor
 import core.osu.gameplay.overlays
 
+pub enum OSUGameplayMode {
+	auto
+	replay
+	player
+}
+
 pub struct OSUGameplay {
 mut:
 	beatmap         &beatmap.Beatmap = unsafe { nil }
@@ -27,7 +33,7 @@ mut:
 	overlay &overlays.GameplayOverlay = unsafe { nil }
 }
 
-pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap.Beatmap) {
+pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap.Beatmap, mode OSUGameplayMode) {
 	// Init renderer
 	// Renderer: SGP
 	sgp_desc := sgp.Desc{}
@@ -52,7 +58,17 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 	osu.beatmap_audio.set_volume(0.2)
 
 	// TODO: Implement replay/auto later.
-	osu.cursor = cursor.make_player_cursor(mut ctx)
+	match mode {
+		.player {
+			osu.cursor = cursor.make_player_cursor(mut ctx)
+		}
+		.auto {
+			osu.cursor = cursor.make_auto_cursor(mut ctx, osu.beatmap.objects)
+		}
+		.replay {
+			panic('TODO')
+		}
+	}
 
 	// FIXME: Ruleset hack.
 	mut temp_cursor_hack := [osu.cursor.cursor]
