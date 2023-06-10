@@ -1,16 +1,12 @@
 module gameplay
 
 import gg
-import sokol.gfx
-import sokol.sgl
-import sokol.sapp
 import mohamedlt.sokolgp as sgp
 import framework.audio
 import framework.graphic.context
 import core.common.settings
 import core.osu.x
 import core.osu.system.skin
-import core.osu.system.player
 import core.osu.parsers.beatmap
 import core.osu.parsers.beatmap.object.graphic
 import core.osu.gameplay.ruleset

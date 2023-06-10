@@ -2,7 +2,6 @@ module gui
 
 import os
 import gg
-import core.common.settings
 import core.osu.parsers.beatmap
 import core.osu.runtime.gameplay
 import framework.logging
