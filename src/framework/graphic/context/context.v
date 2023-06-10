@@ -38,6 +38,7 @@ pub mut:
 	}
 }
 
+// begin_gp begins sokol gp context.
 pub fn (mut context Context) begin_gp() {
 	if !context.has_gp_begin {
 		width := sapp.width()
@@ -50,6 +51,7 @@ pub fn (mut context Context) begin_gp() {
 	}
 }
 
+// begin_gp ends sokol gp context.
 pub fn (mut context Context) end_gp() {
 	sokolgp.flush()
 	sokolgp.end()
@@ -57,6 +59,7 @@ pub fn (mut context Context) end_gp() {
 	context.has_gp_begin = false
 }
 
+// begin_gp ends sokol gp and gg context.
 pub fn (mut context Context) end_gp_short() {
 	gfx.begin_default_pass(context.invisible_pass, int(settings.global.window.width),
 		int(settings.global.window.height))
