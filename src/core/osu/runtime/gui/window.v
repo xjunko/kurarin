@@ -2,6 +2,8 @@ module gui
 
 import os
 import gg
+import math
+import library.tinyfiledialogs
 import core.common.settings
 import core.osu.parsers.beatmap
 import core.osu.runtime.gameplay
@@ -9,7 +11,6 @@ import framework.logging
 import framework.graphic.context
 import framework.graphic.window as i_window
 import framework.math.time
-import math
 
 // Impl
 fn C._sapp_glx_swapinterval(int)
@@ -34,13 +35,14 @@ pub mut:
 	manager  &beatmap.BeatmapManager = unsafe { nil }
 	menu     &MainMenu = unsafe { nil }
 	gameplay &gameplay.OSUGameplay = unsafe { nil }
-
+	// TODO: Rename this god awful fields lmao
 	joe   bool   // Has song loaded yet
 	joe_i int    // Index of beatmap
 	joe_s int    // Current Scene
 	joe_p string // Path of the beatmap (Temp)
 	joe_c int    // Useless counter for uselss thing
 	joe_t gameplay.OSUGameplayMode // Which mode to open gameplay with
+	joe_r string // Replay Path
 }
 
 pub fn (mut window GUIWindow) init(_ voidptr) {
@@ -163,7 +165,8 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.gameplay = &gameplay.OSUGameplay{}
 
-			window.gameplay.init(mut window.ctx, window.menu.current_version, window.joe_t)
+			window.gameplay.init(mut window.ctx, window.menu.current_version, window.joe_t,
+				window.joe_r)
 
 			window.time.reset()
 			C._sapp_glx_swapinterval(0) // Disable VSync when changing to gameplay.
@@ -282,12 +285,31 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 			window.menu.next_version()
 		}
 		.p {
+			logging.info('Play beatmap.')
 			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
 				.player)
 		}
 		.a {
+			logging.info('Picked auto.')
 			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
 				.auto)
+		}
+		.r {
+			logging.info('Picking replay.')
+
+			replay_path := tinyfiledialogs.open_file_picker('Pick a replay file!', '',
+				['*.osr'], 'osu! replay', false)
+
+			if replay_path.len == 0 || !os.exists(replay_path) {
+				logging.error('Invalid replay file.')
+				return
+			}
+
+			logging.info('Replay picked: ${replay_path}')
+
+			window.joe_r = replay_path
+			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
+				.replay)
 		}
 		else {
 			logging.debug('Unhandled key: ${key}')
