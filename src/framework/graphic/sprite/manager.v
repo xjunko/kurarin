@@ -16,6 +16,17 @@ pub fn (mut manager Manager) add(mut sprite Sprite) {
 	sprite.id = manager.queue.len
 }
 
+pub fn (mut manager Manager) add_front(mut sprite Sprite) {
+	// This is bad, I think.
+	mut new_queue := []&Sprite{}
+	new_queue << unsafe { &sprite }
+	new_queue << manager.queue
+
+	manager.queue = new_queue
+
+	sprite.id = manager.queue.len
+}
+
 // TODO: This is slow cuz `O(n)`, but only used once per end time so idk
 pub fn (mut manager Manager) find_index_by_id(id int) int {
 	for i, s in manager.queue {

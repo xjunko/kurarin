@@ -63,7 +63,7 @@ pub enum OriginType {
 }
 
 pub struct Origin {
-	Vector2
+	Vector2[f64]
 pub mut:
 	typ OriginType = OriginType.centre
 }

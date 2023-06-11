@@ -36,6 +36,7 @@ build() {
     # Debug
     if [ "$is_debug" = "true" ]; then
         build_command+=" -cg"
+        build_command+=" -d trace_sokol_memory"
         what_mode="Debug"
     fi
 

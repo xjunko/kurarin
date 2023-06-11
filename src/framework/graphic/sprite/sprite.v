@@ -1,11 +1,12 @@
 module sprite
 
-import library.gg
+import gg
 import gx
 import math
 import framework.math.time
 import framework.math.transform
 import framework.math.vector
+import framework.graphic.context
 
 pub struct Sprite {
 pub mut:
@@ -21,10 +22,10 @@ pub mut:
 	additive       bool
 	always_visible bool
 	origin         vector.Origin = vector.centre
-	position       vector.Vector2
+	position       vector.Vector2[f64]
 	z              f32
-	size           vector.Vector2
-	raw_size       vector.Vector2
+	size           vector.Vector2[f64]
+	raw_size       vector.Vector2[f64]
 	color          gx.Color = gx.white
 	angle          f64
 
@@ -110,7 +111,7 @@ pub fn (mut sprite Sprite) reset_size_based_on_texture(arg CommonSpriteSizeReset
 		sprite.size = arg.size
 	} else if (arg.source.x != 0 || arg.source.y != 0) && arg.fit_size {
 		// Fit image within a given size and keep ratio.
-		mut size := vector.Vector2{}
+		mut size := vector.Vector2[f64]{}
 
 		// Use arg size if given
 		if arg.size.x != 0 || arg.size.y != 0 {
@@ -295,25 +296,45 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 
 		pos := sprite.position
 			.scale(arg.camera.scale)
-			.sub(sprite.origin.multiply(size))
+			.sub(sprite.origin.Vector2.multiply(size))
 			.add(arg.camera.offset)
 
-		arg.ctx.draw_image_with_config(gg.DrawImageConfig{
-			img: sprite.get_texture()
-			img_id: sprite.get_texture().id
-			img_rect: gg.Rect{
-				x: f32(pos.x)
-				y: f32(pos.y)
-				width: f32(size.x)
-				height: f32(size.y)
-			}
-			rotate: f32(sprite.angle)
-			color: sprite.color
-			additive: sprite.additive
-			origin: sprite.origin
-			flip_x: sprite.flip_x
-			flip_y: sprite.flip_x
-			z: sprite.z
-		})
+		if arg.batch {
+			arg.ctx.draw_image_batch_with_config(context.DrawImageConfig{
+				img: sprite.get_texture()
+				img_id: sprite.get_texture().id
+				img_rect: gg.Rect{
+					x: f32(pos.x)
+					y: f32(pos.y)
+					width: f32(size.x)
+					height: f32(size.y)
+				}
+				rotate: f32(sprite.angle)
+				color: sprite.color
+				effect: [.alpha, .add][int(sprite.additive)]
+				origin: sprite.origin
+				flip_x: sprite.flip_x
+				flip_y: sprite.flip_x
+				z: sprite.z
+			})
+		} else {
+			arg.ctx.draw_image_with_config(context.DrawImageConfig{
+				img: sprite.get_texture()
+				img_id: sprite.get_texture().id
+				img_rect: gg.Rect{
+					x: f32(pos.x)
+					y: f32(pos.y)
+					width: f32(size.x)
+					height: f32(size.y)
+				}
+				rotate: f32(sprite.angle)
+				color: sprite.color
+				effect: [.alpha, .add][int(sprite.additive)]
+				origin: sprite.origin
+				flip_x: sprite.flip_x
+				flip_y: sprite.flip_x
+				z: sprite.z
+			})
+		}
 	}
 }

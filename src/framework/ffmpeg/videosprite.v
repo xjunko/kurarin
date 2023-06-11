@@ -1,12 +1,13 @@
 module ffmpeg
 
 import sync
-import library.gg
+import gg
 import framework.math.time
 import framework.math.vector
 import framework.graphic.sprite
 import core.osu.x
 import core.common.settings
+import framework.graphic.context
 
 pub struct VideoSprite {
 	sprite.Sprite
@@ -18,7 +19,7 @@ pub mut:
 	frametime   f64
 	videotime   f64
 	start_at    f64 = -1889
-	ctx         &gg.Context = unsafe { nil }
+	ctx         &context.Context = unsafe { nil }
 	need_update bool
 	mutex       &sync.Mutex = sync.new_mutex()
 }
@@ -32,7 +33,7 @@ pub fn (mut video VideoSprite) draw(arg sprite.CommonSpriteArgument) {
 	video.mutex.unlock()
 
 	if video.is_drawable_at(arg.time) || video.always_visible {
-		video.ctx.draw_image_with_config(gg.DrawImageConfig{
+		video.ctx.draw_image_with_config(context.DrawImageConfig{
 			img_id: video.tex_id
 			img_rect: gg.Rect{
 				x: f32((x.resolution.resolution.x - (video.size.x * arg.scale)) / 2.0)
@@ -41,7 +42,7 @@ pub fn (mut video VideoSprite) draw(arg sprite.CommonSpriteArgument) {
 				height: f32(video.size.y * arg.scale)
 			}
 			color: video.color
-			additive: video.additive
+			effect: [.alpha, .add][int(video.additive)]
 		})
 	}
 }
@@ -83,7 +84,7 @@ pub fn (mut video VideoSprite) update(update_time f64) {
 	video.mutex.unlock()
 }
 
-pub fn make_video_sprite(path string, mut ctx gg.Context, offset f64) &VideoSprite {
+pub fn make_video_sprite(path string, mut ctx context.Context, offset f64) &VideoSprite {
 	mut video := &VideoSprite{
 		ctx: ctx
 		always_visible: true
@@ -119,7 +120,7 @@ pub fn make_video_sprite(path string, mut ctx gg.Context, offset f64) &VideoSpri
 	ratio := settings.global.window.width / video.source.metadata.width
 
 	video.reset_size_based_on_texture(
-		size: vector.Vector2{
+		size: vector.Vector2[f64]{
 			x: video.source.metadata.width * ratio
 			y: video.source.metadata.height * ratio
 		}

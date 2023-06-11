@@ -23,45 +23,44 @@ pub mut:
 pub fn (mut video Video) init_video_pipe_process() {
 	video.video_proc = os.new_process(os.find_abs_path_of_executable('ffmpeg') or { panic(err) })
 
-	ffmpeg_arg := [
+	// vfmt off
+	mut ffmpeg_arg := [
 		'-y',
-		'-f',
-		'rawvideo',
-		'-vcodec',
-		'rawvideo',
-		'-s',
-		'${int(settings.global.window.width)}x${int(settings.global.window.height)}',
-		'-pix_fmt',
-		'rgba',
-		'-r',
-		settings.global.video.fps.str(),
-		'-i',
-		'-',
-		'-vf',
-		'vflip',
-		'-preset',
-		'faster',
-		'-crf',
-		'10',
-		'-c:v',
-		'libx264',
-		'-color_range',
-		'1',
-		'-colorspace',
-		'1',
-		'-color_trc',
-		'1',
-		'-color_primaries',
-		'1',
-		'-movflags',
-		'+write_colr',
-		'-pix_fmt',
-		'yuv420p',
+
+		'-f', 'rawvideo',
+		'-vcodec', 'rawvideo',
+		'-s', '${int(settings.global.window.width)}x${int(settings.global.window.height)}',
+		'-pix_fmt', 'rgba',
+		'-r', settings.global.video.fps.str(),
+		'-i', '-',
+
+		"-an"
+
+		'-vf', 'vflip',
+		'-c:v', 'h264_nvenc',
+		'-color_range', '1',
+		'-colorspace', '1',
+		'-color_trc', '1',
+		'-color_primaries', '1',
+		'-movflags', '+write_colr',
 		'-hide_banner',
-		'-loglevel',
-		'panic',
+		// '-loglevel', 'panic',
+	]
+
+	ffmpeg_arg << [
+		'-pix_fmt', 'yuv420p',
+		"-rc", "vbr",
+		"-b:v", "400M",
+		"-cq", "23",
+		"-profile", "high", 
+		"-preset", "p3"
+	]
+
+	ffmpeg_arg << [
 		'temp.mp4', // output
 	]
+
+	// vfmt on
 
 	video.video_proc.set_args(ffmpeg_arg)
 	video.video_proc.set_redirect_stdio()
@@ -126,12 +125,26 @@ pub fn (mut video Video) pipe_window() {
 	C.v_sapp_gl_read_rgba_pixels(0, 0, int(settings.global.window.width), int(settings.global.window.height),
 		video.record_data)
 
-	// hacky but works
+	// This might not be worth it after all.
 	unsafe {
-		// temp := window.record_data.vbytes(1280 * 720 * 4).bytestr()
-		temp := video.record_data.vstring_with_len(int(settings.global.window.width) * int(settings.global.window.height) * 4)
-		video.video_proc.stdin_write(temp)
-		temp.free()
+		img_size := int(settings.global.window.width) * int(settings.global.window.height) * 4
+		mut remaining := img_size
+
+		for remaining > 0 {
+			written := C.write(video.video_proc.stdio_fd[0], video.record_data, remaining)
+
+			if written < 0 {
+				return
+			}
+
+			remaining = remaining - written
+
+			video.record_data = voidptr(video.record_data + written)
+		}
+
+		free(video.record_data)
+
+		video.record_data = &u8(malloc(img_size))
 	}
 }
 

@@ -46,9 +46,9 @@ pub fn (t Transform) as_two(update_time f64) []f64 {
 	]
 }
 
-pub fn (t Transform) as_vector(update_time f64) vector.Vector2 {
+pub fn (t Transform) as_vector(update_time f64) vector.Vector2[f64] {
 	v := t.as_two(update_time) // pretty sure theres a way to do this in one line
-	return vector.Vector2{
+	return vector.Vector2[f64]{
 		x: v[0]
 		y: v[1]
 	}

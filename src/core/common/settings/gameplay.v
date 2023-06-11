@@ -2,10 +2,16 @@ module settings
 
 pub struct Gameplay {
 pub mut:
+	paths      Path
 	playfield  Playfield
 	cursor     Cursor
 	hitobjects HitObjects
 	overlay    Overlay
+}
+
+pub struct Path {
+pub mut:
+	beatmaps string
 }
 
 pub struct Playfield {
@@ -54,6 +60,9 @@ pub mut:
 // Factory
 pub fn make_gameplay_settings() Gameplay {
 	mut gameplay_ := Gameplay{
+		paths: Path{
+			beatmaps: '<Path to your osu! beatmaps folder here>'
+		}
 		playfield: Playfield{
 			objects_visible: true
 			lead_in_time: 3.0

@@ -1,19 +1,21 @@
 module sprite
 
-import library.gg
+import gg
 import gx
 import framework.math.time
 import framework.math.camera
 import framework.math.vector
 import framework.math.transform
+import framework.graphic.context
 
 [params]
 pub struct CommonSpriteArgument {
 pub mut:
-	ctx   &gg.Context = unsafe { nil }
+	ctx   &context.Context = unsafe { nil }
 	time  f64
 	delta f64
 	scale f64 = f64(1.0)
+	batch bool
 	// Extra scale so we can use it with boost
 	camera camera.Camera
 }
@@ -22,8 +24,8 @@ pub mut:
 pub struct CommonSpriteSizeResetArgument {
 pub:
 	factor   f64 = 1.0
-	size     vector.Vector2
-	source   vector.Vector2
+	size     vector.Vector2[f64]
+	source   vector.Vector2[f64]
 	fit_size bool
 	// If false, just overide, if true factor it based on source
 }
@@ -33,8 +35,8 @@ mut:
 	id int
 	time time.Time
 	origin vector.Origin
-	position vector.Vector2
-	size vector.Vector2
+	position vector.Vector2[f64]
+	size vector.Vector2[f64]
 	color gx.Color
 	angle f64
 	additive bool

@@ -8,21 +8,24 @@ import sync
 import sokol.gfx
 import sokol.sgl
 import sokol.sapp
+import mohamedlt.sokolgp as sgp
 import time as timelib
-import library.gg
+import gg
 import core.osu.x
-import core.osu.skin
-import core.osu.cursor
-import core.osu.beatmap
-import core.osu.ruleset
-import core.osu.overlays
-import core.osu.beatmap.object.graphic
+import core.osu.system.skin
+import core.osu.system.player
+import core.osu.gameplay.cursor
+import core.osu.parsers.beatmap
+import core.osu.gameplay.ruleset
+import core.osu.gameplay.overlays
+import core.osu.parsers.beatmap.object.graphic
 import framework.audio
 import framework.logging
 import framework.math.time
 import framework.math.vector
 import framework.graphic.visualizer
 import framework.graphic.window as i_window
+import framework.graphic.context
 import framework.ffmpeg.export
 
 pub struct Window {
@@ -63,7 +66,7 @@ pub fn (mut window Window) update_boost() {
 
 pub fn (mut window Window) update_cursor(update_time f64, delta f64) {
 	if window.argument.play_mode != .play {
-		window.cursor_controller.update(update_time)
+		window.cursor_controller.update(update_time, delta)
 	}
 
 	for mut cursor in window.cursors {
@@ -121,6 +124,8 @@ pub fn (mut window Window) update(update_time f64, delta f64) {
 }
 
 pub fn (mut window Window) draw() {
+	window.beatmap.free_slider_attr()
+
 	// Background
 	window.ctx.begin()
 	window.ctx.end()
@@ -137,6 +142,7 @@ pub fn (mut window Window) draw() {
 	}
 
 	// TODO: maybe move cursor to beatmap struct
+	window.ctx.begin_gp()
 	if settings.global.gameplay.cursor.visible {
 		for mut cursor in window.cursors {
 			cursor.draw()
@@ -150,15 +156,9 @@ pub fn (mut window Window) draw() {
 		window.GeneralWindow.draw_stats()
 	}
 
-	// // MicroUI
-	// C.mu_begin(&window.microui.ctx)
-	// window.microui.execute_ui()
-	// window.microui.execute_ui_log()
-	// C.mu_end(&window.microui.ctx)
-	// window.microui.draw()
-
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width),
 		int(settings.global.window.height))
+	window.ctx.end_gp()
 	sgl.draw()
 	gfx.end_pass()
 
@@ -169,15 +169,24 @@ pub fn (mut window Window) draw() {
 fn C._sapp_glx_swapinterval(int)
 
 pub fn window_init(mut window Window) {
-	// Turn that shit off
-	C._sapp_glx_swapinterval(0)
+	// Init Renderer(s)
+	// Renderer: SGP
+	sgp_desc := sgp.Desc{}
+	sgp.setup(&sgp_desc)
 
-	mut loaded_beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)
+	if !sgp.is_valid() {
+		panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
+	}
 
-	// init slider renderer
+	// Renderer: Slider
 	graphic.init_slider_renderer()
 
-	//
+	// Renderer: Turn off VSync [HACK]
+	C._sapp_glx_swapinterval(0)
+
+	// NOTE: Routine starts here
+	mut loaded_beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)
+
 	window.beatmap = loaded_beatmap
 	window.beatmap.bind_context(mut window.ctx)
 	window.beatmap.reset()
@@ -198,18 +207,23 @@ pub fn window_init(mut window Window) {
 		window.visualizer.multiplier = 1.0
 		window.visualizer.bar_length = 1000.0
 		window.visualizer.start_distance = 0.0
-		window.visualizer.update_logo(vector.Vector2{0, 0}, vector.Vector2{settings.global.window.width, settings.global.window.height})
+		window.visualizer.update_logo(vector.Vector2[f64]{0, 0}, vector.Vector2[f64]{settings.global.window.width, settings.global.window.height})
 	}
 
+	mut current_player := player.Player{
+		name: 'Player'
+	}
 	// Make cursor based on argument
 	if window.argument.play_mode == .play {
 		window.cursors << cursor.make_cursor(mut window.ctx)
 	} else if window.argument.play_mode == .replay {
 		// HACK: REPLAY HACK
 		window.cursor_controller = cursor.make_replay_cursor(mut window.ctx, window.argument.replay_path)
+		current_player = window.cursor_controller.player
 		window.cursors << unsafe { window.cursor_controller.cursor }
 	} else {
 		window.cursor_controller = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)
+		current_player = window.cursor_controller.player
 		window.cursors << unsafe { window.cursor_controller.cursor }
 	}
 
@@ -219,7 +233,7 @@ pub fn window_init(mut window Window) {
 	// Overlay
 	if settings.global.gameplay.overlay.info {
 		window.overlay = overlays.new_gameplay_overlay(window.ruleset, window.cursors[0],
-			window.ctx)
+			current_player, window.ctx)
 	}
 
 	// If recording
@@ -258,7 +272,7 @@ pub fn window_init(mut window Window) {
 }
 
 pub fn window_draw(mut window Window) {
-	window.ctx.load_image_queue()
+	// window.ctx.load_image_queue()
 
 	window.mutex.@lock()
 	window.draw()
@@ -283,66 +297,65 @@ pub fn window_draw_recording(mut window Window) {
 
 	logging.info('Video rendering started!')
 
-	// Continue rendering
+	// Render
+	fps := settings.global.video.fps
+	update_fps := 1000.0
+	update_delta := 1000.0 / update_fps
+	fps_delta := 1000.0 / fps
+	audio_fps := settings.global.video.update_fps
+	audio_delta := 1000.0 / audio_fps
+
+	mut delta_sum_frame := fps_delta
+	mut delta_sum_audio := 0.0
+
+	end_time := (window.beatmap.time.end + 7000.0) * settings.global.window.speed
+	mut current_time := 0.0
+
+	// Stats
 	mut last_progress := int(0)
 	mut last_count := i64(0)
 	mut count := i64(0)
 	mut last_time := timelib.ticks()
 
-	// shrug
-	update_delta := 1000.0 / 1000.0
-	game_update_delta := 1000.0 / settings.global.video.update_fps // Render Update FPS
-	fps_delta := 1000.0 / settings.global.video.fps
+	for current_time <= end_time {
+		window.update(current_time, update_delta)
 
-	mut delta_sum_video := fps_delta
-	mut delta_sum_update := 0.0
+		delta_sum_audio += update_delta
 
-	mut video_time := 0.0
-
-	end_time := (window.beatmap.time.end + 7000.0) * settings.global.window.speed
-
-	for video_time < end_time {
-		// Update and Audio
-		delta_sum_update += update_delta
-		if delta_sum_update >= game_update_delta {
-			video_time += game_update_delta * settings.global.window.speed
-			// Update
-			window.update(video_time, update_delta)
-
-			// Submit audio
+		for delta_sum_audio >= audio_delta {
 			window.video.pipe_audio()
-			delta_sum_update -= game_update_delta
+
+			delta_sum_audio -= audio_delta
 		}
 
-		// Video
-		delta_sum_video += update_delta
-		if delta_sum_video >= fps_delta {
-			// Draw
-			window.draw()
+		delta_sum_frame += update_delta
 
-			// Pipe
+		if delta_sum_frame >= fps_delta {
+			window.draw()
 			window.video.pipe_window()
 
 			// Print progress
 			count++
-			progress := int((video_time / end_time) * 100.0)
+			progress := int((current_time / end_time) * 100.0)
 
 			if math.fmod(progress, 5) == 0 && progress != last_progress {
 				speed := f64(count - last_count) * (1000 / settings.global.video.fps) / (timelib.ticks() - last_time)
-				eta := int((end_time - video_time) / 1000.0 / speed)
+				eta := int((end_time - current_time) / 1000.0 / speed)
 
 				mut eta_text := ''
 
-				hours := eta / 3600
-				minutes := eta / 60
+				hours := (eta / 3600) % 24
+				minutes := (eta / 60) % 60
 
 				if hours > 0 {
 					eta_text += '${hours}h '
 				}
 
 				if minutes > 0 {
-					eta_text += '${minutes % 60:02d}m'
+					eta_text += '${minutes % 60:02}m '
 				}
+
+				eta_text += '${eta % 60}s'
 
 				logging.info('Progress: ${progress}% | Speed: ${speed:.2f}x | ETA: ${eta_text}')
 
@@ -350,9 +363,12 @@ pub fn window_draw_recording(mut window Window) {
 				last_count = count
 				last_progress = progress
 			}
-			delta_sum_video -= fps_delta
+			delta_sum_frame -= fps_delta
 		}
+
+		current_time += update_delta * settings.global.window.speed
 	}
+
 	window.ctx.quit() // Ok we're done...
 }
 
@@ -362,7 +378,7 @@ pub fn initiate_game_loop(argument GameArgument) {
 	}
 	window.argument = &argument
 
-	window.ctx = gg.new_context(
+	mut gg_context := gg.new_context(
 		width: int(settings.global.window.width)
 		height: int(settings.global.window.height)
 		user_data: window
@@ -395,11 +411,11 @@ pub fn initiate_game_loop(argument GameArgument) {
 			}
 
 			window.ruleset_mutex.@lock()
-			if keycode == .z {
+			if keycode == .a {
 				window.cursors[0].left_button = true
 			}
 
-			if keycode == .x {
+			if keycode == .s {
 				window.cursors[0].right_button = true
 			}
 
@@ -411,17 +427,21 @@ pub fn initiate_game_loop(argument GameArgument) {
 			}
 
 			window.ruleset_mutex.@lock()
-			if keycode == .z {
+			if keycode == .a {
 				window.cursors[0].left_button = false
 			}
 
-			if keycode == .x {
+			if keycode == .s {
 				window.cursors[0].right_button = false
 			}
 
 			window.ruleset_mutex.unlock()
 		}
 	)
+
+	window.ctx = &context.Context{
+		Context: gg_context
+	}
 
 	// Record or na
 	if settings.global.video.record {

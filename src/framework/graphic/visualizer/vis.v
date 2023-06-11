@@ -1,9 +1,9 @@
 module visualizer
 
-import framework.audio
-import library.gg
 import gx
+import framework.audio
 import framework.math.vector
+import framework.graphic.context
 
 pub struct Visualizer {
 pub mut:
@@ -22,11 +22,11 @@ pub mut:
 	multiplier      f64 = 0.5 // Change this to increase the "oopmh"
 	inverted        bool  // Invert the visualizer
 	// logo stuff
-	logo_position vector.Vector2 = vector.Vector2{640, 480}
-	logo_size     vector.Vector2 = vector.Vector2{100, 100}
+	logo_position vector.Vector2[f64] = vector.Vector2[f64]{640, 480}
+	logo_size     vector.Vector2[f64] = vector.Vector2[f64]{100, 100}
 }
 
-pub fn (mut vis Visualizer) update_logo(position vector.Vector2, size vector.Vector2) {
+pub fn (mut vis Visualizer) update_logo(position vector.Vector2[f64], size vector.Vector2[f64]) {
 	vis.logo_position = position
 	vis.logo_size = size
 }
@@ -62,7 +62,7 @@ pub fn (mut vis Visualizer) update(time f64) {
 	vis.last_time = time
 }
 
-pub fn (mut vis Visualizer) draw(mut ctx gg.Context) {
+pub fn (mut vis Visualizer) draw(mut ctx context.Context) {
 	cutoff := 1.0 / vis.bar_length
 
 	position := vis.logo_position
@@ -138,7 +138,7 @@ pub fn (mut vis Visualizer) draw(mut ctx gg.Context) {
 				width = -f32(v * length * inverted)
 			}
 
-			ctx.draw_rect_filled_add(x, y, width, height, gx.purple)
+			ctx.draw_rect_filled(x, y, width, height, gx.purple)
 		}
 	}
 }

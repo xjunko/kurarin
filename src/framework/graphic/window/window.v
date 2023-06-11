@@ -1,11 +1,11 @@
 module window
 
-import library.gg
 import gx
 import sync
 import framework.math.time
 import core.common.constants
 import core.common.settings
+import framework.graphic.context
 
 // Generic window struc
 // Contains: FPS counter and some other info shit
@@ -14,8 +14,8 @@ mut:
 	time_took_to_render time.TimeCounter
 	time_took_to_update time.TimeCounter
 pub mut:
-	ctx   &gg.Context = unsafe { nil }
-	mutex &sync.Mutex = sync.new_mutex()
+	ctx   &context.Context = unsafe { nil }
+	mutex &sync.Mutex      = sync.new_mutex()
 }
 
 pub fn (mut window GeneralWindow) init() {}
@@ -31,12 +31,6 @@ pub fn (mut window GeneralWindow) tick_update() {
 
 // Draw
 pub fn (mut window GeneralWindow) draw_stats() {
-	// Game info
-	window.ctx.draw_rect_filled(0, 50, 60, 16, gx.Color{0, 0, 0, 100})
-	window.ctx.draw_text(5, 50, constants.game_name, gx.TextCfg{ color: gx.white })
-	window.ctx.draw_rect_filled(0, 50 + 16, 145, 16, gx.Color{0, 0, 0, 100})
-	window.ctx.draw_text(5, 50 + 16, constants.game_version, gx.TextCfg{ color: gx.white })
-
 	// FPS
 	window.ctx.draw_rect_filled(int(settings.global.window.width) - 135, int(settings.global.window.height) - 37,
 		155, 16, gx.Color{0, 0, 0, 100})
@@ -54,4 +48,14 @@ pub fn (mut window GeneralWindow) draw_stats() {
 		color: gx.white
 		align: .right
 	})
+}
+
+pub fn (mut window GeneralWindow) draw_branding() {
+	// Game info
+	window.ctx.draw_rect_filled(0, 50, 60, 16, gx.Color{0, 0, 0, 100})
+	window.ctx.draw_text(5, 50, constants.game_name, gx.TextCfg{ color: gx.white })
+	window.ctx.draw_rect_filled(0, 50 + 16, 145, 16, gx.Color{0, 0, 0, 100})
+	window.ctx.draw_text(5, 50 + 16, constants.game_version, gx.TextCfg{ color: gx.white })
+	window.ctx.draw_rect_filled(0, 50 + 16 + 16, 125, 16, gx.Color{0, 0, 0, 100})
+	window.ctx.draw_text(5, 50 + 16 + 16, 'Work in Progress!!', gx.TextCfg{ color: gx.white })
 }
