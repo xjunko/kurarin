@@ -40,6 +40,8 @@ pub fn (mut replay ReplayCursor) update(update_time f64, update_delta f64) {
 			replay.events = replay.events[1..]
 		}
 	}
+
+	replay.cursor.update(update_time, update_delta)
 }
 
 pub fn make_replay_cursor(mut ctx context.Context, path_to_replay string) &ReplayCursor {
