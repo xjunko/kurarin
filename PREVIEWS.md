@@ -2,6 +2,11 @@
 
 `diva` and `sekai` has been removed from the project because it's unmaintained and i'm just lazy. (unnecessary complexity)
 
+## 11/6/2023 Preview
+Added simple GUI with Auto/Play/Replay mode.
+
+https://github.com/xjunko/kurarin/assets/44401509/89897cdc-dc20-4585-87b7-362d03b83d6e
+
 ## 1/6/2023 Preview
 Replay comparison [Me vs Auto] (This is two video stitched together)
 
