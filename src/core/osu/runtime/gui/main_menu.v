@@ -176,4 +176,19 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 20 + 25, version.metadata.version,
 			color: text_color, size: 25, bold: true)
 	}
+
+	// Info
+	main_menu.window.ctx.draw_text(1280 - 100, 32, 'Gameplay Mode: [Press Key]',
+		color: gg.Color{255, 255, 255, 255}
+		size: 20
+		bold: true
+		align: .right
+	)
+	main_menu.window.ctx.draw_text(1280 - 100, 32 + 20, 'A - Auto | P - Play | R - Replay',
+		
+		color: gg.Color{255, 255, 255, 255}
+		size: 20
+		bold: true
+		align: .right
+	)
 }
