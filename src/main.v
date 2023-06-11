@@ -6,6 +6,7 @@ import framework.logging
 import core.common.settings
 import core.common.constants
 import core.osu.runtime
+import core.osu.runtime.gui
 
 const (
 	_ = settings.global
@@ -15,7 +16,6 @@ fn main() {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application(constants.game_name)
 	fp.version(constants.game_version)
-	fp.description('UI is very very very (repeat 100 times) WIP, dont even try it.')
 
 	// Old
 	beatmap_path := fp.string('beatmap', `b`, '', 'Path to the .osu file.')
@@ -23,7 +23,7 @@ fn main() {
 	is_playing := fp.bool('play', `p`, false, 'Enable to play the beatmap.')
 
 	// Game
-	game_type := fp.string('game', `g`, 'osu', 'Option for game engines. [osu!] (Other modes is deprecated.)')
+	game_type := fp.string('game', `g`, 'osu!gui', 'Option for game engines. [osu!, osu!gui] (Other modes is deprecated.)')
 
 	fp.finalize() or {
 		logging.error(err.str())
@@ -32,6 +32,9 @@ fn main() {
 	}
 
 	match game_type {
+		'osu!gui' {
+			gui.run(os.args)
+		}
 		'osu', 'osu!' {
 			if beatmap_path.len == 0 {
 				println(fp.usage())
