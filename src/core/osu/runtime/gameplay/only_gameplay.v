@@ -29,7 +29,7 @@ mut:
 	overlay &overlays.GameplayOverlay = unsafe { nil }
 }
 
-pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap.Beatmap, mode OSUGameplayMode) {
+pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap.Beatmap, mode OSUGameplayMode, replay_path_if_any string) {
 	// Init renderer
 	// Renderer: SGP
 	sgp_desc := sgp.Desc{}
@@ -53,7 +53,6 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 	osu.beatmap_audio = audio.new_track(osu.beatmap.get_audio_path())
 	osu.beatmap_audio.set_volume(0.2)
 
-	// TODO: Implement replay/auto later.
 	match mode {
 		.player {
 			osu.cursor = cursor.make_player_cursor(mut ctx)
@@ -62,7 +61,7 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 			osu.cursor = cursor.make_auto_cursor(mut ctx, osu.beatmap.objects)
 		}
 		.replay {
-			panic('TODO')
+			osu.cursor = cursor.make_replay_cursor(mut ctx, replay_path_if_any)
 		}
 	}
 
