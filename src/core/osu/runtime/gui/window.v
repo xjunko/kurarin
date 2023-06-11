@@ -2,6 +2,7 @@ module gui
 
 import os
 import gg
+import core.common.settings
 import core.osu.parsers.beatmap
 import core.osu.runtime.gameplay
 import framework.logging
@@ -15,6 +16,7 @@ fn C._sapp_glx_swapinterval(int)
 
 // Const
 const (
+	c_scene_error            = 0xFAC
 	c_scene_none             = 0 << 0
 	c_scene_main             = 1 << 0
 	c_scene_pre_gameplay     = 1 << 1
@@ -50,7 +52,7 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 	// Start
 	logging.info('Initialize.')
 
-	window.manager = beatmap.make_manager('/run/media/junko/2nd/Projects/dementia/assets/osu/maps/')
+	window.manager = beatmap.make_manager(settings.global.gameplay.paths.beatmaps)
 
 	logging.info('Found beatmaps: ${window.manager.beatmaps.len} beatmaps')
 
@@ -67,7 +69,12 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 	window.start_update_thread()
 
 	// Test
-	window.menu.change_beatmap(&window.manager.beatmaps[0])
+	if window.manager.beatmaps.len > 0 {
+		window.menu.change_beatmap(&window.manager.beatmaps[0])
+	} else {
+		window.joe_s = gui.c_scene_error
+		logging.error('No beatmap found on: ${settings.global.gameplay.paths.beatmaps}')
+	}
 }
 
 pub fn (mut window GUIWindow) draw(_ voidptr) {
@@ -75,6 +82,32 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 	// Draw scenes
 	match window.joe_s {
+		gui.c_scene_error {
+			window.ctx.begin()
+
+			window.ctx.draw_text(1280 / 2, 720 / 2, 'Invalid beatmap path!',
+				color: gg.Color{255, 255, 255, 255}
+				size: 32
+				align: .center
+				vertical_align: .middle
+			)
+
+			window.draw_stats()
+
+			// Draw the last 32 logs
+			mut t := 1
+			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32,
+				0); i-- {
+				t++
+				window.ctx.draw_rect_filled(0, 720 - t * 16, window.ctx.text_width(logging.global.logs[i]),
+					16, gg.Color{0, 0, 0, 100})
+				window.ctx.draw_text(0, 720 - t * 16, logging.global.logs[i],
+					color: gg.Color{255, 255, 255, 100}
+				)
+			}
+
+			window.ctx.end()
+		}
 		gui.c_scene_main {
 			window.ctx.begin()
 			window.mutex.@lock()
@@ -215,8 +248,11 @@ pub fn (mut window GUIWindow) play_beatmap(path string, typ gameplay.OSUGameplay
 
 // Events
 pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
-	if window.joe_s == gui.c_scene_pre_gameplay || window.joe_s == gui.c_scene_loading_gameplay {
-		return
+	for dont_handle_on_this_scene in [gui.c_scene_pre_gameplay, gui.c_scene_loading_gameplay,
+		gui.c_scene_error] {
+		if window.joe_s == dont_handle_on_this_scene {
+			return
+		}
 	}
 
 	if window.joe_s == gui.c_scene_gameplay {
@@ -260,6 +296,13 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 }
 
 pub fn (mut window GUIWindow) event_keyup(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
+	for dont_handle_on_this_scene in [gui.c_scene_pre_gameplay, gui.c_scene_loading_gameplay,
+		gui.c_scene_error] {
+		if window.joe_s == dont_handle_on_this_scene {
+			return
+		}
+	}
+
 	match window.joe_s {
 		gui.c_scene_gameplay {
 			window.gameplay.event_keyup(key)
@@ -276,7 +319,7 @@ pub fn (mut window GUIWindow) event_mouse(x f32, y f32, _ voidptr) {
 	window.gameplay.event_mouse(x, y)
 }
 
-pub fn main() {
+pub fn run(args []string) {
 	mut window := &GUIWindow{
 		manager: 0
 	}
