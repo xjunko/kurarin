@@ -3,6 +3,7 @@ module gameplay
 import math
 import core.common.settings
 import framework.audio as f_audio
+import core.osu.system.skin
 import core.osu.system.audio as g_audio
 import framework.math.time
 import framework.math.easing
@@ -75,8 +76,8 @@ pub fn (mut counter ComboCounter) draw(arg sprite.CommonSpriteArgument) {
 pub fn make_combo_counter() &ComboCounter {
 	mut counter := &ComboCounter{
 		combo_break: g_audio.get_sample('combobreak')
-		main_font: sprite.make_number_font('combo')
-		pop_font: sprite.make_number_font('combo')
+		main_font: sprite.make_number_font(skin.global.meta.combo_prefix)
+		pop_font: sprite.make_number_font(skin.global.meta.combo_prefix)
 	}
 
 	counter.main_glider.easing = easing.quad_out

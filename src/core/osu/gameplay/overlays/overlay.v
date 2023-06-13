@@ -169,7 +169,7 @@ pub fn (mut overlay GameplayOverlay) draw() {
 pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &cursor.Cursor, player_info player.Player, ctx &context.Context) &GameplayOverlay {
 	mut hitresult := gameplay.make_hit_result(ctx, player_ruleset.beatmap.difficulty.Difficulty)
 	mut counter := gameplay.make_combo_counter()
-	mut score_font := sprite.make_number_font('score')
+	mut score_font := sprite.make_number_font(skin.global.meta.score_prefix)
 
 	mut overlay := &GameplayOverlay{
 		ruleset: unsafe { player_ruleset }
