@@ -6,8 +6,11 @@ import gg
 import framework.logging
 import framework.graphic.context
 
+pub const (
+	global = &Skin{}
+)
+
 const (
-	global         = &Skin{}
 	required_files = [
 		// Cursor
 		'cursor',
@@ -50,6 +53,7 @@ pub fn bind_context(mut ctx context.Context) {
 	mut g := get_skin()
 	g.ctx = ctx
 	g.bind = true
+	g.meta = load_skin_info(g.path)
 
 	logging.info("${@MOD}Skin's context is binded!")
 
@@ -68,11 +72,12 @@ pub fn bind_context(mut ctx context.Context) {
 pub struct Skin {
 pub mut:
 	bind bool
+	meta &SkinMetadata    = unsafe { nil }
 	ctx  &context.Context = unsafe { nil }
 	sync &sync.Mutex      = sync.new_mutex()
-	// Skin shit
-	path     string
-	fallback string = r'assets/osu/skins/default' // Temporary
+	// Internal
+	path     string = r'assets/osu/skins/default'
+	fallback string = r'assets/osu/skins/default'
 	cache    map[string]gg.Image
 }
 
@@ -120,13 +125,26 @@ pub fn get_texture_with_fallback(name string, fallback string) gg.Image {
 
 	// Try get from normal name
 	if name !in skin.cache {
-		original_path := os.join_path(skin.fallback, name + '.png')
+		mut original_path := os.join_path(skin.path, name + '.png')
+
+		if !os.exists(original_path) {
+			logging.info('[${@METHOD}] File not found in `skin` folder, using the fallback path.')
+			original_path = os.join_path(skin.fallback, name + '.png')
+		}
 
 		skin.cache[name] = skin.ctx.create_image(original_path)
 
 		// Check if failed
 		if skin.cache[name].id == 0 || !os.exists(original_path) {
 			logging.debug('Failed getting ${name} from skin, trying ${fallback}!')
+
+			// Use fallback texture name
+			original_path = os.join_path(skin.fallback, fallback + '.png')
+
+			if !os.exists(original_path) {
+				logging.info('[${@METHOD}] Fallback not found, using the fallback texture name.')
+				original_path = os.join_path(skin.fallback, fallback + '.png')
+			}
 
 			// Get from fallback
 			// println(os.join_path(skin.fallback, fallback + '.png'))
