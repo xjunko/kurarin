@@ -4,7 +4,8 @@ pub struct Gameplay {
 pub mut:
 	paths      Path
 	playfield  Playfield
-	cursor     Cursor
+	input      Input
+	skin       Skin
 	hitobjects HitObjects
 	overlay    Overlay
 }
@@ -12,6 +13,8 @@ pub mut:
 pub struct Path {
 pub mut:
 	beatmaps string
+	skins    string
+	replays  string
 }
 
 pub struct Playfield {
@@ -29,12 +32,27 @@ pub mut:
 	background_dim    int
 }
 
+pub struct Input {
+pub mut:
+	left_key  string
+	right_key string
+}
+
+pub struct Skin {
+pub mut:
+	current_skin         string
+	use_colors_from_skin bool
+	use_beatmap_colors   bool
+	cursor               Cursor
+}
+
 pub struct Cursor {
 pub mut:
-	visible      bool
-	size         f64
 	style        f64
-	trail_length int
+	size         f64
+	trail_size   f64
+	trail_length f64
+	visible      bool
 }
 
 pub struct HitObjects {
@@ -62,6 +80,7 @@ pub fn make_gameplay_settings() Gameplay {
 	mut gameplay_ := Gameplay{
 		paths: Path{
 			beatmaps: '<Path to your osu! beatmaps folder here>'
+			skins: '<Path to your osu! skins folder here>'
 		}
 		playfield: Playfield{
 			objects_visible: true
@@ -72,11 +91,21 @@ pub fn make_gameplay_settings() Gameplay {
 				background_dim: 100
 			}
 		}
-		cursor: Cursor{
-			visible: true
-			size: 0.75
-			style: 2
-			trail_length: 1000
+		input: Input{
+			left_key: 'a'
+			right_key: 's'
+		}
+		skin: Skin{
+			current_skin: ''
+			use_colors_from_skin: true
+			use_beatmap_colors: false
+			cursor: Cursor{
+				style: 2
+				size: 0.75
+				trail_size: 1.0
+				trail_length: 1.0
+				visible: true
+			}
 		}
 		hitobjects: HitObjects{
 			disable_hitobjects: false
