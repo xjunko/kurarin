@@ -3,6 +3,10 @@ module beatmap
 import os
 import framework.logging
 
+const (
+	c_hard_limit = 100
+)
+
 pub struct BeatmapContainer {
 pub mut:
 	info     BeatmapMetadataInfo
@@ -19,7 +23,7 @@ pub mut:
 pub fn (mut manager BeatmapManager) load() {
 	logging.info('[${@METHOD}] Loading beatmaps in `${manager.root}`')
 
-	for folder in os.glob(os.join_path(manager.root, '*')) or { [''] } {
+	for i, folder in os.glob(os.join_path(manager.root, '*')) or { [''] } {
 		if os.is_dir(folder) {
 			mut container := BeatmapContainer{}
 
@@ -36,6 +40,10 @@ pub fn (mut manager BeatmapManager) load() {
 			container.versions.sort(a.metadata.id < b.metadata.id)
 
 			manager.beatmaps << container
+		}
+
+		if i > beatmap.c_hard_limit {
+			break
 		}
 	}
 
