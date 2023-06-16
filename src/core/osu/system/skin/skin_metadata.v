@@ -2,7 +2,6 @@ module skin
 
 import gg
 import os
-import framework.logging
 
 /*
 Note(s):
@@ -74,7 +73,7 @@ fn load_skin_info(path_to_skin string) &SkinMetadata {
 		// Combo color
 		if items[0].starts_with('Combo') {
 			// TODO: Does index matter in this case?
-			index := items[0].split('Combo')[1].int()
+			// index := items[0].split('Combo')[1].int()
 			colors := items[1].split(',').map(it.u8())
 
 			if colors.len < 3 {

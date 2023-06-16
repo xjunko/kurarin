@@ -126,11 +126,12 @@ pub fn (mut osu OSUGameplay) event_keydown(keycode gg.KeyCode) {
 	}
 
 	osu.beatmap_ruleset.mutex.@lock()
-	if keycode == .a {
+
+	if keycode == settings.global.gameplay.input.left_key {
 		osu.cursor.cursor.left_button = true
 	}
 
-	if keycode == .s {
+	if keycode == settings.global.gameplay.input.right_key {
 		osu.cursor.cursor.right_button = true
 	}
 	osu.beatmap_ruleset.mutex.unlock()
@@ -142,11 +143,11 @@ pub fn (mut osu OSUGameplay) event_keyup(keycode gg.KeyCode) {
 	}
 
 	osu.beatmap_ruleset.mutex.@lock()
-	if keycode == .a {
+	if keycode == settings.global.gameplay.input.left_key {
 		osu.cursor.cursor.left_button = false
 	}
 
-	if keycode == .s {
+	if keycode == settings.global.gameplay.input.right_key {
 		osu.cursor.cursor.right_button = false
 	}
 	osu.beatmap_ruleset.mutex.unlock()

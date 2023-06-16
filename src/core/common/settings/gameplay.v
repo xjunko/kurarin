@@ -1,5 +1,7 @@
 module settings
 
+import gg
+
 pub struct Gameplay {
 pub mut:
 	paths      Path
@@ -34,8 +36,8 @@ pub mut:
 
 pub struct Input {
 pub mut:
-	left_key  string
-	right_key string
+	left_key  gg.KeyCode
+	right_key gg.KeyCode
 }
 
 pub struct Skin {
@@ -92,8 +94,8 @@ pub fn make_gameplay_settings() Gameplay {
 			}
 		}
 		input: Input{
-			left_key: 'a'
-			right_key: 's'
+			left_key: .a
+			right_key: .s
 		}
 		skin: Skin{
 			current_skin: ''

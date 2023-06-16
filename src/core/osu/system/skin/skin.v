@@ -52,7 +52,7 @@ pub fn get_skin() &Skin {
 pub fn set_skin(path_to_skin_folder string) &Skin {
 	mut skin := get_skin()
 
-	for path, image in skin.cache {
+	for path, _ in skin.cache {
 		// TODO: Invalidate these images.
 		skin.cache.delete(path)
 	}
