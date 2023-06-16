@@ -1,5 +1,6 @@
 module gameplay
 
+import os
 import gg
 import mohamedlt.sokolgp as sgp
 import framework.audio
@@ -43,6 +44,7 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 	graphic.init_slider_renderer()
 
 	// Renderer: Skin storage
+	skin.set_skin(os.join_path(settings.global.gameplay.paths.skins, settings.global.gameplay.skin.current_skin))
 	skin.bind_context(mut ctx)
 
 	// NOTE: Routine starts here.

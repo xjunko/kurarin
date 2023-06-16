@@ -143,7 +143,7 @@ pub fn (mut window Window) draw() {
 
 	// TODO: maybe move cursor to beatmap struct
 	window.ctx.begin_gp()
-	if settings.global.gameplay.cursor.visible {
+	if settings.global.gameplay.skin.cursor.visible {
 		for mut cursor in window.cursors {
 			cursor.draw()
 		}

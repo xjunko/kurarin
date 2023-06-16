@@ -49,6 +49,19 @@ pub fn get_skin() &Skin {
 	}
 }
 
+pub fn set_skin(path_to_skin_folder string) &Skin {
+	mut skin := get_skin()
+
+	for path, image in skin.cache {
+		// TODO: Invalidate these images.
+		skin.cache.delete(path)
+	}
+
+	skin.path = path_to_skin_folder
+
+	return skin
+}
+
 pub fn bind_context(mut ctx context.Context) {
 	mut g := get_skin()
 	g.ctx = ctx

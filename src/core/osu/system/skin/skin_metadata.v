@@ -39,8 +39,9 @@ pub mut:
 	score_overlap f64    [ScoreOverlap]
 
 	// Combo
-	combo_prefix  string [ComboPrefix]
-	combo_overlap f64    [ComboOverlap]
+	combo_prefix  string     [ComboPrefix]
+	combo_overlap f64        [ComboOverlap]
+	combo_colors  []gg.Color
 }
 
 // get_frames_time returns positive integer or 1000/frames to make it play all frames of the animation in one second
@@ -54,7 +55,7 @@ pub fn (mut meta SkinMetadata) get_frame_time(frames int) f64 {
 
 // Parse
 fn load_skin_info(path_to_skin string) &SkinMetadata {
-	lines := os.read_lines(path_to_skin) or { []string{} }
+	lines := os.read_lines(os.join_path(path_to_skin, 'skin.ini')) or { []string{} }
 
 	if lines.len == 0 {
 		println('[${@METHOD}] Nothing found in the `skin.ini` file.')
@@ -70,8 +71,25 @@ fn load_skin_info(path_to_skin string) &SkinMetadata {
 			continue
 		}
 
+		// Combo color
+		if items[0].starts_with('Combo') {
+			// TODO: Does index matter in this case?
+			index := items[0].split('Combo')[1].int()
+			colors := items[1].split(',').map(it.u8())
+
+			if colors.len < 3 {
+				continue // Color is borked.
+			}
+
+			combo_colors << gg.Color{colors[0], colors[1], colors[2], 255}
+
+			continue
+		}
+
 		general_skin_parser[SkinMetadata](mut skin_info, items[0], items[1])
 	}
+
+	skin_info.combo_colors = combo_colors
 
 	return skin_info
 }

@@ -174,7 +174,13 @@ pub fn (mut beatmap Beatmap) reset() {
 		// * use combo_color_hax for beatmap color
 
 		// Set colors
-		color := beatmap.combo_color[combo_color_hax % beatmap.combo_color.len]
+		mut color := beatmap.combo_color[combo_color_hax % beatmap.combo_color.len]
+
+		if settings.global.gameplay.skin.use_colors_from_skin
+			&& skin.global.meta.combo_colors.len > 0 {
+			color = skin.global.meta.combo_colors[combo_color_hax % skin.global.meta.combo_colors.len]
+		}
+
 		o.color = [f64(color.r), f64(color.g), f64(color.b)]
 
 		o.set_id(i)
