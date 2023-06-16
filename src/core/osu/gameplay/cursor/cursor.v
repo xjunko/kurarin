@@ -50,7 +50,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	cursor.mutex.@lock()
 
 	// TODO: This is fucked, fix this
-	if settings.global.gameplay.cursor.style == 2 {
+	if settings.global.gameplay.skin.cursor.style == 2 {
 		for i, trail in cursor.delta_pos {
 			size := cursor.size.scale(0.9 * (0.1 + f64(i) / f64(cursor.delta_pos.len) * 0.9))
 
@@ -100,7 +100,7 @@ pub fn (mut cursor Cursor) draw(_ sprite.CommonSpriteArgument) {
 	mut cursor_img := &cursor.textures[0]
 
 	// Additive Cursor
-	if settings.global.gameplay.cursor.style == 2 {
+	if settings.global.gameplay.skin.cursor.style == 2 {
 		cursor_additive = true
 		cursor_color = gx.white
 		cursor_img = &cursor.textures[2]
@@ -134,7 +134,7 @@ pub fn (mut cursor Cursor) update(update_time f64, _delta f64) {
 
 	// Normal trails
 	// vfmt off
-	if settings.global.gameplay.cursor.style == 0
+	if settings.global.gameplay.skin.cursor.style == 0
 		&& cursor.sixty_delta >= osu_cursor_trail_delta {
 		// vfmt on
 		mut trail := &sprite.Sprite{
@@ -157,7 +157,7 @@ pub fn (mut cursor Cursor) update(update_time f64, _delta f64) {
 			typ: .scale_factor
 			time: time2.Time{update_time, update_time}
 			before: [
-				settings.global.gameplay.cursor.size,
+				settings.global.gameplay.skin.cursor.size,
 			]
 		)
 		trail.reset_size_based_on_texture()
@@ -170,7 +170,7 @@ pub fn (mut cursor Cursor) update(update_time f64, _delta f64) {
 	}
 
 	// Long cursor Trail
-	if settings.global.gameplay.cursor.style == 2 && delta > 0.0 {
+	if settings.global.gameplay.skin.cursor.style == 2 && delta > 0.0 {
 		points := int(cursor.position.distance(cursor.last_position)) * 2
 		cursor.delta_pos << cursor.last_position
 
@@ -220,7 +220,7 @@ pub fn make_cursor(mut ctx context.Context) &Cursor {
 	cursor.add_transform(
 		typ: .scale_factor
 		time: time2.Time{0, 0}
-		before: [settings.global.gameplay.cursor.size]
+		before: [settings.global.gameplay.skin.cursor.size]
 	)
 
 	//
