@@ -90,7 +90,7 @@ pub fn (mut window Window) update(update_time f64, delta f64) {
 		window.audio_been_played = true
 		window.beatmap_song.set_speed(settings.global.window.speed)
 		window.beatmap_song.set_pitch(settings.global.audio.pitch)
-		window.beatmap_song.set_volume(f32((settings.global.audio.music / 100.0) * (settings.global.audio.global / 100.0)))
+		window.beatmap_song.set_volume(f32(settings.global.audio.music * settings.global.audio.global / 10000))
 		window.beatmap_song.set_position(update_time - settings.global.gameplay.playfield.lead_in_time) // HACK: Catch up with the game_time, sometime its too fast.
 		window.beatmap_song.play()
 	}

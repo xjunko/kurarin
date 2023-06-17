@@ -53,7 +53,7 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 	osu.beatmap.reset() // NOTE: This can be delayed.
 
 	osu.beatmap_audio = audio.new_track(osu.beatmap.get_audio_path())
-	osu.beatmap_audio.set_volume(0.2)
+	osu.beatmap_audio.set_volume(f32(settings.global.audio.music * settings.global.audio.global / 10000))
 
 	match mode {
 		.player {
