@@ -4,7 +4,7 @@ import gg
 import sokol.sgl
 import sokol.sapp
 import sokol.gfx
-import mohamedlt.sokolgp
+import xjunko.sokolgp
 import framework.logging
 import framework.math.vector
 import core.common.settings

@@ -4,7 +4,7 @@ import gg
 import sokol.gfx
 import sokol.sgl
 import sokol.sapp
-import mohamedlt.sokolgp as sgp
+import xjunko.sokolgp as sgp
 import framework.graphic.window as i_window
 import framework.graphic.context
 

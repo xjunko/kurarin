@@ -8,7 +8,7 @@ import sync
 import sokol.gfx
 import sokol.sgl
 import sokol.sapp
-import mohamedlt.sokolgp as sgp
+import xjunko.sokolgp as sgp
 import time as timelib
 import gg
 import core.osu.x

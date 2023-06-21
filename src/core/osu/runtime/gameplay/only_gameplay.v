@@ -2,7 +2,7 @@ module gameplay
 
 import os
 import gg
-import mohamedlt.sokolgp as sgp
+import xjunko.sokolgp as sgp
 import framework.audio
 import framework.graphic.context
 import core.common.settings
