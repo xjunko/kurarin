@@ -3,5 +3,5 @@ Module {
 	description: ''
 	version: '0.2.2'
 	license: ''
-	dependencies: ["mohamedLT.sokolgp"]
+	dependencies: ["https://github.com/xjunko/sokolgp-v"]
 }
