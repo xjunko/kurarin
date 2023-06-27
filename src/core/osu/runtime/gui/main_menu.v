@@ -135,10 +135,11 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 
 	// Titles
 	main_menu.window.ctx.draw_text(10, 0, '${main_menu.current_version.metadata.artist} - ${main_menu.current_version.metadata.title} [${main_menu.current_version.metadata.version}]',
-		color: gg.Color{255, 255, 255, 255}, size: 32)
+		color: gg.Color{255, 255, 255, 255}
+		size: 32
+	)
 
 	main_menu.window.ctx.draw_text(10, 32, 'Mapped by ${main_menu.current_version.metadata.creator}',
-		
 		color: gg.Color{255, 255, 255, 255}
 		size: 25
 	)
@@ -149,7 +150,6 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 	)
 
 	main_menu.window.ctx.draw_text(10, 32 + 25 + 25, 'CS:${main_menu.current_version.difficulty.cs} AR:${main_menu.current_version.difficulty.ar} OD:${main_menu.current_version.difficulty.od} HP:${main_menu.current_version.difficulty.hp} Stars:0.0',
-		
 		color: gg.Color{255, 255, 255, 255}
 		size: 25
 	)
@@ -171,11 +171,18 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 		main_menu.window.ctx.draw_rect_filled(int(1280.0 * (2.5 / 4)), start_y, 500, y_size,
 			gg.Color{0, 0, 0, 100})
 		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y, version.metadata.title,
-			color: text_color, size: 25)
+			color: text_color
+			size: 25
+		)
 		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 25, '${version.metadata.artist} // ${version.metadata.creator}',
-			color: text_color, size: 20)
+			color: text_color
+			size: 20
+		)
 		main_menu.window.ctx.draw_text(int(1280.0 * (2.5 / 4)), start_y + 20 + 25, version.metadata.version,
-			color: text_color, size: 25, bold: true)
+			color: text_color
+			size: 25
+			bold: true
+		)
 	}
 
 	// Info
@@ -186,7 +193,6 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 		align: .right
 	)
 	main_menu.window.ctx.draw_text(1280 - 100, 32 + 20, 'A - Auto | P - Play | R - Replay',
-		
 		color: gg.Color{255, 255, 255, 255}
 		size: 20
 		bold: true
