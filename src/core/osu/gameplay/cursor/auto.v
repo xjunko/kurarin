@@ -125,9 +125,10 @@ pub fn (mut auto AutoCursor) update(time f64, delta f64) {
 	auto.last_time = time
 }
 
-pub fn make_auto_cursor(mut ctx context.Context, hitobjects []object.IHitObject) &AutoCursor {
+// Create auto cursor from beatmap objects
+pub fn AutoCursor.new(mut ctx context.Context, hitobjects []object.IHitObject) &AutoCursor {
 	mut auto := &AutoCursor{
-		cursor: make_cursor(mut ctx)
+		cursor: Cursor.new(mut ctx)
 		queue: hitobjects
 	}
 

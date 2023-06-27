@@ -44,9 +44,10 @@ pub fn (mut replay ReplayCursor) update(update_time f64, update_delta f64) {
 	replay.cursor.update(update_time, update_delta)
 }
 
-pub fn make_replay_cursor(mut ctx context.Context, path_to_replay string) &ReplayCursor {
+// Make a cursor that moves based on the replay events
+pub fn ReplayCursor.new(mut ctx context.Context, path_to_replay string) &ReplayCursor {
 	mut auto := &ReplayCursor{
-		cursor: make_cursor(mut ctx)
+		cursor: Cursor.new(mut ctx)
 	}
 
 	auto.cursor.position.x = 512.0 / 2.0

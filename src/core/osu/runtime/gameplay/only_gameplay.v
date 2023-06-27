@@ -57,13 +57,19 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 
 	match mode {
 		.player {
-			osu.cursor = cursor.make_player_cursor(mut ctx)
+			// vfmt off
+			osu.cursor = cursor.PlayerCursor.new(mut ctx)
+			// vfmt on
 		}
 		.auto {
-			osu.cursor = cursor.make_auto_cursor(mut ctx, osu.beatmap.objects)
+			// vfmt off
+			osu.cursor = cursor.AutoCursor.new(mut ctx, osu.beatmap.objects)
+			// vfmt on
 		}
 		.replay {
-			osu.cursor = cursor.make_replay_cursor(mut ctx, replay_path_if_any)
+			// vfmt off
+			osu.cursor = cursor.ReplayCursor.new(mut ctx, replay_path_if_any)
+			// vfmt on
 		}
 	}
 

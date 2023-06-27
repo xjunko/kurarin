@@ -13,9 +13,10 @@ pub fn (mut player_c PlayerCursor) update(time_ms f64, time_delta f64) {
 	player_c.cursor.update(time_ms, time_delta)
 }
 
-pub fn make_player_cursor(mut ctx context.Context) &PlayerCursor {
+// Creates player cursor
+pub fn PlayerCursor.new(mut ctx context.Context) &PlayerCursor {
 	mut player_c := &PlayerCursor{
-		cursor: make_cursor(mut ctx)
+		cursor: Cursor.new(mut ctx)
 		player: player.Player{
 			name: 'Player'
 		}

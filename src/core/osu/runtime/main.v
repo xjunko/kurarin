@@ -215,14 +215,20 @@ pub fn window_init(mut window Window) {
 	}
 	// Make cursor based on argument
 	if window.argument.play_mode == .play {
-		window.cursors << cursor.make_cursor(mut window.ctx)
+		// vfmt off
+		window.cursors << cursor.Cursor.new(mut window.ctx)
+		// vfmt on
 	} else if window.argument.play_mode == .replay {
 		// HACK: REPLAY HACK
-		window.cursor_controller = cursor.make_replay_cursor(mut window.ctx, window.argument.replay_path)
+		// vfmt off
+		window.cursor_controller = cursor.ReplayCursor.new(mut window.ctx, window.argument.replay_path)
+		// vfmt on
 		current_player = window.cursor_controller.player
 		window.cursors << unsafe { window.cursor_controller.cursor }
 	} else {
-		window.cursor_controller = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)
+		// vfmt off
+		window.cursor_controller = cursor.AutoCursor.new(mut window.ctx, window.beatmap.objects)
+		// vfmt on
 		current_player = window.cursor_controller.player
 		window.cursors << unsafe { window.cursor_controller.cursor }
 	}
