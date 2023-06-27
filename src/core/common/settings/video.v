@@ -7,12 +7,10 @@ pub mut:
 	update_fps f64
 }
 
-pub fn make_video_settings() Video {
-	mut render := Video{
+pub fn Video.new() Video {
+	return Video{
 		record: false
 		fps: 60.0
 		update_fps: 480
 	}
-
-	return render
 }

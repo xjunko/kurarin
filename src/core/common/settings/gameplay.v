@@ -78,8 +78,8 @@ pub mut:
 }
 
 // Factory
-pub fn make_gameplay_settings() Gameplay {
-	mut gameplay_ := Gameplay{
+pub fn Gameplay.new() Gameplay {
+	return Gameplay{
 		paths: Path{
 			beatmaps: '<Path to your osu! beatmaps folder here>'
 			skins: '<Path to your osu! skins folder here>'
@@ -123,6 +123,4 @@ pub fn make_gameplay_settings() Gameplay {
 			info: true
 		}
 	}
-
-	return gameplay_
 }

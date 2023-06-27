@@ -12,8 +12,8 @@ pub mut:
 	ignore_beatmap_volume  bool
 }
 
-pub fn make_audio_settings() Audio {
-	mut audio_ := Audio{
+pub fn Audio.new() Audio {
+	return Audio{
 		global: 100
 		music: 75
 		sample: 75
@@ -22,6 +22,4 @@ pub fn make_audio_settings() Audio {
 		ignore_beatmap_samples: false
 		ignore_beatmap_volume: false
 	}
-
-	return audio_
 }

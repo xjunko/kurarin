@@ -11,10 +11,10 @@ pub const (
 
 pub struct Settings {
 pub mut:
-	audio    Audio    = make_audio_settings()
-	window   Window   = make_window_settings()
-	gameplay Gameplay = make_gameplay_settings()
-	video    Video    = make_video_settings()
+	audio    Audio    = Audio.new()
+	window   Window   = Window.new()
+	gameplay Gameplay = Gameplay.new()
+	video    Video    = Video.new()
 }
 
 pub fn (mut settings Settings) save() {
