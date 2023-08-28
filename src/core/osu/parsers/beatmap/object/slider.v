@@ -149,6 +149,13 @@ pub fn (mut slider Slider) play_hitsound_generic(sample_set_ int, addition_set_ 
 	audio.play_sample(sample_set, addition_set, sample, point.sample_index, point.sample_volume)
 }
 
+fn (mut slider Slider) update_internal_slider_position(pos vector.Vector2[f64]) {
+	slider.slider_overlay_sprite.position.x = pos.x
+	slider.slider_overlay_sprite.position.y = pos.y
+	slider.slider_b_sprite.position.x = pos.x
+	slider.slider_b_sprite.position.y = pos.y
+}
+
 pub fn (mut slider Slider) update(update_time f64) bool {
 	slider.slider_renderer_fade.update(update_time)
 	slider.hitcircle.update(update_time)
@@ -157,12 +164,9 @@ pub fn (mut slider Slider) update(update_time f64) bool {
 		sprite.update(update_time)
 	}
 
-	// HACK: MOVe this to somwhre else
+	// NOTE: This is kinda fugly but whatever
 	slider_current_position := slider.get_position_at_lazer(update_time)
-	slider.slider_overlay_sprite.position.x = slider_current_position.x
-	slider.slider_overlay_sprite.position.y = slider_current_position.y
-	slider.slider_b_sprite.position.x = slider_current_position.x
-	slider.slider_b_sprite.position.y = slider_current_position.y
+	slider.update_internal_slider_position(slider_current_position)
 
 	// SliderBall angle
 	if update_time >= slider.time.start && update_time <= slider.time.end - 5.0 {
