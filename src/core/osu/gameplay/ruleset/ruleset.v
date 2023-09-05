@@ -105,12 +105,14 @@ pub mut:
 	queue     []IHitObject
 	processed []IHitObject
 
-	hit_listener HitListener
+	hit_listener HitListener = dummy_listener
 
 	mutex &sync.Mutex = sync.new_mutex()
 }
 
 type HitListener = fn (f64, i64, vector.Vector2[f64], HitResult, ComboResult, i64)
+
+pub fn dummy_listener(_ f64, _ i64, _ vector.Vector2[f64], _ HitResult, _ ComboResult, _ i64) {}
 
 pub fn (mut ruleset Ruleset) set_listener(func HitListener) {
 	ruleset.hit_listener = func
