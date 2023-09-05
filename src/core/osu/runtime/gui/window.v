@@ -163,7 +163,9 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			// Load gameplay.
 			logging.info('Loading gameplay.')
 
-			window.gameplay = &gameplay.OSUGameplay{}
+			window.gameplay = &gameplay.OSUGameplay{
+				cursor: &voidptr(0) // NOTE: Not safe.
+			}
 
 			window.gameplay.init(mut window.ctx, window.menu.current_version, window.joe_t,
 				window.joe_r)
