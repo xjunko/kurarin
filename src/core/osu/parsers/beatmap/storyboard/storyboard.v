@@ -355,7 +355,7 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		else {}
 	}
 
-	mut parameters := items[4..]
+	mut parameters := unsafe { items[4..] }
 	if arguments == 0 {
 		match parameters[0] {
 			'A' {
