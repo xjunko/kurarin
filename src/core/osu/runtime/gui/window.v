@@ -181,7 +181,6 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.mutex.unlock()
 
 			window.ctx.begin()
-			window.ctx.begin_gp()
 			window.draw_stats()
 
 			// Draw the last 16 logs
@@ -195,7 +194,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 					color: gg.Color{255, 255, 255, 100}
 				)
 			}
-			window.ctx.end_gp_short()
+			window.ctx.end_short()
 		}
 		else {}
 	}
@@ -343,7 +342,7 @@ pub fn (mut window GUIWindow) event_mouse(x f32, y f32, _ voidptr) {
 
 pub fn run(args []string) {
 	mut window := &GUIWindow{
-		manager: 0
+		manager: unsafe { 0 }
 	}
 
 	logging.info('Runtime logs:')

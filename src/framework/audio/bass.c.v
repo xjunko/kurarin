@@ -6,6 +6,10 @@ module audio
 #include "bassmix.h"
 #flag -Wl,-rpath=assets/common/dll,-L@VMODROOT/../assets/common/dll -lbass -lbass_fx -lbassmix
 
+type C.HSAMPLE = u32
+type C.HSTREAM = u32
+type C.QWORD = u64
+
 // Important bits
 fn C.BASS_Init(int, int, int, int, int) int
 fn C.BASS_SetConfig(int, int)

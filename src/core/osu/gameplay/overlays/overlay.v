@@ -15,12 +15,12 @@ import framework.graphic.context
 import core.osu.gameplay.overlays.gameplay
 
 const g_overlay_hack = &GameplayOverlay{
-	ctx: 0
-	ruleset: 0
-	cursor: 0
-	hitresult: 0
-	combo_counter: 0
-	scoreboard: 0
+	ctx: unsafe { 0 }
+	ruleset: unsafe { 0 }
+	cursor: unsafe { 0 }
+	hitresult: unsafe { 0 }
+	combo_counter: unsafe { 0 }
+	scoreboard: unsafe { 0 }
 }
 
 pub struct GameplayOverlay {
@@ -176,7 +176,7 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 		hitresult: hitresult
 		combo_counter: counter
 		score_font: score_font
-		scoreboard: 0
+		scoreboard: unsafe { 0 }
 	}
 
 	mut scoreboard := gameplay.make_score_board(overlay, counter, player_info)

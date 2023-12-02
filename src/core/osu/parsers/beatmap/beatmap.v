@@ -316,9 +316,6 @@ pub fn (mut beatmap Beatmap) draw() {
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width),
 		int(settings.global.window.height))
 
-	// HACK: SGP
-	beatmap.ctx.begin_gp()
-
 	beatmap.storyboard.draw() // Includes background
 
 	// Shitty background dim
@@ -343,7 +340,6 @@ pub fn (mut beatmap Beatmap) draw() {
 		gx.white)
 
 	// Done
-	beatmap.ctx.end_gp()
 	sgl.draw()
 	gfx.end_pass()
 	gfx.commit()

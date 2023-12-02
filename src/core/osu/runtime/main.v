@@ -8,7 +8,6 @@ import sync
 import sokol.gfx
 import sokol.sgl
 import sokol.sapp
-// import xjunko.sokolgp as sgp
 import time as timelib
 import gg
 import core.osu.x
@@ -142,7 +141,6 @@ pub fn (mut window Window) draw() {
 	}
 
 	// TODO: maybe move cursor to beatmap struct
-	window.ctx.begin_gp()
 	if settings.global.gameplay.skin.cursor.visible {
 		for mut cursor in window.cursors {
 			cursor.draw()
@@ -158,7 +156,6 @@ pub fn (mut window Window) draw() {
 
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width),
 		int(settings.global.window.height))
-	window.ctx.end_gp()
 	sgl.draw()
 	gfx.end_pass()
 
@@ -170,13 +167,6 @@ fn C._sapp_glx_swapinterval(int)
 
 pub fn window_init(mut window Window) {
 	// Init Renderer(s)
-	// Renderer: SGP
-	// sgp_desc := sgp.Desc{}
-	// sgp.setup(&sgp_desc)
-
-	// if !sgp.is_valid() {
-	// 	panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
-	// }
 
 	// Renderer: Slider
 	graphic.init_slider_renderer()

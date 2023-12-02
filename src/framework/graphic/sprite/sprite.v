@@ -298,7 +298,7 @@ pub fn (mut sprite Sprite) draw(arg CommonSpriteArgument) {
 			.add(arg.camera.offset)
 
 		if arg.batch {
-			arg.ctx.draw_image_batch_with_config(context.DrawImageConfig{
+			arg.ctx.draw_image_with_config(context.DrawImageConfig{
 				img: sprite.get_texture()
 				img_id: sprite.get_texture().id
 				img_rect: gg.Rect{

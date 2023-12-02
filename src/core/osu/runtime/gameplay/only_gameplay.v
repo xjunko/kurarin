@@ -2,7 +2,6 @@ module gameplay
 
 import os
 import gg
-// import xjunko.sokolgp as sgp
 import framework.audio
 import framework.graphic.context
 import core.common.settings
@@ -32,14 +31,6 @@ mut:
 
 pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap.Beatmap, mode OSUGameplayMode, replay_path_if_any string) {
 	// Init renderer
-	// // Renderer: SGP
-	// sgp_desc := sgp.Desc{}
-	// sgp.setup(&sgp_desc)
-
-	// if !sgp.is_valid() {
-	// 	panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
-	// }
-
 	// Renderer: Slider
 	graphic.init_slider_renderer()
 
@@ -86,10 +77,8 @@ pub fn (mut osu OSUGameplay) draw(mut ctx context.Context) {
 	// Beatmap & Storyboard
 	osu.beatmap.draw()
 
-	ctx.begin_gp()
 	osu.overlay.draw()
 	osu.cursor.cursor.draw()
-	ctx.end_gp_short()
 }
 
 pub fn (mut osu OSUGameplay) update(time_ms f64, time_delta f64) {

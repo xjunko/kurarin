@@ -1,7 +1,7 @@
 Module {
 	name: 'dementia'
 	description: ''
-	version: '0.2.2'
+	version: '0.2.4'
 	license: ''
-	dependencies: ["https://github.com/xjunko/sokolgp-v"]
+	dependencies: []
 }
