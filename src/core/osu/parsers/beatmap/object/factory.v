@@ -1,11 +1,9 @@
 module object
 
-const (
-	circle    = 1 << 0
-	slider    = 1 << 1
-	new_combo = 1 << 2
-	spinner   = 1 << 3
-)
+const circle = 1 << 0
+const slider = 1 << 1
+const new_combo = 1 << 2
+const spinner = 1 << 3
 
 pub fn make_object(items []string) IHitObject {
 	object_type := items[3].i8()

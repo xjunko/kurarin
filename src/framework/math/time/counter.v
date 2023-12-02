@@ -7,12 +7,10 @@ import math
 import time as timelib
 import core.common.settings
 
-pub const (
-	update_rate_fps = settings.global.window.fps
-	update_rate_ms  = (f64(1000.0) / update_rate_fps) * timelib.millisecond
+pub const update_rate_fps = settings.global.window.fps
+pub const update_rate_ms = (f64(1000.0) / update_rate_fps) * timelib.millisecond
 
-	global          = &TimeCounter{}
-)
+pub const global = &TimeCounter{}
 
 //
 pub fn get_time() &TimeCounter {
@@ -59,7 +57,7 @@ pub fn (mut t TimeCounter) stop() {
 	t.stop = true
 }
 
-[args; params]
+@[args; params]
 pub struct ResetArgs {
 pub:
 	offset f64

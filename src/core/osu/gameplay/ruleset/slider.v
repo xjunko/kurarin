@@ -5,10 +5,8 @@ import math
 import framework.math.vector
 import core.osu.parsers.beatmap.object
 
-const (
-	left_button  = Buttons(1 << 0)
-	right_button = Buttons(1 << 1)
-)
+const left_button = Buttons(1 << 0)
+const right_button = Buttons(1 << 1)
 
 pub struct SliderState {
 pub mut:

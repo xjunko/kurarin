@@ -4,7 +4,7 @@ import gg
 import sokol.sgl
 import sokol.sapp
 import sokol.gfx
-import xjunko.sokolgp
+// import xjunko.sokolgp
 import framework.logging
 import framework.math.vector
 import core.common.settings
@@ -19,20 +19,20 @@ pub mut:
 	invisible_pass    gfx.PassAction = gfx.PassAction{
 		colors: [
 			gfx.ColorAttachmentAction{
-				action: .dontcare
-				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+				load_action: .dontcare
+				clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
 			},
 			gfx.ColorAttachmentAction{
-				action: .dontcare
-				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+				load_action: .dontcare
+				clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
 			},
 			gfx.ColorAttachmentAction{
-				action: .dontcare
-				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+				load_action: .dontcare
+				clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
 			},
 			gfx.ColorAttachmentAction{
-				action: .dontcare
-				value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+				load_action: .dontcare
+				clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
 			},
 		]!
 	}
@@ -40,23 +40,23 @@ pub mut:
 
 // begin_gp begins sokol gp context.
 pub fn (mut context Context) begin_gp() {
-	if !context.has_gp_begin {
-		width := sapp.width()
-		height := sapp.height()
+	// if !context.has_gp_begin {
+	// 	width := sapp.width()
+	// 	height := sapp.height()
 
-		sokolgp.begin(width, height)
-		sokolgp.viewport(0, 0, width, height)
+	// 	sokolgp.begin(width, height)
+	// 	sokolgp.viewport(0, 0, width, height)
 
-		context.has_gp_begin = true
-	}
+	// 	context.has_gp_begin = true
+	// }
 }
 
 // begin_gp ends sokol gp context.
 pub fn (mut context Context) end_gp() {
-	sokolgp.flush()
-	sokolgp.end()
+	// sokolgp.flush()
+	// sokolgp.end()
 
-	context.has_gp_begin = false
+	// context.has_gp_begin = false
 }
 
 // begin_gp ends sokol gp and gg context.
@@ -158,7 +158,7 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 	}
 
 	sgl.enable_texture()
-	sgl.texture(img.simg)
+	sgl.texture(img.simg, gfx.Sampler{})
 
 	if config.rotate != 0 {
 		width := img_rect.width * ctx.scale
@@ -285,113 +285,118 @@ pub fn (ctx &Context) draw_image_with_config(config DrawImageConfig) {
 }
 
 pub fn (ctx &Context) draw_image_batch_with_config(config DrawImageConfig) {
-	id := if !isnil(config.img) { config.img.id } else { config.img_id }
-
-	if id >= ctx.image_cache.len {
-		eprintln('gg: draw_image() bad img id ${id} (img cache len = ${ctx.image_cache.len})')
+	// BROKEN: ATM
+	if true {
+		ctx.draw_image_with_config(config)
 		return
 	}
 
-	img := &ctx.image_cache[id]
+	// id := if !isnil(config.img) { config.img.id } else { config.img_id }
 
-	if !img.simg_ok {
-		return
-	}
+	// if id >= ctx.image_cache.len {
+	// 	eprintln('gg: draw_image() bad img id ${id} (img cache len = ${ctx.image_cache.len})')
+	// 	return
+	// }
 
-	mut img_rect := config.img_rect
-	if img_rect.width == 0 && img_rect.height == 0 {
-		img_rect = gg.Rect{img_rect.x, img_rect.y, img.width, img.height}
-	}
+	// img := &ctx.image_cache[id]
 
-	mut part_rect := config.part_rect
-	if part_rect.width == 0 && part_rect.height == 0 {
-		part_rect = gg.Rect{part_rect.x, part_rect.y, img.width, img.height}
-	}
+	// if !img.simg_ok {
+	// 	return
+	// }
 
-	x0 := img_rect.x * ctx.scale
-	y0 := img_rect.y * ctx.scale
+	// mut img_rect := config.img_rect
+	// if img_rect.width == 0 && img_rect.height == 0 {
+	// 	img_rect = gg.Rect{img_rect.x, img_rect.y, img.width, img.height}
+	// }
 
-	// vfmt off
-	match config.effect {
-		.add {
-			sokolgp.set_blend_mode(.sgp_blendmode_add)
-		}
-		.alpha {
-			sokolgp.set_blend_mode(.sgp_blendmode_blend)
-		}
-	}
+	// mut part_rect := config.part_rect
+	// if part_rect.width == 0 && part_rect.height == 0 {
+	// 	part_rect = gg.Rect{part_rect.x, part_rect.y, img.width, img.height}
+	// }
 
+	// x0 := img_rect.x * ctx.scale
+	// y0 := img_rect.y * ctx.scale
 
-	if config.rotate != 0 {
-		width := img_rect.width * ctx.scale
-		height := (if img_rect.height > 0 { img_rect.height } else { img.height }) * ctx.scale
+	// // vfmt off
+	// match config.effect {
+	// 	.add {
+	// 		sokolgp.set_blend_mode(.sgp_blendmode_add)
+	// 	}
+	// 	.alpha {
+	// 		sokolgp.set_blend_mode(.sgp_blendmode_blend)
+	// 	}
+	// }
 
-		sokolgp.push_transform()
+	// if config.rotate != 0 {
+	// 	width := img_rect.width * ctx.scale
+	// 	height := (if img_rect.height > 0 { img_rect.height } else { img.height }) * ctx.scale
 
-		// NOTE: This is awful, but it works.
-		match config.origin.typ {
-			.top_left {
-				sokolgp.translate(x0, y0)
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0, -y0)
-			}
-			.top_centre {
-				sokolgp.translate(x0 + (width / 2), y0 - height)
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0 - (width / 2), -y0)
-			}
-			.top_right {
-				sokolgp.translate(x0 + width, y0 - height)
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0 - width, -y0)
-			}
-			.centre_left {
-				sokolgp.translate(x0, y0 + (height / 2))
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0, -y0 - (height / 2))
-			}
-			.centre {
-				sokolgp.translate(x0 + (width / 2), y0 + (height / 2))
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0 - (width / 2), -y0 - (height / 2))
-			}
-			.centre_right {
-				sokolgp.translate(x0 + width, y0 + (height / 2))
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0 - width, -y0 - (height / 2))
-			}
-			.bottom_left {
-				sokolgp.translate(x0, y0 + height)
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0, -y0 - height)
-			}
-			.bottom_centre {
-				sokolgp.translate(x0 + (width / 2), y0 + height)
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0 - (width / 2), -y0 - height)
-			}
-			.bottom_right {
-				sokolgp.translate(x0 + width, y0 + height)
-				sokolgp.rotate(sgl.rad(-config.rotate))
-				sokolgp.translate(-x0 - width, -y0 - height)
-			}
-		}
-	}
+	// 	sokolgp.push_transform()
 
-	sokolgp.set_image(0, img.simg)
+	// 	// NOTE: This is awful, but it works.
+	// 	match config.origin.typ {
+	// 		.top_left {
+	// 			sokolgp.translate(x0, y0)
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0, -y0)
+	// 		}
+	// 		.top_centre {
+	// 			sokolgp.translate(x0 + (width / 2), y0 - height)
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0 - (width / 2), -y0)
+	// 		}
+	// 		.top_right {
+	// 			sokolgp.translate(x0 + width, y0 - height)
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0 - width, -y0)
+	// 		}
+	// 		.centre_left {
+	// 			sokolgp.translate(x0, y0 + (height / 2))
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0, -y0 - (height / 2))
+	// 		}
+	// 		.centre {
+	// 			sokolgp.translate(x0 + (width / 2), y0 + (height / 2))
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0 - (width / 2), -y0 - (height / 2))
+	// 		}
+	// 		.centre_right {
+	// 			sokolgp.translate(x0 + width, y0 + (height / 2))
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0 - width, -y0 - (height / 2))
+	// 		}
+	// 		.bottom_left {
+	// 			sokolgp.translate(x0, y0 + height)
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0, -y0 - height)
+	// 		}
+	// 		.bottom_centre {
+	// 			sokolgp.translate(x0 + (width / 2), y0 + height)
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0 - (width / 2), -y0 - height)
+	// 		}
+	// 		.bottom_right {
+	// 			sokolgp.translate(x0 + width, y0 + height)
+	// 			sokolgp.rotate(sgl.rad(-config.rotate))
+	// 			sokolgp.translate(-x0 - width, -y0 - height)
+	// 		}
+	// 	}
+	// }
 
-	sokolgp.set_color(
-		f32(config.color.r) / 255.0, 
-		f32(config.color.g) / 255.0, 
-		f32(config.color.b) / 255.0,
-		f32(config.color.a) / 255.0
-	)
+	// sokolgp.set_image(0, img.simg)
 
-	sokolgp.draw_textured_rect(x0, y0, img_rect.width, img_rect.height)
+	// sokolgp.set_color(
+	// 	f32(config.color.r) / 255.0,
+	// 	f32(config.color.g) / 255.0,
+	// 	f32(config.color.b) / 255.0,
+	// 	f32(config.color.a) / 255.0
+	// )
 
-	if config.rotate != 0 {
-		sokolgp.pop_transform()
-	}
+	// sokolgp.draw_textured_rect(x0, y0, img_rect.width, img_rect.height)
 
-	// vfmt on
+	// if config.rotate != 0 {
+	// 	sokolgp.pop_transform()
+	// }
+
+	// // vfmt on
 }

@@ -1,34 +1,30 @@
 module difficulty
 
-pub const (
-	hit_fade_in     = 400.0
-	hit_fade_out    = 240.0
-	hit_range       = 400.0
-	result_fade_in  = 120.0
-	result_fade_out = 600.0
-	post_empt       = 500.0
-)
+pub const hit_fade_in = 400.0
+pub const hit_fade_out = 240.0
+pub const hit_range = 400.0
+pub const result_fade_in = 120.0
+pub const result_fade_out = 600.0
+pub const post_empt = 500.0
 
 pub struct Difficulty {
 pub mut:
-	hp                f64 [HPDrainRate]
-	cs                f64 [CircleSize]
-	od                f64 [OverallDifficulty]
-	ar                f64 [ApproachRate]
-	slider_multiplier f64 [SliderMultiplier]
-	slider_tick_rate  f64 [SliderTickRate]
-
+	hp                f64 @[HPDrainRate]
+	cs                f64 @[CircleSize]
+	od                f64 @[OverallDifficulty]
+	ar                f64 @[ApproachRate]
+	slider_multiplier f64 @[SliderMultiplier]
+	slider_tick_rate  f64 @[SliderTickRate]
 	// Actual values
-	hit300 f64 [_SKIP]
-	hit100 f64 [_SKIP]
-	hit50  f64 [_SKIP]
+	hit300 f64 @[_SKIP]
+	hit100 f64 @[_SKIP]
+	hit50  f64 @[_SKIP]
 
-	circle_radius f64 [_SKIP]
-	preempt       f64 [_SKIP]
-	fade_in       f64 [_SKIP]
-
+	circle_radius f64 @[_SKIP]
+	preempt       f64 @[_SKIP]
+	fade_in       f64 @[_SKIP]
 	//
-	calculated bool [_SKIP]
+	calculated bool @[_SKIP]
 }
 
 pub fn (mut diff Difficulty) calculate() {

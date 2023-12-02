@@ -23,22 +23,22 @@ import core.osu.parsers.beatmap.object.graphic
 
 pub struct BeatmapGeneralInfo {
 pub mut:
-	bg_filename    string [_SKIP]
-	video_filename string [_SKIP]
-	video_offset   f64    [_SKIP]
-	audio_filename string [AudioFilename]
-	stack_leniency f64    [StackLeniency]
-	widescreen     bool   [WidescreenStoryboard]
-	preview_time   f64    [PreviewTime]
+	bg_filename    string @[_SKIP]
+	video_filename string @[_SKIP]
+	video_offset   f64    @[_SKIP]
+	audio_filename string @[AudioFilename]
+	stack_leniency f64    @[StackLeniency]
+	widescreen     bool   @[WidescreenStoryboard]
+	preview_time   f64    @[PreviewTime]
 }
 
 pub struct BeatmapMetadataInfo {
 pub mut:
-	title   string [Title]
-	artist  string [Artist]
-	version string [Version]
-	creator string [Creator]
-	id      int    [BeatmapID]
+	title   string @[Title]
+	artist  string @[Artist]
+	version string @[Version]
+	creator string @[Creator]
+	id      int    @[BeatmapID]
 }
 
 pub struct BeatmapDifficultyInfo {

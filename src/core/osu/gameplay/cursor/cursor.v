@@ -18,12 +18,10 @@ import core.osu.parsers.beatmap.object as gameobject
 import core.osu.system.skin
 import core.osu.x
 
-const (
-	used_imports           = gameobject.used_imports
-	max_valid_style        = 2
+const used_imports = gameobject.used_imports
+const max_valid_style = 2
 
-	osu_cursor_trail_delta = f64(1000.0 / 120.0) // 120FPS
-)
+const osu_cursor_trail_delta = f64(1000.0 / 120.0) // 120FPS
 
 pub struct Cursor {
 	sprite.Sprite

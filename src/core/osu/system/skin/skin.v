@@ -6,40 +6,36 @@ import gg
 import framework.logging
 import framework.graphic.context
 
-pub const (
-	global = &Skin{}
-)
+pub const global = &Skin{}
 
-const (
-	required_files = [
-		// Cursor
-		'cursor',
-		'cursortrail',
-		'cursor-top',
-		'cursortrailfx',
-		// HitCircle
-		'hitcircle',
-		'hitcircleoverlay',
-		'approachcircle',
-		// Slider: These files might not exists
-		'sliderstartcircleoverlay',
-		'sliderstartcircle',
-		'hitcircleoverlay',
-		'sliderfollowcircle',
-		'sliderb',
-		// Spinner
-		'spinner-circle',
-		'spinner-approachcircle',
-		// Hit Accuracy
-		'hit0',
-		'hit50',
-		'hit100',
-		'hit300',
-		// UI shit
-		'inputoverlay-background',
-		'inputoverlay-key',
-	]
-)
+const required_files = [
+	// Cursor
+	'cursor',
+	'cursortrail',
+	'cursor-top',
+	'cursortrailfx',
+	// HitCircle
+	'hitcircle',
+	'hitcircleoverlay',
+	'approachcircle',
+	// Slider: These files might not exists
+	'sliderstartcircleoverlay',
+	'sliderstartcircle',
+	'hitcircleoverlay',
+	'sliderfollowcircle',
+	'sliderb',
+	// Spinner
+	'spinner-circle',
+	'spinner-approachcircle',
+	// Hit Accuracy
+	'hit0',
+	'hit50',
+	'hit100',
+	'hit300',
+	// UI shit
+	'inputoverlay-background',
+	'inputoverlay-key',
+]
 
 //
 pub fn get_skin() &Skin {

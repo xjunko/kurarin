@@ -3,9 +3,7 @@ module curves
 import math
 import framework.math.vector
 
-const (
-	min_part_width = f64(0.0001)
-)
+const min_part_width = f64(0.0001)
 
 pub struct MultiCurve {
 pub mut:

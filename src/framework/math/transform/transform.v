@@ -21,10 +21,10 @@ pub enum TransformType {
 
 pub struct Transform {
 pub mut:
-	typ    TransformType         [required]
+	typ    TransformType         @[required]
 	easing easing.EasingFunction = easing.linear
-	time   time.Time             [required]
-	before []f64                 [required]
+	time   time.Time             @[required]
+	before []f64                 @[required]
 	after  []f64
 }
 

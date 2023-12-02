@@ -8,7 +8,7 @@ import framework.math.vector
 import framework.math.transform
 import framework.graphic.context
 
-[params]
+@[params]
 pub struct CommonSpriteArgument {
 pub mut:
 	ctx   &context.Context = unsafe { nil }
@@ -20,7 +20,7 @@ pub mut:
 	camera camera.Camera
 }
 
-[params]
+@[params]
 pub struct CommonSpriteSizeResetArgument {
 pub:
 	factor   f64 = 1.0
@@ -32,14 +32,14 @@ pub:
 
 pub interface ISprite {
 mut:
-	id int
-	time time.Time
-	origin vector.Origin
-	position vector.Vector2[f64]
-	size vector.Vector2[f64]
-	color gx.Color
-	angle f64
-	additive bool
+	id             int
+	time           time.Time
+	origin         vector.Origin
+	position       vector.Vector2[f64]
+	size           vector.Vector2[f64]
+	color          gx.Color
+	angle          f64
+	additive       bool
 	always_visible bool
 	update(f64)
 	draw(CommonSpriteArgument)

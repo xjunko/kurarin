@@ -35,13 +35,11 @@ fn C.fuck_shader_desc(gfx.Backend) &gfx.ShaderDesc
 
 // fn C.test_shader_desc(gfx.Backend) &gfx.ShaderDesc
 
-pub const (
-	used_import     = gfx.used_import + sokol.used_import
-	global_renderer = &SliderRenderer{}
-	use_test_shader = false
-)
+pub const used_import = gfx.used_import + sokol.used_import
+pub const global_renderer = &SliderRenderer{}
+pub const use_test_shader = false
 
-[manualfree]
+@[manualfree]
 pub struct SliderRendererAttr {
 pub mut:
 	cs                   f64
@@ -284,7 +282,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 
 	gfx.begin_default_pass(graphic.global_renderer.pass_action, int(settings.global.window.width), int(settings.global.window.height))
 		sgl.enable_texture()
-		sgl.texture(graphic.global_renderer.color_img)
+		sgl.texture(graphic.global_renderer.color_img, gfx.Sampler{})
 		sgl.c4b(255, 255, 255, u8(255 - (255 * alpha)))
 		sgl.begin_quads()
 			sgl.v3f_t2f(0, 0, 1, 0, 1)
@@ -391,13 +389,13 @@ pub fn init_slider_renderer() {
 
 	// Pass action
 	renderer.pass_action.colors[0] = gfx.ColorAttachmentAction{
-		action: .dontcare
-		value: gfx.Color{1.0, 1.0, 1.0, 1.0}
+		load_action: .dontcare
+		clear_value: gfx.Color{1.0, 1.0, 1.0, 1.0}
 	}
 
 	renderer.pass_action2.colors[0] = gfx.ColorAttachmentAction{
-		action: .clear
-		value: gfx.Color{1.0, 1.0, 1.0, 0.0}
+		load_action: .clear
+		clear_value: gfx.Color{1.0, 1.0, 1.0, 0.0}
 	}
 
 	// Uniform (projection and slider scale)

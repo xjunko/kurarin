@@ -8,9 +8,7 @@ import core.common.constants
 import core.osu.runtime
 import core.osu.runtime.gui
 
-const (
-	_ = settings.global
-)
+const _ = settings.global
 
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)

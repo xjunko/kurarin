@@ -8,10 +8,9 @@ import framework.math.time
 import framework.math.vector
 import framework.math.easing
 
-const (
-	offset           = osu_cursor_trail_delta // 120fps
-	tag_on_new_combo = true
-)
+const offset = osu_cursor_trail_delta // 120fps
+
+const tag_on_new_combo = true
 
 // [deprecated: "TODO: remove this after we got realtime auto."]
 pub fn make_replay(mut current_beatmap beatmap.Beatmap, mut cursor Cursor, player_number int, max_player int) {

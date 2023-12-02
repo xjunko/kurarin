@@ -8,26 +8,24 @@ import framework.math.vector
 import core.osu.parsers.beatmap.timing
 import core.osu.parsers.beatmap.difficulty
 
-pub const (
-	used_imports = true
-)
+pub const used_imports = true
 
 pub interface IHitObject {
 mut:
-	id int
-	diff difficulty.Difficulty
-	time time.Time
-	position vector.Vector2[f64]
-	end_position vector.Vector2[f64]
-	raw_position vector.Vector2[f64]
+	id               int
+	diff             difficulty.Difficulty
+	time             time.Time
+	position         vector.Vector2[f64]
+	end_position     vector.Vector2[f64]
+	raw_position     vector.Vector2[f64]
 	raw_end_position vector.Vector2[f64]
-	stack_offset vector.Vector2[f64]
-	stack_index int
-	color []f64
-	color_offset int
-	is_slider bool
-	is_spinner bool
-	done bool
+	stack_offset     vector.Vector2[f64]
+	stack_index      int
+	color            []f64
+	color_offset     int
+	is_slider        bool
+	is_spinner       bool
+	done             bool
 	draw(sprite.CommonSpriteArgument)
 	update(f64) bool
 	post_update(f64)

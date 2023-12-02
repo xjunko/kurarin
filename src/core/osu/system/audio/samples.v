@@ -5,23 +5,21 @@ import core.common.settings
 import framework.audio
 import framework.logging
 
-const (
-	global_sample = &GameSamples{}
-	set_ids       = {
-		'normal': 1
-		'soft':   2
-		'drum':   3
-	}
-	hitsound_names = {
-		'hitnormal':     1
-		'hitwhistle':    2
-		'hitfinish':     3
-		'hitclap':       4
-		'slidertick':    5
-		'sliderslide':   6
-		'sliderwhistle': 7
-	}
-)
+const global_sample = &GameSamples{}
+const set_ids = {
+	'normal': 1
+	'soft':   2
+	'drum':   3
+}
+const hitsound_names = {
+	'hitnormal':     1
+	'hitwhistle':    2
+	'hitfinish':     3
+	'hitclap':       4
+	'slidertick':    5
+	'sliderslide':   6
+	'sliderwhistle': 7
+}
 
 pub struct GameSamples {
 pub mut:

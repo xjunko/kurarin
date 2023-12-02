@@ -11,35 +11,30 @@ Note(s):
 // https://osu.ppy.sh/wiki/en/Skinning/skin.ini#[general]
 pub struct SkinMetadata {
 pub mut:
-	name   string [Name]
-	author string [Author]
+	name   string @[Name]
+	author string @[Author]
 
-	version             f64 [Version]
-	animation_framerate f64 [AnimationFramerate]
-
+	version             f64 @[Version]
+	animation_framerate f64 @[AnimationFramerate]
 	// Cursor
-	cursor_centre bool [CursorCentre]
-	cursor_expand bool [CursorExpand]
-	cursor_rotate bool [CursorRotate]
-
+	cursor_centre bool @[CursorCentre]
+	cursor_expand bool @[CursorExpand]
+	cursor_rotate bool @[CursorRotate]
 	// Sliders
-	slider_ball_tint      bool     [AllowSliderBallTint]
-	slider_ball_flip      bool     [SliderBallFlip]
-	slider_ball           gg.Color [SliderBall]
-	slider_border         gg.Color [SliderBorder]
-	slider_track_override gg.Color [SliderTrackOverride]
-
+	slider_ball_tint      bool     @[AllowSliderBallTint]
+	slider_ball_flip      bool     @[SliderBallFlip]
+	slider_ball           gg.Color @[SliderBall]
+	slider_border         gg.Color @[SliderBorder]
+	slider_track_override gg.Color @[SliderTrackOverride]
 	// HitCircle
-	hit_circle_prefix  string [HitCirclePrefix]
-	hit_circle_overlap f64    [HitCircleOverlap]
-
+	hit_circle_prefix  string @[HitCirclePrefix]
+	hit_circle_overlap f64    @[HitCircleOverlap]
 	// Score
-	score_prefix  string [ScorePrefix]
-	score_overlap f64    [ScoreOverlap]
-
+	score_prefix  string @[ScorePrefix]
+	score_overlap f64    @[ScoreOverlap]
 	// Combo
-	combo_prefix  string     [ComboPrefix]
-	combo_overlap f64        [ComboOverlap]
+	combo_prefix  string     @[ComboPrefix]
+	combo_overlap f64        @[ComboOverlap]
 	combo_colors  []gg.Color
 }
 

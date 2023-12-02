@@ -5,12 +5,10 @@ import framework.math.time
 import framework.graphic.context
 import core.osu.parsers.replay as i_replay
 
-const (
-	osu_m1 = 1 << 0
-	osu_m2 = 1 << 1
-	osu_k1 = 1 << 2
-	osu_k2 = 1 << 3
-)
+const osu_m1 = 1 << 0
+const osu_m2 = 1 << 1
+const osu_k1 = 1 << 2
+const osu_k2 = 1 << 3
 
 pub struct ReplayEvent {
 pub:

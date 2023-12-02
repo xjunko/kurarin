@@ -8,7 +8,7 @@ import sync
 import sokol.gfx
 import sokol.sgl
 import sokol.sapp
-import xjunko.sokolgp as sgp
+// import xjunko.sokolgp as sgp
 import time as timelib
 import gg
 import core.osu.x
@@ -171,12 +171,12 @@ fn C._sapp_glx_swapinterval(int)
 pub fn window_init(mut window Window) {
 	// Init Renderer(s)
 	// Renderer: SGP
-	sgp_desc := sgp.Desc{}
-	sgp.setup(&sgp_desc)
+	// sgp_desc := sgp.Desc{}
+	// sgp.setup(&sgp_desc)
 
-	if !sgp.is_valid() {
-		panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
-	}
+	// if !sgp.is_valid() {
+	// 	panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
+	// }
 
 	// Renderer: Slider
 	graphic.init_slider_renderer()

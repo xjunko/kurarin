@@ -9,10 +9,8 @@ import core.osu.gameplay.cursor
 import framework.logging
 import framework.math.vector
 
-const (
-	tolerance_2b = int(3)
-	grades       = ['None', 'SSH', 'SS', 'S', 'A', 'B', 'C', 'D']
-)
+const tolerance_2b = int(3)
+const grades = ['None', 'SSH', 'SS', 'S', 'A', 'B', 'C', 'D']
 
 pub enum Grade {
 	@none
@@ -62,10 +60,8 @@ mut:
 
 type Buttons = i64
 
-const (
-	left_mouse  = Buttons(1 << 0)
-	right_mouse = Buttons(1 << 1)
-)
+const left_mouse = Buttons(1 << 0)
+const right_mouse = Buttons(1 << 1)
 
 pub struct DifficultyPlayer {
 pub mut:

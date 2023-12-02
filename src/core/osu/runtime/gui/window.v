@@ -16,17 +16,15 @@ import framework.math.time
 fn C._sapp_glx_swapinterval(int)
 
 // Const
-const (
-	c_scene_error            = 0xFAC
-	c_scene_none             = int(0 << 0)
-	c_scene_main             = int(1 << 0)
-	c_scene_pre_gameplay     = int(1 << 1)
-	c_scene_loading_gameplay = int(1 << 2)
-	c_scene_gameplay         = int(1 << 3)
-)
+const c_scene_error = 0xFAC
+const c_scene_none = int(0 << 0)
+const c_scene_main = int(1 << 0)
+const c_scene_pre_gameplay = int(1 << 1)
+const c_scene_loading_gameplay = int(1 << 2)
+const c_scene_gameplay = int(1 << 3)
 
 // Structs
-[heap]
+@[heap]
 pub struct GUIWindow {
 	i_window.GeneralWindow
 mut:

@@ -6,9 +6,7 @@ import time as timelib
 import framework.audio
 import core.common.settings
 
-const (
-	used_import = sapp.used_import
-)
+const used_import = sapp.used_import
 
 pub struct Video {
 pub mut:

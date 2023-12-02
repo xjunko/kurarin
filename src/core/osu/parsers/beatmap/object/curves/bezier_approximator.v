@@ -3,10 +3,8 @@ module curves
 import sync
 import framework.math.vector
 
-const (
-	_bezier_quantization    = 0.5
-	_bezier_quantization_sq = _bezier_quantization * _bezier_quantization
-)
+const _bezier_quantization = 0.5
+const _bezier_quantization_sq = _bezier_quantization * _bezier_quantization
 
 pub struct ItemStack {
 pub mut:

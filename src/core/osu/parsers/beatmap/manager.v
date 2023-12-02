@@ -3,9 +3,7 @@ module beatmap
 import os
 import framework.logging
 
-const (
-	c_hard_limit = 100
-)
+const c_hard_limit = 100
 
 pub struct BeatmapContainer {
 pub mut:

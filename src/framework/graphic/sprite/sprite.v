@@ -188,9 +188,7 @@ pub fn (mut sprite Sprite) get_texture() &gg.Image {
 }
 
 // Draw/Update FNs
-const (
-	time_to_catch_up = f64(100.0)
-)
+const time_to_catch_up = f64(100.0)
 
 pub fn (mut sprite Sprite) update(update_time f64) {
 	// TODO: make better updater

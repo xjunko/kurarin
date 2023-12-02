@@ -7,9 +7,7 @@ import framework.math.vector
 import framework.math.camera
 import core.common.settings
 
-pub const (
-	resolution = &Resolution{}
-)
+pub const resolution = &Resolution{}
 
 pub struct Resolution {
 pub mut:

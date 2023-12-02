@@ -14,16 +14,14 @@ import framework.graphic.sprite
 import framework.graphic.context
 import core.osu.gameplay.overlays.gameplay
 
-const (
-	g_overlay_hack = &GameplayOverlay{
-		ctx: 0
-		ruleset: 0
-		cursor: 0
-		hitresult: 0
-		combo_counter: 0
-		scoreboard: 0
-	}
-)
+const g_overlay_hack = &GameplayOverlay{
+	ctx: 0
+	ruleset: 0
+	cursor: 0
+	hitresult: 0
+	combo_counter: 0
+	scoreboard: 0
+}
 
 pub struct GameplayOverlay {
 pub mut:

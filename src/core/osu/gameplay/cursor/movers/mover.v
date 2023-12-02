@@ -39,8 +39,8 @@ pub fn (mut mover Mover) get_point_at(update_time f64) vector.Vector2[f64] {
 pub interface IMover {
 mut:
 	start vector.Vector2[f64]
-	end vector.Vector2[f64]
-	time time.Time
+	end   vector.Vector2[f64]
+	time  time.Time
 	init(mut start object.IHitObject, mut end object.IHitObject, direction int)
 	get_multiplier(time f64) f64
 	get_point_at(time f64) vector.Vector2[f64]

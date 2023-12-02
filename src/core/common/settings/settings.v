@@ -5,9 +5,7 @@ import math
 import json
 import framework.logging
 
-pub const (
-	global = &Settings{} // disgusting global hack
-)
+pub const global = &Settings{} // disgusting global hack
 
 pub struct Settings {
 pub mut:

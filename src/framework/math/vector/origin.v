@@ -1,54 +1,52 @@
 module vector
 
-pub const (
-	top_left = Origin{
-		x: 0
-		y: 0
-		typ: OriginType.top_left
-	}
-	top_centre = Origin{
-		x: 0.5
-		y: -1
-		typ: OriginType.top_centre
-	}
-	top_right = Origin{
-		x: 1
-		y: -1
-		typ: OriginType.top_right
-	}
+pub const top_left = Origin{
+	x: 0
+	y: 0
+	typ: OriginType.top_left
+}
+pub const top_centre = Origin{
+	x: 0.5
+	y: -1
+	typ: OriginType.top_centre
+}
+pub const top_right = Origin{
+	x: 1
+	y: -1
+	typ: OriginType.top_right
+}
 
-	centre_left = Origin{
-		x: 0
-		y: 0.5
-		typ: OriginType.centre_left
-	}
-	centre = Origin{
-		x: 0.5
-		y: 0.5
-		typ: OriginType.centre
-	}
-	centre_right = Origin{
-		x: 1
-		y: 0.5
-		typ: OriginType.centre_right
-	}
+pub const centre_left = Origin{
+	x: 0
+	y: 0.5
+	typ: OriginType.centre_left
+}
+pub const centre = Origin{
+	x: 0.5
+	y: 0.5
+	typ: OriginType.centre
+}
+pub const centre_right = Origin{
+	x: 1
+	y: 0.5
+	typ: OriginType.centre_right
+}
 
-	bottom_left = Origin{
-		x: 0
-		y: 1
-		typ: OriginType.bottom_left
-	}
-	bottom_centre = Origin{
-		x: 0.5
-		y: 1
-		typ: OriginType.bottom_centre
-	}
-	bottom_right = Origin{
-		x: 1
-		y: 1
-		typ: OriginType.bottom_right
-	}
-)
+pub const bottom_left = Origin{
+	x: 0
+	y: 1
+	typ: OriginType.bottom_left
+}
+pub const bottom_centre = Origin{
+	x: 0.5
+	y: 1
+	typ: OriginType.bottom_centre
+}
+pub const bottom_right = Origin{
+	x: 1
+	y: 1
+	typ: OriginType.bottom_right
+}
 
 pub enum OriginType {
 	top_left

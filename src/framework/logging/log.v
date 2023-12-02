@@ -2,14 +2,12 @@ module logging
 
 import log
 
-pub const (
-	global = &KurarinLogger{
-		Log: &log.Log{
-			level: .info
-			output_target: .console
-		}
+pub const global = &KurarinLogger{
+	Log: &log.Log{
+		level: .info
+		output_target: .console
 	}
-)
+}
 
 pub struct KurarinLogger {
 	log.Log

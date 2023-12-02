@@ -13,10 +13,8 @@ import core.osu.system.audio
 import core.osu.system.skin
 // import core.osu.x
 
-const (
-	default_hitcircle_size = 128.0
-	is_hidden              = false
-)
+const default_hitcircle_size = 128.0
+const is_hidden = false
 
 pub struct Circle {
 	HitObject

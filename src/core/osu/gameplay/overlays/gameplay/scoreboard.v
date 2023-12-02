@@ -8,7 +8,7 @@ import framework.graphic.sprite
 
 pub interface MainOverlay {
 mut:
-	score i64
+	score        i64
 	score_smooth i64
 }
 
@@ -46,7 +46,6 @@ pub fn (mut scoreboard ScoreBoard) draw(arg sprite.CommonSpriteArgument) {
 
 	// Name
 	arg.ctx.draw_text(int(4 * arg.scale), int(313 + (12 * arg.scale)), scoreboard.player.name,
-		
 		color: gg.Color{255, 255, 255, 255}
 		size: int(20 * arg.scale)
 	)

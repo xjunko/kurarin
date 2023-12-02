@@ -4,11 +4,11 @@ import gg
 import sokol.gfx
 import sokol.sgl
 import sokol.sapp
-import xjunko.sokolgp as sgp
+// import xjunko.sokolgp as sgp
 import framework.graphic.window as i_window
 import framework.graphic.context
 
-[heap]
+@[heap]
 pub struct Window {
 	i_window.GeneralWindow
 pub mut:
@@ -18,12 +18,12 @@ pub mut:
 pub fn (mut window Window) init(_ voidptr) {
 	// Init Renderer(s)
 	// Renderer: SGP
-	sgp_desc := sgp.Desc{}
-	sgp.setup(&sgp_desc)
+	// sgp_desc := sgp.Desc{}
+	// sgp.setup(&sgp_desc)
 
-	if !sgp.is_valid() {
-		panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
-	}
+	// if !sgp.is_valid() {
+	// 	panic('Failed to init SokolGP: ${sgp.get_error_message(sgp.get_last_error())}')
+	// }
 
 	window.img = window.ctx.create_image('/home/junko/Pictures/1.png')
 }
@@ -34,11 +34,11 @@ pub fn (mut window Window) draw(_ voidptr) {
 	width := sapp.width()
 	height := sapp.height()
 
-	sgp.begin(width, height)
-	sgp.viewport(0, 0, width, height)
+	// sgp.begin(width, height)
+	// sgp.viewport(0, 0, width, height)
 
-	sgp.set_color(0.1, 0.1, 0.1, 1.0)
-	sgp.clear()
+	// sgp.set_color(0.1, 0.1, 0.1, 1.0)
+	// sgp.clear()
 
 	window.ctx.draw_image_batch_with_config(
 		img: &window.img
@@ -54,8 +54,8 @@ pub fn (mut window Window) draw(_ voidptr) {
 
 	gfx.begin_default_pass(window.ctx.clear_pass, sapp.width(), sapp.height())
 
-	sgp.flush()
-	sgp.end()
+	// sgp.flush()
+	// sgp.end()
 
 	sgl.draw()
 

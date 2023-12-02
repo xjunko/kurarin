@@ -3,9 +3,7 @@ module audio
 import framework.logging
 import core.common.settings
 
-const (
-	global = &GlobalMixer{}
-)
+const global = &GlobalMixer{}
 
 pub struct GlobalMixer {
 pub mut:
