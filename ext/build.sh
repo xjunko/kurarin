@@ -24,7 +24,7 @@ format() {
 }
 
 build_shaders() {
-    v shader $shaders_dir
+    v shader $shaders_dir -l glsl330
 }
 
 build() {
