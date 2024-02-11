@@ -57,12 +57,14 @@ pub fn make_number_sprite(number int, prefix string) &NumberSprite {
 	}
 
 	// HACK: we only need one texture for this to work
-	sprite.textures << sprite.fonts['0']
+	sprite.textures << unsafe { sprite.fonts['0'] }
 
 	// size
-	sprite.reset_size_based_on_texture(
-		size: vector.Vector2[f64]{sprite.fonts['0'].width, sprite.fonts['0'].height}
-	)
+	unsafe {
+		sprite.reset_size_based_on_texture(
+			size: vector.Vector2[f64]{sprite.fonts['0'].width, sprite.fonts['0'].height}
+		)
+	}
 
 	return sprite
 }

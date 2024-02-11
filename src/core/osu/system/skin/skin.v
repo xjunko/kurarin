@@ -144,7 +144,7 @@ pub fn get_texture_with_fallback(name string, fallback string) gg.Image {
 		skin.cache[name] = skin.ctx.create_image(original_path)
 
 		// Check if failed
-		if skin.cache[name].id == 0 || !os.exists(original_path) {
+		if unsafe { skin.cache[name].id == 0 } || !os.exists(original_path) {
 			logging.debug('Failed getting ${name} from skin, trying ${fallback}!')
 
 			// Use fallback texture name
@@ -159,15 +159,15 @@ pub fn get_texture_with_fallback(name string, fallback string) gg.Image {
 			// println(os.join_path(skin.fallback, fallback + '.png'))
 			skin.cache[fallback] = skin.ctx.create_image(os.join_path(skin.fallback, fallback +
 				'.png'))
-			skin.cache[name] = skin.cache[fallback]
+			skin.cache[name] = unsafe { skin.cache[fallback] }
 
 			// If still fail, then fuck it, we ballin.
-			if skin.cache[fallback].id == skin.ctx.texture_not_found.id {
+			if unsafe { skin.cache[fallback].id } == skin.ctx.texture_not_found.id {
 				skin.cache.delete(fallback)
 				skin.cache.delete(name)
 			}
 		}
 	}
 
-	return skin.cache[name]
+	return skin.cache[name] or { panic('Cache missed: This should never happen.') }
 }

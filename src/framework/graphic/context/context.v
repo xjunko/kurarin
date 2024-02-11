@@ -67,7 +67,7 @@ pub fn (mut context Context) create_image(path string) gg.Image {
 		}
 	}
 
-	return context.cache[path]
+	return context.cache[path] or { panic('[Context] Cache missed: This should never happen.') }
 }
 
 pub struct DrawImageConfig {

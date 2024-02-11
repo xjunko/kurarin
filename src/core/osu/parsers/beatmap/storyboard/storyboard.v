@@ -43,7 +43,7 @@ pub fn (mut storyboard Storyboard) get_image(path_ string) gg.Image {
 		storyboard.cache[path] = storyboard.ctx.create_image(path)
 	}
 
-	return storyboard.cache[path]
+	return unsafe { storyboard.cache[path] }
 }
 
 pub fn (mut storyboard Storyboard) update_time(time f64) {
