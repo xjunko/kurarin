@@ -7,6 +7,7 @@ import core.common.settings
 import core.common.constants
 import core.osu.runtime
 import core.osu.runtime.gui
+import core.basic.runtime as basic
 
 const _ = settings.global
 
@@ -41,6 +42,9 @@ fn main() {
 
 			runtime.run(beatmap_path.replace('\\', ''), replay_path.replace('\\', ''),
 				is_playing)
+		}
+		'basic', 'b' {
+			basic.run()
 		}
 		else {
 			logging.error('Invalid game_type: ${game_type}')

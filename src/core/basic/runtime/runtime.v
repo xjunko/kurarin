@@ -1,47 +1,56 @@
 module runtime
 
 import gg
-import sokol.gfx
-import sokol.sgl
-import sokol.sapp
+import framework.math.time
 import framework.graphic.window as i_window
 import framework.graphic.context
 
+// Simple Basic Window
+// emulates how the real game operates but without the game.
+// to get the baseline performance of the whole thing,
+// just in case theres some dumb internal overhead.
 @[heap]
 pub struct Window {
 	i_window.GeneralWindow
-pub mut:
-	img gg.Image
 }
 
+// VSync hack.
+fn C._sapp_glx_swapinterval(int)
+
 pub fn (mut window Window) init(_ voidptr) {
-	window.img = window.ctx.create_image('/home/junko/Pictures/1.png')
+	C._sapp_glx_swapinterval(0)
+
+	spawn fn (mut window Window) {
+		mut g_time := time.get_time()
+		mut limiter := time.Limiter{1000, 0, 0}
+
+		g_time.reset()
+		g_time.set_speed(1.0)
+
+		for {
+			window.mutex.@lock()
+			window.update(g_time.time, g_time.delta)
+			window.mutex.unlock()
+
+			window.GeneralWindow.tick_update()
+			limiter.sync()
+		}
+	}(mut window)
+}
+
+pub fn (mut window Window) update(update_time f64, delta f64) {
+	// Nothing.
 }
 
 pub fn (mut window Window) draw(_ voidptr) {
+	window.mutex.@lock()
+
 	window.ctx.begin()
+	window.tick_draw()
+	window.GeneralWindow.draw_stats()
+	window.ctx.end()
 
-	width := sapp.width()
-	height := sapp.height()
-
-	window.ctx.draw_image_with_config(
-		img: &window.img
-		img_id: window.img.id
-		img_rect: gg.Rect{
-			x: 0
-			y: 0
-			width: 1280
-			height: 720
-		}
-		color: gg.Color{255, 255, 255, 255}
-	)
-
-	gfx.begin_default_pass(window.ctx.clear_pass, sapp.width(), sapp.height())
-
-	sgl.draw()
-
-	gfx.end_pass()
-	gfx.commit()
+	window.mutex.unlock()
 }
 
 pub fn run() {
