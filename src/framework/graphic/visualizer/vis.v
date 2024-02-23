@@ -37,21 +37,20 @@ pub fn (mut vis Visualizer) update(time f64) {
 	vis.counter += delta
 	mut decay := delta * vis.decay_value
 
-	// TODO: FFT Removed cuz of backend being generic.
-	// if vis.counter >= vis.update_delay {
-	// 	fft := &vis.music.fft
+	if vis.counter >= vis.update_delay {
+		effects := &vis.music.effects
 
-	// 	for i := 0; i < vis.bars; i++ {
-	// 		value := unsafe { fft[(i + vis.jump_counter) % vis.bars] * vis.multiplier }
+		for i := 0; i < vis.bars; i++ {
+			value := unsafe { effects.fft_raw[(i + vis.jump_counter) % vis.bars] * vis.multiplier }
 
-	// 		if value > vis.fft[i] {
-	// 			vis.fft[i] = value
-	// 		}
-	// 	}
+			if value > vis.fft[i] {
+				vis.fft[i] = value
+			}
+		}
 
-	// 	vis.jump_counter = (vis.jump_counter + vis.jump_size) % vis.bars
-	// 	vis.counter -= vis.update_delay
-	// }
+		vis.jump_counter = (vis.jump_counter + vis.jump_size) % vis.bars
+		vis.counter -= vis.update_delay
+	}
 
 	for i := 0; i < vis.bars; i++ {
 		vis.fft[i] -= (vis.fft[i] + 0.03) * decay

@@ -1,10 +1,14 @@
 module dummy
 
+import framework.audio.common
+
 // Structs
 pub struct DummyTrack {
 pub mut:
 	path    string
 	playing bool
+
+	effects common.AudioEffects
 }
 
 pub fn (mut dummy_track DummyTrack) play() {}

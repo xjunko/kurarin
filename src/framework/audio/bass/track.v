@@ -39,13 +39,11 @@ pub fn track_setup_fx_channel(channel C.HSTREAM) {
 // Decl
 pub struct Track {
 pub mut:
-	channel  C.HSTREAM
-	pitch    f64
-	speed    f64
-	fft      []f32 = []f32{len: 512}
-	boost    f32
-	boost_sm f32 // Smoothed boost
-	playing  bool
+	channel C.HSTREAM
+	effects common.AudioEffects
+	pitch   f64
+	speed   f64
+	playing bool
 }
 
 pub fn (mut track Track) play() {
@@ -89,16 +87,16 @@ pub fn (mut track Track) set_pitch(pitch f64) {
 
 pub fn (mut track Track) update(time f64) {
 	// Get FFT data
-	C.BASS_Mixer_ChannelGetData(track.channel, &track.fft[0], C.BASS_DATA_FFT1024)
+	C.BASS_Mixer_ChannelGetData(track.channel, &track.effects.fft_raw[0], C.BASS_DATA_FFT1024)
 
 	// calculate peak
 	mut boost := f32(0.0)
 	for i := 0; i < 10; i++ {
-		boost += (track.fft[i] * track.fft[i]) * (10.0 - f32(i)) / 10.0
+		boost += (track.effects.fft_raw[i] * track.effects.fft_raw[i]) * (10.0 - f32(i)) / 10.0
 	}
 
-	track.boost = boost
-	track.boost_sm = track.boost * 0.1 + track.boost_sm - track.boost_sm * 0.1
+	track.effects.peak_raw = boost
+	track.effects.peak_smoothed = track.effects.peak_raw * 0.1 + track.effects.peak_smoothed - track.effects.peak_smoothed * 0.1
 }
 
 pub fn (mut track Track) get_position() f64 {

@@ -16,6 +16,7 @@ pub interface ITrack {
 mut:
 	// Field
 	playing bool
+	effects AudioEffects
 	// Method
 	play()
 	pause()
@@ -32,6 +33,7 @@ pub interface ISample {
 mut:
 	// Field
 	playing bool
+	effects AudioEffects
 	// Method
 	play()
 	play_volume(vol f32)
