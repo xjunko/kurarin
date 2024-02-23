@@ -49,14 +49,14 @@ pub mut:
 	record bool
 	video  &export.Video = unsafe { nil }
 	// HACK: move this to somewhere else
-	beatmap_song       &audio.ITrack = unsafe { nil }
+	beatmap_song       &audio.ITrack
 	beatmap_song_boost f32 = f32(1.0)
 }
 
 pub fn (mut window Window) update_boost() {
 	if settings.global.gameplay.hitobjects.scale_to_beat {
-		panic('UNIMPLEMNT NEW BACKEDN AUDIO SCALE TO BEATY')
-		// target := math.clamp(1.0 + (0.5 * window.beatmap_song.boost), 1.0, 2.0) // 2.0 is the max
+		// target := math.clamp(1.0 + (0.5 * window.beatmap_song.effects.peak_raw), 1.0,
+		// 	2.0) // 2.0 is the max
 		// window.beatmap_song_boost = f32(target * 0.1 + window.beatmap_song_boost - window.beatmap_song_boost * 0.1)
 
 		// rate := 0.15 * (time.global.delta / 8.33334) // 120fps
@@ -365,6 +365,7 @@ pub fn window_draw_recording(mut window Window) {
 
 pub fn initiate_game_loop(argument GameArgument) {
 	mut window := &Window{
+		beatmap_song: audio.new_dummy_track()
 		cursor_controller: unsafe { nil }
 	}
 	window.argument = &argument
