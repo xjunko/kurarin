@@ -303,16 +303,17 @@ pub fn new_ruleset(mut loaded_beatmap beatmap.Beatmap, mut cursors []&cursor.Cur
 	ruleset.subset = []&SubSet{}
 
 	// Unsafe: V thinks this is unsafe (which is true), but the list will get overwritten so it's fine.
-	mut diff_players := unsafe { []&DifficultyPlayer{len: cursors.len} }
+	mut diff_players := []&DifficultyPlayer{}
 
-	for i, mut cursor in cursors {
+	for mut cursor in cursors {
 		mut diff := loaded_beatmap.difficulty.Difficulty
 
 		mut player := &DifficultyPlayer{
 			cursor: unsafe { *cursor }
 			diff: diff
 		}
-		diff_players[i] = player
+
+		diff_players << player
 
 		ruleset.cursors << unsafe { *cursor }
 		ruleset.subset << &SubSet{
