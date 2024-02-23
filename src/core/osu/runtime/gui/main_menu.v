@@ -20,7 +20,7 @@ mut:
 pub mut:
 	current_beatmap &beatmap.BeatmapContainer = unsafe { nil }
 	current_version &beatmap.Beatmap = unsafe { nil }
-	current_track   &audio.Track     = unsafe { nil }
+	current_track   &audio.ITrack    = unsafe { nil }
 }
 
 pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.BeatmapContainer) {

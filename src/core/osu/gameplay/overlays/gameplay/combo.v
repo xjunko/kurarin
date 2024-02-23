@@ -18,7 +18,7 @@ pub mut:
 	main_font &sprite.NumberSprite = unsafe { nil }
 	pop_font  &sprite.NumberSprite = unsafe { nil }
 
-	combo_break f_audio.Sample
+	combo_break f_audio.ISample
 
 	main_glider &glider.Glider = glider.new_glider(1.0)
 	pop_glider  &glider.Glider = glider.new_glider(1.0)

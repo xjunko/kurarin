@@ -23,11 +23,13 @@ const hitsound_names = {
 
 pub struct GameSamples {
 pub mut:
-	base         [3][7]audio.Sample
-	beatmap      [3][7]map[int]audio.Sample
-	cache        map[string]audio.Sample
+	// vfmt off
+	base         [3][7]&audio.ISample
+	beatmap      [3][7]map[int]&audio.ISample
+	cache        map[string]&audio.ISample
 	skin_path    string
 	beatmap_path string
+	// vfmt on
 }
 
 pub fn (mut sample GameSamples) load_base_sample() {
@@ -131,7 +133,7 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 
 			// Re-Init the dict again (segmentation error w/o this)
 			if g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1].len == 0 {
-				g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1] = map[int]audio.Sample{}
+				g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1] = map[int]&audio.ISample{}
 			}
 
 			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index] = audio.new_sample(path)
@@ -211,7 +213,7 @@ pub fn init_samples(skin_path string, beatmap_path string) {
 	sample.load_beatmap_sample()
 }
 
-pub fn get_sample(name string) audio.Sample {
+pub fn get_sample(name string) &audio.ISample {
 	mut sample := get_global_sample()
 
 	if name.to_lower() !in sample.cache {
@@ -225,5 +227,7 @@ pub fn get_sample(name string) audio.Sample {
 	}
 
 	// FIXME: im not sure how to handle this exactly
-	return sample.cache[name.to_lower()] or { audio.Sample{} }
+	return sample.cache[name.to_lower()] or {
+		panic('Failed to get sample, audio fucks up: src.core.osu.system.audio.samples:get_sample')
+	}
 }

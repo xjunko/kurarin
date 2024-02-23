@@ -22,7 +22,7 @@ pub enum OSUGameplayMode {
 pub struct OSUGameplay {
 mut:
 	beatmap         &beatmap.Beatmap = unsafe { nil }
-	beatmap_audio   &audio.Track     = unsafe { nil }
+	beatmap_audio   &audio.ITrack    = unsafe { nil }
 	beatmap_ruleset &ruleset.Ruleset = unsafe { nil }
 
 	cursor  cursor.ICursorController
