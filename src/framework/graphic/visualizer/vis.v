@@ -38,15 +38,15 @@ pub fn (mut vis Visualizer) update(time f64) {
 	mut decay := delta * vis.decay_value
 
 	if vis.counter >= vis.update_delay {
-		effects := &vis.music.effects
+		// effects := &vis.music.effects
 
-		for i := 0; i < vis.bars; i++ {
-			value := unsafe { effects.fft_raw[(i + vis.jump_counter) % vis.bars] * vis.multiplier }
+		// for i := 0; i < vis.bars; i++ {
+		// 	value := unsafe { (&effects.fft_raw)[(i + vis.jump_counter) % vis.bars] * vis.multiplier }
 
-			if value > vis.fft[i] {
-				vis.fft[i] = value
-			}
-		}
+		// 	if value > vis.fft[i] {
+		// 		vis.fft[i] = value
+		// 	}
+		// }
 
 		vis.jump_counter = (vis.jump_counter + vis.jump_size) % vis.bars
 		vis.counter -= vis.update_delay

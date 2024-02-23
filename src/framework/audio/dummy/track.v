@@ -8,7 +8,7 @@ pub mut:
 	path    string
 	playing bool
 
-	effects common.AudioEffects
+	effects &common.AudioEffects
 }
 
 pub fn (mut dummy_track DummyTrack) play() {}

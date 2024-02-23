@@ -6,6 +6,7 @@ import framework.audio.common
 pub fn (mut bass_mixer BassMixer) new_track(path string) &common.ITrack {
 	mut track := &Track{
 		mixer: unsafe { bass_mixer }
+		effects: &common.AudioEffects{}
 	}
 
 	// Load?
@@ -30,7 +31,7 @@ mut:
 	mixer &BassMixer
 pub mut:
 	channel C.HSTREAM
-	effects common.AudioEffects
+	effects &common.AudioEffects
 	pitch   f64
 	speed   f64
 	playing bool

@@ -19,12 +19,14 @@ pub fn (mut dummy_mixer DummyMixer) get_mixer_data(mut buffer []u8) {
 pub fn (mut dummy_mixer DummyMixer) new_track(path string) &common.ITrack {
 	return &DummyTrack{
 		path: path
+		effects: &common.AudioEffects{}
 	}
 }
 
 pub fn (mut dummy_mixer DummyMixer) new_sample(path string) &common.ISample {
 	return &DummySample{
 		path: path
+		effects: &common.AudioEffects{}
 	}
 }
 
