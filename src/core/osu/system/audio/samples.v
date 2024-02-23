@@ -188,7 +188,9 @@ pub fn play_sample_internal(_sample_set int, hitsound_index int, index int, volu
 	if global_sample.beatmap[sample_set - 1][hitsound_index].len > 0
 		&& index in global_sample.beatmap[sample_set - 1][hitsound_index]
 		&& !settings.global.audio.ignore_beatmap_samples {
-		g_sample.beatmap[sample_set - 1][hitsound_index][index].play_volume(f32(volume))
+		unsafe {
+			g_sample.beatmap[sample_set - 1][hitsound_index][index].play_volume(f32(volume))
+		}
 	} else {
 		g_sample.base[sample_set - 1][hitsound_index].play_volume(f32(volume))
 	}
