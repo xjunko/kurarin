@@ -1,4 +1,20 @@
-module audio
+module bass
+
+import framework.audio.common
+
+// Struct Based
+pub fn (mut bass_mixer GlobalMixer) new_track(path string) &common.ITrack {
+	mut track := &Track{}
+
+	// Load?
+	track.channel = C.BASS_StreamCreateFile(0, path.str, 0, 0, C.BASS_STREAM_DECODE | C.BASS_STREAM_PRESCAN | C.BASS_ASYNCFILE)
+
+	// FX?
+	track.channel = C.BASS_FX_TempoCreate(track.channel, C.BASS_FX_FREESOURCE | C.BASS_STREAM_DECODE)
+	track_setup_fx_channel(track.channel)
+
+	return track
+}
 
 // Fact
 pub fn new_track(path string) &Track {

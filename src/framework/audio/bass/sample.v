@@ -1,6 +1,13 @@
-module audio
+module bass
 
 import core.common.settings
+import framework.audio.common
+
+pub fn (mut bass_mixer GlobalMixer) new_sample(path string) &common.ISample {
+	mut sample := &Sample{}
+	sample.bass_sample = C.BASS_SampleLoad(0, path.str, 0, 0, 32, C.BASS_SAMPLE_OVER_POS)
+	return sample
+}
 
 pub fn new_sample(path string) &Sample {
 	mut sample := &Sample{}

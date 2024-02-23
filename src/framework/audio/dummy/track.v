@@ -1,16 +1,10 @@
 module dummy
 
-// Factory
-pub fn new_track(path string) &DummyTrack {
-	return &DummyTrack{
-		path: path
-	}
-}
-
 // Structs
 pub struct DummyTrack {
 pub mut:
-	path string
+	path    string
+	playing bool
 }
 
 pub fn (mut dummy_track DummyTrack) play() {}

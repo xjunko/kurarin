@@ -1,6 +1,6 @@
-module audio
+module bass
 
-#flag -I @VMODROOT/framework/audio/header
+#flag -I @VMODROOT/framework/audio/bass/header
 #include "bass.h"
 #include "bass_fx.h"
 #include "bassmix.h"

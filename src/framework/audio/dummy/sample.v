@@ -1,12 +1,5 @@
 module dummy
 
-// Factory
-pub fn new_sample(path string) &DummySample {
-	return &DummySample{
-		path: path
-	}
-}
-
 // Structs
 pub struct DummySample {
 	DummyTrack
