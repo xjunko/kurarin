@@ -3,22 +3,10 @@ module bass
 import framework.audio.common
 
 // Struct Based
-pub fn (mut bass_mixer GlobalMixer) new_track(path string) &common.ITrack {
-	mut track := &Track{}
-
-	// Load?
-	track.channel = C.BASS_StreamCreateFile(0, path.str, 0, 0, C.BASS_STREAM_DECODE | C.BASS_STREAM_PRESCAN | C.BASS_ASYNCFILE)
-
-	// FX?
-	track.channel = C.BASS_FX_TempoCreate(track.channel, C.BASS_FX_FREESOURCE | C.BASS_STREAM_DECODE)
-	track_setup_fx_channel(track.channel)
-
-	return track
-}
-
-// Fact
-pub fn new_track(path string) &Track {
-	mut track := &Track{}
+pub fn (mut bass_mixer BassMixer) new_track(path string) &common.ITrack {
+	mut track := &Track{
+		mixer: unsafe { bass_mixer }
+	}
 
 	// Load?
 	track.channel = C.BASS_StreamCreateFile(0, path.str, 0, 0, C.BASS_STREAM_DECODE | C.BASS_STREAM_PRESCAN | C.BASS_ASYNCFILE)
@@ -38,6 +26,8 @@ pub fn track_setup_fx_channel(channel C.HSTREAM) {
 
 // Decl
 pub struct Track {
+mut:
+	mixer &BassMixer
 pub mut:
 	channel C.HSTREAM
 	effects common.AudioEffects
@@ -48,7 +38,7 @@ pub mut:
 
 pub fn (mut track Track) play() {
 	// C.BASS_ChannelPlay(track.channel, 1)
-	C.BASS_Mixer_StreamAddChannel(global.master, track.channel, C.BASS_MIXER_CHAN_NORAMPIN | C.BASS_MIXER_CHAN_BUFFER)
+	C.BASS_Mixer_StreamAddChannel(track.mixer.master, track.channel, C.BASS_MIXER_CHAN_NORAMPIN | C.BASS_MIXER_CHAN_BUFFER)
 	track.playing = true
 }
 

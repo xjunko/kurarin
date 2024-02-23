@@ -5,7 +5,7 @@ import framework.audio.dummy
 import framework.audio.bass
 
 pub const boxed_backend = &Boxed{&common.IBackend(&dummy.DummyMixer{})}
-pub const is_bass = true // hack
+pub const is_bass = true // TODO: Force BASS for now.
 
 pub struct Boxed {
 pub mut:
@@ -16,7 +16,7 @@ pub fn init() {
 	if audio.is_bass {
 		unsafe {
 			mut boxed := audio.boxed_backend
-			boxed.backend = &common.IBackend(&bass.GlobalMixer{})
+			boxed.backend = &common.IBackend(&bass.BassMixer{})
 			boxed.backend.init()
 		}
 	} else {
