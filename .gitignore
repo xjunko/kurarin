@@ -21,3 +21,4 @@ assets/osu/shaders/*.h
 assets/osu/maps/*
 
 kurarin
+*.exe
