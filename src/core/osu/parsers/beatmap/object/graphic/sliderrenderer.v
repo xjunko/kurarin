@@ -28,7 +28,7 @@ import framework.math.vector
 import framework.math.time
 
 #flag -I @VMODROOT/
-#include "assets/osu/shaders/slider.h"
+#include "../assets/osu/shaders/slider.h"
 // #include "assets/osu/shaders/test.h"
 
 fn C.fuck_shader_desc(gfx.Backend) &gfx.ShaderDesc

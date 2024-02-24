@@ -163,8 +163,6 @@ pub fn (mut window Window) draw() {
 	gfx.commit()
 }
 
-// VSync
-fn C._sapp_glx_swapinterval(int)
 
 pub fn window_init(mut window Window) {
 	// Init Renderer(s)
@@ -173,7 +171,7 @@ pub fn window_init(mut window Window) {
 	graphic.init_slider_renderer()
 
 	// Renderer: Turn off VSync [HACK]
-	C._sapp_glx_swapinterval(0)
+	context.vsync(false)
 
 	// NOTE: Routine starts here
 	mut loaded_beatmap := beatmap.parse_beatmap(window.argument.beatmap_path, false)

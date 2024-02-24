@@ -14,11 +14,8 @@ pub struct Window {
 	i_window.GeneralWindow
 }
 
-// VSync hack.
-fn C._sapp_glx_swapinterval(int)
-
 pub fn (mut window Window) init(_ voidptr) {
-	C._sapp_glx_swapinterval(0)
+	context.vsync(false)
 
 	spawn fn (mut window Window) {
 		mut g_time := time.get_time()

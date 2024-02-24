@@ -12,9 +12,6 @@ import framework.graphic.context
 import framework.graphic.window as i_window
 import framework.math.time
 
-// Impl
-fn C._sapp_glx_swapinterval(int)
-
 // Const
 const c_scene_error = 0xFAC
 const c_scene_none = int(0 << 0)
@@ -169,7 +166,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 				window.joe_r)
 
 			window.time.reset()
-			C._sapp_glx_swapinterval(0) // Disable VSync when changing to gameplay.
+			context.vsync(false)
 
 			logging.info('Gameplay loaded?')
 
