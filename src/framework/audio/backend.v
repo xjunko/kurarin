@@ -20,7 +20,7 @@ pub fn init() {
 			boxed.backend.init()
 		}
 	} else {
-		panic('Dummy audio backend: Unimplemented.')
+		println("[DEBUG] Dummy audio initialized.")
 	}
 }
 
