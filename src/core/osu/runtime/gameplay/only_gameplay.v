@@ -3,6 +3,7 @@ module gameplay
 import os
 import gg
 import framework.audio
+import framework.audio.common
 import framework.graphic.context
 import core.common.settings
 import core.osu.x
@@ -22,7 +23,7 @@ pub enum OSUGameplayMode {
 pub struct OSUGameplay {
 mut:
 	beatmap         &beatmap.Beatmap = unsafe { nil }
-	beatmap_audio   &audio.ITrack    = unsafe { nil }
+	beatmap_audio   &common.ITrack
 	beatmap_ruleset &ruleset.Ruleset = unsafe { nil }
 
 	cursor  cursor.ICursorController

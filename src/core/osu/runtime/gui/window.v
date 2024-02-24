@@ -8,6 +8,7 @@ import core.common.settings
 import core.osu.parsers.beatmap
 import core.osu.runtime.gameplay
 import framework.logging
+import framework.audio
 import framework.graphic.context
 import framework.graphic.window as i_window
 import framework.math.time
@@ -58,6 +59,7 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 
 	window.menu = &MainMenu{
 		window: window
+		current_track: audio.new_dummy_track()
 	}
 
 	logging.info('Done setting up scenes.')
@@ -160,6 +162,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.gameplay = &gameplay.OSUGameplay{
 				cursor: &voidptr(0) // NOTE: Not safe.
+				beatmap_audio: audio.new_dummy_track()
 			}
 
 			window.gameplay.init(mut window.ctx, window.menu.current_version, window.joe_t,

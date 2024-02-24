@@ -3,6 +3,7 @@ module audio
 import os
 import core.common.settings
 import framework.audio
+import framework.audio.common
 import framework.logging
 
 const global_sample = &GameSamples{}
@@ -24,9 +25,9 @@ const hitsound_names = {
 pub struct GameSamples {
 pub mut:
 	// vfmt off
-	base         [3][7]&audio.ISample
-	beatmap      [3][7]map[int]&audio.ISample
-	cache        map[string]&audio.ISample
+	base         [3][7]&common.ISample
+	beatmap      [3][7]map[int]&common.ISample
+	cache        map[string]&common.ISample
 	skin_path    string
 	beatmap_path string
 	// vfmt on
@@ -133,7 +134,7 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 
 			// Re-Init the dict again (segmentation error w/o this)
 			if g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1].len == 0 {
-				g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1] = map[int]&audio.ISample{}
+				g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1] = map[int]&common.ISample{}
 			}
 
 			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index] = audio.new_sample(path)
@@ -213,7 +214,7 @@ pub fn init_samples(skin_path string, beatmap_path string) {
 	sample.load_beatmap_sample()
 }
 
-pub fn get_sample(name string) &audio.ISample {
+pub fn get_sample(name string) &common.ISample {
 	mut sample := get_global_sample()
 
 	if name.to_lower() !in sample.cache {

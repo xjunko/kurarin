@@ -4,6 +4,7 @@ import gg
 import core.common.settings
 import core.osu.parsers.beatmap
 import framework.audio
+import framework.audio.common
 import framework.logging
 import framework.graphic.sprite
 import framework.math.time
@@ -20,7 +21,7 @@ mut:
 pub mut:
 	current_beatmap &beatmap.BeatmapContainer = unsafe { nil }
 	current_version &beatmap.Beatmap = unsafe { nil }
-	current_track   &audio.ITrack    = unsafe { nil }
+	current_track   &common.ITrack
 }
 
 pub fn (mut main_menu MainMenu) change_beatmap(new_beatmap &beatmap.BeatmapContainer) {

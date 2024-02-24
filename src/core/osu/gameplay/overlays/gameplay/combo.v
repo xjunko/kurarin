@@ -2,7 +2,7 @@ module gameplay
 
 import math
 import core.common.settings
-import framework.audio as f_audio
+import framework.audio.common as c_audio
 import core.osu.system.skin
 import core.osu.system.audio as g_audio
 import framework.math.time
@@ -18,7 +18,7 @@ pub mut:
 	main_font &sprite.NumberSprite = unsafe { nil }
 	pop_font  &sprite.NumberSprite = unsafe { nil }
 
-	combo_break f_audio.ISample
+	combo_break c_audio.ISample
 
 	main_glider &glider.Glider = glider.new_glider(1.0)
 	pop_glider  &glider.Glider = glider.new_glider(1.0)

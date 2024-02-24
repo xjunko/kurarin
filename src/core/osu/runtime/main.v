@@ -19,6 +19,7 @@ import core.osu.gameplay.ruleset
 import core.osu.gameplay.overlays
 import core.osu.parsers.beatmap.object.graphic
 import framework.audio
+import framework.audio.common
 import framework.logging
 import framework.math.time
 import framework.math.vector
@@ -49,7 +50,7 @@ pub mut:
 	record bool
 	video  &export.Video = unsafe { nil }
 	// HACK: move this to somewhere else
-	beatmap_song       &audio.ITrack
+	beatmap_song       &common.ITrack
 	beatmap_song_boost f32 = f32(1.0)
 }
 
@@ -163,7 +164,6 @@ pub fn (mut window Window) draw() {
 	gfx.commit()
 }
 
-
 pub fn window_init(mut window Window) {
 	// Init Renderer(s)
 
@@ -182,7 +182,6 @@ pub fn window_init(mut window Window) {
 
 	// Init beatmap bg song
 	window.beatmap_song = audio.new_track(window.beatmap.get_audio_path())
-
 	// Visualizer stuff
 	if settings.global.gameplay.overlay.visualizer {
 		window.visualizer = &visualizer.Visualizer{

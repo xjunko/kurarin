@@ -2,6 +2,7 @@ module visualizer
 
 import gx
 import framework.audio
+import framework.audio.common
 import framework.math.vector
 import framework.graphic.context
 
@@ -18,7 +19,7 @@ pub mut:
 	last_time       f64
 	counter         f64
 	fft             []f64 = []f64{len: 200} // TODO: fix this, make a visualizer factor yor smth
-	music           &audio.ITrack
+	music           &common.ITrack
 	multiplier      f64 = 0.5 // Change this to increase the "oopmh"
 	inverted        bool  // Invert the visualizer
 	// logo stuff
@@ -38,15 +39,15 @@ pub fn (mut vis Visualizer) update(time f64) {
 	mut decay := delta * vis.decay_value
 
 	if vis.counter >= vis.update_delay {
-		// effects := &vis.music.effects
+		fft := &vis.music.effects.fft_raw
 
-		// for i := 0; i < vis.bars; i++ {
-		// 	value := unsafe { (&effects.fft_raw)[(i + vis.jump_counter) % vis.bars] * vis.multiplier }
+		for i := 0; i < vis.bars; i++ {
+			value := unsafe { fft[(i + vis.jump_counter) % vis.bars] * vis.multiplier }
 
-		// 	if value > vis.fft[i] {
-		// 		vis.fft[i] = value
-		// 	}
-		// }
+			if value > vis.fft[i] {
+				vis.fft[i] = value
+			}
+		}
 
 		vis.jump_counter = (vis.jump_counter + vis.jump_size) % vis.bars
 		vis.counter -= vis.update_delay
