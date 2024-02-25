@@ -1,21 +1,12 @@
 module graphic
 
 /*
-THE ONE AND ONLY
+	osu! slider renderer pipeline
 
-	SLIDER RENDER RER
-
-	I FUCKING HATE SLIDER RENDER RER
-*/
-
-/*
-BIG FUCKEN TODO
-
-	* figure out how the fuck to create a rendertarget (with depth test and blending)
-	* render slider on the rendertarget (with depth test and without blending) (pass 1)
-	* draw the rendertarget on the screen with (without depth test and with blending) (pass 2)
-
-	// OK DONE :DDDD
+	reference:
+		- danser
+		- mcosu
+		- osu! 2016
 */
 import core.common.settings
 import core.osu.x
@@ -29,15 +20,11 @@ import framework.math.time
 
 #flag -I @VMODROOT/
 #include "../assets/osu/shaders/slider.h"
-// #include "assets/osu/shaders/test.h"
 
-fn C.fuck_shader_desc(gfx.Backend) &gfx.ShaderDesc
-
-// fn C.test_shader_desc(gfx.Backend) &gfx.ShaderDesc
+fn C.osu_slider_shader_desc(gfx.Backend) &gfx.ShaderDesc
 
 pub const used_import = gfx.used_import + sokol.used_import
 pub const global_renderer = &SliderRenderer{}
-pub const use_test_shader = false
 
 @[manualfree]
 pub struct SliderRendererAttr {
@@ -54,7 +41,7 @@ pub mut:
 
 pub struct SliderRenderer {
 mut:
-	quality              int = 30 // anything >= 3 is fine
+	quality              int = 50 // anything >= 3 is fine
 	has_been_initialized bool
 pub mut:
 	shader         gfx.Shader
@@ -207,7 +194,7 @@ pub fn (mut attr SliderRendererAttr) bind_slider() {
 
 	// Failed to create vertex_buffers
 	// if attr.bindings.vertex_buffers[0].id == 0 {
-	// TODO: Fix this dumbass code
+	// TODO: Fix this
 	if false {
 		logging.error('Failed to bind vertex buffers')
 		return
@@ -215,22 +202,6 @@ pub fn (mut attr SliderRendererAttr) bind_slider() {
 
 	// Done
 	attr.has_been_initialized = true
-}
-
-pub fn (mut attr SliderRendererAttr) update_vertex_progress(start int, end int) {
-	// TODO: come back to this
-	// if !attr.has_been_initialized {
-	// 	attr.make_vertices()
-	// }
-
-	// if attr.vertices[start * 30 * 24 .. end * 30 * 24].len != 0 {	
-	// C.sg_update_buffer(&attr.bindings.vertex_buffers[0], &C.sg_range{
-	// ptr: &attr.vertices[start * 30 * 24 .. (end * 30 * 24) - 1][0],
-	// size: usize((attr.vertices[start * 30 * 24 .. end * 30 * 24].len) * int(sizeof(f32)))
-	// ptr: attr.vertices.data,
-	// size: usize(attr.vertices.len * int(sizeof(f32)))
-	// })	
-	// }
 }
 
 // Draw
@@ -329,7 +300,7 @@ pub fn init_slider_renderer() {
 	mut renderer := unsafe { graphic.global_renderer }
 
 	// Normal slider shader
-	renderer.shader = gfx.make_shader(C.fuck_shader_desc(gfx.query_backend()))
+	renderer.shader = gfx.make_shader(C.osu_slider_shader_desc(gfx.query_backend()))
 
 	// Make pipeline
 	mut pipeline_desc := &gfx.PipelineDesc{
@@ -353,18 +324,6 @@ pub fn init_slider_renderer() {
 	pipeline_desc.layout.attrs[C.ATTR_vs_centre].format = .float3 // centre
 	pipeline_desc.layout.attrs[C.ATTR_vs_texture_coord].format = .float2 // texture coord
 	renderer.pip = gfx.make_pipeline(pipeline_desc)
-
-	// // Test Shader
-	// renderer.shader = C.sg_make_shader(
-	// 	C.test_shader_desc(
-	// 		C.sg_query_backend()
-	// 	)
-	// )
-
-	// mut pipeline_desc := &C.sg_pipeline_desc{shader: renderer.shader}
-	// pipeline_desc.layout.attrs[C.ATTR_vs_test_position].format = .float3
-	// pipeline_desc.layout.attrs[C.ATTR_vs_test_color].format = .float3
-	// renderer.pip = C.sg_make_pipeline(pipeline_desc)
 
 	// Color and Depth buffer
 	mut img_desc := gfx.ImageDesc{

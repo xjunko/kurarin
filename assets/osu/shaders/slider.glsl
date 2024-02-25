@@ -125,4 +125,4 @@ void main() {
 }
 @end
 
-@program fuck vs fs
+@program osu_slider vs fs
