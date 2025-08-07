@@ -166,7 +166,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			logging.info('Loading gameplay.')
 
 			window.gameplay = &gameplay.OSUGameplay{
-				cursor:        &voidptr(0) // NOTE: Not safe.
+				cursor:        unsafe { nil }
 				beatmap_audio: audio.new_dummy_track()
 			}
 

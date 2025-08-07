@@ -54,7 +54,8 @@ pub fn decode_lzma(data []u8) !string {
 
 		mut output_buffer := []string{}
 
-		r := decompress_run(hand, read_func, data, write_func, output_buffer, 1)
+		r := decompress_run(hand, read_func, voidptr(&data), voidptr(&write_func), voidptr(&output_buffer),
+			1)
 
 		if r != 0 {
 			panic('Failed to read replay file. | Error code: ${r}')
