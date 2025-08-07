@@ -40,7 +40,7 @@ const required_files = [
 //
 pub fn get_skin() &Skin {
 	unsafe {
-		mut skin := skin.global
+		mut skin := global
 		return skin
 	}
 }
@@ -68,7 +68,7 @@ pub fn bind_context(mut ctx context.Context) {
 
 	logging.info('Loading skin assets!')
 
-	for file in skin.required_files {
+	for file in required_files {
 		logging.debug('Loading: ${file} from skin')
 		get_texture(file)
 		get_frames(file)

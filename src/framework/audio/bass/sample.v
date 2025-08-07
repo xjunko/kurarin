@@ -5,7 +5,7 @@ import framework.audio.common
 
 pub fn (mut bass_mixer BassMixer) new_sample(path string) &common.ISample {
 	mut sample := &Sample{
-		mixer: unsafe { bass_mixer }
+		mixer:   unsafe { bass_mixer }
 		effects: &common.AudioEffects{}
 	}
 	sample.bass_sample = C.BASS_SampleLoad(0, path.str, 0, 0, 32, C.BASS_SAMPLE_OVER_POS)

@@ -63,41 +63,41 @@ pub fn (mut spinner Spinner) set_difficulty(diff difficulty.Difficulty) {
 	// Animation
 	for mut t in spinner.sprites {
 		t.add_transform(
-			typ: .move
-			time: time.Time{start_time, start_time}
+			typ:    .move
+			time:   time.Time{start_time, start_time}
 			before: [
 				spinner.position.x,
 				spinner.position.y,
 			]
 		)
 		t.add_transform(
-			typ: .fade
-			time: time.Time{start_time, end_time}
+			typ:    .fade
+			time:   time.Time{start_time, end_time}
 			before: [
 				0.0,
 			]
-			after: [255.5]
+			after:  [255.5]
 		)
 		t.add_transform(
-			typ: .fade
-			time: time.Time{spinner.time.end, spinner.time.end + difficulty.hit_fade_out}
+			typ:    .fade
+			time:   time.Time{spinner.time.end, spinner.time.end + difficulty.hit_fade_out}
 			before: [255.0]
-			after: [0.0]
+			after:  [0.0]
 		)
 		t.add_transform(
-			typ: .scale_factor
-			time: time.Time{start_time, start_time}
+			typ:    .scale_factor
+			time:   time.Time{start_time, start_time}
 			before: [
 				0.75,
 			]
 		)
 		t.add_transform(
-			typ: .angle
-			time: time.Time{start_time, spinner.time.end}
+			typ:    .angle
+			time:   time.Time{start_time, spinner.time.end}
 			before: [
 				0.0,
 			]
-			after: [math.pi * 2.0]
+			after:  [math.pi * 2.0]
 		)
 
 		t.reset_size_based_on_texture()
@@ -105,10 +105,10 @@ pub fn (mut spinner Spinner) set_difficulty(diff difficulty.Difficulty) {
 	}
 
 	spinner.spinner_approach.add_transform(
-		typ: .scale_factor
-		time: time.Time{start_time, spinner.time.end}
+		typ:    .scale_factor
+		time:   time.Time{start_time, spinner.time.end}
 		before: [2.0 * 0.75]
-		after: [0.0]
+		after:  [0.0]
 	)
 	spinner.spinner_approach.reset_attributes_based_on_transforms()
 }

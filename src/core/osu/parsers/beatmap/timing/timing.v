@@ -22,15 +22,15 @@ pub mut:
 
 fn get_default_timing() TimingPoint {
 	return TimingPoint{
-		time: 0.0
+		time:           0.0
 		beatlengthbase: 60000.0 / 60.0
-		beatlength: 60000.0 / 60.0
-		sample_set: 0
-		sample_index: 1
-		sample_volume: 1
-		signature: 4
-		inherited: false
-		kiai: false
+		beatlength:     60000.0 / 60.0
+		sample_set:     0
+		sample_index:   1
+		sample_volume:  1
+		signature:      4
+		inherited:      false
+		kiai:           false
 	}
 }
 
@@ -66,15 +66,15 @@ pub mut:
 
 pub fn (mut timing Timings) add_point(time f64, beatlength f64, sample_set int, sample_index int, sample_volume f64, signature int, inherited bool, kiai bool) {
 	timing.points << TimingPoint{
-		time: time
+		time:           time
 		beatlengthbase: beatlength
-		beatlength: beatlength
-		sample_set: sample_set
-		sample_index: sample_index
-		sample_volume: sample_volume
-		signature: signature
-		inherited: inherited
-		kiai: kiai
+		beatlength:     beatlength
+		sample_set:     sample_set
+		sample_index:   sample_index
+		sample_volume:  sample_volume
+		signature:      signature
+		inherited:      inherited
+		kiai:           kiai
 	}
 }
 

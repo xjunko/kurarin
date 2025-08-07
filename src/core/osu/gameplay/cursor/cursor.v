@@ -59,9 +59,9 @@ pub fn (mut cursor Cursor) update(update_time f64, _delta f64) {
 // Factory
 pub fn make_cursor(mut ctx context.Context) &Cursor {
 	mut cursor := &Cursor{
-		ctx: ctx
+		ctx:            ctx
 		always_visible: true
-		renderer: graphics.DebugCursor.create()
+		renderer:       graphics.DebugCursor.create()
 	}
 
 	match int(settings.global.gameplay.skin.cursor.style) {

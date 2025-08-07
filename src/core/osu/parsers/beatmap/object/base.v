@@ -143,17 +143,17 @@ pub fn common_parse(items []string, extra_index int) &HitObject {
 	object_type := items[3].int()
 
 	mut hitobject := &HitObject{
-		data: items
-		id: -1
-		position: position
-		raw_position: position
-		end_position: position
+		data:             items
+		id:               -1
+		position:         position
+		raw_position:     position
+		end_position:     position
 		raw_end_position: position
-		time: object_time
-		new_combo: (object_type & new_combo) == 4
-		color_offset: (object_type >> new_combo) & 7
-		is_slider: (object_type & slider) > 0
-		is_spinner: (object_type & spinner) > 0
+		time:             object_time
+		new_combo:        (object_type & new_combo) == 4
+		color_offset:     (object_type >> new_combo) & 7
+		is_slider:        (object_type & slider) > 0
+		is_spinner:       (object_type & spinner) > 0
 	}
 
 	// Extra data

@@ -55,11 +55,11 @@ pub fn run() {
 	mut window := &Window{}
 
 	mut gg_context := gg.new_context(
-		width: 1280
-		height: 720
+		width:     1280
+		height:    720
 		user_data: window
 		// FNs
-		init_fn: window.init
+		init_fn:  window.init
 		frame_fn: window.draw
 	)
 

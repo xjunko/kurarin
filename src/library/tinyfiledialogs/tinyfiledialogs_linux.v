@@ -12,9 +12,10 @@ pub fn open_file_picker(title string, starting_path string, filters []string, fi
 	ret_c_str := C.tinyfd_openFileDialog(title.str, starting_path.str, filters.len, filters.data,
 		filters_name.str, int(multiple))
 
-	if ret_c_str != &char(0) {
-		return unsafe { ret_c_str.vstring() }
+	unsafe {
+		if ret_c_str != nil {
+			return ret_c_str.vstring()
+		}
 	}
-
 	return ''
 }

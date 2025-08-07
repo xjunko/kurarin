@@ -33,8 +33,8 @@ pub mut:
 	score_prefix  string @[ScorePrefix]
 	score_overlap f64    @[ScoreOverlap]
 	// Combo
-	combo_prefix  string     @[ComboPrefix]
-	combo_overlap f64        @[ComboOverlap]
+	combo_prefix  string @[ComboPrefix]
+	combo_overlap f64    @[ComboOverlap]
 	combo_colors  []gg.Color
 }
 
@@ -101,23 +101,23 @@ fn tokenize_ini_format_line(_line string, delimiter string) []string {
 
 fn get_default_skin_info() &SkinMetadata {
 	return &SkinMetadata{
-		name: ''
-		author: ''
-		version: 2.7
-		animation_framerate: -1
-		cursor_centre: true
-		cursor_expand: true
-		cursor_rotate: true
-		slider_ball_tint: false
-		slider_ball_flip: false
-		slider_border: gg.Color{255, 255, 255, 255}
+		name:                  ''
+		author:                ''
+		version:               2.7
+		animation_framerate:   -1
+		cursor_centre:         true
+		cursor_expand:         true
+		cursor_rotate:         true
+		slider_ball_tint:      false
+		slider_ball_flip:      false
+		slider_border:         gg.Color{255, 255, 255, 255}
 		slider_track_override: gg.Color{255, 255, 255, 255}
-		hit_circle_prefix: 'default'
-		hit_circle_overlap: -2
-		score_prefix: 'score'
-		score_overlap: 0
-		combo_prefix: 'score'
-		combo_overlap: 0
+		hit_circle_prefix:     'default'
+		hit_circle_overlap:    -2
+		score_prefix:          'score'
+		score_overlap:         0
+		combo_prefix:          'score'
+		combo_overlap:         0
 	}
 }
 

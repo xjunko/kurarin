@@ -15,7 +15,7 @@ pub const global = &TimeCounter{}
 //
 pub fn get_time() &TimeCounter {
 	unsafe {
-		mut time := time.global
+		mut time := global
 		return time
 	}
 }

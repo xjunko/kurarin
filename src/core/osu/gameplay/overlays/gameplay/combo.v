@@ -76,8 +76,8 @@ pub fn (mut counter ComboCounter) draw(arg sprite.CommonSpriteArgument) {
 pub fn make_combo_counter() &ComboCounter {
 	mut counter := &ComboCounter{
 		combo_break: g_audio.get_sample('combobreak')
-		main_font: sprite.make_number_font(skin.global.meta.combo_prefix)
-		pop_font: sprite.make_number_font(skin.global.meta.combo_prefix)
+		main_font:   sprite.make_number_font(skin.global.meta.combo_prefix)
+		pop_font:    sprite.make_number_font(skin.global.meta.combo_prefix)
 	}
 
 	counter.main_glider.easing = easing.quad_out
@@ -85,8 +85,8 @@ pub fn make_combo_counter() &ComboCounter {
 
 	// PopFont alpha
 	counter.pop_font.add_transform(
-		typ: .fade
-		time: time.Time{0.0, 0.0}
+		typ:    .fade
+		time:   time.Time{0.0, 0.0}
 		before: [
 			100.0,
 		]

@@ -21,10 +21,10 @@ pub enum TransformType {
 
 pub struct Transform {
 pub mut:
-	typ    TransformType         @[required]
+	typ    TransformType @[required]
 	easing easing.EasingFunction = easing.linear
-	time   time.Time             @[required]
-	before []f64                 @[required]
+	time   time.Time @[required]
+	before []f64     @[required]
 	after  []f64
 }
 
@@ -73,10 +73,10 @@ pub fn (t Transform) as_four(update_time f64) []f64 {
 
 pub fn (t Transform) clone(current_time time.Time) &Transform {
 	return &Transform{
-		typ: t.typ
+		typ:    t.typ
 		easing: t.easing
-		time: current_time
+		time:   current_time
 		before: t.before
-		after: t.after
+		after:  t.after
 	}
 }

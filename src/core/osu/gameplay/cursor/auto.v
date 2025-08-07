@@ -128,7 +128,7 @@ pub fn (mut auto AutoCursor) update(time f64, delta f64) {
 pub fn make_auto_cursor(mut ctx context.Context, hitobjects []object.IHitObject) &AutoCursor {
 	mut auto := &AutoCursor{
 		cursor: make_cursor(mut ctx)
-		queue: hitobjects
+		queue:  hitobjects
 	}
 
 	auto.cursor.position.x = 512.0 / 2.0

@@ -1,6 +1,6 @@
 module runtime
 
-import core.common.settings // Load this first
+import core.common.settings
 import os
 import gx
 import sync
@@ -27,8 +27,8 @@ pub struct Window {
 mut:
 	play_mode PlayState
 pub mut:
-	beatmap        &beatmap.Beatmap = unsafe { nil }
-	current_player player.Player    = player.Player{
+	beatmap           &beatmap.Beatmap = unsafe { nil }
+	current_player    player.Player    = player.Player{
 		name: 'Junko'
 	}
 	cursors           []&cursor.Cursor
@@ -94,7 +94,7 @@ pub fn (mut window Window) initialize(_ &voidptr) {
 
 pub fn initiate_game_loop(argument GameArgument) {
 	mut window := &Window{
-		beatmap_song: audio.new_dummy_track()
+		beatmap_song:      audio.new_dummy_track()
 		cursor_controller: unsafe { nil }
 	}
 
@@ -107,19 +107,19 @@ pub fn initiate_game_loop(argument GameArgument) {
 	}
 
 	mut gg_context := gg.new_context(
-		width: int(settings.global.window.width)
-		height: int(settings.global.window.height)
+		width:     int(settings.global.window.width)
+		height:    int(settings.global.window.height)
 		user_data: window
-		bg_color: gx.black
+		bg_color:  gx.black
 		// Callback FNs
-		init_fn: window.initialize
-		frame_fn: draw_callback
-		move_fn: window.mouse_move
-		scroll_fn: window.mouse_scroll
-		click_fn: window.mouse_click
+		init_fn:    window.initialize
+		frame_fn:   draw_callback
+		move_fn:    window.mouse_move
+		scroll_fn:  window.mouse_scroll
+		click_fn:   window.mouse_click
 		unclick_fn: window.mouse_unclick
 		keydown_fn: window.key_click
-		keyup_fn: window.key_unclick
+		keyup_fn:   window.key_unclick
 	)
 
 	window.ctx = context.Context.create(mut gg_context)
@@ -196,8 +196,8 @@ pub fn run(beatmap_path string, replay_path string, _is_playing bool) {
 	// Create GameArgument
 	argument := &GameArgument{
 		beatmap_path: beatmap_path
-		replay_path: replay_path
-		play_mode: play_mode
+		replay_path:  replay_path
+		play_mode:    play_mode
 	}
 
 	logging.info('Beatmap: ${beatmap_path}')

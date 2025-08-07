@@ -111,9 +111,9 @@ pub fn (mut slider Slider) update_click_for(_player &DifficultyPlayer, time f64)
 				}
 
 				if player.left_cond {
-					state.down_button = ruleset.left_button
+					state.down_button = left_button
 				} else if player.right_cond {
-					state.down_button = ruleset.right_button
+					state.down_button = right_button
 				} else {
 					state.down_button = player.mouse_down_button
 				}
@@ -177,19 +177,19 @@ pub fn (mut slider Slider) update_for(_player &DifficultyPlayer, time f64, proce
 	if time >= slider.hitslider.time.start && !state.is_hit {
 		mut mouse_down_acceptable := false
 		mut mouse_down_acceptable_swap := player.game_down_state
-			&& !(player.last_button == (ruleset.left_button | ruleset.right_button)
+			&& !(player.last_button == (left_button | right_button)
 			&& player.last_button2 == player.mouse_down_button)
 
 		if player.game_down_state {
 			if state.down_button == Buttons(0)
-				|| (player.mouse_down_button != (ruleset.left_button | ruleset.right_button)
+				|| (player.mouse_down_button != (left_button | right_button)
 				&& mouse_down_acceptable_swap) {
 				state.down_button = Buttons(0)
 
 				if player.left_cond {
-					state.down_button = ruleset.left_button
+					state.down_button = left_button
 				} else if player.right_cond {
-					state.down_button = ruleset.right_button
+					state.down_button = right_button
 				} else {
 					state.down_button = player.mouse_down_button
 				}
@@ -281,9 +281,9 @@ pub fn (mut slider Slider) update_post_for(_player &DifficultyPlayer, time f64, 
 			.reset)
 
 		if player.left_cond {
-			state.down_button = ruleset.left_button
+			state.down_button = left_button
 		} else if player.right_cond {
-			state.down_button = ruleset.right_button
+			state.down_button = right_button
 		} else {
 			state.down_button = player.mouse_down_button
 		}

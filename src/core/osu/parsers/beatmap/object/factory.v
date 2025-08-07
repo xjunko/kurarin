@@ -8,11 +8,11 @@ const spinner = 1 << 3
 pub fn make_object(items []string) IHitObject {
 	object_type := items[3].i8()
 
-	if (object_type & object.circle) > 0 {
+	if (object_type & circle) > 0 {
 		return make_circle(items)
-	} else if (object_type & object.slider) > 0 {
+	} else if (object_type & slider) > 0 {
 		return make_slider(items)
-	} else if (object_type & object.spinner) > 0 {
+	} else if (object_type & spinner) > 0 {
 		return make_spinner(items)
 	}
 

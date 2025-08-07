@@ -40,11 +40,11 @@ pub fn make_replay_tag(mut current_beatmap beatmap.Beatmap, mut cursor Cursor, p
 		if mut object is gameobject.Circle || mut object is gameobject.Slider {
 			// Color
 			cursor.add_transform(
-				typ: .color
+				typ:    .color
 				easing: easing.linear
-				time: time.Time{last_object.time.end, object.time.start}
+				time:   time.Time{last_object.time.end, object.time.start}
 				before: last_object.color
-				after: object.color
+				after:  object.color
 			)
 
 			// Movement
@@ -63,13 +63,13 @@ pub fn make_replay_tag(mut current_beatmap beatmap.Beatmap, mut cursor Cursor, p
 				// vfmt on
 				position := mover.get_point_at(i)
 				cursor.add_transform(
-					typ: .move
+					typ:    .move
 					easing: easing.quad_out
 					// vfmt off
 					time: time.Time{i, i + offset}
 					// vfmt on
 					before: [last_position.x, last_position.y]
-					after: [position.x, position.y]
+					after:  [position.x, position.y]
 				)
 				last_position = position
 			}
@@ -123,11 +123,11 @@ pub fn make_replay_tag(mut current_beatmap beatmap.Beatmap, mut cursor Cursor, p
 					math.sin(rotation) * radius + 384.0 / 2.0}
 
 				cursor.add_transform(
-					typ: .move
+					typ:    .move
 					easing: easing.linear
-					time: time.Time{i, i + timeframe}
+					time:   time.Time{i, i + timeframe}
 					before: [last_position.x, last_position.y]
-					after: [position.x, position.y]
+					after:  [position.x, position.y]
 				)
 
 				rotation += speed

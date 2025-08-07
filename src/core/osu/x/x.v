@@ -116,7 +116,7 @@ pub fn get_matrix_projection(res Resolution) m4.Mat4 {
 //
 fn init() {
 	unsafe {
-		mut r := x.resolution
+		mut r := resolution
 		r.calculate()
 	}
 }

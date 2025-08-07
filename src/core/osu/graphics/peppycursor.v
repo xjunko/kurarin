@@ -31,16 +31,16 @@ pub fn (mut peppy_cursor PeppyCursor) draw(arg sprite.CommonSpriteArgument) {
 		pos := peppy_cursor.trails[i].position.apply_origin(peppy_cursor.origin, peppy_cursor.trails[i].size)
 
 		arg.ctx.draw_image_with_config(context.DrawImageConfig{
-			img: &peppy_cursor.textures[1]
-			img_id: peppy_cursor.textures[1].id
+			img:      &peppy_cursor.textures[1]
+			img_id:   peppy_cursor.textures[1].id
 			img_rect: gg.Rect{
-				x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
-				y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
-				width: f32(peppy_cursor.trails[i].size.x * x.resolution.playfield_scale)
+				x:      f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
+				y:      f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
+				width:  f32(peppy_cursor.trails[i].size.x * x.resolution.playfield_scale)
 				height: f32(peppy_cursor.trails[i].size.y * x.resolution.playfield_scale)
 			}
-			color: peppy_cursor.trails[i].color
-			effect: .alpha
+			color:    peppy_cursor.trails[i].color
+			effect:   .alpha
 		})
 	}
 
@@ -48,16 +48,16 @@ pub fn (mut peppy_cursor PeppyCursor) draw(arg sprite.CommonSpriteArgument) {
 	pos := peppy_cursor.position.apply_origin(peppy_cursor.origin, peppy_cursor.size)
 
 	arg.ctx.draw_image_with_config(context.DrawImageConfig{
-		img: &peppy_cursor.textures[0]
-		img_id: peppy_cursor.textures[0].id
+		img:      &peppy_cursor.textures[0]
+		img_id:   peppy_cursor.textures[0].id
 		img_rect: gg.Rect{
-			x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
-			y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
-			width: f32(peppy_cursor.size.x * x.resolution.playfield_scale)
+			x:      f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
+			y:      f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
+			width:  f32(peppy_cursor.size.x * x.resolution.playfield_scale)
 			height: f32(peppy_cursor.size.y * x.resolution.playfield_scale)
 		}
-		effect: .alpha
-		color: peppy_cursor.color
+		effect:   .alpha
+		color:    peppy_cursor.color
 	})
 }
 
@@ -67,29 +67,29 @@ pub fn (mut peppy_cursor PeppyCursor) update(update_time f64) {
 	delta := update_time - peppy_cursor.last_updated_time
 	peppy_cursor.catch_up_sixty_delta += delta
 
-	if peppy_cursor.catch_up_sixty_delta >= graphics.osu_cursor_trail_delta {
+	if peppy_cursor.catch_up_sixty_delta >= osu_cursor_trail_delta {
 		mut new_trail := &sprite.Sprite{
 			textures: [peppy_cursor.textures[1]]
 		}
 
 		new_trail.add_transform(
-			typ: .fade
+			typ:    .fade
 			easing: easing.quad_out
-			time: time2.Time{update_time, update_time + 150}
+			time:   time2.Time{update_time, update_time + 150}
 			before: [255.0]
-			after: [0.0]
+			after:  [0.0]
 		)
 
 		new_trail.add_transform(
-			typ: .move
+			typ:    .move
 			easing: easing.quad_out
-			time: time2.Time{update_time, update_time + 150}
+			time:   time2.Time{update_time, update_time + 150}
 			before: [peppy_cursor.position.x, peppy_cursor.position.y]
 		)
 
 		new_trail.add_transform(
-			typ: .scale_factor
-			time: time2.Time{update_time, update_time}
+			typ:    .scale_factor
+			time:   time2.Time{update_time, update_time}
 			before: [
 				settings.global.gameplay.skin.cursor.size,
 			]
@@ -100,7 +100,7 @@ pub fn (mut peppy_cursor PeppyCursor) update(update_time f64) {
 
 		peppy_cursor.trails << new_trail
 
-		peppy_cursor.catch_up_sixty_delta -= graphics.osu_cursor_trail_delta
+		peppy_cursor.catch_up_sixty_delta -= osu_cursor_trail_delta
 	}
 
 	// Update + Delete unusued trail
@@ -121,7 +121,7 @@ pub fn (mut peppy_cursor PeppyCursor) update(update_time f64) {
 pub fn PeppyCursor.create() &PeppyCursor {
 	mut cursor := &PeppyCursor{
 		always_visible: true
-		textures: [
+		textures:       [
 			skin.get_texture('cursor'),
 			skin.get_texture('cursortrail'),
 			skin.get_texture('cursor-top'),
@@ -129,8 +129,8 @@ pub fn PeppyCursor.create() &PeppyCursor {
 	}
 
 	cursor.add_transform(
-		typ: .scale_factor
-		time: time2.Time{0, 0}
+		typ:    .scale_factor
+		time:   time2.Time{0, 0}
 		before: [settings.global.gameplay.skin.cursor.size]
 	)
 

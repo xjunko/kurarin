@@ -7,6 +7,7 @@ dementia
 settings.json
 *.json
 
+# internals
 build/*
 library/microui
 src/library/microui
@@ -20,6 +21,10 @@ assets/replays/*
 assets/osu/shaders/*.h
 assets/osu/maps/*
 
+# runtime
+runtime/*
+
+# build artifacts
 kurarin
 *.exe
 *.zip

@@ -25,7 +25,7 @@ pub fn make_hit_result(ctx &context.Context, diff difficulty.Difficulty) &HitRes
 	logging.debug('[HitResult] Difficulty: ${diff}')
 
 	mut hitresult := &HitResults{
-		ctx: unsafe { ctx }
+		ctx:  unsafe { ctx }
 		diff: diff
 	}
 	hitresult.ratio = f64((hitresult.diff.circle_radius * 1.05 * 2) / 128)
@@ -64,69 +64,69 @@ pub fn (mut result HitResults) add_result(_time f64, _result ruleset.HitResult, 
 
 	hit.add_transform(typ: .move, time: time.Time{_time, _time}, before: [position.x, position.y])
 	hit.add_transform(
-		typ: .fade
-		time: time.Time{_time, fade_in}
+		typ:    .fade
+		time:   time.Time{_time, fade_in}
 		before: [0.0]
-		after: [
+		after:  [
 			255.0,
 		]
 	)
 	hit.add_transform(
-		typ: .fade
-		time: time.Time{post_empt, fade_out}
+		typ:    .fade
+		time:   time.Time{post_empt, fade_out}
 		before: [
 			255.0,
 		]
-		after: [0.0]
+		after:  [0.0]
 	)
 
 	hit.add_transform(
-		typ: .scale_factor
-		time: time.Time{_time, _time + difficulty.result_fade_in * 0.8}
+		typ:    .scale_factor
+		time:   time.Time{_time, _time + difficulty.result_fade_in * 0.8}
 		before: [0.6]
-		after: [1.1]
+		after:  [1.1]
 	)
 	hit.add_transform(
-		typ: .scale_factor
-		time: time.Time{fade_in, _time + difficulty.result_fade_in * 1.2}
+		typ:    .scale_factor
+		time:   time.Time{fade_in, _time + difficulty.result_fade_in * 1.2}
 		before: [1.1]
-		after: [0.9]
+		after:  [0.9]
 	)
 	hit.add_transform(
-		typ: .scale_factor
-		time: time.Time{_time + difficulty.result_fade_in * 1.2, _time +
+		typ:    .scale_factor
+		time:   time.Time{_time + difficulty.result_fade_in * 1.2, _time +
 			difficulty.result_fade_in * 1.4}
 		before: [0.9]
-		after: [1.0]
+		after:  [1.0]
 	)
 
 	if _result == .miss {
 		rotation := rand.f64() * 0.3 - 0.15
 
 		hit.add_transform(
-			typ: .angle
-			time: time.Time{_time, fade_in}
+			typ:    .angle
+			time:   time.Time{_time, fade_in}
 			before: [0.0]
-			after: [
+			after:  [
 				rotation,
 			]
 		)
 		hit.add_transform(
-			typ: .angle
-			time: time.Time{fade_in, fade_out}
+			typ:    .angle
+			time:   time.Time{fade_in, fade_out}
 			before: [
 				rotation,
 			]
-			after: [rotation * 2.0]
+			after:  [rotation * 2.0]
 		)
 
 		hit.add_transform(
-			typ: .move_y
-			time: time.Time{_time, fade_out}
+			typ:    .move_y
+			time:   time.Time{_time, fade_out}
 			before: [
 				position.y - 5.0,
 			]
-			after: [position.y + 40.0]
+			after:  [position.y + 40.0]
 		)
 	}
 

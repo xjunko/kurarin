@@ -10,7 +10,7 @@ const used_import = 1
 pub struct Video {
 pub mut:
 	video_proc  &os.Process = unsafe { 0 }
-	record_data &u8 = unsafe { 0 }
+	record_data &u8         = unsafe { 0 }
 
 	audio_proc &os.Process = unsafe { 0 }
 	audio_data []u8
@@ -71,7 +71,8 @@ pub fn (mut video Video) init_video_pipe_process() {
 }
 
 pub fn (mut video Video) init_audio_pipe_process() {
-	audio_buffer_size := unsafe { audio.boxed_backend.backend.get_required_buffer_size_for_mixer(1.0 / settings.global.video.update_fps) } // Render Update FPS (Refer to window_draw_recording in main)
+	// Render Update FPS (Refer to window_draw_recording in main)
+	audio_buffer_size := audio.get_required_buffer_size_for_mixer(1.0 / settings.global.video.update_fps)
 	video.audio_data = []u8{len: audio_buffer_size}
 
 	// Create the process
@@ -147,7 +148,7 @@ pub fn (mut video Video) pipe_window() {
 
 pub fn (mut video Video) pipe_audio() {
 	unsafe {
-		audio.boxed_backend.backend.get_mixer_data(mut video.audio_data)
+		audio.get_mixer_data(mut video.audio_data)
 	}
 
 	// hacky

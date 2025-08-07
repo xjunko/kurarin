@@ -55,7 +55,7 @@ pub mut:
 
 	sprites              []&sprite.Sprite
 	slider_renderer_attr &graphic.SliderRendererAttr = unsafe { nil }
-	slider_renderer_fade &glider.Glider = unsafe { nil }
+	slider_renderer_fade &glider.Glider              = unsafe { nil }
 	// Sample
 	samples       []int
 	sample_sets   []int
@@ -221,29 +221,29 @@ pub fn (mut slider Slider) init_slide(_time f64) {
 	fade_in_end := math.min[f64](start_time + 180, slider.time.end)
 
 	slider.slider_overlay_sprite.add_transform(
-		typ: .fade
-		time: time.Time{start_time, math.min[f64](start_time + 60, slider.time.end)}
+		typ:    .fade
+		time:   time.Time{start_time, math.min[f64](start_time + 60, slider.time.end)}
 		before: [0.0]
-		after: [255.0]
+		after:  [255.0]
 	)
 	slider.slider_overlay_sprite.add_transform(
-		typ: .scale_factor
-		time: time.Time{start_time, fade_in_end}
+		typ:    .scale_factor
+		time:   time.Time{start_time, fade_in_end}
 		before: [size_ratio * 0.5]
-		after: [size_ratio * 1.0]
+		after:  [size_ratio * 1.0]
 	)
 
 	slider.slider_overlay_sprite.add_transform(
-		typ: .fade
-		time: time.Time{slider.time.end, slider.time.end + 200}
+		typ:    .fade
+		time:   time.Time{slider.time.end, slider.time.end + 200}
 		before: [255.0]
-		after: [0.0]
+		after:  [0.0]
 	)
 	slider.slider_overlay_sprite.add_transform(
-		typ: .scale_factor
-		time: time.Time{slider.time.end, slider.time.end + 200}
+		typ:    .scale_factor
+		time:   time.Time{slider.time.end, slider.time.end + 200}
 		before: [size_ratio * 1.0]
-		after: [size_ratio * 0.8]
+		after:  [size_ratio * 0.8]
 	)
 
 	slider.slider_overlay_sprite.reset_attributes_based_on_transforms()
@@ -293,27 +293,27 @@ pub fn (mut slider Slider) kill_slide(_time f64) {
 
 	// Force follower to normal size
 	slider.slider_overlay_sprite.add_transform(
-		typ: .scale_factor
+		typ:    .scale_factor
 		easing: easing.quad_out
-		time: time.Time{math.min[f64](_time, next_point - 1.0), math.min[f64](_time + 100,
+		time:   time.Time{math.min[f64](_time, next_point - 1.0), math.min[f64](_time + 100,
 			next_point - 1.0)}
 		before: [
 			slider.slider_overlay_sprite.size.x / slider.slider_overlay_sprite.raw_size.x,
 		]
-		after: [size_ratio]
+		after:  [size_ratio]
 	)
 
 	slider.slider_overlay_sprite.add_transform(
-		typ: .fade
-		time: time.Time{next_point - 100, next_point}
+		typ:    .fade
+		time:   time.Time{next_point - 100, next_point}
 		before: [255.0]
-		after: [0.0]
+		after:  [0.0]
 	)
 	slider.slider_overlay_sprite.add_transform(
-		typ: .scale_factor
-		time: time.Time{next_point - 100, next_point}
+		typ:    .scale_factor
+		time:   time.Time{next_point - 100, next_point}
 		before: [size_ratio]
-		after: [size_ratio * 1.5]
+		after:  [size_ratio * 1.5]
 	)
 
 	// TODO:
@@ -414,7 +414,7 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 
 		if span < int(slider.repeated) - 1 {
 			slider.score_points_lazer << TickPoint{
-				time: span_start_time + span_duration
+				time:       span_start_time + span_duration
 				is_reverse: true
 			}
 		} else {
@@ -461,7 +461,7 @@ pub fn (mut slider Slider) set_timing(t timing.Timings) {
 			slider.score_path << Pathline{
 				time1: i64(start_time)
 				time2: i64(start_time + progress)
-				line: curves.make_linear(p1, p2)
+				line:  curves.make_linear(p1, p2)
 			}
 
 			start_time += progress
@@ -556,8 +556,8 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 
 	// Color
 	slider.slider_b_sprite.add_transform(
-		typ: .color
-		time: time.Time{slider.time.start, slider.time.start}
+		typ:    .color
+		time:   time.Time{slider.time.start, slider.time.start}
 		before: slider.color
 	)
 
@@ -566,15 +566,15 @@ pub fn (mut slider Slider) generate_slider_follow_circles() {
 	for i, mut sprite in slider_sprites {
 		if i == 1 {
 			sprite.add_transform(
-				typ: .fade
-				time: time.Time{slider.time.end, slider.time.end + 120.0}
+				typ:    .fade
+				time:   time.Time{slider.time.end, slider.time.end + 120.0}
 				before: [255.0]
-				after: [0.0]
+				after:  [0.0]
 			)
 		}
 		sprite.add_transform(
-			typ: .scale_factor
-			time: time.Time{slider.time.start, slider.time.start}
+			typ:    .scale_factor
+			time:   time.Time{slider.time.start, slider.time.start}
 			before: [size_ratio]
 		)
 
@@ -610,43 +610,43 @@ pub fn (mut slider Slider) generate_slider_tickpoints() {
 		tick_sprite.textures << texture
 
 		tick_sprite.add_transform(
-			typ: .move
-			time: time.Time{slider.time.start, slider.time.end}
+			typ:    .move
+			time:   time.Time{slider.time.start, slider.time.end}
 			before: [
 				p.pos.x,
 				p.pos.y,
 			]
 		)
 		tick_sprite.add_transform(
-			typ: .scale_factor
-			time: time.Time{a, end_time}
+			typ:    .scale_factor
+			time:   time.Time{a, end_time}
 			before: [
 				size_ratio * 0.5,
 			]
-			after: [size_ratio * 1.2]
+			after:  [size_ratio * 1.2]
 		)
 		tick_sprite.add_transform(
-			typ: .scale_factor
+			typ:    .scale_factor
 			easing: easing.quad_out
-			time: time.Time{end_time, end_time + 150.0}
+			time:   time.Time{end_time, end_time + 150.0}
 			before: [size_ratio * 1.2]
-			after: [size_ratio * 1.0]
+			after:  [size_ratio * 1.0]
 		)
 		tick_sprite.add_transform(
-			typ: .fade
-			time: time.Time{a, end_time}
+			typ:    .fade
+			time:   time.Time{a, end_time}
 			before: [
 				0.0,
 			]
-			after: [255.0]
+			after:  [255.0]
 		)
 		tick_sprite.add_transform(
-			typ: .fade
-			time: time.Time{p.time, p.time + 16.0}
+			typ:    .fade
+			time:   time.Time{p.time, p.time + 16.0}
 			before: [
 				255.0,
 			]
-			after: [0.0]
+			after:  [0.0]
 		)
 		tick_sprite.reset_size_based_on_texture()
 		tick_sprite.reset_attributes_based_on_transforms()
@@ -695,8 +695,8 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 		mut repeat_sprite := &sprite.Sprite{}
 		repeat_sprite.textures << skin.get_texture('reversearrow')
 		repeat_sprite.add_transform(
-			typ: .move
-			time: time.Time{appear_time, appear_time}
+			typ:    .move
+			time:   time.Time{appear_time, appear_time}
 			before: [
 				position.x,
 				position.y,
@@ -704,37 +704,37 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 		)
 
 		repeat_sprite.add_transform(
-			typ: .scale_factor
-			time: time.Time{appear_time, appear_time}
+			typ:    .scale_factor
+			time:   time.Time{appear_time, appear_time}
 			before: [
 				size_ratio,
 			]
 		)
 		repeat_sprite.add_transform(
-			typ: .angle
-			time: time.Time{appear_time, appear_time}
+			typ:    .angle
+			time:   time.Time{appear_time, appear_time}
 			before: [
 				angle,
 			]
 		)
 		repeat_sprite.add_transform(
-			typ: .fade
-			time: time.Time{appear_time, math.min[f64](circle_time, appear_time + 150.0)}
+			typ:    .fade
+			time:   time.Time{appear_time, math.min[f64](circle_time, appear_time + 150.0)}
 			before: [0.0]
-			after: [255.0]
+			after:  [255.0]
 		)
 		repeat_sprite.add_transform(
-			typ: .fade
-			time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}
+			typ:    .fade
+			time:   time.Time{circle_time, circle_time + difficulty.hit_fade_out}
 			before: [255.0]
-			after: [0.0]
+			after:  [0.0]
 		)
 		repeat_sprite.add_transform(
-			typ: .scale_factor
+			typ:    .scale_factor
 			easing: easing.quad_out
-			time: time.Time{circle_time, circle_time + difficulty.hit_fade_out}
+			time:   time.Time{circle_time, circle_time + difficulty.hit_fade_out}
 			before: [size_ratio]
-			after: [
+			after:  [
 				size_ratio * 1.4,
 			]
 		)
@@ -745,12 +745,12 @@ pub fn (mut slider Slider) generate_slider_repeat_circle() {
 		for t := f64(slider.time.start) - bounce_start_time; t < circle_time; t += 300.0 {
 			length := math.min(300.0, circle_time - t)
 			repeat_sprite.add_transform(
-				typ: .scale_factor
-				time: time.Time{t, t + length}
+				typ:    .scale_factor
+				time:   time.Time{t, t + length}
 				before: [
 					size_ratio * 1.3,
 				]
-				after: [size_ratio * 1.0]
+				after:  [size_ratio * 1.0]
 			)
 		}
 

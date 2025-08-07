@@ -9,8 +9,8 @@ pub mut:
 
 pub fn make_video_settings() Video {
 	mut render := Video{
-		record: false
-		fps: 60.0
+		record:     false
+		fps:        60.0
 		update_fps: 480
 	}
 

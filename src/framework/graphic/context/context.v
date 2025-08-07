@@ -52,7 +52,7 @@ pub fn Context.create(mut context gg.Context) &Context {
 
 // begin_gp ends sokol gp and gg context.
 pub fn (mut ctx Context) end_short() {
-	gfx.begin_pass(sapp.create_default_pass(context.invisible_pass))
+	gfx.begin_pass(sapp.create_default_pass(invisible_pass))
 
 	sgl.draw()
 	gfx.end_pass()
