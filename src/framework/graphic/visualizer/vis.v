@@ -20,7 +20,7 @@ pub mut:
 	fft             []f64 = []f64{len: 200} // TODO: fix this, make a visualizer factor yor smth
 	music           &common.ITrack
 	multiplier      f64 = 0.5 // Change this to increase the "oopmh"
-	inverted        bool  // Invert the visualizer
+	inverted        bool // Invert the visualizer
 	// logo stuff
 	logo_position vector.Vector2[f64] = vector.Vector2[f64]{640, 480}
 	logo_size     vector.Vector2[f64] = vector.Vector2[f64]{100, 100}

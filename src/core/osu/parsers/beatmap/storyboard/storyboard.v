@@ -83,10 +83,10 @@ pub fn (mut storyboard Storyboard) start_thread() {
 
 pub fn (mut storyboard Storyboard) draw() {
 	storyboard.manager.draw(
-		ctx: storyboard.ctx
+		ctx:    storyboard.ctx
 		camera: storyboard.camera
-		time: storyboard.last_time
-		batch: true
+		time:   storyboard.last_time
+		batch:  true
 	)
 
 	if storyboard.video != unsafe { nil } {
@@ -239,7 +239,7 @@ pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string)
 		origin := vector.parse_origin(items[2])
 
 		mut storyboard_sprite := &sprite.Sprite{
-			origin: origin
+			origin:   origin
 			textures: [storyboard.get_image(img_path)] // ez
 		}
 
@@ -360,22 +360,22 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 		match parameters[0] {
 			'A' {
 				transforms << &transform.Transform{
-					typ: .additive
-					time: time2.Time{start_time, end_time}
+					typ:    .additive
+					time:   time2.Time{start_time, end_time}
 					before: [1.0]
 				}
 			}
 			'V' {
 				transforms << &transform.Transform{
-					typ: .flip_vertically
-					time: time2.Time{start_time, end_time}
+					typ:    .flip_vertically
+					time:   time2.Time{start_time, end_time}
 					before: [1.0]
 				}
 			}
 			'H' {
 				transforms << &transform.Transform{
-					typ: .flip_horizontally
-					time: time2.Time{start_time, end_time}
+					typ:    .flip_horizontally
+					time:   time2.Time{start_time, end_time}
 					before: [1.0]
 				}
 			}
@@ -407,74 +407,74 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 	match command_type {
 		'F' {
 			transforms << &transform.Transform{
-				typ: .fade
+				typ:    .fade
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		'R' {
 			transforms << &transform.Transform{
-				typ: .angle
+				typ:    .angle
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		'S' {
 			transforms << &transform.Transform{
-				typ: .scale_factor
+				typ:    .scale_factor
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		'MX' {
 			transforms << &transform.Transform{
-				typ: .move_x
+				typ:    .move_x
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		'MY' {
 			transforms << &transform.Transform{
-				typ: .move_y
+				typ:    .move_y
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		'M' {
 			transforms << &transform.Transform{
-				typ: .move
+				typ:    .move
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		'V' {
 			transforms << &transform.Transform{
-				typ: .scale
+				typ:    .scale
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		'C' {
 			transforms << &transform.Transform{
-				typ: .color
+				typ:    .color
 				easing: transform_easing
-				time: time2.Time{start_time, end_time}
+				time:   time2.Time{start_time, end_time}
 				before: sections[0]
-				after: sections[1]
+				after:  sections[1]
 			}
 		}
 		else {
@@ -492,7 +492,7 @@ pub fn (mut storyboard Storyboard) initialize_camera() {
 			x: 0
 			y: 0
 		}
-		scale: storyboard.scale
+		scale:  storyboard.scale
 	}
 
 	// Scale and Center the storyboard somehow

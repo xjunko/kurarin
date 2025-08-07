@@ -40,7 +40,7 @@ pub fn (mut manager BeatmapManager) load() {
 			manager.beatmaps << container
 		}
 
-		if i > beatmap.c_hard_limit {
+		if i > c_hard_limit {
 			break
 		}
 	}

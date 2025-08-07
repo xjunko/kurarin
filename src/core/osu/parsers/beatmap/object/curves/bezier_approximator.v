@@ -40,8 +40,8 @@ pub mut:
 
 pub fn make_bezier_approximator(control_points []vector.Vector2[f64]) &BezierApproximator {
 	return &BezierApproximator{
-		count: control_points.len
-		control_points: control_points
+		count:              control_points.len
+		control_points:     control_points
 		subdivisionbuffer1: []vector.Vector2[f64]{len: control_points.len}
 		subdivisionbuffer2: []vector.Vector2[f64]{len: control_points.len * 2 - 1}
 	}
@@ -49,7 +49,7 @@ pub fn make_bezier_approximator(control_points []vector.Vector2[f64]) &BezierApp
 
 pub fn is_flat_enough(control_points []vector.Vector2[f64]) bool {
 	for i := 1; i < control_points.len - 1; i++ {
-		if control_points[i - 1].sub(control_points[i].scale(2)).add(control_points[i + 1]).length_squared() > curves._bezier_quantization_sq {
+		if control_points[i - 1].sub(control_points[i].scale(2)).add(control_points[i + 1]).length_squared() > _bezier_quantization_sq {
 			return false
 		}
 	}

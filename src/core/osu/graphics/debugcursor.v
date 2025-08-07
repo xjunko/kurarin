@@ -49,8 +49,8 @@ pub fn (mut debug_cursor DebugCursor) update(update_time f64) {
 		debug_cursor.catch_up_sixty_delta -= osu_cursor_trail_delta
 
 		debug_cursor.deltas_i++
-		debug_cursor.deltas[debug_cursor.deltas_i % graphics.debug_length].x = debug_cursor.position.x
-		debug_cursor.deltas[debug_cursor.deltas_i % graphics.debug_length].y = debug_cursor.position.y
+		debug_cursor.deltas[debug_cursor.deltas_i % debug_length].x = debug_cursor.position.x
+		debug_cursor.deltas[debug_cursor.deltas_i % debug_length].y = debug_cursor.position.y
 
 		debug_cursor.catch_up_sixty_delta -= osu_cursor_trail_delta
 	}
@@ -62,14 +62,14 @@ pub fn (mut debug_cursor DebugCursor) update(update_time f64) {
 pub fn DebugCursor.create() &DebugCursor {
 	mut cursor := &DebugCursor{
 		always_visible: true
-		textures: [
+		textures:       [
 			skin.get_texture('cursor'),
 		]
 	}
 
 	cursor.add_transform(
-		typ: .scale_factor
-		time: time2.Time{0, 0}
+		typ:    .scale_factor
+		time:   time2.Time{0, 0}
 		before: [settings.global.gameplay.skin.cursor.size]
 	)
 

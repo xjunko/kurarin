@@ -9,7 +9,7 @@ import core.osu.runtime
 import core.osu.runtime.gui
 import core.basic.runtime as basic
 
-const _ = settings.global
+const imports_used = settings.global
 
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)

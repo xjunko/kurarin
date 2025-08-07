@@ -80,47 +80,47 @@ pub mut:
 // Factory
 pub fn make_gameplay_settings() Gameplay {
 	mut gameplay_ := Gameplay{
-		paths: Path{
+		paths:      Path{
 			beatmaps: '<Path to your osu! beatmaps folder here>'
-			skins: '<Path to your osu! skins folder here>'
+			skins:    '<Path to your osu! skins folder here>'
 		}
-		playfield: Playfield{
+		playfield:  Playfield{
 			objects_visible: true
-			lead_in_time: 3.0
-			background: Background{
+			lead_in_time:    3.0
+			background:      Background{
 				enable_storyboard: true
-				enable_video: true
-				background_dim: 100
+				enable_video:      true
+				background_dim:    100
 			}
 		}
-		input: Input{
-			left_key: .a
+		input:      Input{
+			left_key:  .a
 			right_key: .s
 		}
-		skin: Skin{
-			current_skin: ''
+		skin:       Skin{
+			current_skin:         ''
 			use_colors_from_skin: true
-			use_beatmap_colors: false
-			cursor: Cursor{
-				style: 2
-				size: 0.75
-				trail_size: 1.0
+			use_beatmap_colors:   false
+			cursor:               Cursor{
+				style:        2
+				size:         0.75
+				trail_size:   1.0
 				trail_length: 1.0
-				visible: true
+				visible:      true
 			}
 		}
 		hitobjects: HitObjects{
-			disable_hitobjects: false
-			scale_to_beat: false
-			rainbow_hitcircle: false
-			rainbow_slider: false
-			slider_width: 1.0
-			slider_lazer_style: false
+			disable_hitobjects:           false
+			scale_to_beat:                false
+			rainbow_hitcircle:            false
+			rainbow_slider:               false
+			slider_width:                 1.0
+			slider_lazer_style:           false
 			slider_body_use_border_color: false
 		}
-		overlay: Overlay{
+		overlay:    Overlay{
 			visualizer: true
-			info: true
+			info:       true
 		}
 	}
 

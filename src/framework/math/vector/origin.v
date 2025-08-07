@@ -1,50 +1,50 @@
 module vector
 
 pub const top_left = Origin{
-	x: 0
-	y: 0
+	x:   0
+	y:   0
 	typ: OriginType.top_left
 }
 pub const top_centre = Origin{
-	x: 0.5
-	y: -1
+	x:   0.5
+	y:   -1
 	typ: OriginType.top_centre
 }
 pub const top_right = Origin{
-	x: 1
-	y: -1
+	x:   1
+	y:   -1
 	typ: OriginType.top_right
 }
 
 pub const centre_left = Origin{
-	x: 0
-	y: 0.5
+	x:   0
+	y:   0.5
 	typ: OriginType.centre_left
 }
 pub const centre = Origin{
-	x: 0.5
-	y: 0.5
+	x:   0.5
+	y:   0.5
 	typ: OriginType.centre
 }
 pub const centre_right = Origin{
-	x: 1
-	y: 0.5
+	x:   1
+	y:   0.5
 	typ: OriginType.centre_right
 }
 
 pub const bottom_left = Origin{
-	x: 0
-	y: 1
+	x:   0
+	y:   1
 	typ: OriginType.bottom_left
 }
 pub const bottom_centre = Origin{
-	x: 0.5
-	y: 1
+	x:   0.5
+	y:   1
 	typ: OriginType.bottom_centre
 }
 pub const bottom_right = Origin{
-	x: 1
-	y: 1
+	x:   1
+	y:   1
 	typ: OriginType.bottom_right
 }
 
@@ -69,35 +69,35 @@ pub mut:
 pub fn parse_origin(s string) Origin {
 	return match s {
 		'TopLeft' {
-			vector.top_left
+			top_left
 		}
 		'TopCentre' {
-			vector.top_centre
+			top_centre
 		}
 		'TopRight' {
-			vector.top_right
+			top_right
 		}
 		'CentreLeft' {
-			vector.centre_left
+			centre_left
 		}
 		'Centre' {
-			vector.centre
+			centre
 		}
 		'CentreRight' {
-			vector.centre_right
+			centre_right
 		}
 		'BottomLeft' {
-			vector.bottom_left
+			bottom_left
 		}
 		'BottomCentre' {
-			vector.bottom_centre
+			bottom_centre
 		}
 		'BottomRight' {
-			vector.bottom_right
+			bottom_right
 		}
 		else {
 			println('> Error: Failed to parse origin=${s}')
-			vector.top_left
+			top_left
 		}
 	}
 }

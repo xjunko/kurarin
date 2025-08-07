@@ -15,14 +15,16 @@ import framework.graphic.sprite
 import framework.graphic.context
 import core.osu.gameplay.overlays.gameplay
 
-const g_overlay_hack = &GameplayOverlay{
-	ctx: unsafe { 0 }
-	ruleset: unsafe { 0 }
-	cursor: unsafe { 0 }
-	hitresult: unsafe { 0 }
-	combo_counter: unsafe { 0 }
-	scoreboard: unsafe { 0 }
-}
+__global (
+	g_overlay_hack = &GameplayOverlay{
+		ctx:           unsafe { 0 }
+		ruleset:       unsafe { 0 }
+		cursor:        unsafe { 0 }
+		hitresult:     unsafe { 0 }
+		combo_counter: unsafe { 0 }
+		scoreboard:    unsafe { 0 }
+	}
+)
 
 pub struct GameplayOverlay {
 pub mut:
@@ -75,22 +77,22 @@ pub fn (mut overlay GameplayOverlay) update(_time f64) {
 
 			key.remove_transform_by_type(.scale_factor)
 			key.add_transform(
-				typ: .scale_factor
-				time: time.Time{_time, _time + 100.0}
+				typ:    .scale_factor
+				time:   time.Time{_time, _time + 100.0}
 				before: [
 					1.0,
 				]
-				after: [0.8]
+				after:  [0.8]
 			)
 			key.add_transform(
-				typ: .color
-				time: time.Time{_time, _time + 100.0}
+				typ:    .color
+				time:   time.Time{_time, _time + 100.0}
 				before: [
 					255.0,
 					255.0,
 					255.0,
 				]
-				after: color
+				after:  color
 			)
 
 			overlay.key_counters[i]++
@@ -102,18 +104,18 @@ pub fn (mut overlay GameplayOverlay) update(_time f64) {
 
 			key.remove_transform_by_type(.scale_factor)
 			key.add_transform(
-				typ: .scale_factor
-				time: time.Time{math.max[f64](_time, overlay.last_presses[i]), _time + 100.0}
+				typ:    .scale_factor
+				time:   time.Time{math.max[f64](_time, overlay.last_presses[i]), _time + 100.0}
 				before: [key.size.y / key.raw_size.y]
-				after: [
+				after:  [
 					1.0,
 				]
 			)
 			key.add_transform(
-				typ: .color
-				time: time.Time{_time, _time + 100.0}
+				typ:    .color
+				time:   time.Time{_time, _time + 100.0}
 				before: color
-				after: [
+				after:  [
 					255.0,
 					255.0,
 					255.0,
@@ -144,8 +146,8 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 		overlay.keys_font.draw_number(overlay.key_counters[i].str(), vector.Vector2[f64]{pos_x, pos_y},
 			vector.centre,
-			time: overlay.last_time
-			ctx: overlay.ctx
+			time:  overlay.last_time
+			ctx:   overlay.ctx
 			scale: scale
 		)
 	}
@@ -156,8 +158,8 @@ pub fn (mut overlay GameplayOverlay) draw() {
 	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) - f64(overlay.score_smooth) * 0.5)
 	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2[f64]{settings.global.window.width - 5 - (8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0},
 		vector.top_left,
-		ctx: overlay.ctx
-		time: overlay.last_time
+		ctx:   overlay.ctx
+		time:  overlay.last_time
 		scale: x.resolution.ui_camera.scale
 	)
 
@@ -179,40 +181,40 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 	logging.debug('[Overlay] Stage 1')
 
 	mut overlay := &GameplayOverlay{
-		ruleset: unsafe { player_ruleset }
-		cursor: unsafe { player_cursor }
-		ctx: unsafe { ctx }
-		hitresult: hitresult
+		ruleset:       unsafe { player_ruleset }
+		cursor:        unsafe { player_cursor }
+		ctx:           unsafe { ctx }
+		hitresult:     hitresult
 		combo_counter: counter
-		score_font: score_font
-		scoreboard: unsafe { 0 }
+		score_font:    score_font
+		scoreboard:    unsafe { 0 }
 	}
 
 	mut scoreboard := gameplay.make_score_board(overlay, counter, player_info)
 	overlay.scoreboard = scoreboard
 
 	overlay.keys_background = &sprite.Sprite{
-		origin: vector.top_left
+		origin:         vector.top_left
 		always_visible: true
 	}
 	overlay.keys_background.add_transform(
-		typ: .move
-		time: time.Time{0.0, 0.0}
+		typ:    .move
+		time:   time.Time{0.0, 0.0}
 		before: [
 			settings.global.window.width,
 			settings.global.window.height / 2.0 - 64.0,
 		]
 	)
 	overlay.keys_background.add_transform(
-		typ: .angle
-		time: time.Time{0.0, 0.0}
+		typ:    .angle
+		time:   time.Time{0.0, 0.0}
 		before: [
 			math.pi / 2.0,
 		]
 	)
 	overlay.keys_background.add_transform(
-		typ: .scale
-		time: time.Time{0.0, 0.0}
+		typ:    .scale
+		time:   time.Time{0.0, 0.0}
 		before: [
 			1.05,
 			1.0,
@@ -230,8 +232,8 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 
 		mut key := &sprite.Sprite{}
 		key.add_transform(
-			typ: .move
-			time: time.Time{0.0, 0.0}
+			typ:    .move
+			time:   time.Time{0.0, 0.0}
 			before: [
 				settings.global.window.width - 24.0 * x.resolution.ui_camera.scale,
 				pos_y,
@@ -255,14 +257,14 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 
 	// HACK: bruh
 	unsafe {
-		overlays.g_overlay_hack = overlay
+		g_overlay_hack = overlay
 	}
 	return overlay
 }
 
 // Some hack
 pub fn hit_received(current_time f64, number i64, position vector.Vector2[f64], result ruleset.HitResult, combo ruleset.ComboResult, score i64) {
-	mut g_overlay := unsafe { overlays.g_overlay_hack }
+	mut g_overlay := unsafe { g_overlay_hack }
 	g_overlay.score = score
 	g_overlay.hitresult.add_result(current_time, result, position)
 

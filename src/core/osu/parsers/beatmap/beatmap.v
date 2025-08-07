@@ -113,26 +113,26 @@ pub fn (mut beatmap Beatmap) ensure_background_loaded() {
 		end_size := vector.Vector2[f64]{f64(image.width * ratio), f64(image.height * ratio)}
 
 		mut beatmap_bg := &sprite.Sprite{
-			origin: vector.centre
-			textures: [image]
+			origin:         vector.centre
+			textures:       [image]
 			always_visible: true
-			position: vector.Vector2[f64]{320.0, 240.0}
+			position:       vector.Vector2[f64]{320.0, 240.0}
 		}
 
 		// fade
 		beatmap_bg.add_transform(
-			typ: .fade
-			time: time.Time{-1500, -500}
+			typ:    .fade
+			time:   time.Time{-1500, -500}
 			before: [
 				0.0,
 			]
-			after: [255.0]
+			after:  [255.0]
 		)
 
 		if has_video {
 			beatmap_bg.add_transform(
-				typ: .fade
-				time: time.Time{1100, 1200}
+				typ:    .fade
+				time:   time.Time{1100, 1200}
 				before: [
 					0.0,
 				]
@@ -380,9 +380,9 @@ pub fn (mut beatmap Beatmap) draw() {
 			// Render hitcircle
 			gfx.begin_pass(sapp.create_default_pass(graphic.global_renderer.pass_action))
 			beatmap.queue[i].draw(
-				ctx: beatmap.ctx
-				time: beatmap.last_update
-				scale: beatmap.last_boost
+				ctx:    beatmap.ctx
+				time:   beatmap.last_update
+				scale:  beatmap.last_boost
 				camera: x.resolution.camera
 			)
 			sgl.draw()

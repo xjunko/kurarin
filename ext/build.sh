@@ -24,7 +24,7 @@ format() {
 }
 
 build_shaders() {
-    v shader $shaders_dir -l glsl330
+    v shader $shaders_dir -l glsl410
 }
 
 build() {
@@ -49,6 +49,9 @@ build() {
     # Compiler
     # TODO: use cc or smth
     build_command+=" -cc $compiler"
+
+    # globals
+    build_command+=" -enable-globals"
 
     # What to compile
     build_command+=" $where"

@@ -15,13 +15,13 @@ pub fn init() {
 }
 
 pub fn new_track(path string) &common.ITrack {
-	mut boxed := unsafe { &audio.boxed_backend }
+	mut boxed := unsafe { &boxed_backend }
 	mut track := boxed.backend.new_track(path)
 	return track
 }
 
 pub fn new_sample(path string) &common.ISample {
-	mut boxed := unsafe { &audio.boxed_backend }
+	mut boxed := unsafe { &boxed_backend }
 	mut track := boxed.backend.new_sample(path)
 	return track
 }

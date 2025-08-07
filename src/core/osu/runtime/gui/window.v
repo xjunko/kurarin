@@ -29,20 +29,20 @@ mut:
 	time &time.TimeCounter = unsafe { nil }
 pub mut:
 	manager  &beatmap.BeatmapManager = unsafe { nil }
-	menu     &MainMenu = unsafe { nil }
-	gameplay &gameplay.OSUGameplay = unsafe { nil }
+	menu     &MainMenu               = unsafe { nil }
+	gameplay &gameplay.OSUGameplay   = unsafe { nil }
 	// TODO: Rename this god awful fields lmao
-	joe   bool   // Has song loaded yet
-	joe_i int    // Index of beatmap
-	joe_s int    // Current Scene
-	joe_p string // Path of the beatmap (Temp)
-	joe_c int    // Useless counter for uselss thing
+	joe   bool                     // Has song loaded yet
+	joe_i int                      // Index of beatmap
+	joe_s int                      // Current Scene
+	joe_p string                   // Path of the beatmap (Temp)
+	joe_c int                      // Useless counter for uselss thing
 	joe_t gameplay.OSUGameplayMode // Which mode to open gameplay with
-	joe_r string // Replay Path
+	joe_r string                   // Replay Path
 }
 
 pub fn (mut window GUIWindow) init(_ voidptr) {
-	window.joe_s = gui.c_scene_main
+	window.joe_s = c_scene_main
 
 	// Reset time
 	window.time = time.get_time()
@@ -58,7 +58,7 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 	logging.info('Setting up scenes.')
 
 	window.menu = &MainMenu{
-		window: window
+		window:        window
 		current_track: audio.new_dummy_track()
 	}
 
@@ -71,7 +71,7 @@ pub fn (mut window GUIWindow) init(_ voidptr) {
 	if window.manager.beatmaps.len > 0 {
 		window.menu.change_beatmap(&window.manager.beatmaps[0])
 	} else {
-		window.joe_s = gui.c_scene_error
+		window.joe_s = c_scene_error
 		logging.error('No beatmap found on: ${settings.global.gameplay.paths.beatmaps}')
 	}
 }
@@ -81,14 +81,14 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 	// Draw scenes
 	match window.joe_s {
-		gui.c_scene_error {
+		c_scene_error {
 			window.ctx.begin()
 
 			window.ctx.draw_text(int(settings.global.window.width / 2), int(settings.global.window.height / 2),
 				'Invalid beatmap path!',
-				color: gg.Color{255, 255, 255, 255}
-				size: 32
-				align: .center
+				color:          gg.Color{255, 255, 255, 255}
+				size:           32
+				align:          .center
 				vertical_align: .middle
 			)
 
@@ -109,7 +109,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.ctx.end()
 		}
-		gui.c_scene_main {
+		c_scene_main {
 			window.ctx.begin()
 			window.mutex.@lock()
 			window.menu.draw(ctx: window.ctx)
@@ -132,7 +132,7 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.ctx.end()
 		}
-		gui.c_scene_pre_gameplay {
+		c_scene_pre_gameplay {
 			// Black screen with loading
 			window.ctx.begin()
 
@@ -145,9 +145,9 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			window.ctx.draw_text(int(settings.global.window.width) / 2, int(settings.global.window.height) / 2,
 				'Loading...',
-				color: gg.Color{255, 255, 255, 255}
-				size: 64
-				align: .center
+				color:          gg.Color{255, 255, 255, 255}
+				size:           64
+				align:          .center
 				vertical_align: .middle
 			)
 
@@ -157,16 +157,16 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.joe_c++
 
 			if window.joe_c > 10 {
-				window.joe_s = gui.c_scene_loading_gameplay
+				window.joe_s = c_scene_loading_gameplay
 			}
 		}
-		gui.c_scene_loading_gameplay {
+		c_scene_loading_gameplay {
 			// This is kinda hacky but whatever.
 			// Load gameplay.
 			logging.info('Loading gameplay.')
 
 			window.gameplay = &gameplay.OSUGameplay{
-				cursor: &voidptr(0) // NOTE: Not safe.
+				cursor:        &voidptr(0) // NOTE: Not safe.
 				beatmap_audio: audio.new_dummy_track()
 			}
 
@@ -178,9 +178,9 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			logging.info('Gameplay loaded?')
 
-			window.joe_s = gui.c_scene_gameplay
+			window.joe_s = c_scene_gameplay
 		}
-		gui.c_scene_gameplay {
+		c_scene_gameplay {
 			window.mutex.@lock()
 			window.gameplay.draw(mut window.ctx)
 			window.mutex.unlock()
@@ -230,10 +230,10 @@ pub fn (mut window GUIWindow) update(time_ms f64) {
 	window.tick_update()
 
 	match window.joe_s {
-		gui.c_scene_main {
+		c_scene_main {
 			window.menu.update(time_ms)
 		}
-		gui.c_scene_gameplay {
+		c_scene_gameplay {
 			window.gameplay.update(time_ms, window.time.delta)
 		}
 		else {}
@@ -242,7 +242,7 @@ pub fn (mut window GUIWindow) update(time_ms f64) {
 
 // Enter
 pub fn (mut window GUIWindow) play_beatmap(path string, typ gameplay.OSUGameplayMode) {
-	window.joe_s = gui.c_scene_pre_gameplay // Getting reading to load
+	window.joe_s = c_scene_pre_gameplay // Getting reading to load
 	window.joe_p = path
 	window.joe_t = typ
 
@@ -256,14 +256,13 @@ pub fn (mut window GUIWindow) play_beatmap(path string, typ gameplay.OSUGameplay
 
 // Events
 pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
-	for dont_handle_on_this_scene in [gui.c_scene_pre_gameplay, gui.c_scene_loading_gameplay,
-		gui.c_scene_error] {
+	for dont_handle_on_this_scene in [c_scene_pre_gameplay, c_scene_loading_gameplay, c_scene_error] {
 		if window.joe_s == dont_handle_on_this_scene {
 			return
 		}
 	}
 
-	if window.joe_s == gui.c_scene_gameplay {
+	if window.joe_s == c_scene_gameplay {
 		window.gameplay.event_keydown(key)
 		return
 	}
@@ -323,15 +322,14 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 }
 
 pub fn (mut window GUIWindow) event_keyup(key gg.KeyCode, mod gg.Modifier, _ voidptr) {
-	for dont_handle_on_this_scene in [gui.c_scene_pre_gameplay, gui.c_scene_loading_gameplay,
-		gui.c_scene_error] {
+	for dont_handle_on_this_scene in [c_scene_pre_gameplay, c_scene_loading_gameplay, c_scene_error] {
 		if window.joe_s == dont_handle_on_this_scene {
 			return
 		}
 	}
 
 	match window.joe_s {
-		gui.c_scene_gameplay {
+		c_scene_gameplay {
 			window.gameplay.event_keyup(key)
 		}
 		else {}
@@ -339,7 +337,7 @@ pub fn (mut window GUIWindow) event_keyup(key gg.KeyCode, mod gg.Modifier, _ voi
 }
 
 pub fn (mut window GUIWindow) event_mouse(x f32, y f32, _ voidptr) {
-	if window.joe_s != gui.c_scene_gameplay {
+	if window.joe_s != c_scene_gameplay {
 		return
 	}
 
@@ -358,16 +356,16 @@ pub fn run(args []string) {
 
 	mut gg_context := gg.new_context(
 		// Basic
-		width: int(settings.global.window.width)
-		height: int(settings.global.window.height)
+		width:     int(settings.global.window.width)
+		height:    int(settings.global.window.height)
 		user_data: window
 		// FNs
-		init_fn: window.init
+		init_fn:  window.init
 		frame_fn: window.draw
 		// Event
 		keydown_fn: window.event_keydown
-		keyup_fn: window.event_keyup
-		move_fn: window.event_mouse
+		keyup_fn:   window.event_keyup
+		move_fn:    window.event_mouse
 	)
 
 	window.ctx = context.Context.create(mut gg_context)

@@ -16,7 +16,7 @@ fn get_elzma_dl() !&voidptr {
 
 fn read_func(mut ctx []u8, buf &voidptr, size &usize) int {
 	unsafe {
-		file := C.fmemopen(ctx#[..*size].data, *size, 'rb'.str)
+		file := C.fmemopen(ctx#[..*size].data, *size, c'rb')
 
 		if file == C.NULL {
 			panic('[ELZMA] Failed to open memory for reading file.')

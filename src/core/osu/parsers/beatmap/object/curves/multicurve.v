@@ -105,7 +105,7 @@ pub fn new_multi_curve_t(typ string, points []vector.Vector2[f64], desired_lengt
 		for m_curve.lines.len > 0 {
 			mut line := m_curve.lines[m_curve.lines.len - 1]
 
-			if line.get_length() > diff + curves.min_part_width {
+			if line.get_length() > diff + min_part_width {
 				if !line.p1.equal(line.p2) {
 					pt := line.point_at((line.get_length() - f64(diff)) / line.get_length())
 					m_curve.lines[m_curve.lines.len - 1] = make_linear(line.p1, pt)

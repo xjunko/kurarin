@@ -26,14 +26,14 @@ pub mut:
 
 pub fn new_glider(value f64) &Glider {
 	mut glider := &Glider{
-		value: value
+		value:       value
 		start_value: value
-		current: Event{
-			time: time.Time{-1.0, 0}
-			target_value: value
+		current:     Event{
+			time:            time.Time{-1.0, 0}
+			target_value:    value
 			has_start_value: false
-			start_value: 0.0
-			easing: easing.linear
+			start_value:     0.0
+			easing:          easing.linear
 		}
 	}
 
@@ -42,22 +42,22 @@ pub fn new_glider(value f64) &Glider {
 
 pub fn (mut glider Glider) add_event(start_time f64, end_time f64, value f64) {
 	glider.queue << Event{
-		time: time.Time{start_time, end_time}
-		target_value: value
+		time:            time.Time{start_time, end_time}
+		target_value:    value
 		has_start_value: false
-		start_value: 0.0
-		easing: glider.easing
+		start_value:     0.0
+		easing:          glider.easing
 	}
 	glider.dirty = true
 }
 
 pub fn (mut glider Glider) add_event_start(start_time f64, end_time f64, start_value f64, end_value f64) {
 	glider.queue << Event{
-		time: time.Time{start_time, end_time}
-		target_value: end_value
+		time:            time.Time{start_time, end_time}
+		target_value:    end_value
 		has_start_value: true
-		start_value: start_value
-		easing: glider.easing
+		start_value:     start_value
+		easing:          glider.easing
 	}
 	glider.dirty = true
 }

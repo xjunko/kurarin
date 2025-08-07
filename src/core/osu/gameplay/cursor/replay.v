@@ -30,10 +30,9 @@ pub fn (mut replay ReplayCursor) update(update_time f64, update_delta f64) {
 		if update_time >= replay.events[i].time {
 			keys := replay.events[i].keys
 
-			replay.cursor.input.left_button = (keys & cursor.osu_m1) == cursor.osu_m1
-				|| (keys & cursor.osu_k1) == cursor.osu_k1
-			replay.cursor.input.right_button = (keys & cursor.osu_m2) == cursor.osu_m2
-				|| (keys & cursor.osu_k2) == cursor.osu_k2
+			replay.cursor.input.left_button = (keys & osu_m1) == osu_m1 || (keys & osu_k1) == osu_k1
+			replay.cursor.input.right_button = (keys & osu_m2) == osu_m2
+				|| (keys & osu_k2) == osu_k2
 
 			replay.events = replay.events[1..]
 		}
@@ -66,13 +65,13 @@ pub fn make_replay_cursor(mut ctx context.Context, path_to_replay string) &Repla
 		current_y := action.position[1]
 
 		auto.cursor.add_transform(
-			typ: .move
-			time: time.Time{action.time - delta, action.time}
+			typ:    .move
+			time:   time.Time{action.time - delta, action.time}
 			before: [
 				last_pos[0],
 				last_pos[1],
 			]
-			after: [current_x, current_y]
+			after:  [current_x, current_y]
 		)
 
 		last_pos[0] = current_x

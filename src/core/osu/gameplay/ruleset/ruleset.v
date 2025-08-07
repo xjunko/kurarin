@@ -311,7 +311,7 @@ pub fn new_ruleset(mut loaded_beatmap beatmap.Beatmap, mut cursors []&cursor.Cur
 
 		mut player := &DifficultyPlayer{
 			cursor: unsafe { *cursor }
-			diff: diff
+			diff:   diff
 		}
 
 		diff_players << player

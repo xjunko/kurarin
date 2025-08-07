@@ -10,7 +10,7 @@ const used_import = 1
 pub struct Video {
 pub mut:
 	video_proc  &os.Process = unsafe { 0 }
-	record_data &u8 = unsafe { 0 }
+	record_data &u8         = unsafe { 0 }
 
 	audio_proc &os.Process = unsafe { 0 }
 	audio_data []u8
@@ -71,35 +71,35 @@ pub fn (mut video Video) init_video_pipe_process() {
 }
 
 pub fn (mut video Video) init_audio_pipe_process() {
-	audio_buffer_size := unsafe { audio.boxed_backend.backend.get_required_buffer_size_for_mixer(1.0 / settings.global.video.update_fps) } // Render Update FPS (Refer to window_draw_recording in main)
-	video.audio_data = []u8{len: audio_buffer_size}
+	// audio_buffer_size := unsafe { audio.boxed_backend.backend.get_required_buffer_size_for_mixer(1.0 / settings.global.video.update_fps) } // Render Update FPS (Refer to window_draw_recording in main)
+	// video.audio_data = []u8{len: audio_buffer_size}
 
-	// Create the process
-	video.audio_proc = os.new_process(os.find_abs_path_of_executable('ffmpeg') or { panic(err) })
+	// // Create the process
+	// video.audio_proc = os.new_process(os.find_abs_path_of_executable('ffmpeg') or { panic(err) })
 
-	ffmpeg_arg := [
-		'-y',
-		'-f',
-		'f32le',
-		'-acodec',
-		'pcm_f32le',
-		'-ar',
-		'48000',
-		'-ac',
-		'2',
-		'-i',
-		'-',
-		'-nostats',
-		'-vn',
-		'-nostdin', // shut the fuck upp ffmpeg
-		'temp.mp3',
-	]
+	// ffmpeg_arg := [
+	// 	'-y',
+	// 	'-f',
+	// 	'f32le',
+	// 	'-acodec',
+	// 	'pcm_f32le',
+	// 	'-ar',
+	// 	'48000',
+	// 	'-ac',
+	// 	'2',
+	// 	'-i',
+	// 	'-',
+	// 	'-nostats',
+	// 	'-vn',
+	// 	'-nostdin', // shut the fuck upp ffmpeg
+	// 	'temp.mp3',
+	// ]
 
-	video.audio_proc.set_args(ffmpeg_arg)
-	video.audio_proc.set_redirect_stdio()
-	video.audio_proc.run()
+	// video.audio_proc.set_args(ffmpeg_arg)
+	// video.audio_proc.set_redirect_stdio()
+	// video.audio_proc.run()
 
-	println('AudioPipe Process started!')
+	// println('AudioPipe Process started!')
 }
 
 pub fn (mut video Video) close_pipe_process() {
@@ -146,14 +146,14 @@ pub fn (mut video Video) pipe_window() {
 }
 
 pub fn (mut video Video) pipe_audio() {
-	unsafe {
-		audio.boxed_backend.backend.get_mixer_data(mut video.audio_data)
-	}
+	// unsafe {
+	// 	audio.boxed_backend.backend.get_mixer_data(mut video.audio_data)
+	// }
 
-	// hacky
-	unsafe {
-		temp := video.audio_data.bytestr()
-		video.audio_proc.stdin_write(temp)
-		temp.free()
-	}
+	// // hacky
+	// unsafe {
+	// 	temp := video.audio_data.bytestr()
+	// 	video.audio_proc.stdin_write(temp)
+	// 	temp.free()
+	// }
 }

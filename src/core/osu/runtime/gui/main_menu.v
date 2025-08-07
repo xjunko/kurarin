@@ -20,7 +20,7 @@ mut:
 }
 pub mut:
 	current_beatmap &beatmap.BeatmapContainer = unsafe { nil }
-	current_version &beatmap.Beatmap = unsafe { nil }
+	current_version &beatmap.Beatmap          = unsafe { nil }
 	current_track   &common.ITrack
 }
 
@@ -65,20 +65,20 @@ pub fn (mut main_menu MainMenu) change_version(version &beatmap.Beatmap) {
 		// Load background and other crap
 		mut background := &sprite.Sprite{
 			always_visible: true
-			textures: [main_menu.window.ctx.create_image(main_menu.current_version.get_bg_path())]
-			origin: vector.top_left
+			textures:       [main_menu.window.ctx.create_image(main_menu.current_version.get_bg_path())]
+			origin:         vector.top_left
 		}
 
 		background.add_transform(
-			typ: .fade
-			time: time.Time{main_menu.window.time.time, main_menu.window.time.time + 50.0}
+			typ:    .fade
+			time:   time.Time{main_menu.window.time.time, main_menu.window.time.time + 50.0}
 			before: [195.0]
-			after: [255.0]
+			after:  [255.0]
 		)
 
 		background.reset_size_based_on_texture(
 			fit_size: true
-			source: vector.Vector2[f64]{settings.global.window.width, settings.global.window.height}
+			source:   vector.Vector2[f64]{settings.global.window.width, settings.global.window.height}
 		)
 
 		main_menu.background.add(mut background)
@@ -143,22 +143,22 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 	// Titles
 	main_menu.window.ctx.draw_text(10, 0, '${main_menu.current_version.metadata.artist} - ${main_menu.current_version.metadata.title} [${main_menu.current_version.metadata.version}]',
 		color: gg.Color{255, 255, 255, 255}
-		size: 32
+		size:  32
 	)
 
 	main_menu.window.ctx.draw_text(10, 32, 'Mapped by ${main_menu.current_version.metadata.creator}',
 		color: gg.Color{255, 255, 255, 255}
-		size: 25
+		size:  25
 	)
 
 	main_menu.window.ctx.draw_text(10, 32 + 25, 'Length: 4:20 BPM: 69 Objects: 420',
 		color: gg.Color{255, 255, 255, 255}
-		size: 25
+		size:  25
 	)
 
 	main_menu.window.ctx.draw_text(10, 32 + 25 + 25, 'CS:${main_menu.current_version.difficulty.cs} AR:${main_menu.current_version.difficulty.ar} OD:${main_menu.current_version.difficulty.od} HP:${main_menu.current_version.difficulty.hp} Stars:0.0',
 		color: gg.Color{255, 255, 255, 255}
-		size: 25
+		size:  25
 	)
 
 	// Difficulties/Version whatever its called
@@ -180,49 +180,49 @@ pub fn (mut main_menu MainMenu) draw(arg sprite.CommonSpriteArgument) {
 		main_menu.window.ctx.draw_text(int((settings.global.window.width) * (2.5 / 4)),
 			start_y, version.metadata.title,
 			color: text_color
-			size: 25
+			size:  25
 		)
 		main_menu.window.ctx.draw_text(int((settings.global.window.width) * (2.5 / 4)),
 			start_y + 25, '${version.metadata.artist} // ${version.metadata.creator}',
 			color: text_color
-			size: 20
+			size:  20
 		)
 		main_menu.window.ctx.draw_text(int((settings.global.window.width) * (2.5 / 4)),
 			start_y + 20 + 25, version.metadata.version,
 			color: text_color
-			size: 25
-			bold: true
+			size:  25
+			bold:  true
 		)
 	}
 
 	// Info
 	main_menu.window.ctx.draw_text(int(settings.global.window.width) - 100, 32, 'Gameplay Mode: [Press Key]',
 		color: gg.Color{255, 255, 255, 255}
-		size: 20
-		bold: true
+		size:  20
+		bold:  true
 		align: .right
 	)
 
 	main_menu.window.ctx.draw_text(int(settings.global.window.width) - 100, 32 + 20, 'A - Auto | P - Play | R - Replay',
 		color: gg.Color{255, 255, 255, 255}
-		size: 20
-		bold: true
+		size:  20
+		bold:  true
 		align: .right
 	)
 
 	main_menu.window.ctx.draw_text(int(settings.global.window.width) - 100, 32 + 20 + 20,
 		'Left-Right for beatmap selection',
 		color: gg.Color{255, 255, 255, 255}
-		size: 20
-		bold: true
+		size:  20
+		bold:  true
 		align: .right
 	)
 
 	main_menu.window.ctx.draw_text(int(settings.global.window.width) - 100, 32 + 20 + 20 + 20,
 		'Up-Down for difficulty selection',
 		color: gg.Color{255, 255, 255, 255}
-		size: 20
-		bold: true
+		size:  20
+		bold:  true
 		align: .right
 	)
 }

@@ -59,7 +59,7 @@ pub mut:
 // Boost scaling thingy
 pub fn update_boost_level(boost f32) {
 	unsafe {
-		mut g_render := graphic.global_renderer
+		mut g_render := global_renderer
 		g_render.uniform_values[16] = boost
 	}
 }
@@ -69,8 +69,8 @@ pub fn make_circle_vertices(position vector.Vector2[f64], cs f64) []vector.Vecto
 	mut points := []vector.Vector2[f64]{}
 	points << position
 
-	for i := 0; i < graphic.global_renderer.quality; i++ {
-		points << vector.new_vec_rad(f64(i) / f64(graphic.global_renderer.quality) * 2.0 * math.pi,
+	for i := 0; i < global_renderer.quality; i++ {
+		points << vector.new_vec_rad(f64(i) / f64(global_renderer.quality) * 2.0 * math.pi,
 			cs).add_normal(position.x, position.y)
 	}
 
@@ -109,7 +109,7 @@ pub fn make_slider_renderer_attr(cs f64, points []vector.Vector2[f64], pixel_len
 	attr.colors[9] = f32(settings.global.gameplay.hitobjects.slider_lazer_style)
 
 	attr.uniform = gfx.Range{
-		ptr: attr.colors.data
+		ptr:  attr.colors.data
 		size: usize(attr.colors.len * int(sizeof(f32)))
 	}
 
@@ -183,12 +183,12 @@ pub fn (mut attr SliderRendererAttr) bind_slider() {
 		// 	ptr: attr.vertices.data
 		// 	size: usize(attr.vertices.len * int(sizeof(f32)))
 		// }
-		label: 'SliderBinding'.str
+		label: c'SliderBinding'
 		usage: .dynamic
 	})
 
 	C.sg_update_buffer(&attr.bindings.vertex_buffers[0], &gfx.Range{
-		ptr: attr.vertices.data
+		ptr:  attr.vertices.data
 		size: usize(attr.vertices.len * int(sizeof(f32)))
 	})
 
@@ -206,7 +206,7 @@ pub fn (mut attr SliderRendererAttr) bind_slider() {
 
 // Draw
 pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
-	if !graphic.global_renderer.has_been_initialized {
+	if !global_renderer.has_been_initialized {
 		panic('global_renderer.has_been_initialized == False; This should not happen.')
 	}
 
@@ -289,7 +289,7 @@ pub fn (mut attr SliderRendererAttr) free() {
 
 // Init
 pub fn init_slider_renderer() {
-	if graphic.global_renderer.has_been_initialized {
+	if global_renderer.has_been_initialized {
 		logging.warn('Slider renderer already initialized!!')
 		return
 	}
@@ -297,7 +297,7 @@ pub fn init_slider_renderer() {
 	// Start
 	logging.info('Initializing slider renderer!')
 
-	mut renderer := unsafe { graphic.global_renderer }
+	mut renderer := unsafe { global_renderer }
 
 	// Normal slider shader
 	renderer.shader = gfx.make_shader(C.osu_slider_shader_desc(gfx.query_backend()))
@@ -305,9 +305,9 @@ pub fn init_slider_renderer() {
 	// Make pipeline
 	mut pipeline_desc := &gfx.PipelineDesc{
 		shader: renderer.shader
-		depth: gfx.DepthState{
-			pixel_format: .depth
-			compare: .less
+		depth:  gfx.DepthState{
+			pixel_format:  .depth
+			compare:       .less
 			write_enabled: true
 		}
 	}
@@ -328,19 +328,19 @@ pub fn init_slider_renderer() {
 	// Color and Depth buffer
 	mut img_desc := gfx.ImageDesc{
 		render_target: true
-		width: int(settings.global.window.width)
-		height: int(settings.global.window.height)
-		pixel_format: .rgba8
-		label: 'ColorBuffer'.str
+		width:         int(settings.global.window.width)
+		height:        int(settings.global.window.height)
+		pixel_format:  .rgba8
+		label:         c'ColorBuffer'
 	}
 	renderer.color_img = gfx.make_image(&img_desc)
 	img_desc.pixel_format = .depth
-	img_desc.label = 'DepthBuffer'.str
+	img_desc.label = c'DepthBuffer'
 	renderer.depth_img = gfx.make_image(&img_desc)
 
 	// Pass
 	mut offscreen_pass_desc := gfx.AttachmentsDesc{
-		label: 'offscreen-pass'.str
+		label: c'offscreen-pass'
 	}
 	offscreen_pass_desc.colors[0].image = renderer.color_img
 	offscreen_pass_desc.depth_stencil.image = renderer.depth_img
@@ -372,7 +372,7 @@ pub fn init_slider_renderer() {
 	]
 
 	renderer.uniform = gfx.Range{
-		ptr: renderer.uniform_values.data
+		ptr:  renderer.uniform_values.data
 		size: usize(renderer.uniform_values.len * int(sizeof(f32)))
 	}
 

@@ -41,7 +41,7 @@ pub fn (mut loop LoopProcessor) finalize() []&transform.Transform {
 		for t in loop.transforms {
 			transforms << t.clone(
 				start: t.time.start + part_start
-				end: t.time.end + part_start
+				end:   t.time.end + part_start
 			)
 		}
 	}

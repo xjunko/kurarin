@@ -18,7 +18,7 @@ pub mut:
 	delta_count f64
 	frametime   f64
 	videotime   f64
-	start_at    f64 = -1889
+	start_at    f64              = -1889
 	ctx         &context.Context = unsafe { nil }
 	need_update bool
 	mutex       &sync.Mutex = sync.new_mutex()
@@ -38,15 +38,15 @@ pub fn (mut video VideoSprite) draw(arg sprite.CommonSpriteArgument) {
 
 	if video.is_drawable_at(arg.time) || video.always_visible {
 		video.ctx.draw_image_with_config(context.DrawImageConfig{
-			img_id: video.tex_id
+			img_id:   video.tex_id
 			img_rect: gg.Rect{
-				x: f32((x.resolution.resolution.x - (video.size.x * arg.scale)) / 2.0)
-				y: f32((x.resolution.resolution.y - (video.size.y * arg.scale)) / 2.0)
-				width: f32(video.size.x * arg.scale)
+				x:      f32((x.resolution.resolution.x - (video.size.x * arg.scale)) / 2.0)
+				y:      f32((x.resolution.resolution.y - (video.size.y * arg.scale)) / 2.0)
+				width:  f32(video.size.x * arg.scale)
 				height: f32(video.size.y * arg.scale)
 			}
-			color: video.color
-			effect: [.alpha, .add][int(video.additive)]
+			color:    video.color
+			effect:   [.alpha, .add][int(video.additive)]
 		})
 	}
 }
@@ -78,7 +78,7 @@ pub fn (mut video VideoSprite) update(update_time f64) {
 
 pub fn make_video_sprite(path string, mut ctx context.Context, offset f64) &VideoSprite {
 	mut video := &VideoSprite{
-		ctx: ctx
+		ctx:            ctx
 		always_visible: true
 	}
 
@@ -100,10 +100,10 @@ pub fn make_video_sprite(path string, mut ctx context.Context, offset f64) &Vide
 
 	// fade in
 	video.add_transform(
-		typ: .fade
-		time: time.Time{0, 1000}
+		typ:    .fade
+		time:   time.Time{0, 1000}
 		before: [0.0]
-		after: [
+		after:  [
 			255.0,
 		]
 	)

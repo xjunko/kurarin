@@ -28,16 +28,16 @@ pub fn (mut danser_cursor DanserCursor) draw(arg sprite.CommonSpriteArgument) {
 		pos := danser_cursor.last_positions[i].apply_origin(danser_cursor.origin, size)
 
 		arg.ctx.draw_image_with_config(context.DrawImageConfig{
-			img: &danser_cursor.textures[1]
-			img_id: danser_cursor.textures[1].id
+			img:      &danser_cursor.textures[1]
+			img_id:   danser_cursor.textures[1].id
 			img_rect: gg.Rect{
-				x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
-				y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
-				width: f32(size.x * x.resolution.playfield_scale)
+				x:      f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
+				y:      f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
+				width:  f32(size.x * x.resolution.playfield_scale)
 				height: f32(size.y * x.resolution.playfield_scale)
 			}
-			color: danser_cursor.color
-			effect: .add
+			color:    danser_cursor.color
+			effect:   .add
 		})
 	}
 
@@ -45,16 +45,16 @@ pub fn (mut danser_cursor DanserCursor) draw(arg sprite.CommonSpriteArgument) {
 	pos := danser_cursor.position.apply_origin(danser_cursor.origin, danser_cursor.size)
 
 	arg.ctx.draw_image_with_config(context.DrawImageConfig{
-		img: &danser_cursor.textures[0]
-		img_id: danser_cursor.textures[0].id
+		img:      &danser_cursor.textures[0]
+		img_id:   danser_cursor.textures[0].id
 		img_rect: gg.Rect{
-			x: f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
-			y: f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
-			width: f32(danser_cursor.size.x * x.resolution.playfield_scale)
+			x:      f32(pos.x * x.resolution.playfield_scale + x.resolution.offset.x)
+			y:      f32(pos.y * x.resolution.playfield_scale + x.resolution.offset.y)
+			width:  f32(danser_cursor.size.x * x.resolution.playfield_scale)
 			height: f32(danser_cursor.size.y * x.resolution.playfield_scale)
 		}
-		effect: .add
-		color: gx.white
+		effect:   .add
+		color:    gx.white
 	})
 }
 
@@ -96,7 +96,7 @@ pub fn (mut danser_cursor DanserCursor) update(update_time f64) {
 pub fn DanserCursor.create() &DanserCursor {
 	mut cursor := &DanserCursor{
 		always_visible: true
-		textures: [
+		textures:       [
 			skin.get_texture('cursor'),
 			skin.get_texture('cursor-top'),
 			skin.get_texture('cursortrailfx'),
@@ -104,8 +104,8 @@ pub fn DanserCursor.create() &DanserCursor {
 	}
 
 	cursor.add_transform(
-		typ: .scale_factor
-		time: time2.Time{0, 0}
+		typ:    .scale_factor
+		time:   time2.Time{0, 0}
 		before: [settings.global.gameplay.skin.cursor.size]
 	)
 

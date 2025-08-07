@@ -115,10 +115,10 @@ pub fn (mut replay Replay) read_frames(data []u8) {
 			keys := items[3].int()
 
 			replay.frames << ReplayFrame{
-				delta: delta
-				time: total_delta
+				delta:    delta
+				time:     total_delta
 				position: [items[1].f64(), items[2].f64()]!
-				keys: keys
+				keys:     keys
 			}
 
 			prev_keys = keys

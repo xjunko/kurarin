@@ -30,16 +30,16 @@ pub fn (mut number NumberSprite) draw_number(text string, position vector.Vector
 			character_position := arg.camera.translate(base_position)
 
 			arg.ctx.draw_image_with_config(
-				img: character_image
-				img_id: character_image.id
+				img:      character_image
+				img_id:   character_image.id
 				img_rect: gg.Rect{
-					x: f32(character_position.x)
-					y: f32(character_position.y)
-					width: f32(size.x)
+					x:      f32(character_position.x)
+					y:      f32(character_position.y)
+					width:  f32(size.x)
 					height: f32(size.y)
 				}
-				color: number.color
-				effect: [.alpha, .add][int(number.additive)]
+				color:    number.color
+				effect:   [.alpha, .add][int(number.additive)]
 			)
 
 			base_position.x += number.size.x * (arg.scale)

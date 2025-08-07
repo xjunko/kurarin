@@ -1,39 +1,33 @@
 module audio
 
+import framework.logging
 import framework.audio.common
 import framework.audio.dummy
 import framework.audio.bass
 
-pub const boxed_backend = &Boxed{&common.IBackend(&dummy.DummyMixer{})}
-pub const is_bass = true // TODO: Force BASS for now.
-
-pub struct Boxed {
-pub mut:
-	backend &common.IBackend
-}
+__global (
+	audio_backend = &common.IBackend(&dummy.DummyMixer{})
+	audio_type    = BackendType.bass
+)
 
 pub fn init() {
-	if audio.is_bass {
-		unsafe {
-			mut boxed := audio.boxed_backend
-			boxed.backend = &common.IBackend(&bass.BassMixer{})
-			boxed.backend.init()
+	match audio_type {
+		.dummy {}
+		.bass {
+			audio_backend = &common.IBackend(&bass.BassMixer{})
+			audio_backend.init()
 		}
-	} else {
-		println('[DEBUG] Dummy audio initialized.')
 	}
+
+	logging.info('Audio Backend: ${audio_type}')
 }
 
 pub fn new_track(path string) &common.ITrack {
-	mut boxed := unsafe { &audio.boxed_backend }
-	mut track := boxed.backend.new_track(path)
-	return track
+	return audio_backend.new_track(path)
 }
 
 pub fn new_sample(path string) &common.ISample {
-	mut boxed := unsafe { &audio.boxed_backend }
-	mut track := boxed.backend.new_sample(path)
-	return track
+	return audio_backend.new_sample(path)
 }
 
 pub fn new_dummy_track() &common.ITrack {

@@ -29,7 +29,7 @@ interface Any {
 }
 
 pub fn get_logger() &KurarinLogger {
-	return logging.global
+	return global
 }
 
 pub fn fatal(s Any) {
