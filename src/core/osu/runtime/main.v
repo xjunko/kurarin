@@ -1,6 +1,6 @@
 module runtime
 
-import core.common.settings // Load this first
+import core.common.settings
 import os
 import gx
 import sync

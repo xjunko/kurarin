@@ -21,24 +21,24 @@ pub mut:
 	cursor &Cursor
 	player player.Player
 
-	keys   [4]bool
-	events []ReplayEvent
+	keys     [4]bool
+	events   []ReplayEvent
+	events_i int
 }
 
+@[direct_array_access]
 pub fn (mut replay ReplayCursor) update(update_time f64, update_delta f64) {
-	for i := 0; i < replay.events.len; i++ {
-		if update_time >= replay.events[i].time {
-			keys := replay.events[i].keys
-
-			replay.cursor.input.left_button = (keys & osu_m1) == osu_m1 || (keys & osu_k1) == osu_k1
-			replay.cursor.input.right_button = (keys & osu_m2) == osu_m2
-				|| (keys & osu_k2) == osu_k2
-
-			replay.events = replay.events[1..]
-		}
+	for replay.events[replay.events_i].time <= update_time {
+		keys := replay.events[replay.events_i].keys
+		replay.cursor.input.left_button = (keys & osu_m1) == osu_m1 || (keys & osu_k1) == osu_k1
+		replay.cursor.input.right_button = (keys & osu_m2) == osu_m2 || (keys & osu_k2) == osu_k2
+		replay.events_i++
 	}
 
-	replay.cursor.update(update_time, update_delta)
+	// NOTE: i dont think this is needed, since the cursor is controlled by
+	//       the replay events
+	// seems to fix the performance issue.
+	// replay.cursor.update(update_time, update_delta)
 }
 
 pub fn make_replay_cursor(mut ctx context.Context, path_to_replay string) &ReplayCursor {
