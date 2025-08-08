@@ -56,14 +56,6 @@ pub mut:
 	uniform_values []f32 //
 }
 
-// Boost scaling thingy
-pub fn update_boost_level(boost f32) {
-	unsafe {
-		mut g_render := global_renderer
-		g_render.uniform_values[16] = boost
-	}
-}
-
 // Maker
 pub fn make_circle_vertices(position vector.Vector2[f64], cs f64) []vector.Vector2[f64] {
 	mut points := []vector.Vector2[f64]{}
@@ -218,7 +210,7 @@ pub fn (mut attr SliderRendererAttr) draw_slider(alpha f64, colors []f64) {
 	// Fuck around with the colors
 	// Literally copy-pasted from mcosu lmaooo credit to mckay
 	if settings.global.gameplay.hitobjects.rainbow_slider {
-		current_time := time.global.time / 100.0
+		current_time := time.get_time().time / 100.0
 		attr.colors[0] = f32(math.sin(0.3 * current_time + 0 + 10) * 127 + 128) / 255
 		attr.colors[1] = f32(math.sin(0.3 * current_time + 2 + 10) * 127 + 128) / 255
 		attr.colors[2] = f32(math.sin(0.3 * current_time + 4 + 10) * 127 + 128) / 255

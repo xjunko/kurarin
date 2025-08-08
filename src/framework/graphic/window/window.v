@@ -11,8 +11,8 @@ import framework.graphic.context
 // Contains: FPS counter and some other info shit
 pub struct GeneralWindow {
 mut:
-	time_took_to_render time.TimeCounter
-	time_took_to_update time.TimeCounter
+	time_took_to_render time.Ticks
+	time_took_to_update time.Ticks
 pub mut:
 	ctx   &context.Context = unsafe { nil }
 	mutex &sync.Mutex      = sync.new_mutex()
@@ -22,11 +22,11 @@ pub fn (mut window GeneralWindow) init() {}
 
 // Tickers
 pub fn (mut window GeneralWindow) tick_draw() {
-	window.time_took_to_render.tick_average_fps()
+	window.time_took_to_render.tick()
 }
 
 pub fn (mut window GeneralWindow) tick_update() {
-	window.time_took_to_update.tick_average_fps()
+	window.time_took_to_update.tick()
 }
 
 // Draw
@@ -37,13 +37,13 @@ pub fn (mut window GeneralWindow) draw_stats() {
 	window.ctx.draw_rect_filled(int(settings.global.window.width) - 120, int(settings.global.window.height) - (
 		37 + 16), 150, 16, gx.Color{0, 0, 0, 100})
 	window.ctx.draw_text(int(settings.global.window.width) - 5, int(settings.global.window.height) - 37,
-		'Update: ${window.time_took_to_update.get_average_fps():.0}fps [${window.time_took_to_update.average:.0}ms]',
+		'Update: ${window.time_took_to_update.get_average_fps():.0}fps [${window.time_took_to_update.get_average_delta():.0}ms]',
 		gx.TextCfg{
 		color: gx.white
 		align: .right
 	})
 	window.ctx.draw_text(int(settings.global.window.width) - 5, int(settings.global.window.height) - (
-		37 + 16), 'Draw: ${window.time_took_to_render.get_average_fps():.0}fps [${window.time_took_to_render.average:.0}ms]',
+		37 + 16), 'Draw: ${window.time_took_to_render.get_average_fps():.0}fps [${window.time_took_to_render.get_average_delta():.0}ms]',
 		gx.TextCfg{
 		color: gx.white
 		align: .right

@@ -1,39 +1,19 @@
 module time
 
-/*
-TODO: Redesign this
-*/
-import math
 import time as timelib
 import core.common.settings
 
 pub const update_rate_fps = settings.global.window.fps
 pub const update_rate_ms = (f64(1000.0) / update_rate_fps) * timelib.millisecond
 
-pub const global = &TimeCounter{}
+__global (
+	time_counter = &TimeCounter{}
+)
 
-//
+@[inline]
 pub fn get_time() &TimeCounter {
-	unsafe {
-		mut time := global
-		return time
-	}
+	return time_counter
 }
-
-fn init() {
-	// Starts counting time on startup albeit with a countdown so it doesnt kill the cpu
-	spawn fn () {
-		mut time := get_time()
-		for !time.stop {
-			time.tick()
-			// vfmt off
-			timelib.sleep(update_rate_ms / 2) // Count at two time the normal speed
-			// vfmt on
-		}
-	}()
-}
-
-//
 
 pub struct TimeCounter {
 mut:
@@ -49,8 +29,6 @@ pub mut:
 	stop             bool
 	use_custom_delta bool
 	custom_delta     f64
-	//
-	average f64
 }
 
 pub fn (mut t TimeCounter) stop() {
@@ -97,19 +75,11 @@ pub fn (mut t TimeCounter) set_speed(s f64) {
 	t.speed = s
 }
 
-// New shit
-// TODO: Maybe split this into its own struct?
-pub fn (mut t TimeCounter) tick_average_fps() {
-	delta := t.tick()
-
-	if t.average == 0.0 {
-		t.average = delta
-	}
-
-	rate := f64(1.0 - math.pow(0.4, delta / 100.0))
-	t.average = t.average + (delta - t.average) * rate
-}
-
-pub fn (t &TimeCounter) get_average_fps() f64 {
-	return 1000.0 / t.average
+fn init() {
+	spawn fn () {
+		for !time_counter.stop {
+			time_counter.tick()
+			timelib.sleep(update_rate_ms / 2) // tick at double the delta
+		}
+	}()
 }
