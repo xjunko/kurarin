@@ -44,8 +44,7 @@ pub fn (mut window Window) update(update_time f64, delta f64) {
 	window.ruleset.update(update_time - settings.global.gameplay.playfield.lead_in_time)
 	window.ruleset_mutex.unlock()
 
-	window.beatmap.update(update_time - settings.global.gameplay.playfield.lead_in_time,
-		window.beatmap_song_boost)
+	window.beatmap.update(update_time - settings.global.gameplay.playfield.lead_in_time)
 
 	// Overlay
 	if settings.global.gameplay.overlay.info {
@@ -59,18 +58,6 @@ pub fn (mut window Window) update(update_time f64, delta f64) {
 	window.beatmap_song.update(update_time - settings.global.gameplay.playfield.lead_in_time)
 	window.update_cursor(update_time - settings.global.gameplay.playfield.lead_in_time,
 		delta)
-	window.update_boost()
-}
-
-pub fn (mut window Window) update_boost() {
-	if settings.global.gameplay.hitobjects.scale_to_beat {
-		// target := math.clamp(1.0 + (0.5 * window.beatmap_song.effects.peak_raw), 1.0,
-		// 	2.0) // 2.0 is the max
-		// window.beatmap_song_boost = f32(target * 0.1 + window.beatmap_song_boost - window.beatmap_song_boost * 0.1)
-
-		// rate := 0.15 * (time.global.delta / 8.33334) // 120fps
-		// window.beatmap_song_boost = f32(target * rate + window.beatmap_song_boost - window.beatmap_song_boost * rate)
-	}
 }
 
 pub fn (mut window Window) update_cursor(update_time f64, delta f64) {

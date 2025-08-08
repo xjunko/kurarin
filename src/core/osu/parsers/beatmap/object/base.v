@@ -41,7 +41,6 @@ mut:
 	is_new_combo() bool
 	set_new_combo(bool)
 	set_combo_number(int)
-	set_boost_level(f32)
 }
 
 pub struct HitSoundInfo {
@@ -75,10 +74,9 @@ pub mut:
 	is_slider  bool
 	is_spinner bool
 	// Internal
-	done        bool
-	data        []string
-	hitsound    HitSoundInfo
-	music_boost f32 = f32(1.0)
+	done     bool
+	data     []string
+	hitsound HitSoundInfo
 }
 
 // pub fn (mut hitobject HitObject) draw(arg sprite.CommonSpriteArgument) // :trolldecai: looks like i need to uncomment one of these (interface methods) for the code to compile bruh moment
@@ -130,10 +128,6 @@ pub fn (hitobject &HitObject) is_new_combo() bool {
 
 pub fn (mut hitobject HitObject) set_new_combo(b bool) {
 	hitobject.new_combo = b
-}
-
-pub fn (mut hitobject HitObject) set_boost_level(boost f32) {
-	hitobject.music_boost = boost
 }
 
 // Utils

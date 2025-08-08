@@ -21,7 +21,6 @@ pub mut:
 	ctx   &context.Context    = unsafe { nil }
 	video &ffmpeg.VideoSprite = unsafe { nil }
 
-	last_boost     f64
 	last_time      f64
 	thread_started bool
 	mutex          &sync.Mutex = sync.new_mutex()
@@ -48,10 +47,6 @@ pub fn (mut storyboard Storyboard) get_image(path_ string) gg.Image {
 
 pub fn (mut storyboard Storyboard) update_time(time f64) {
 	storyboard.last_time = time
-}
-
-pub fn (mut storyboard Storyboard) update_boost(boost f64) {
-	storyboard.last_boost = boost
 }
 
 pub fn (mut storyboard Storyboard) update(time f64) {
@@ -90,7 +85,7 @@ pub fn (mut storyboard Storyboard) draw() {
 	)
 
 	if storyboard.video != unsafe { nil } {
-		storyboard.video.draw(ctx: storyboard.ctx, scale: storyboard.last_boost)
+		storyboard.video.draw(ctx: storyboard.ctx)
 	}
 }
 

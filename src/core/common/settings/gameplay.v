@@ -60,8 +60,6 @@ pub mut:
 pub struct HitObjects {
 pub mut:
 	disable_hitobjects bool
-
-	scale_to_beat bool
 	// Slider customization stuff
 	slider_width                 f64
 	slider_lazer_style           bool
@@ -111,7 +109,6 @@ pub fn make_gameplay_settings() Gameplay {
 		}
 		hitobjects: HitObjects{
 			disable_hitobjects:           false
-			scale_to_beat:                false
 			rainbow_hitcircle:            false
 			rainbow_slider:               false
 			slider_width:                 1.0

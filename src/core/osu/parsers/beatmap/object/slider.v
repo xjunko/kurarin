@@ -321,11 +321,6 @@ pub fn (mut slider Slider) kill_slide(_time f64) {
 	slider.is_sliding = false
 }
 
-pub fn (mut slider Slider) set_boost_level(boost f32) {
-	slider.HitObject.set_boost_level(boost)
-	slider.hitcircle.set_boost_level(boost)
-}
-
 pub fn (mut slider Slider) set_timing(t timing.Timings) {
 	slider.timing = t
 	slider.timing_point = t.get_point_at(slider.time.start)

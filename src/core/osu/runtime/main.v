@@ -47,8 +47,7 @@ pub mut:
 	record bool
 	video  &export.Video = unsafe { nil }
 	// HACK: move this to somewhere else
-	beatmap_song       &common.ITrack
-	beatmap_song_boost f32 = f32(1.0)
+	beatmap_song &common.ITrack
 }
 
 pub fn (mut window Window) initialize(_ &voidptr) {

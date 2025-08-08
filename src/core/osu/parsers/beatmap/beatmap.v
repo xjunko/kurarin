@@ -72,7 +72,6 @@ pub mut:
 	playfield_size  vector.Vector2[f64]
 	temp_beatmap_sb []string
 	last_update     f64
-	last_boost      f64
 	// vfmt off
 	to_be_freed []&graphic.SliderRendererAttr
 	// vfmt on
@@ -227,14 +226,12 @@ pub fn (mut beatmap Beatmap) reset() {
 		-500.0, 1.0)
 }
 
-pub fn (mut beatmap Beatmap) update(update_time f64, boost f32) {
+pub fn (mut beatmap Beatmap) update(update_time f64) {
 	// Update shit
 	beatmap.last_update = update_time
-	beatmap.last_boost = boost
 
 	// Storyboard
 	beatmap.storyboard.update_time(update_time)
-	beatmap.storyboard.update_boost(beatmap.last_boost)
 
 	// Update storyboard in beatmap thread if recording instead
 	if settings.global.video.record {
@@ -271,11 +268,7 @@ pub fn (mut beatmap Beatmap) update(update_time f64, boost f32) {
 		}
 
 		beatmap.queue[i].update(update_time)
-		beatmap.queue[i].set_boost_level(f32(beatmap.last_boost))
 	}
-
-	// Slider renderer scale
-	graphic.update_boost_level(f32(beatmap.last_boost))
 
 	if beatmap.last_update + settings.global.gameplay.playfield.lead_in_time > settings.global.gameplay.playfield.lead_in_time {
 		// Over the lead_in_time, put actual size
@@ -382,7 +375,6 @@ pub fn (mut beatmap Beatmap) draw() {
 			beatmap.queue[i].draw(
 				ctx:    beatmap.ctx
 				time:   beatmap.last_update
-				scale:  beatmap.last_boost
 				camera: x.resolution.camera
 			)
 			sgl.draw()

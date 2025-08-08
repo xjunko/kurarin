@@ -100,7 +100,7 @@ pub fn (mut osu OSUGameplay) update(time_ms f64, time_delta f64) {
 	osu.beatmap_ruleset.mutex.unlock()
 
 	// Beatmap
-	osu.beatmap.update(time_ms - settings.global.gameplay.playfield.lead_in_time, 1.0)
+	osu.beatmap.update(time_ms - settings.global.gameplay.playfield.lead_in_time)
 
 	// Cursor
 	osu.cursor.update(time_ms - settings.global.gameplay.playfield.lead_in_time, time_delta)
