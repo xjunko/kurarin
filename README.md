@@ -52,12 +52,18 @@ Currently does not support:
 - V
 - GCC/Clang
 - OpenGL 3
+- GNU make
 
 #### Linux
 
 Tested with Arch but it _should_ work anywhere else as long as it's linux.
 
-Use [`ext/build.sh`](https://github.com/FireRedz/kurarin/blob/rewrite/ext/build.sh) to build the program, no makefile :).
+On the root folder of the project, run:
+```
+make
+```
+
+That's it :D
 
 ## Credits
 
