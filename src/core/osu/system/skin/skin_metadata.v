@@ -140,7 +140,8 @@ pub fn general_skin_parser[T](mut cls T, name string, value string) {
 			} $else $if field.typ is bool {
 				cls.$(field.name) = value == '1'
 			} $else $if field.typ is gg.Color {
-				items := value.split(',').map(it.split('//')[0]).map(it.trim_space()).map(u8(it.int()))
+				items :=
+					value.split(',').map(it.split('//')[0]).map(it.trim_space()).map(u8(it.int()))
 				cls.$(field.name) = gg.Color{items[0], items[1], items[2], 255}
 			} $else {
 				panic('Type not supported: ${field.typ}')
@@ -150,6 +151,7 @@ pub fn general_skin_parser[T](mut cls T, name string, value string) {
 }
 
 fn main() {
-	skin := load_skin_info('/run/media/junko/2nd/Games/osu!/Skins/- # Rafis 2k18 [1.1] (CK FULL)/skin.ini')
-	println(skin)
+	skin :=
+		load_skin_info('/run/media/junko/2nd/Games/osu!/Skins/- # Rafis 2k18 [1.1] (CK FULL)/skin.ini')
+	// println(skin)
 }

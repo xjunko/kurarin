@@ -20,7 +20,8 @@ pub fn make_catmull(points []vector.Vector2[f64]) &Catmull {
 	point_length := math.ceil(points[1].distance(points[2]))
 
 	for i := 1; i <= point_length; i++ {
-		cum.approx_length += cum.point_at(f64(i) / f64(point_length)).distance(cum.point_at(f64(i - 1) / point_length))
+		cum.approx_length +=
+			cum.point_at(f64(i) / f64(point_length)).distance(cum.point_at(f64(i - 1) / point_length))
 	}
 
 	return cum
@@ -37,9 +38,10 @@ pub fn find_point(vec1 vector.Vector2[f64], vec2 vector.Vector2[f64], vec3 vecto
 	// OH MY FUCKING GOD WTF IS THIS WIEKU???
 	// https://github.com/Wieku/danser-go/blob/2b0ec47f1b93a338df37ece927743d3b92288cc0/framework/math/curves/catmull.go#L40
 	return vector.Vector2[f64]{0.5 * (2 * vec2.x + (-vec1.x + vec3.x) * t +
-		(2 * vec1.x - 5 * vec2.x + 4 * vec3.x - vec4.x) * t2 + (-vec1.x + 3 * vec2.x - 3 * vec3.x +
-		vec4.x) * t3), 0.5 * (2 * vec2.y + (-vec1.y + vec3.y) * t + (2 * vec1.y - 5 * vec2.y +
-		4 * vec3.y - vec4.y) * t2 + (-vec1.y + 3 * vec2.y - 3 * vec3.y + vec4.y) * t3)}
+		(2 * vec1.x - 5 * vec2.x + 4 * vec3.x - vec4.x) * t2 +
+		(-vec1.x + 3 * vec2.x - 3 * vec3.x + vec4.x) * t3), 0.5 * (2 * vec2.y +
+		(-vec1.y + vec3.y) * t + (2 * vec1.y - 5 * vec2.y + 4 * vec3.y - vec4.y) * t2 +
+		(-vec1.y + 3 * vec2.y - 3 * vec3.y + vec4.y) * t3)}
 }
 
 pub fn (cum Catmull) get_length() f64 {

@@ -67,8 +67,10 @@ pub fn (mut window Window) draw_record(_ voidptr) {
 		|| window_size.height != int(settings.global.window.height) {
 		window.ctx.begin()
 		window.ctx.resize(int(settings.global.window.width), int(settings.global.window.height))
-		window.ctx.draw_text(0, 0, 'Please make sure the window resolution is [${int(settings.global.window.width)}, ${int(settings.global.window.height)}].',
-			gx.TextCfg{ color: gx.white })
+		window.ctx.draw_text(0, 0,
+			'Please make sure the window resolution is [${int(settings.global.window.width)}, ${int(settings.global.window.height)}].', gx.TextCfg{
+			color: gx.white
+		})
 		window.ctx.end()
 		return
 	}

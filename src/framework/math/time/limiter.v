@@ -45,7 +45,6 @@ pub fn (mut limiter Limiter) sync() {
 		limiter.variable_yield_time = math.min[i64](limiter.variable_yield_time + 200 * 1000,
 			sleep_time)
 	} else if over_sleep < limiter.variable_yield_time - 200 * 1000 {
-		limiter.variable_yield_time = math.min[i64](limiter.variable_yield_time - 2 * 1000,
-			0)
+		limiter.variable_yield_time = math.min[i64](limiter.variable_yield_time - 2 * 1000, 0)
 	}
 }

@@ -36,8 +36,8 @@ pub fn (mut spinner Spinner) update(update_time f64) bool {
 	if update_time >= spinner.get_end_time() && !spinner.done {
 		spinner.done = true
 		// TODO: proper spinner hitsound
-		audio.play_sample(spinner.hitsound.sample_set, spinner.hitsound.addition_set,
-			0, spinner.hitsound.custom_index, 1.0)
+		audio.play_sample(spinner.hitsound.sample_set, spinner.hitsound.addition_set, 0,
+			spinner.hitsound.custom_index, 1.0)
 	}
 
 	return true

@@ -18,7 +18,8 @@ pub fn (mut halfcircle HalfCircleMover) init(mut start object.IHitObject, mut en
 	halfcircle.middle.x = (halfcircle.start.x + halfcircle.end.x) / 2.0
 	halfcircle.middle.y = (halfcircle.start.y + halfcircle.end.y) / 2.0
 	halfcircle.radius = halfcircle.middle.distance(halfcircle.start)
-	halfcircle.ang = math.atan2(halfcircle.start.y - halfcircle.middle.y, halfcircle.start.x - halfcircle.middle.x)
+	halfcircle.ang = math.atan2(halfcircle.start.y - halfcircle.middle.y,
+		halfcircle.start.x - halfcircle.middle.x)
 }
 
 pub fn (mut halfcircle HalfCircleMover) get_point_at(time f64) vector.Vector2[f64] {

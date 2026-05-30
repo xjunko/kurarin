@@ -73,8 +73,7 @@ pub fn make_circ_arc(p1 vector.Vector2[f64], p2 vector.Vector2[f64], p3 vector.V
 }
 
 pub fn (circ CircArc) point_at(time f64) vector.Vector2[f64] {
-	return vector.new_vec_rad[f64](circ.start_angle + circ.dir * time * circ.total_angle,
-		circ.r).add(circ.centre)
+	return vector.new_vec_rad[f64](circ.start_angle + circ.dir * time * circ.total_angle, circ.r).add(circ.centre)
 }
 
 pub fn (circ CircArc) get_start_angle() f64 {

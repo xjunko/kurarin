@@ -1,7 +1,7 @@
 module ffmpeg
 
-import os
-import x.json2 as json
+// import os
+// import x.json2 as json
 
 pub struct Metadata {
 pub mut:
@@ -13,19 +13,20 @@ pub mut:
 pub fn load_metadata(path string) &Metadata {
 	mut metadata := &Metadata{}
 
-	output := os.execute("ffprobe -i '${path}' -select_streams v:0 -show_entries stream -show_entries format -of json -loglevel quiet").output
-	mut data := (json.raw_decode(output) or { panic(err) }).as_map()
+	// HACK
+	// output := os.execute("ffprobe -i '${path}' -select_streams v:0 -show_entries stream -show_entries format -of json -loglevel quiet").output
+	// mut data := (json.decode[json.Any](output) or { panic(err) }).as_map()
 
-	video_stream := ((data['streams'] or { panic('JSON: Field does not exists.') }).as_map()['0'] or {
-		panic('JSON: Field does not exists.')
-	}).as_map()
+	// video_stream := ((data['streams'] or { panic('JSON: Field does not exists.') }).as_map()['0'] or {
+	// 	panic('JSON: Field does not exists.')
+	// }).as_map()
 
-	// parse shit
-	metadata.width = (video_stream['width'] or { panic('JSON: Field does not exists.') }).f64()
-	metadata.height = (video_stream['height'] or { panic('JSON: Field does not exists.') }).f64()
-	metadata.fps = parse_rate((video_stream['r_frame_rate'] or {
-		panic('JSON: Field does not exists.')
-	}).str())
+	// // parse shit
+	// metadata.width = (video_stream['width'] or { panic('JSON: Field does not exists.') }).f64()
+	// metadata.height = (video_stream['height'] or { panic('JSON: Field does not exists.') }).f64()
+	// metadata.fps = parse_rate((video_stream['r_frame_rate'] or {
+	// 	panic('JSON: Field does not exists.')
+	// }).str())
 
 	return metadata
 }

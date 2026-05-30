@@ -36,11 +36,12 @@ pub fn (mut window Window) update(update_time f64, delta f64) {
 
 	// Ruleset
 	window.ruleset_mutex.@lock()
-	window.ruleset.update_click_for(window.cursors[0], update_time - settings.global.gameplay.playfield.lead_in_time)
-	window.ruleset.update_normal_for(window.cursors[0], update_time - settings.global.gameplay.playfield.lead_in_time,
-		false)
-	window.ruleset.update_post_for(window.cursors[0], update_time - settings.global.gameplay.playfield.lead_in_time,
-		false)
+	window.ruleset.update_click_for(window.cursors[0],
+		update_time - settings.global.gameplay.playfield.lead_in_time)
+	window.ruleset.update_normal_for(window.cursors[0],
+		update_time - settings.global.gameplay.playfield.lead_in_time, false)
+	window.ruleset.update_post_for(window.cursors[0],
+		update_time - settings.global.gameplay.playfield.lead_in_time, false)
 	window.ruleset.update(update_time - settings.global.gameplay.playfield.lead_in_time)
 	window.ruleset_mutex.unlock()
 
@@ -56,8 +57,7 @@ pub fn (mut window Window) update(update_time f64, delta f64) {
 	}
 
 	window.beatmap_song.update(update_time - settings.global.gameplay.playfield.lead_in_time)
-	window.update_cursor(update_time - settings.global.gameplay.playfield.lead_in_time,
-		delta)
+	window.update_cursor(update_time - settings.global.gameplay.playfield.lead_in_time, delta)
 }
 
 pub fn (mut window Window) update_cursor(update_time f64, delta f64) {

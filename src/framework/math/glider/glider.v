@@ -103,8 +103,8 @@ pub fn (mut glider Glider) update(update_time f64) {
 pub fn (mut glider Glider) update_current(update_time f64) {
 	if update_time < glider.current.time.end {
 		e := glider.current
-		glider.value = e.easing(update_time - e.time.start, e.start_value, e.target_value - e.start_value,
-			e.time.duration())
+		glider.value = e.easing(update_time - e.time.start, e.start_value,
+			e.target_value - e.start_value, e.time.duration())
 	} else {
 		glider.value = glider.current.target_value
 		glider.start_value = glider.value

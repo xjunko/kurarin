@@ -1,7 +1,6 @@
 module sprite
 
 import gg
-import gx
 import framework.math.time
 import framework.math.camera
 import framework.math.vector
@@ -37,7 +36,7 @@ mut:
 	origin         vector.Origin
 	position       vector.Vector2[f64]
 	size           vector.Vector2[f64]
-	color          gx.Color
+	color          gg.Color
 	angle          f64
 	additive       bool
 	always_visible bool

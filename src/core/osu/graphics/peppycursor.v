@@ -28,7 +28,8 @@ pub fn (mut peppy_cursor PeppyCursor) draw(arg sprite.CommonSpriteArgument) {
 			continue // Preferably, I want to remove this trail from the list, but it's better to leave the draw function to just do the drawing.
 		}
 
-		pos := peppy_cursor.trails[i].position.apply_origin(peppy_cursor.origin, peppy_cursor.trails[i].size)
+		pos := peppy_cursor.trails[i].position.apply_origin(peppy_cursor.origin,
+			peppy_cursor.trails[i].size)
 
 		arg.ctx.draw_image_with_config(context.DrawImageConfig{
 			img:      &peppy_cursor.textures[1]

@@ -36,7 +36,8 @@ pub fn (mut osu OSUGameplay) init(mut ctx context.Context, beatmap_lazy &beatmap
 	graphic.init_slider_renderer()
 
 	// Renderer: Skin storage
-	skin.set_skin(os.join_path(settings.global.gameplay.paths.skins, settings.global.gameplay.skin.current_skin))
+	skin.set_skin(os.join_path(settings.global.gameplay.paths.skins,
+		settings.global.gameplay.skin.current_skin))
 	skin.bind_context(mut ctx)
 
 	// NOTE: Routine starts here.
@@ -91,11 +92,12 @@ pub fn (mut osu OSUGameplay) update(time_ms f64, time_delta f64) {
 
 	// Ruleset
 	osu.beatmap_ruleset.mutex.@lock()
-	osu.beatmap_ruleset.update_click_for(osu.cursor.cursor, time_ms - settings.global.gameplay.playfield.lead_in_time)
-	osu.beatmap_ruleset.update_normal_for(osu.cursor.cursor, time_ms - settings.global.gameplay.playfield.lead_in_time,
-		false)
-	osu.beatmap_ruleset.update_post_for(osu.cursor.cursor, time_ms - settings.global.gameplay.playfield.lead_in_time,
-		false)
+	osu.beatmap_ruleset.update_click_for(osu.cursor.cursor,
+		time_ms - settings.global.gameplay.playfield.lead_in_time)
+	osu.beatmap_ruleset.update_normal_for(osu.cursor.cursor,
+		time_ms - settings.global.gameplay.playfield.lead_in_time, false)
+	osu.beatmap_ruleset.update_post_for(osu.cursor.cursor,
+		time_ms - settings.global.gameplay.playfield.lead_in_time, false)
 	osu.beatmap_ruleset.update(time_ms - settings.global.gameplay.playfield.lead_in_time)
 	osu.beatmap_ruleset.mutex.unlock()
 

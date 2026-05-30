@@ -6,9 +6,12 @@ import core.common.settings
 pub const update_rate_fps = settings.global.window.fps
 pub const update_rate_ms = (f64(1000.0) / update_rate_fps) * timelib.millisecond
 
+// vfmt off
+// HACK: vfmt fucks up here...
 __global (
 	time_counter = &TimeCounter{}
 )
+// vfmt on
 
 @[inline]
 pub fn get_time() &TimeCounter {
@@ -43,7 +46,7 @@ pub:
 
 pub fn (mut t TimeCounter) reset(arg ResetArgs) {
 	t.offset = arg.offset
-	t.last_time = timelib.ticks()
+	t.last_time = f64(timelib.ticks())
 	t.start_time = t.last_time
 	t.time = 0
 	t.delta = 0
@@ -51,7 +54,7 @@ pub fn (mut t TimeCounter) reset(arg ResetArgs) {
 }
 
 pub fn (mut t TimeCounter) tick() f64 {
-	now := timelib.ticks()
+	now := f64(timelib.ticks())
 
 	// Most likely a recording timer, dont use system time.
 	if t.use_custom_delta {

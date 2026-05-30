@@ -1,7 +1,6 @@
 module sprite
 
 import gg
-import gx
 import math
 import framework.math.time
 import framework.math.transform
@@ -26,7 +25,7 @@ pub mut:
 	z              f32
 	size           vector.Vector2[f64]
 	raw_size       vector.Vector2[f64]
-	color          gx.Color = gx.white
+	color          gg.Color = gg.white
 	angle          f64
 
 	flip_x bool

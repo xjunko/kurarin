@@ -27,7 +27,8 @@ pub fn (mut window Window) initialize_player() {
 			window.cursors << cursor.make_cursor(mut window.ctx)
 		}
 		.replay {
-			window.cursor_controller = cursor.make_replay_cursor(mut window.ctx, window.argument.replay_path)
+			window.cursor_controller = cursor.make_replay_cursor(mut window.ctx,
+				window.argument.replay_path)
 			window.current_player = window.cursor_controller.player
 			window.cursors << unsafe { window.cursor_controller.cursor }
 		}
@@ -35,7 +36,8 @@ pub fn (mut window Window) initialize_player() {
 			panic('Unimplemented!')
 		}
 		else {
-			window.cursor_controller = cursor.make_auto_cursor(mut window.ctx, window.beatmap.objects)
+			window.cursor_controller = cursor.make_auto_cursor(mut window.ctx,
+				window.beatmap.objects)
 			window.current_player = window.cursor_controller.player
 			window.cursors << unsafe { window.cursor_controller.cursor }
 		}

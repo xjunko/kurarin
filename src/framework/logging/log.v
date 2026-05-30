@@ -25,7 +25,7 @@ pub fn KurarinLogger.create() &KurarinLogger {
 }
 
 interface Any {
-	str() string
+	// str() string
 }
 
 pub fn get_logger() &KurarinLogger {
@@ -33,31 +33,31 @@ pub fn get_logger() &KurarinLogger {
 }
 
 pub fn fatal(s Any) {
-	mut l := get_logger()
-	l.fatal(s.str())
-	l.logs << '[${@METHOD}]: ${s.str()}'
+	// mut l := get_logger()
+	// l.fatal(s.str())
+	// l.logs << '[${@METHOD}]: ${s.str()}'
 }
 
 pub fn error(s Any) {
-	mut l := get_logger()
-	l.error(s.str())
-	l.logs << '[${@METHOD}]: ${s.str()}'
+	// mut l := get_logger()
+	// l.error(s.str())
+	// l.logs << '[${@METHOD}]: ${s.str()}'
 }
 
 pub fn warn(s Any) {
-	mut l := get_logger()
-	l.warn(s.str())
-	l.logs << '[${@METHOD}]: ${s.str()}'
+	// mut l := get_logger()
+	// l.warn(s.str())
+	// l.logs << '[${@METHOD}]: ${s.str()}'
 }
 
 pub fn info(s Any) {
-	mut l := get_logger()
-	l.info(s.str())
-	l.logs << '[${@METHOD}]: ${s.str()}'
+	// mut l := get_logger()
+	// l.info(s.str())
+	// l.logs << '[${@METHOD}]: ${s.str()}'
 }
 
 pub fn debug(s Any) {
-	mut l := get_logger()
-	l.debug(s.str())
-	l.logs << '[${@METHOD}]: ${s.str()}'
+	// mut l := get_logger()
+	// l.debug(s.str())
+	// l.logs << '[${@METHOD}]: ${s.str()}'
 }

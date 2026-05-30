@@ -32,15 +32,13 @@ pub fn (mut counter ComboCounter) increase() {
 		counter.max_combo = counter.combo
 	}
 
-	counter.main_glider.add_event_start(counter.last_time, counter.last_time + 150.0,
-		1.0, 1.1)
-	counter.main_glider.add_event_start(counter.last_time + 150.0, counter.last_time + 200.0,
-		1.1, 1.0)
+	counter.main_glider.add_event_start(counter.last_time, counter.last_time + 150.0, 1.0, 1.1)
+	counter.main_glider.add_event_start(counter.last_time + 150.0, counter.last_time + 200.0, 1.1,
+		1.0)
 
-	counter.pop_glider.add_event_start(counter.last_time, counter.last_time + 150.0, 1.0,
-		1.5)
-	counter.pop_glider.add_event_start(counter.last_time + 150.0, counter.last_time + 250.0,
-		1.5, 1.0)
+	counter.pop_glider.add_event_start(counter.last_time, counter.last_time + 150.0, 1.0, 1.5)
+	counter.pop_glider.add_event_start(counter.last_time + 150.0, counter.last_time + 250.0, 1.5,
+		1.0)
 }
 
 pub fn (mut counter ComboCounter) reset() {

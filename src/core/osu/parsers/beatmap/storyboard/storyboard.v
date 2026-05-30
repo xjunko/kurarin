@@ -216,8 +216,8 @@ pub fn (mut storyboard Storyboard) find_file_case_insensitive(path_ string) stri
 pub fn (mut storyboard Storyboard) load_sprite(header string, commands []string) {
 	items := parse_comma(header)
 
-	mut img_path := os.join_path(storyboard.root, items[3].replace('"', '').trim_space()).replace('\\',
-		'/') // Weird linux thing
+	mut img_path :=
+		os.join_path(storyboard.root, items[3].replace('"', '').trim_space()).replace('\\', '/') // Weird linux thing
 
 	// ??? what
 	if !img_path.to_lower().ends_with('.png') && !img_path.to_lower().ends_with('.jpg') {
@@ -319,7 +319,8 @@ pub fn parse_command(mut items []string) []&transform.Transform {
 	}
 
 	command_type := items[0]
-	transform_easing := easing.get_easing_from_enum(unsafe { easing.Easing(items[1].i8()) }) // looks fucked
+	transform_easing :=
+		easing.get_easing_from_enum(unsafe { easing.Easing(items[1].i8()) }) // looks fucked
 
 	mut start_time := items[2].f64()
 

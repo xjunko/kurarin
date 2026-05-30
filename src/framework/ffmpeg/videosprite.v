@@ -90,8 +90,8 @@ pub fn make_video_sprite(path string, mut ctx context.Context, offset f64) &Vide
 	video.source.initialize_ffmpeg()
 
 	// Make a texture for it
-	video.tex_id = ctx.new_streaming_image(int(video.source.metadata.width), int(video.source.metadata.height),
-		4, gg.StreamingImageConfig{})
+	video.tex_id = ctx.new_streaming_image(int(video.source.metadata.width),
+		int(video.source.metadata.height), 4, gg.StreamingImageConfig{})
 
 	// ehh
 	video.frametime = 1000.0 / video.source.metadata.fps

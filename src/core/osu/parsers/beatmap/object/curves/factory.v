@@ -50,6 +50,7 @@ pub fn new_slider_curve(typp string, points []vector.Vector2[f64]) SliderCurve {
 			println('> THE FUCK: Slider type: ${typ}')
 		}
 	}
+
 	mut sections := []f64{len: curves_list.len + 1}
 	sections[0] = 0.0
 	mut prev := 0.0

@@ -44,8 +44,7 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 		match category {
 			'General' {
 				items := common_parse_with_key_value_and_limit(line, ':', 2)
-				general_beatmap_parser[BeatmapGeneralInfo](mut beatmap.general, items[0],
-					items[1])
+				general_beatmap_parser[BeatmapGeneralInfo](mut beatmap.general, items[0], items[1])
 			}
 			'Metadata' {
 				items := common_parse_with_key_value_and_limit(line, ':', 2)
@@ -153,8 +152,7 @@ pub fn parse_beatmap(path string, lazy bool) &Beatmap {
 					logging.info('Beatmap difficulty calculated.')
 				}
 
-				mut hitobject := object.make_object(common_parse_with_key_value(line,
-					','))
+				mut hitobject := object.make_object(common_parse_with_key_value(line, ','))
 
 				beatmap.objects << &hitobject
 			}

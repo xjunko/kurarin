@@ -29,10 +29,13 @@ pub fn (mut sample Sample) play_volume(vol f32) {
 	mut channel := &SampleChannel{
 		source: sample.bass_sample
 	}
-	channel.channel = C.BASS_SampleGetChannel(channel.source, C.BASS_SAMCHAN_STREAM | C.BASS_STREAM_DECODE)
+	channel.channel = C.BASS_SampleGetChannel(channel.source,
+		C.BASS_SAMCHAN_STREAM | C.BASS_STREAM_DECODE)
 
-	C.BASS_ChannelSetAttribute(channel.channel, C.BASS_ATTRIB_VOL, f32((settings.global.audio.sample / 100.0) * (settings.global.audio.global / 100.0)) * vol)
-	C.BASS_Mixer_StreamAddChannel(sample.mixer.master, channel.channel, C.BASS_MIXER_CHAN_NORAMPIN | C.BASS_STREAM_AUTOFREE)
+	C.BASS_ChannelSetAttribute(channel.channel, C.BASS_ATTRIB_VOL,
+		f32((settings.global.audio.sample / 100.0) * (settings.global.audio.global / 100.0)) * vol)
+	C.BASS_Mixer_StreamAddChannel(sample.mixer.master, channel.channel,
+		C.BASS_MIXER_CHAN_NORAMPIN | C.BASS_STREAM_AUTOFREE)
 }
 
 pub fn (mut sample Sample) play() {

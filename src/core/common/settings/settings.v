@@ -39,7 +39,8 @@ fn init() {
 	settings.save()
 
 	// Post-Fix
-	settings.gameplay.playfield.lead_in_time = math.max(1.0, settings.gameplay.playfield.lead_in_time)
+	settings.gameplay.playfield.lead_in_time = math.max(1.0,
+		settings.gameplay.playfield.lead_in_time)
 	settings.gameplay.playfield.lead_in_time *= 1000.0
 
 	// unepic global hack

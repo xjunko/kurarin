@@ -29,9 +29,9 @@ pub fn (mut debug_cursor DebugCursor) draw(arg sprite.CommonSpriteArgument) {
 		b := u8(25 * (f64(i) / f64(debug_cursor.deltas.len)))
 
 		arg.ctx.draw_rect_filled(f32(
-			(debug_cursor.deltas[i].x - 8) * x.resolution.playfield_scale + x.resolution.offset.x),
-			f32((debug_cursor.deltas[i].y - 8) * x.resolution.playfield_scale +
-			x.resolution.offset.y), 16, 16, gx.Color{r, g, b, 255})
+			(debug_cursor.deltas[i].x - 8) * x.resolution.playfield_scale + x.resolution.offset.x), f32(
+			(debug_cursor.deltas[i].y - 8) * x.resolution.playfield_scale + x.resolution.offset.y),
+			16, 16, gx.Color{r, g, b, 255})
 	}
 
 	arg.ctx.draw_rect_filled(f32((debug_cursor.position.x - 16) * x.resolution.playfield_scale +

@@ -1,9 +1,9 @@
-CC        = clang
+CC        = gcc
 VCC       = v
 VCC_FLAGS = -enable-globals -cc $(CC)
 OUT      = kurarin
 
-ROOT   = .
+ROOT   = ./src
 ASSETS = assets
 SHADER_LVL = glsl410
 
@@ -16,7 +16,7 @@ $(OUT): clean format $(ASSETS)/osu/shaders/slider.h
 	$(VCC) $(VCC_FLAGS) -o $(OUT) $(ROOT)
 
 debug: clean format $(ASSETS)/osu/shaders/slider.h
-	$(VCC) $(VCC_FLAGS) -cg -g -d trace_sokol_memory -o $(OUT) $(ROOT)
+	$(VCC) $(VCC_FLAGS) -cg -g -d trace_sokol_memory -o $(OUT) -show-c-output $(ROOT)
 
 prod: clean format $(ASSETS)/osu/shaders/slider.h
 	$(VCC) $(VCC_FLAGS) -prod -o $(OUT) $(ROOT)
@@ -43,7 +43,8 @@ release: $(OUT)
 	rm -rf build/
 
 clean: $(OUT)
-	rm -f $(OUT) $(ASSETS)/osu/shaders/*.h
+	echo "CLEAN"
+	# rm -f $(OUT) $(ASSETS)/osu/shaders/*.h
 
 format:
 	$(VCC) fmt -w $(ROOT)

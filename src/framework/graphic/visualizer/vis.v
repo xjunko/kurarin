@@ -1,6 +1,6 @@
 module visualizer
 
-import gx
+import gg
 import framework.audio.common
 import framework.math.vector
 import framework.graphic.context
@@ -102,7 +102,7 @@ pub fn (mut vis Visualizer) draw(mut ctx context.Context) {
 				width = -f32(v * length * inverted)
 			}
 
-			ctx.draw_rect_filled(x, y, width, height, gx.white)
+			ctx.draw_rect_filled(x, y, width, height, gg.white)
 		}
 	}
 
@@ -138,7 +138,7 @@ pub fn (mut vis Visualizer) draw(mut ctx context.Context) {
 				width = -f32(v * length * inverted)
 			}
 
-			ctx.draw_rect_filled(x, y, width, height, gx.purple)
+			ctx.draw_rect_filled(x, y, width, height, gg.purple)
 		}
 	}
 }

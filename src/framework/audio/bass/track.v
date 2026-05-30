@@ -9,10 +9,12 @@ pub fn (mut bass_mixer BassMixer) new_track(path string) &common.ITrack {
 	}
 
 	// Load?
-	track.channel = C.BASS_StreamCreateFile(0, path.str, 0, 0, C.BASS_STREAM_DECODE | C.BASS_STREAM_PRESCAN | C.BASS_ASYNCFILE)
+	track.channel = C.BASS_StreamCreateFile(0, path.str, 0, 0,
+		C.BASS_STREAM_DECODE | C.BASS_STREAM_PRESCAN | C.BASS_ASYNCFILE)
 
 	// FX?
-	track.channel = C.BASS_FX_TempoCreate(track.channel, C.BASS_FX_FREESOURCE | C.BASS_STREAM_DECODE)
+	track.channel = C.BASS_FX_TempoCreate(track.channel,
+		C.BASS_FX_FREESOURCE | C.BASS_STREAM_DECODE)
 	track_setup_fx_channel(track.channel)
 
 	return track
@@ -38,7 +40,8 @@ pub mut:
 
 pub fn (mut track Track) play() {
 	// C.BASS_ChannelPlay(track.channel, 1)
-	C.BASS_Mixer_StreamAddChannel(track.mixer.master, track.channel, C.BASS_MIXER_CHAN_NORAMPIN | C.BASS_MIXER_CHAN_BUFFER)
+	C.BASS_Mixer_StreamAddChannel(track.mixer.master, track.channel,
+		C.BASS_MIXER_CHAN_NORAMPIN | C.BASS_MIXER_CHAN_BUFFER)
 	track.playing = true
 }
 
@@ -86,7 +89,8 @@ pub fn (mut track Track) update(time f64) {
 	}
 
 	track.effects.peak_raw = boost
-	track.effects.peak_smoothed = track.effects.peak_raw * 0.1 + track.effects.peak_smoothed - track.effects.peak_smoothed * 0.1
+	track.effects.peak_smoothed = track.effects.peak_raw * 0.1 + track.effects.peak_smoothed -
+		track.effects.peak_smoothed * 0.1
 }
 
 pub fn (mut track Track) get_position() f64 {

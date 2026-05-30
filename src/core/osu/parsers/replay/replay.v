@@ -49,7 +49,7 @@ pub fn (mut replay Replay) load(path string) {
 	replay.offset = 0
 	replay.parse()
 
-	println(replay.player)
+	// println(replay.player)
 }
 
 // High level reading

@@ -140,8 +140,8 @@ pub fn (mut overlay GameplayOverlay) draw() {
 
 		// Text
 		pos_x := settings.global.window.width - 24 * x.resolution.ui_camera.scale
-		pos_y := (settings.global.window.height / 2.0 - 64 + (30.4 +
-			f64(i) * 47.2) * x.resolution.ui_camera.scale)
+		pos_y := (settings.global.window.height / 2.0 - 64 +
+			(30.4 + f64(i) * 47.2) * x.resolution.ui_camera.scale)
 		scale := (sprite.size.y / sprite.raw_size.y) * x.resolution.ui_camera.scale
 
 		overlay.keys_font.draw_number(overlay.key_counters[i].str(), vector.Vector2[f64]{pos_x, pos_y},
@@ -155,9 +155,11 @@ pub fn (mut overlay GameplayOverlay) draw() {
 	overlay.combo_counter.draw(ctx: overlay.ctx, scale: x.resolution.ui_camera.scale)
 
 	// Score
-	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) - f64(overlay.score_smooth) * 0.5)
-	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2[f64]{settings.global.window.width - 5 - (8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0},
-		vector.top_left,
+	overlay.score_smooth = i64(f64(overlay.score) * 0.5 + f64(overlay.score_smooth) -
+		f64(overlay.score_smooth) * 0.5)
+	overlay.score_font.draw_number('${overlay.score_smooth:08d}', vector.Vector2[f64]{
+		settings.global.window.width - 5 -
+		(8 * (overlay.score_font.size.x * x.resolution.ui_camera.scale)), 0}, vector.top_left,
 		ctx:   overlay.ctx
 		time:  overlay.last_time
 		scale: x.resolution.ui_camera.scale
@@ -227,8 +229,8 @@ pub fn new_gameplay_overlay(player_ruleset &ruleset.Ruleset, player_cursor &curs
 	// Input keys
 	for i in 0 .. 4 {
 		// Key
-		pos_y := settings.global.window.height / 2.0 - 64.0 + (30.4 +
-			f64(i) * 47.2) * x.resolution.ui_camera.scale
+		pos_y := settings.global.window.height / 2.0 - 64.0 +
+			(30.4 + f64(i) * 47.2) * x.resolution.ui_camera.scale
 
 		mut key := &sprite.Sprite{}
 		key.add_transform(

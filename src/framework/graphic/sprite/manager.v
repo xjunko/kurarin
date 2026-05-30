@@ -45,11 +45,12 @@ pub fn (mut manager Manager) update(time f64) {
 		// Remove
 		if time >= sprite.time.end && !sprite.always_visible {
 			// start := f64(timelib.ticks())
-			$if project_sekai ? {
-				manager.queue.delete(manager.find_index_by_id(sprite.id))
-			} $else {
-				manager.queue.delete(manager.queue.index(sprite))
-			}
+			// HACK: broken
+			// $if project_sekai ? {
+			// 	manager.queue.delete(manager.find_index_by_id(sprite.id))
+			// } $else {
+			// 	manager.queue.delete(manager.queue.index(sprite))
+			// }
 
 			// println("Took: ${f64(timelib.ticks()) - start:.10} to finish")
 			continue

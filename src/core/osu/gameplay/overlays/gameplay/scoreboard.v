@@ -51,8 +51,8 @@ pub fn (mut scoreboard ScoreBoard) draw(arg sprite.CommonSpriteArgument) {
 	)
 
 	// Combo
-	arg.ctx.draw_text(int((140 * arg.scale) - (10 * arg.scale)), int(313 + (64 * arg.scale) - (24 * arg.scale)),
-		'${humanize_number(scoreboard.counter.max_combo)}x',
+	arg.ctx.draw_text(int((140 * arg.scale) - (10 * arg.scale)), int(313 + (64 * arg.scale) -
+		(24 * arg.scale)), '${humanize_number(scoreboard.counter.max_combo)}x',
 		color: gg.Color{153, 237, 255, 255}
 		size:  int(18 * arg.scale)
 		align: .right

@@ -137,7 +137,8 @@ pub fn (mut sample GameSamples) load_beatmap_sample() {
 				g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1] = map[int]&common.ISample{}
 			}
 
-			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index] = audio.new_sample(path)
+			g_sample.beatmap[current_set_id - 1][current_hitsound_id - 1][hitsound_index] =
+				audio.new_sample(path)
 		}
 	})
 }

@@ -19,7 +19,7 @@ import framework.math.vector
 import framework.math.time
 
 #flag -I @VMODROOT/
-#include "../assets/osu/shaders/slider.h"
+#include "assets/osu/shaders/slider.h"
 
 fn C.osu_slider_shader_desc(gfx.Backend) &gfx.ShaderDesc
 
@@ -62,8 +62,8 @@ pub fn make_circle_vertices(position vector.Vector2[f64], cs f64) []vector.Vecto
 	points << position
 
 	for i := 0; i < global_renderer.quality; i++ {
-		points << vector.new_vec_rad(f64(i) / f64(global_renderer.quality) * 2.0 * math.pi,
-			cs).add_normal(position.x, position.y)
+		points << vector.new_vec_rad(f64(i) / f64(global_renderer.quality) * 2.0 * math.pi, cs).add_normal(position.x,
+			position.y)
 	}
 
 	points << points[1]
@@ -185,9 +185,7 @@ pub fn (mut attr SliderRendererAttr) bind_slider() {
 	})
 
 	// Failed to create vertex_buffers
-	// if attr.bindings.vertex_buffers[0].id == 0 {
-	// TODO: Fix this
-	if false {
+	if attr.bindings.vertex_buffers[0].id == 0 {
 		logging.error('Failed to bind vertex buffers')
 		return
 	}

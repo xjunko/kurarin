@@ -84,8 +84,8 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 		c_scene_error {
 			window.ctx.begin()
 
-			window.ctx.draw_text(int(settings.global.window.width / 2), int(settings.global.window.height / 2),
-				'Invalid beatmap path!',
+			window.ctx.draw_text(int(settings.global.window.width / 2),
+				int(settings.global.window.height / 2), 'Invalid beatmap path!',
 				color:          gg.Color{255, 255, 255, 255}
 				size:           32
 				align:          .center
@@ -97,12 +97,12 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			// Draw the last 32 logs
 			mut t := 1
-			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32,
-				0); i-- {
+			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32, 0); i-- {
 				t++
 				window.ctx.draw_rect_filled(0, int(settings.global.window.height) - t * 16,
 					window.ctx.text_width(logging.global.logs[i]), 16, gg.Color{0, 0, 0, 100})
-				window.ctx.draw_text(0, int(settings.global.window.height) - t * 16, logging.global.logs[i],
+				window.ctx.draw_text(0, int(settings.global.window.height) - t * 16,
+					logging.global.logs[i],
 					color: gg.Color{255, 255, 255, 100}
 				)
 			}
@@ -120,12 +120,12 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			// Draw the last 32 logs
 			mut t := 1
-			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32,
-				0); i-- {
+			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 32, 0); i-- {
 				t++
 				window.ctx.draw_rect_filled(0, int(settings.global.window.height) - t * 16,
 					window.ctx.text_width(logging.global.logs[i]), 16, gg.Color{0, 0, 0, 100})
-				window.ctx.draw_text(0, int(settings.global.window.height) - t * 16, logging.global.logs[i],
+				window.ctx.draw_text(0, int(settings.global.window.height) - t * 16,
+					logging.global.logs[i],
 					color: gg.Color{255, 255, 255, 100}
 				)
 			}
@@ -140,11 +140,11 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 			window.menu.draw(ctx: window.ctx)
 			window.mutex.unlock()
 
-			window.ctx.draw_rect_filled(0, 0, int(settings.global.window.width), int(settings.global.window.height),
-				gg.Color{0, 0, 0, 200})
+			window.ctx.draw_rect_filled(0, 0, int(settings.global.window.width),
+				int(settings.global.window.height), gg.Color{0, 0, 0, 200})
 
-			window.ctx.draw_text(int(settings.global.window.width) / 2, int(settings.global.window.height) / 2,
-				'Loading...',
+			window.ctx.draw_text(int(settings.global.window.width) / 2,
+				int(settings.global.window.height) / 2, 'Loading...',
 				color:          gg.Color{255, 255, 255, 255}
 				size:           64
 				align:          .center
@@ -191,11 +191,10 @@ pub fn (mut window GUIWindow) draw(_ voidptr) {
 
 			// Draw the last 16 logs
 			mut t := 1
-			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 16,
-				0); i-- {
+			for i := logging.global.logs.len - 1; i > math.max(logging.global.logs.len - 16, 0); i-- {
 				t++
-				window.ctx.draw_rect_filled(0, t * 16, window.ctx.text_width(logging.global.logs[i]),
-					16, gg.Color{0, 0, 0, 200})
+				window.ctx.draw_rect_filled(0, t * 16,
+					window.ctx.text_width(logging.global.logs[i]), 16, gg.Color{0, 0, 0, 200})
 				window.ctx.draw_text(0, t * 16, logging.global.logs[i],
 					color: gg.Color{255, 255, 255, 100}
 				)
@@ -290,19 +289,20 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 		}
 		.p {
 			logging.info('Play beatmap.')
-			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
-				.player)
+			window.play_beatmap(os.join_path(window.menu.current_version.root,
+				window.menu.current_version.filename), .player)
 		}
 		.a {
 			logging.info('Picked auto.')
-			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
-				.auto)
+			window.play_beatmap(os.join_path(window.menu.current_version.root,
+				window.menu.current_version.filename), .auto)
 		}
 		.r {
 			logging.info('Picking replay.')
 
-			replay_path := tinyfiledialogs.open_file_picker('Pick a replay file!', '',
-				['*.osr'], 'osu! replay', false)
+			replay_path := tinyfiledialogs.open_file_picker('Pick a replay file!', '', [
+				'*.osr',
+			], 'osu! replay', false)
 
 			if replay_path.len == 0 || !os.exists(replay_path) {
 				logging.error('Invalid replay file.')
@@ -312,8 +312,8 @@ pub fn (mut window GUIWindow) event_keydown(key gg.KeyCode, mod gg.Modifier, _ v
 			logging.info('Replay picked: ${replay_path}')
 
 			window.joe_r = replay_path
-			window.play_beatmap(os.join_path(window.menu.current_version.root, window.menu.current_version.filename),
-				.replay)
+			window.play_beatmap(os.join_path(window.menu.current_version.root,
+				window.menu.current_version.filename), .replay)
 		}
 		else {
 			logging.debug('Unhandled key: ${key}')

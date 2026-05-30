@@ -78,5 +78,6 @@ pub fn make_cursor(mut ctx context.Context) &Cursor {
 			panic('Invalid cursor style selected, only supports 0 and 1.')
 		}
 	}
+
 	return cursor
 }

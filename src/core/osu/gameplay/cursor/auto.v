@@ -43,7 +43,8 @@ pub fn (mut auto AutoCursor) update(time f64, delta f64) {
 			mut release_at := end_time + 50.0
 
 			if auto.queue_i + 1 < auto.queue.len {
-				n_time := auto.queue[math.min[int](auto.queue_i + 2, auto.queue.len - 1)].get_start_time()
+				n_time :=
+					auto.queue[math.min[int](auto.queue_i + 2, auto.queue.len - 1)].get_start_time()
 				release_at = math.clamp(n_time - 2.0, end_time + 1.0, release_at)
 			}
 
@@ -63,8 +64,8 @@ pub fn (mut auto AutoCursor) update(time f64, delta f64) {
 			if time > auto.queue[auto.queue_i].time.end {
 				auto.queue_i++
 				if auto.queue_i + 1 < auto.queue.len {
-					auto.mover.init(mut &auto.queue[auto.queue_i - 1], mut &auto.queue[auto.queue_i],
-						auto.mover_path)
+					auto.mover.init(mut &auto.queue[auto.queue_i - 1], mut
+						&auto.queue[auto.queue_i], auto.mover_path)
 
 					// Negate, so it goes left right left right ....
 					auto.mover_path = auto.mover_path * -1

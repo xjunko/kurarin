@@ -72,7 +72,8 @@ pub fn (mut video Video) init_video_pipe_process() {
 
 pub fn (mut video Video) init_audio_pipe_process() {
 	// Render Update FPS (Refer to window_draw_recording in main)
-	audio_buffer_size := audio.get_required_buffer_size_for_mixer(1.0 / settings.global.video.update_fps)
+	audio_buffer_size :=
+		audio.get_required_buffer_size_for_mixer(1.0 / settings.global.video.update_fps)
 	video.audio_data = []u8{len: audio_buffer_size}
 
 	// Create the process
@@ -114,14 +115,15 @@ pub fn (mut video Video) close_pipe_process() {
 
 	// Merge audio (for now we'll do it over here instead of doing it on pipe)
 	audio_path := 'temp.mp3'
-	result := os.execute('ffmpeg -i temp.mp4 -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -async 1 "output.mp4" -y')
-	println(result)
+	result :=
+		os.execute('ffmpeg -i temp.mp4 -i "${audio_path}" -map 0:0 -map 1:0 -c:v copy -preset ultrafast -async 1 "output.mp4" -y')
+	// println(result)
 }
 
 pub fn (mut video Video) pipe_window() {
 	// read gl buffer
-	C.v_sapp_gl_read_rgba_pixels(0, 0, int(settings.global.window.width), int(settings.global.window.height),
-		video.record_data)
+	C.v_sapp_gl_read_rgba_pixels(0, 0, int(settings.global.window.width),
+		int(settings.global.window.height), video.record_data)
 
 	// This might not be worth it after all.
 	unsafe {

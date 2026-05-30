@@ -120,8 +120,8 @@ pub fn (mut slider Slider) play_hitsound_edge(index int) {
 		sample_set = slider.hitsound.sample_set
 	}
 
-	slider.play_hitsound_generic(sample_set, slider.addition_sets[index], slider.samples[index],
-		slider.timing.get_point_at(slider.time.start + math.floor(f64(index) * slider.duration) + 5))
+	slider.play_hitsound_generic(sample_set, slider.addition_sets[index], slider.samples[index], slider.timing.get_point_at(
+		slider.time.start + math.floor(f64(index) * slider.duration) + 5))
 }
 
 pub fn (mut slider Slider) play_hitsound(index int) {
@@ -524,7 +524,8 @@ pub fn (mut slider Slider) generate_slider_path() {
 	}
 
 	// oh god
-	slider.curve = curves.new_multi_curve_t(slider_points_raw[0], slider_points, slider.pixel_length)
+	slider.curve = curves.new_multi_curve_t(slider_points_raw[0], slider_points,
+		slider.pixel_length)
 	slider.get_slider_points() // Generate points
 	slider.end_position = slider.get_position_at_lazer(slider.time.end)
 
@@ -591,7 +592,8 @@ pub fn (mut slider Slider) generate_slider_tickpoints() {
 	sl_sn_in_e := slider.time.start - slider.diff.preempt * 2.0 / 3.0 * 1.0 + slider.duration * 0.0
 
 	for mut p in slider.tick_points {
-		mut a := (p.time - slider.time.start) / 2.0 + slider.time.start - slider.diff.preempt * 2.0 / 3.0
+		mut a := (p.time - slider.time.start) / 2.0 + slider.time.start -
+			slider.diff.preempt * 2.0 / 3.0
 		mut fs := (p.time - slider.time.start) / slider.duration
 
 		if fs < 1.0 {
@@ -800,7 +802,8 @@ pub fn (mut slider Slider) get_position_at_stable(current_time f64) vector.Vecto
 	if p_line.time2 == p_line.time1 {
 		pos = p_line.line.p2
 	} else {
-		pos = p_line.line.point_at(f32(clamped - f64(p_line.time1)) / f32(p_line.time2 - p_line.time1))
+		pos =
+			p_line.line.point_at(f32(clamped - f64(p_line.time1)) / f32(p_line.time2 - p_line.time1))
 	}
 
 	return pos
@@ -829,8 +832,8 @@ pub fn (mut slider Slider) set_difficulty(diff difficulty.Difficulty) {
 
 	// FadeAnimation
 	slider.slider_renderer_fade = glider.new_glider(0.0)
-	slider.slider_renderer_fade.add_event(slider.time.start - slider.diff.preempt, slider.time.start - (slider.diff.preempt - slider.diff.fade_in),
-		1.0)
+	slider.slider_renderer_fade.add_event(slider.time.start - slider.diff.preempt,
+		slider.time.start - (slider.diff.preempt - slider.diff.fade_in), 1.0)
 	slider.slider_renderer_fade.add_event_start(slider.time.end, slider.time.end +
 		difficulty.hit_fade_out, 1.0, 0.0)
 

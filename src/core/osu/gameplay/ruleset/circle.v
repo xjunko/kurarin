@@ -56,7 +56,8 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 		mut radius := player.diff.circle_radius
 
 		// TODO: Relax
-		if false {
+		p_is_relax := false
+		if p_is_relax {
 			radius = 100.0
 		}
 
@@ -100,8 +101,8 @@ pub fn (mut circle Circle) update_click_for(_player &DifficultyPlayer, time f64)
 							circle.hitcircle.arm(hit != .miss, time)
 						}
 
-						circle.ruleset.send_result(time, mut player.cursor, mut circle,
-							position, hit, combo)
+						circle.ruleset.send_result(time, mut player.cursor, mut circle, position,
+							hit, combo)
 
 						state.is_hit = true
 					}
@@ -129,8 +130,7 @@ pub fn (mut circle Circle) update_post_for(_player &DifficultyPlayer, time f64, 
 
 	if time > circle.hitcircle.get_end_time() + player.diff.hit50 && !state.is_hit {
 		position := circle.hitcircle.position
-		circle.ruleset.send_result(time, mut player.cursor, mut circle, position, .miss,
-			.reset)
+		circle.ruleset.send_result(time, mut player.cursor, mut circle, position, .miss, .reset)
 
 		if circle.players.len == 1 {
 			circle.hitcircle.arm(false, time)

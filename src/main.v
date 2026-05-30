@@ -22,7 +22,8 @@ fn main() {
 	is_playing := fp.bool('play', `p`, false, 'Enable to play the beatmap.')
 
 	// Game
-	game_type := fp.string('game', `g`, 'osu!gui', 'Option for game engines. [osu!, osu!gui] (Other modes is deprecated.)')
+	game_type := fp.string('game', `g`, 'osu!gui',
+		'Option for game engines. [osu!, osu!gui] (Other modes is deprecated.)')
 
 	fp.finalize() or {
 		logging.error(err.str())
@@ -40,8 +41,7 @@ fn main() {
 				return
 			}
 
-			runtime.run(beatmap_path.replace('\\', ''), replay_path.replace('\\', ''),
-				is_playing)
+			runtime.run(beatmap_path.replace('\\', ''), replay_path.replace('\\', ''), is_playing)
 		}
 		'basic', 'b' {
 			basic.run()

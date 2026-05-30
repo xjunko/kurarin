@@ -150,7 +150,8 @@ pub fn (mut ruleset Ruleset) can_be_hit(time f64, mut current_object IHitObject,
 	mut hit_range := difficulty.hit_range
 
 	// TODO: Relax
-	if false {
+	p_is_relax := false
+	if p_is_relax {
 		hit_range -= 200.0
 	}
 
@@ -197,7 +198,8 @@ pub fn (mut ruleset Ruleset) update_click_for(player_cursor &cursor.Cursor, time
 	player.already_stolen = true
 
 	// TODO: Replay/Player
-	if true {
+	p_is_relax := false
+	if p_is_relax {
 		player.left_cond = !player.buttons.left && player.cursor.input.left_button
 		player.right_cond = !player.buttons.right && player.cursor.input.right_button
 
@@ -233,7 +235,7 @@ pub fn (mut ruleset Ruleset) update_click_for(player_cursor &cursor.Cursor, time
 	}
 
 	// TODO: Replay/Player
-	if true {
+	if p_is_relax {
 		player.buttons.left = player.cursor.input.left_button
 		player.buttons.right = player.cursor.input.right_button
 	}
@@ -310,13 +312,13 @@ pub fn new_ruleset(mut loaded_beatmap beatmap.Beatmap, mut cursors []&cursor.Cur
 		mut diff := loaded_beatmap.difficulty.Difficulty
 
 		mut player := &DifficultyPlayer{
-			cursor: unsafe { *cursor }
+			cursor: unsafe { cursor } // HACK
 			diff:   diff
 		}
 
 		diff_players << player
 
-		ruleset.cursors << unsafe { *cursor }
+		ruleset.cursors << unsafe { cursor } // HACK
 		ruleset.subset << &SubSet{
 			player: player
 		}

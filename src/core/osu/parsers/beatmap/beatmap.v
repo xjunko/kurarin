@@ -315,23 +315,24 @@ pub fn (mut beatmap Beatmap) draw() {
 	beatmap.storyboard.draw() // Includes background
 
 	// Shitty background dim
-	beatmap.ctx.draw_rect_filled(0, 0, int(settings.global.window.width), int(settings.global.window.height),
-		gx.Color{0, 0, 0, u8(settings.global.gameplay.playfield.background.background_dim)})
+	beatmap.ctx.draw_rect_filled(0, 0, int(settings.global.window.width),
+		int(settings.global.window.height), gx.Color{0, 0, 0, u8(settings.global.gameplay.playfield.background.background_dim)})
 
 	// Playfield
 	// Insides
-	beatmap.ctx.draw_rect_filled(f32((int(settings.global.window.width) - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2),
-		f32((int(settings.global.window.height) - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2),
-		f32(beatmap.playfield_size.x +
-		(beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(
-		beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)),
-		gx.Color{0, 0, 0, 150})
+	beatmap.ctx.draw_rect_filled(f32((int(settings.global.window.width) - beatmap.playfield_size.x -
+		(beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((
+		int(settings.global.window.height) - beatmap.playfield_size.y -
+		(beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(
+		beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(
+		beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), gx.Color{0, 0, 0, 150})
 
 	// Outline
-	beatmap.ctx.draw_rect_empty(f32((int(settings.global.window.width) - beatmap.playfield_size.x - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2),
-		f32((int(settings.global.window.height) - beatmap.playfield_size.y - (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2),
-		f32(beatmap.playfield_size.x +
-		(beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(
+	beatmap.ctx.draw_rect_empty(f32((int(settings.global.window.width) - beatmap.playfield_size.x -
+		(beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32((
+		int(settings.global.window.height) - beatmap.playfield_size.y -
+		(beatmap.difficulty.circle_radius * x.resolution.playfield_scale)) / 2), f32(
+		beatmap.playfield_size.x + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)), f32(
 		beatmap.playfield_size.y + (beatmap.difficulty.circle_radius * x.resolution.playfield_scale)),
 		gx.white)
 
@@ -355,14 +356,12 @@ pub fn (mut beatmap Beatmap) draw() {
 					$if debug {
 						local_position := x.resolution.camera.translate(hitobject.position)
 						beatmap.ctx.draw_text(int(local_position.x), int(local_position.y),
-							'Type: ${hitobject.typ} | Pixel length: ${hitobject.pixel_length}',
-							gx.TextCfg{
+							'Type: ${hitobject.typ} | Pixel length: ${hitobject.pixel_length}', gx.TextCfg{
 							color: gx.Color{255, 255, 255, u8(hitobject.slider_renderer_fade.value * 255.0)}
 							align: .center
 						})
 						beatmap.ctx.draw_text(int(local_position.x), int(local_position.y) + 16,
-							'Curve length: ${hitobject.curve.length} | Curve lines: ${hitobject.curve.lines.len}',
-							gx.TextCfg{
+							'Curve length: ${hitobject.curve.length} | Curve lines: ${hitobject.curve.lines.len}', gx.TextCfg{
 							color: gx.Color{255, 255, 255, u8(hitobject.slider_renderer_fade.value * 255.0)}
 							align: .center
 						})
