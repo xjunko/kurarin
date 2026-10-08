@@ -1,5 +1,5 @@
-CC        = clang
-VCC       = v
+CC        = gcc
+VCC       = thirdparty/v/v
 VCC_FLAGS = -enable-globals -cc $(CC)
 OUT      = kurarin
 
@@ -7,46 +7,40 @@ ROOT   = .
 ASSETS = assets
 SHADER_LVL = glsl410
 
-all: $(OUT) 
+.PHONY: default
+default:
+	@echo "available targets: "
+	@echo "    - debug            // build debug version"
+	@echo "    - prod             // build production version"
+	@echo "    - clean            // remove build artifacts"
+	@echo "    - clean-bootstrap  // remove bootstrap artifacts"
+	@echo "    - format           // format source code"
+	@echo "    - run              // run the built executable"
+	@echo "    - all              // build everything (bootstrap + debug)"
 
-$(ASSETS)/osu/shaders/slider.h:
+$(VCC):
+	$(MAKE) -C thirdparty
+
+$(ASSETS)/osu/shaders/slider.h: $(VCC)
 	$(VCC) shader $(ASSETS)/osu/shaders/ -l $(SHADER_LVL)
 
-$(OUT): clean format $(ASSETS)/osu/shaders/slider.h
+$(OUT): $(VCC) clean format $(ASSETS)/osu/shaders/slider.h
 	$(VCC) $(VCC_FLAGS) -o $(OUT) $(ROOT)
 
-debug: clean format $(ASSETS)/osu/shaders/slider.h
+debug: $(VCC) clean format $(ASSETS)/osu/shaders/slider.h
 	$(VCC) $(VCC_FLAGS) -cg -g -d trace_sokol_memory -o $(OUT) $(ROOT)
 
-prod: clean format $(ASSETS)/osu/shaders/slider.h
+prod: $(VCC) clean format $(ASSETS)/osu/shaders/slider.h
 	$(VCC) $(VCC_FLAGS) -prod -o $(OUT) $(ROOT)
 
-release: $(OUT)
-	wget https://hatsune-miku.has.rocks/r/hikari.zip 
-	mkdir assets/osu/maps/hikari -p
-	unzip hikari.zip -d assets/osu/maps/hikari 
-
-	mkdir build -p
-	mkdir build/assets -p
-	mkdir build/assets/osu -p
-	mkdir build/assets/osu/maps/hikari -p
-
-	cp kurarin build/ -r
-	cp assets/common build/assets/ -r
-	cp assets/osu/shaders build/assets/osu/shaders -r
-	cp assets/osu/skins build/assets/osu/skins -r
-	cp assets/osu/maps/hikari build/assets/osu/maps -r
-
-	cd build
-	zip -r ../linux_x64.zip .
-	cd ..
-	rm -rf build/
-
-clean: $(OUT)
+clean:
 	rm -f $(OUT) $(ASSETS)/osu/shaders/*.h
 
+clean-bootstrap:
+	$(MAKE) -C thirdparty clean
+
 format:
-	$(VCC) fmt -w $(ROOT)
+	$(VCC) fmt -w $(ROOT)/src
 
 run: $(OUT)
 	./$(OUT)
